@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unique Items Showcase — MGK Prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #0d0a06;
+      --bg-panel: #1a1008;
+      --bg-card: #231508;
+      --bg-card-hover: #2d1c0a;
+      --border-gold: #8a6530;
+      --border-gold-bright: #c8a050;
+      --text-primary: #f0e8d0;
+      --text-gold: #c8a050;
+      --text-muted: #8a7050;
+      --text-green: #4aaa60;
+      --text-red: #cc4444;
+      --rarity-common: #8a8a8a;
+      --rarity-superior: #5aaa5a;
+      --rarity-magic: #5a7acc;
+      --rarity-rare: #cc9a20;
+      --rarity-powerful: #cc6020;
+      --rarity-mythic: #aa40cc;
+      --rarity-unique: #0aacaa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      text-align: center;
+      padding: 32px 24px 16px;
+      border-bottom: 1px solid var(--border-gold);
+    }
+    .back-link {
+      display: inline-block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .back-link:hover { color: var(--text-gold); }
+    .site-header h1 {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 28px;
+      color: var(--text-gold);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .site-header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .badge-legend {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .badge-legend span {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 20px 24px;
+      border-bottom: 1px solid #2a1a08;
+    }
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      color: var(--text-muted);
+      padding: 7px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { color: var(--text-gold); border-color: var(--border-gold-bright); }
+    .filter-btn.active {
+      background: #2a1a08;
+      color: var(--text-gold);
+      border-color: var(--border-gold-bright);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .stats-bar span { color: var(--text-gold); font-weight: 600; }
+
+    /* Grid */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      padding: 20px 24px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Item card */
+    .item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+      position: relative;
+    }
+    .item-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-gold-bright);
+      box-shadow: 0 6px 20px rgba(200,160,80,0.15);
+    }
+    .item-card.hidden { display: none; }
+
+    /* Top color bar by rarity */
+    .rarity-bar {
+      height: 3px;
+      width: 100%;
+    }
+
+    /* Icon area */
+    .item-icon-wrap {
+      background: var(--bg-panel);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100px;
+      position: relative;
+    }
+    .item-icon-wrap img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .item-icon-placeholder {
+      font-size: 48px;
+      opacity: 0.6;
+    }
+    .rarity-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .priority-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #1a1008;
+      border: 1px solid var(--border-gold);
+      color: var(--text-muted);
+    }
+
+    /* Card body */
+    .item-body {
+      padding: 12px;
+    }
+    .item-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-gold);
+      margin-bottom: 2px;
+      line-height: 1.2;
+    }
+    .item-slot {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .item-affix {
+      font-size: 12px;
+      color: var(--text-primary);
+      font-style: italic;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      padding: 8px;
+      background: var(--bg-panel);
+      border-radius: 4px;
+      border-left: 2px solid var(--border-gold-bright);
+    }
+    .item-flavor {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+      line-height: 1.4;
+    }
+    .item-flavor::before { content: '"'; }
+    .item-flavor::after { content: '"'; }
+
+    /* Priority 2 placeholder icon */
+    .placeholder-icon {
+      width: 64px;
+      height: 64px;
+      opacity: 0.5;
+    }
+
+    /* Section divider */
+    .section-label {
+      grid-column: 1 / -1;
+      padding: 8px 0 4px;
+      font-family: Georgia, serif;
+      font-size: 16px;
+      color: var(--text-gold);
+      border-bottom: 1px solid var(--border-gold);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--border-gold), transparent);
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="../" class="back-link">← Back to Prototypes</a>
+  <h1>✦ Unique Items ✦</h1>
+  <p>All implemented unique items — Priority 1 &amp; Priority 2 batches</p>
+  <div class="badge-legend">
+    <span style="background:#2a2a2a;color:#8a8a8a;">Common</span>
+    <span style="background:#1a3a1a;color:#5aaa5a;">Superior</span>
+    <span style="background:#1a2a4a;color:#5a7acc;">Magic</span>
+    <span style="background:#3a2a05;color:#cc9a20;">Rare</span>
+    <span style="background:#3a1a05;color:#cc6020;">Powerful</span>
+    <span style="background:#2a0a3a;color:#aa40cc;">Mythic</span>
+    <span style="background:#0a2a2a;color:#0aacaa;">Unique</span>
+  </div>
+</header>
+
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">All Items (21)</button>
+  <button class="filter-btn" data-filter="p1">Priority 1 (10)</button>
+  <button class="filter-btn" data-filter="p2">Priority 2 (11)</button>
+  <button class="filter-btn" data-filter="weapon">Weapons</button>
+  <button class="filter-btn" data-filter="armor">Armor</button>
+  <button class="filter-btn" data-filter="accessory">Accessories</button>
+</div>
+
+<div class="stats-bar">
+  Showing <span id="visible-count">21</span> of <span>21</span> unique items
+</div>
+
+<div class="items-grid" id="items-grid">
+
+  <!-- PRIORITY 1 -->
+  <div class="section-label" data-section="p1">📜 Priority 1 — Implemented</div>
+
+  <div class="item-card" data-priority="p1" data-category="armor">
+    <div class="rarity-bar" style="background:#cc6020;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/oLeEfwxAeCAzppqheghNbb0D7xWcxAP5AajfTyftN15e4vwJLA/out-0.webp" alt="Executioner's Decree" />
+      <span class="rarity-badge" style="background:#3a1a05;color:#cc6020;">Rare</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Executioner's Decree</div>
+      <div class="item-slot">Hands · Heavy Gloves</div>
+      <div class="item-affix">Any damage you deal against a target with 15% or less health will kill them instantly.</div>
+      <div class="item-flavor">Off with their heads.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="weapon">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/Nerdazs02TTHZCdoZ1h47vGdJS7JsvrU3ORyDFOT16V6vwJLA/out-0.webp" alt="Exalted Miner" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Exalted Miner</div>
+      <div class="item-slot">Weapon · Axe</div>
+      <div class="item-affix">Your quantity of mined materials is doubled.</div>
+      <div class="item-flavor">Dig and dig and diggety dig.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="weapon">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/QnByHhMXUjrqOdDu5sBzneJdPWcshlL9lksmjn5eVqn3fCnsA/out-0.webp" alt="Exalted Lumberjack" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Exalted Lumberjack</div>
+      <div class="item-slot">Weapon · Axe</div>
+      <div class="item-affix">Your quantity of chopped materials is doubled.</div>
+      <div class="item-flavor">No machine dare challenge you.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="weapon">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/jwz81WkLxyLoIRbH4FdYHFVSMhIpj0Xc0VYrAqMpArmevwJLA/out-0.webp" alt="Exalted Herbalist" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Exalted Herbalist</div>
+      <div class="item-slot">Weapon · Dagger</div>
+      <div class="item-affix">Your quantity of picked materials is doubled.</div>
+      <div class="item-flavor">A bouquet worthy of the Kingdom.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="accessory">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/jYeKayIWchzuVS62Ct6vEwf2iRXHegN8KrcRyYGbtD76fFOZB/out-0.webp" alt="Perfect Chum" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Perfect Chum</div>
+      <div class="item-slot">Offhand</div>
+      <div class="item-affix">Increases your fishing speed by 100%.</div>
+      <div class="item-flavor">It's chopped up fish, shrimp, and something else. You're not sure what, but it works.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="armor">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/otRP6wofmwXwZqHDKpxEK48uoUFhIs8CRZZ8SGwlIUMAwwJLA/out-0.webp" alt="Earthstompers" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Earthstompers</div>
+      <div class="item-slot">Lower · Heavy Boots</div>
+      <div class="item-affix">Whenever you hit an enemy with your basic attack, their attack speed is slowed by 15–30% for 3 seconds.</div>
+      <div class="item-flavor">You're tracking mud everywhere.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="accessory">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/sfj3wDmhxgSCf0fnfWmjTiLxwqEWdYvkY5EjhUAK0MpPAGOZB/out-0.webp" alt="Lunar Cycle" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Lunar Cycle</div>
+      <div class="item-slot">Accessory · Ring</div>
+      <div class="item-affix">During the night, your gold find is increased by 80–100%.</div>
+      <div class="item-flavor">Especially in darkness, a hero must find the light.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="accessory">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/mPI9CYmovsb1JJnr3jXTvTwItKR6oJiRAihSzqGn3DuBY4kF/out-0.webp" alt="Solar Cycle" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Solar Cycle</div>
+      <div class="item-slot">Accessory · Ring</div>
+      <div class="item-affix">During the day, your gold find is increased by 50–75%.</div>
+      <div class="item-flavor">A true hero must seek the light.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="weapon">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/RdVTdnz6AM7iK5du79uxeyCap52DzYgpuZDuDvVBAZjEwwJLA/out-0.webp" alt="The Templar's Rite" />
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">The Templar's Rite</div>
+      <div class="item-slot">Weapon · Sword</div>
+      <div class="item-affix">All of your attacks inflict burning on their target which deals 15–25% of your hit damage over 5 seconds.</div>
+      <div class="item-flavor">Burn with the fury of the Heavens.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p1" data-category="armor">
+    <div class="rarity-bar" style="background:#cc6020;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P1</span>
+      <img src="https://replicate.delivery/xezq/0fp8baaoH71kSy9zTTxiIFc57FvZoHCnUsbxwQsCbIUGwwJLA/out-0.webp" alt="Speedrunners" />
+      <span class="rarity-badge" style="background:#3a1a05;color:#cc6020;">Powerful</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Speedrunners</div>
+      <div class="item-slot">Lower · Light Boots</div>
+      <div class="item-affix">Your magic find is increased by 400–500% in dungeons, but drops by 1–5% each second until reaching 0%.</div>
+      <div class="item-flavor">Good things come to those who go as fast as they possibly can.</div>
+    </div>
+  </div>
+
+  <!-- PRIORITY 2 -->
+  <div class="section-label" data-section="p2">⚔️ Priority 2 — Implemented</div>
+
+  <div class="item-card" data-priority="p2" data-category="armor">
+    <div class="rarity-bar" style="background:#0aacaa;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 4L8 16v20c0 13 10 22 24 24 14-2 24-11 24-24V16L32 4z" fill="#8a6530" stroke="#c8a050" stroke-width="1.5"/>
+        <path d="M32 12L14 22v14c0 9 7 15 18 17 11-2 18-8 18-17V22L32 12z" fill="#1a1008" stroke="#8a6530" stroke-width="1"/>
+        <text x="32" y="38" text-anchor="middle" fill="#c8a050" font-size="18" font-family="serif">✦</text>
+      </svg>
+      <span class="rarity-badge" style="background:#0a2a2a;color:#0aacaa;">Unique</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Blessed Bulwark</div>
+      <div class="item-slot">Offhand · Shield</div>
+      <div class="item-affix">Any time you reach 0 health, you are fully healed. May only occur once per wave.</div>
+      <div class="item-flavor">We know not who blessed this item with such power. Is the purpose to save or to devour?</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="weapon">
+    <div class="rarity-bar" style="background:#cc9a20;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="28" y="4" width="8" height="48" rx="2" fill="#8a6530" stroke="#c8a050" stroke-width="1"/>
+        <ellipse cx="32" cy="8" rx="6" ry="6" fill="#c8a050"/>
+        <rect x="16" y="30" width="32" height="6" rx="2" fill="#8a6530" stroke="#c8a050" stroke-width="1"/>
+      </svg>
+      <span class="rarity-badge" style="background:#3a2a05;color:#cc9a20;">Rare</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">The Righteous Hand</div>
+      <div class="item-slot">Weapon · Mace</div>
+      <div class="item-affix">The first hit with this weapon in each wave will stun the target for 5–10 seconds, and 3–6 nearby targets for 2.5–5 seconds. Bypasses immunities.</div>
+      <div class="item-flavor">Infinite thy vast domain, everlasting is thy reign.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="armor">
+    <div class="rarity-bar" style="background:#5a7acc;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 16 Q16 32 20 48 Q32 56 44 48 Q48 32 44 16 Q32 8 20 16z" fill="#1a2a4a" stroke="#5a7acc" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="6" fill="#5a7acc" opacity="0.5"/>
+        <path d="M26 26 L38 38 M38 26 L26 38" stroke="#c8a050" stroke-width="1.5"/>
+      </svg>
+      <span class="rarity-badge" style="background:#1a2a4a;color:#5a7acc;">Magic</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Phantom Dancer</div>
+      <div class="item-slot">Lower · Medium Boots</div>
+      <div class="item-affix">Your dodge chance increases by 5–15% every second, and resets to 0% when you dodge.</div>
+      <div class="item-flavor">Be the ghost.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="accessory">
+    <div class="rarity-bar" style="background:#0aacaa;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="32" rx="20" ry="8" fill="none" stroke="#0aacaa" stroke-width="2"/>
+        <ellipse cx="32" cy="32" rx="8" ry="20" fill="none" stroke="#0aacaa" stroke-width="2"/>
+        <circle cx="32" cy="32" r="4" fill="#0aacaa"/>
+      </svg>
+      <span class="rarity-badge" style="background:#0a2a2a;color:#0aacaa;">Unique</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Unleashed</div>
+      <div class="item-slot">Accessory · Amulet</div>
+      <div class="item-affix">Your Attack Power and Spell Power is increased by 0.75–1% for every 0.5–1% of health you are missing.</div>
+      <div class="item-flavor">Your suffering does not end with you.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="accessory">
+    <div class="rarity-bar" style="background:#0aacaa;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="18" fill="none" stroke="#0aacaa" stroke-width="2"/>
+        <circle cx="32" cy="32" r="10" fill="none" stroke="#8a6530" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="4" fill="#0aacaa"/>
+        <path d="M32 14 L32 18 M32 46 L32 50 M14 32 L18 32 M46 32 L50 32" stroke="#0aacaa" stroke-width="2"/>
+      </svg>
+      <span class="rarity-badge" style="background:#0a2a2a;color:#0aacaa;">Unique</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Unrestrained</div>
+      <div class="item-slot">Accessory · Ring</div>
+      <div class="item-affix">Your Haste and Cast Speed is increased by 0.75–1% for every 0.5–1% of mana you are missing.</div>
+      <div class="item-flavor">A strong mind exceeds the norm.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="weapon">
+    <div class="rarity-bar" style="background:#5a7acc;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 6 L38 26 L58 26 L42 38 L48 58 L32 46 L16 58 L22 38 L6 26 L26 26 Z" fill="#1a2a4a" stroke="#5a7acc" stroke-width="1.5"/>
+        <path d="M32 14 L36 24 L48 24 L38 32 L42 44 L32 37 L22 44 L26 32 L16 24 L28 24 Z" fill="#5a7acc" opacity="0.3"/>
+      </svg>
+      <span class="rarity-badge" style="background:#1a2a4a;color:#5a7acc;">Magic</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Ambition</div>
+      <div class="item-slot">Weapon · Sword</div>
+      <div class="item-affix">Every time you strike with this weapon, your offensive power increases or decreases by 30–60%, and your defensive power does the opposite.</div>
+      <div class="item-flavor">An insatiable drive to greatness leaves the fool's soul wanting.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="accessory">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="16" fill="none" stroke="#8a6530" stroke-width="2" stroke-dasharray="4 2"/>
+        <circle cx="32" cy="32" r="6" fill="#8a6530"/>
+        <path d="M20 20 L44 44 M44 20 L20 44" stroke="#c8a050" stroke-width="1.5" opacity="0.5"/>
+      </svg>
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Awry</div>
+      <div class="item-slot">Accessory · Ring</div>
+      <div class="item-affix">Your overall minimum damage is reduced by 20–40%, your overall maximum damage is increased by 20–40%.</div>
+      <div class="item-flavor">You feel odd wearing this ring.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="weapon">
+    <div class="rarity-bar" style="background:#5a7acc;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="4" width="4" height="44" rx="2" fill="#8a6530"/>
+        <circle cx="32" cy="52" rx="10" ry="6" fill="none" stroke="#5a7acc" stroke-width="2"/>
+        <circle cx="32" cy="52" r="4" fill="#5a7acc"/>
+        <path d="M24 20 Q32 12 40 20" stroke="#5a7acc" stroke-width="1.5" fill="none"/>
+      </svg>
+      <span class="rarity-badge" style="background:#1a2a4a;color:#5a7acc;">Magic</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Fury of the Earth</div>
+      <div class="item-slot">Weapon · Staff</div>
+      <div class="item-affix">All Magical damage converted to Physical.</div>
+      <div class="item-flavor">An ancient fury within you has unleashed.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="weapon">
+    <div class="rarity-bar" style="background:#5a7acc;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="28" width="24" height="8" rx="3" fill="#8a6530"/>
+        <rect x="28" y="4" width="8" height="56" rx="3" fill="#8a6530"/>
+        <ellipse cx="32" cy="8" rx="8" ry="5" fill="#5a7acc" opacity="0.7"/>
+        <path d="M22 32 Q12 20 22 12" stroke="#5a7acc" stroke-width="1.5" fill="none"/>
+        <path d="M42 32 Q52 20 42 12" stroke="#5a7acc" stroke-width="1.5" fill="none"/>
+      </svg>
+      <span class="rarity-badge" style="background:#1a2a4a;color:#5a7acc;">Magic</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Fury of the Sky</div>
+      <div class="item-slot">Weapon · 2H Mace</div>
+      <div class="item-affix">All Physical damage converted to Magical.</div>
+      <div class="item-flavor">Against your fury, all shall fall.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="armor">
+    <div class="rarity-bar" style="background:#8a8a8a;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 16 L12 48 Q12 56 32 60 Q52 56 52 48 L52 16 L32 8 Z" fill="#1a1008" stroke="#8a6530" stroke-width="1.5"/>
+        <circle cx="32" cy="34" r="10" fill="none" stroke="#5a7acc" stroke-width="1.5"/>
+        <path d="M32 24 L32 44 M22 34 L42 34" stroke="#5a7acc" stroke-width="1"/>
+      </svg>
+      <span class="rarity-badge" style="background:#2a2a2a;color:#aaa;">Common</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Inner Peace</div>
+      <div class="item-slot">Hands · Bracers</div>
+      <div class="item-affix">If you take a hit that deals more than 10–20% of your maximum health, gain 100% dodge chance for 4–8 seconds.</div>
+      <div class="item-flavor">In your darkest hour, a moment of respite.</div>
+    </div>
+  </div>
+
+  <div class="item-card" data-priority="p2" data-category="armor">
+    <div class="rarity-bar" style="background:#cc6020;"></div>
+    <div class="item-icon-wrap">
+      <span class="priority-badge">P2</span>
+      <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 20 L8 44 Q8 56 32 60 Q56 56 56 44 L56 20 L32 12 Z" fill="#1a1008" stroke="#cc6020" stroke-width="1.5"/>
+        <path d="M20 36 L44 36 M20 42 L44 42" stroke="#cc6020" stroke-width="2"/>
+        <circle cx="32" cy="28" r="6" fill="none" stroke="#c8a050" stroke-width="1.5"/>
+        <text x="32" y="33" text-anchor="middle" fill="#c8a050" font-size="10" font-family="serif">↩</text>
+      </svg>
+      <span class="rarity-badge" style="background:#3a1a05;color:#cc6020;">Powerful</span>
+    </div>
+    <div class="item-body">
+      <div class="item-name">Stonefaulds</div>
+      <div class="item-slot">Lower · Heavy Legs</div>
+      <div class="item-affix">All physical hits you suffer stack up. After 3–5 hits, your next hit will reflect all the stacked damage back at your target at 50–70% power.</div>
+      <div class="item-flavor">You dare strike me?</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.item-card');
+  const countEl = document.getElementById('visible-count');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+
+      let visible = 0;
+      cards.forEach(card => {
+        const show = filter === 'all'
+          || card.dataset.priority === filter
+          || card.dataset.category === filter;
+        card.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+
+      // Show/hide section labels
+      document.querySelectorAll('.section-label').forEach(label => {
+        const section = label.dataset.section;
+        if (!section) return;
+        const sectionCards = document.querySelectorAll(`.item-card[data-priority="${section}"]`);
+        const anyVisible = [...sectionCards].some(c => !c.classList.contains('hidden'));
+        label.style.display = (filter === 'all' || anyVisible) ? '' : 'none';
+      });
+
+      countEl.textContent = visible;
+    });
+  });
+</script>
+</body>
+</html>
