@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COA Issue Category — Qredible Mockup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #3B82F6; --blue-dark: #2563EB;
+      --green: #16A34A; --green-light: #22C55E;
+      --red: #DC2626; --red-light: #EF4444;
+      --orange: #D97706; --orange-light: #F59E0B;
+      --purple: #7C3AED;
+      --bg: #F8FAFC; --surface: #FFFFFF;
+      --border: #E2E8F0;
+      --text-primary: #0F172A; --text-secondary: #64748B; --text-muted: #94A3B8;
+      --header-bg: #1E3A5F;
+      --radius-card: 10px; --radius-sm: 6px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text-primary); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 13px; line-height: 1.5; }
+    .page-header { background: var(--header-bg); color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .page-header h1 { font-size: 15px; font-weight: 700; }
+    .page-header .sub { font-size: 11px; color: #90CAF9; margin-top: 2px; }
+    .breadcrumb { font-size: 11px; color: #90CAF9; margin-bottom: 4px; }
+    .nav-back { color: #90CAF9; text-decoration: none; font-size: 12px; }
+    .main { padding: 24px; display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1400px; }
+    .card { background: white; border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; }
+    .card-header { background: #F8FAFC; border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .card-header h3 { font-size: 13px; font-weight: 600; }
+
+    /* Table */
+    .toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .toolbar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; color: var(--text-primary); background: white; cursor: pointer; white-space: nowrap; }
+    .search { flex: 1; min-width: 180px; }
+    .search input { width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; outline: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: var(--header-bg); color: white; text-align: left; padding: 9px 12px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:hover td { background: #F8FAFC; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+    .b-compliant { background: #F0FDF4; color: #15803D; }
+    .b-expired { background: #FFFBEB; color: #B45309; }
+    .b-missing { background: #FEF2F2; color: #B91C1C; }
+    .b-validation { background: #F5F3FF; color: #6D28D9; }
+    .b-system-flag { background: #FFFBEB; color: #B45309; border: 1px solid #FCD34D; }
+    .dot-status { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .dot-green { background: var(--green-light); }
+    .dot-orange { background: var(--orange-light); }
+    .dot-red { background: var(--red-light); }
+    .dot-purple { background: var(--purple); }
+
+    /* Flag icon */
+    .flag-icon { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: var(--orange); font-weight: 600; cursor: pointer; }
+    .flag-icon:hover { color: var(--red); }
+
+    /* Issue category tooltip */
+    .issue-tooltip { position: relative; display: inline-block; }
+    .issue-tooltip .tooltip-body {
+      display: none; position: absolute; bottom: 100%; left: 0; margin-bottom: 6px;
+      background: #1E293B; color: white; padding: 8px 12px; border-radius: var(--radius-sm);
+      font-size: 11px; white-space: nowrap; z-index: 10; min-width: 200px;
+    }
+    .issue-tooltip:hover .tooltip-body { display: block; }
+
+    /* Menu mockup */
+    .context-menu { background: white; border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: 0 4px 16px rgba(0,0,0,0.12); padding: 4px 0; width: 220px; }
+    .menu-item { padding: 8px 14px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .menu-item:hover { background: #F8FAFC; }
+    .menu-item.danger { color: var(--red); }
+    .menu-item.flag { color: var(--orange-light); font-weight: 600; }
+    .menu-divider { border-top: 1px solid var(--border); margin: 4px 0; }
+
+    /* Flag issue modal */
+    .modal { background: white; border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: 0 8px 32px rgba(0,0,0,0.15); padding: 20px; width: 380px; }
+    .modal h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .modal .sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+    .form-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .form-select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; margin-bottom: 12px; }
+    .form-textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; height: 72px; resize: none; margin-bottom: 16px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn { padding: 7px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-primary); }
+
+    /* Spec panel */
+    .spec-panel { font-size: 12px; }
+    .spec-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .spec-section:last-child { border-bottom: none; }
+    .spec-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-secondary); margin-bottom: 6px; }
+    .spec-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .spec-key { color: var(--text-secondary); }
+    .spec-val { font-weight: 600; }
+    .br-item { display: flex; gap: 8px; margin-bottom: 8px; line-height: 1.5; }
+    .br-num { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; color: var(--blue); background: #EFF6FF; padding: 1px 5px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+    .ac-item { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; }
+    .ac-check { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+    .story-pts { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--blue-dark); }
+    .effort-tag { display: inline-flex; align-items: center; padding: 3px 8px; background: #FFFBEB; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; color: #B45309; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .mockup-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="index.html" class="nav-back">← Sprint Mockups</a> / Audit Improvement Initiative</div>
+    <h1>COA Issue Category — Validation Status System</h1>
+    <div class="sub">Q-Monitor / Product Compliance / BPO Review Workflow</div>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <span class="story-pts">🎯 5 pts</span>
+    <span class="effort-tag">Medium</span>
+  </div>
+</div>
+
+<div class="main">
+  <div>
+
+    <!-- Table with new validation issue status -->
+    <div class="mockup-label">MOCKUP A — COAs Tab · New "Validation Issue" status + system-flag indicator</div>
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="toolbar">
+        <div class="search"><input type="text" placeholder="Search COAs…" /></div>
+        <div class="toolbar-btn">🔽 Filters</div>
+        <div class="toolbar-btn">Compliance Issue ▾</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" /></th>
+            <th>COA File</th>
+            <th>Product</th>
+            <th>Lab</th>
+            <th>COA Status</th>
+            <th>Compliance Issue</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td style="font-family:'IBM Plex Mono',monospace; font-size:11px;">BLK-CBD-2500-D9.pdf</td>
+            <td>Black Bear CBD 2500mg Tincture</td>
+            <td>Badger Analytics</td>
+            <td><span class="badge b-compliant"><span class="dot-status dot-green"></span> Compliant</span></td>
+            <td>—</td>
+            <td>⋯</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td style="font-family:'IBM Plex Mono',monospace; font-size:11px;">UPLOAD-2024-11-doc.pdf</td>
+            <td>Unassigned</td>
+            <td>—</td>
+            <td>
+              <div class="issue-tooltip">
+                <span class="badge b-validation"><span class="dot-status dot-purple"></span> Validation Issue</span>
+                <div class="tooltip-body">Issue: Not a COA · Flagged by BPO team<br>Mar 22, 2026 · Sarah K.</div>
+              </div>
+            </td>
+            <td><span class="badge b-validation">Not a COA</span></td>
+            <td>⋯</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td style="font-family:'IBM Plex Mono',monospace; font-size:11px;">INVOICE-THC-2025.pdf</td>
+            <td>Delta-9 Sleep Gummies</td>
+            <td>—</td>
+            <td>
+              <span class="badge b-system-flag">⚑ System Flagged</span>
+            </td>
+            <td><span style="font-size:10px; color:var(--orange); font-weight:600;">Review needed — suspicious pattern detected</span></td>
+            <td>⋯</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td style="font-family:'IBM Plex Mono',monospace; font-size:11px;">KRATOM-PARTIAL-LAB.pdf</td>
+            <td>Red Vein Kratom 60ct</td>
+            <td>KCA Labs</td>
+            <td>
+              <div class="issue-tooltip">
+                <span class="badge b-validation"><span class="dot-status dot-purple"></span> Validation Issue</span>
+                <div class="tooltip-body">Issue: Insufficient Data · Flagged by BPO team<br>Missing alkaloid panel · Mar 21, 2026</div>
+              </div>
+            </td>
+            <td><span class="badge b-validation">Insufficient Data</span></td>
+            <td>⋯</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <!-- Three-dot menu -->
+      <div>
+        <div class="mockup-label">MOCKUP B — Three-dot menu with "Flag Issue" option</div>
+        <div class="context-menu">
+          <div class="menu-item">👁 View Details</div>
+          <div class="menu-item">🔗 Assign to Product</div>
+          <div class="menu-item">📤 Export COA</div>
+          <div class="menu-divider"></div>
+          <div class="menu-item flag">⚑ Flag Issue…</div>
+          <div class="menu-item">📦 Archive</div>
+          <div class="menu-divider"></div>
+          <div class="menu-item danger">🗑 Delete</div>
+        </div>
+      </div>
+
+      <!-- Flag Issue modal -->
+      <div>
+        <div class="mockup-label">MOCKUP C — Flag Issue modal</div>
+        <div class="modal">
+          <h4>Flag Validation Issue</h4>
+          <div class="sub">INVOICE-THC-2025.pdf · Delta-9 Sleep Gummies</div>
+          <label class="form-label">Issue Category *</label>
+          <select class="form-select">
+            <option>Not a COA</option>
+            <option>Out-of-Scope Document</option>
+            <option selected>Insufficient Data</option>
+            <option>Suspicious COA</option>
+            <option>Lab Error</option>
+            <option>Duplicate</option>
+            <option>Unreadable / Corrupted</option>
+          </select>
+          <label class="form-label">Notes (optional)</label>
+          <textarea class="form-textarea" placeholder="Add context for this flag…">Missing alkaloid panel required for kratom classification. Lab report only covers 3 of 12 required compounds.</textarea>
+          <div class="modal-actions">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Flag Issue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System flag resolve -->
+    <div class="mockup-label">MOCKUP D — System-flagged COA row requiring human action</div>
+    <div class="card" style="max-width:700px;">
+      <div style="padding: 12px 16px; background: #FFFBEB; border-bottom: 1px solid #FDE68A; display:flex; align-items:center; gap:10px;">
+        <span style="font-size:18px;">⚑</span>
+        <div>
+          <div style="font-size:12px; font-weight:600; color:#92400E;">System-detected concern on INVOICE-THC-2025.pdf</div>
+          <div style="font-size:11px; color:#B45309;">Document structure does not match expected COA format. Please review and confirm or dismiss this flag.</div>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:8px;">
+          <button class="btn btn-secondary" style="font-size:11px; padding:5px 10px;">Dismiss</button>
+          <button class="btn" style="background:#D97706; color:white; font-size:11px; padding:5px 10px;">Confirm Issue…</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Spec panel -->
+  <div>
+    <div class="card spec-panel">
+      <div class="card-header">
+        <h3>Ticket Specification</h3>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-secondary);">QP-XXXX</span>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Metadata</div>
+        <div class="spec-row"><span class="spec-key">Initiative</span><span class="spec-val">Audit Improvement</span></div>
+        <div class="spec-row"><span class="spec-key">Story Points</span><span class="spec-val story-pts">🎯 5</span></div>
+        <div class="spec-row"><span class="spec-key">Effort</span><span class="spec-val effort-tag">Medium</span></div>
+        <div class="spec-row"><span class="spec-key">Label</span><span class="spec-val"><span class="badge" style="background:#F5F3FF;color:#6D28D9;">PRODUCT COMPLIAN…</span></span></div>
+        <div class="spec-row"><span class="spec-key">Related</span><span class="spec-val" style="font-size:11px;">QP-3528 (issue tooltip)</span></div>
+      </div>
+
+      <div class="spec-section">
+        <div class="spec-label">Problem</div>
+        <p style="color:var(--text-secondary); line-height:1.6;">BPO team has no structured way to categorize invalid COAs. All invalid COAs look the same — no differentiation between "not a COA at all" vs "insufficient data" vs "suspicious." No distinction between system-detected flags and human-confirmed issues.</p>
+      </div>
+
+      <div class="spec-section">
+        <div class="spec-label">Issue Category Values (BR-1)</div>
+        <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
+          <span class="badge b-validation">Not a COA</span>
+          <span class="badge b-validation">Out-of-Scope</span>
+          <span class="badge b-validation">Insufficient Data</span>
+          <span class="badge b-validation">Suspicious COA</span>
+          <span class="badge b-validation">Lab Error</span>
+          <span class="badge b-validation">Duplicate</span>
+          <span class="badge b-validation">Unreadable</span>
+        </div>
+      </div>
+
+      <div class="spec-section">
+        <div class="spec-label">Business Rules</div>
+        <div class="br-item"><span class="br-num">BR-1</span><span>Issue Category values as listed above.</span></div>
+        <div class="br-item"><span class="br-num">BR-2</span><span>System-flagged (auto-detected) shows "System Flagged" badge + inline action bar. Human-confirmed shows "Validation Issue" badge + category.</span></div>
+        <div class="br-item"><span class="br-num">BR-3</span><span>COA with confirmed Issue Category receives new status "Validation Issue" — distinct from Violative, Expired, Missing, Compliant.</span></div>
+        <div class="br-item"><span class="br-num">BR-4</span><span>Issue Category selectable from three-dot actions menu ("Flag Issue") and from COA Details modal.</span></div>
+        <div class="br-item"><span class="br-num">BR-5</span><span>Issue Category visible as tooltip on COA Status badge showing reviewer + timestamp.</span></div>
+        <div class="br-item"><span class="br-num">BR-6</span><span>"Validation Issue" added to Compliance Issue filter dropdown.</span></div>
+      </div>
+
+      <div class="spec-section">
+        <div class="spec-label">Acceptance Criteria</div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Issue Category field exists with all 7 values</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>"Validation Issue" COA status exists, distinct from all others</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>BPO can set Issue Category from three-dot menu and COA Details modal</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>COA Status badge tooltip shows category, reviewer, timestamp</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>System-flagged COAs show distinct "System Flagged" badge with Confirm/Dismiss actions</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>"Validation Issue" filterable in Compliance Issue filter</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Validation Issue COAs excluded from compliant counts</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

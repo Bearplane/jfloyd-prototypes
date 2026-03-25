@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tobacco/Vape Classifications — Qredible Mockup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--blue:#3B82F6;--blue-dark:#2563EB;--green:#16A34A;--red:#DC2626;--orange:#D97706;--purple:#7C3AED;--bg:#F8FAFC;--border:#E2E8F0;--text-primary:#0F172A;--text-secondary:#64748B;--text-muted:#94A3B8;--header-bg:#1E3A5F;--radius-card:10px;--radius-sm:6px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text-primary);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;line-height:1.5}
+    .page-header{background:var(--header-bg);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+    .page-header h1{font-size:15px;font-weight:700}
+    .page-header .sub{font-size:11px;color:#90CAF9;margin-top:2px}
+    .breadcrumb{font-size:11px;color:#90CAF9;margin-bottom:4px}
+    .nav-back{color:#90CAF9;text-decoration:none;font-size:12px}
+    .main{padding:24px;display:grid;grid-template-columns:1fr 380px;gap:24px;max-width:1400px}
+    .card{background:white;border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden;margin-bottom:24px}
+    .card-header{background:#F8FAFC;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+    .card-header h3{font-size:13px;font-weight:600}
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+    .b-never{background:#F0FDF4;color:#15803D}
+    .b-always{background:#FEF2F2;color:#B91C1C}
+    .b-conditional{background:#FFFBEB;color:#B45309}
+    .b-new{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+    .b-tobacco{background:#F5F0FF;color:#6D28D9}
+    .b-fda{background:#FFFBEB;color:#B45309}
+
+    /* Classification tree */
+    .tree{padding:12px 16px}
+    .tree-family{font-size:12px;font-weight:700;color:var(--text-primary);padding:8px 0 4px;display:flex;align-items:center;gap:6px}
+    .tree-item{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;margin-left:20px;border-left:2px solid var(--border);font-size:12px;cursor:pointer}
+    .tree-item:hover{background:#F8FAFC}
+    .tree-item.new-item{background:#F0F9FF;border-left-color:#3B82F6}
+    .tree-item.new-item:hover{background:#E0F2FE}
+    .tree-badges{display:flex;align-items:center;gap:6px}
+
+    /* Edit modal */
+    .modal{background:white;border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:0 8px 32px rgba(0,0,0,.15);padding:20px;width:400px}
+    .modal h4{font-size:14px;font-weight:700;margin-bottom:4px}
+    .modal .sub{font-size:12px;color:var(--text-secondary);margin-bottom:16px}
+    .form-label{font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:block}
+    .form-select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;margin-bottom:12px}
+    .form-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;margin-bottom:12px}
+    .keyword-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+    .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#F1F5F9;border:1px solid var(--border);border-radius:20px;font-size:11px}
+    .chip-new{background:#EFF6FF;border-color:#BFDBFE;color:var(--blue-dark)}
+    .chip .remove{color:var(--text-muted);cursor:pointer;font-size:10px}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+    .btn{padding:7px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:none}
+    .btn-primary{background:var(--blue);color:white}
+    .btn-secondary{background:white;border:1px solid var(--border);color:var(--text-primary)}
+
+    /* Compliance view badge */
+    .product-row{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:12px}
+    .product-row:last-child{border-bottom:none}
+
+    .spec-panel{font-size:12px}
+    .spec-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+    .spec-section:last-child{border-bottom:none}
+    .spec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-secondary);margin-bottom:6px}
+    .spec-row{display:flex;justify-content:space-between;margin-bottom:4px}
+    .spec-key{color:var(--text-secondary)}
+    .spec-val{font-weight:600}
+    .br-item{display:flex;gap:8px;margin-bottom:8px;line-height:1.5}
+    .br-num{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;color:var(--blue);background:#EFF6FF;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+    .ac-item{display:flex;gap:8px;margin-bottom:6px;align-items:flex-start}
+    .ac-check{color:var(--text-muted);font-size:13px;flex-shrink:0}
+    .story-pts{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:20px;font-size:12px;font-weight:700;color:var(--blue-dark)}
+    .effort-tag{display:inline-flex;align-items:center;padding:3px 8px;background:#F0FDF4;border-radius:var(--radius-sm);font-size:11px;font-weight:600;color:#15803D}
+    .mockup-label{font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px}
+
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{background:var(--header-bg);color:white;text-align:left;padding:9px 12px;font-size:11px;font-weight:600}
+    td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+  </style>
+</head>
+<body>
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="index.html" class="nav-back">← Sprint Mockups</a> / Product Classification Framework</div>
+    <h1>Add Tobacco/Vape Product Classifications</h1>
+    <div class="sub">Q-Audit / Q-Monitor / Product Classification — Westtown Unblock · Sprint 1</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="story-pts">🎯 3 pts</span>
+    <span class="effort-tag">Light</span>
+  </div>
+</div>
+<div class="main">
+  <div>
+
+    <!-- Classification tree with new entries -->
+    <div class="mockup-label">MOCKUP A — Q-Audit Product Classification Settings · New classifications highlighted</div>
+    <div class="card">
+      <div class="card-header"><h3>Product Classifications</h3><button style="padding:5px 12px;background:var(--blue);color:white;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">+ Add Classification</button></div>
+      <div class="tree">
+        <div class="tree-family">📦 Finished Product</div>
+
+        <div class="tree-item"><span>Tinctures</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
+        <div class="tree-item"><span>Edibles</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
+        <div class="tree-item"><span>Pre-Rolls</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
+        <div class="tree-item"><span>Beverages</span><div class="tree-badges"><span class="badge b-conditional">COA: Conditional</span></div></div>
+        <div class="tree-item"><span>Accessories</span><div class="tree-badges"><span class="badge b-never">COA: Never</span></div></div>
+        <div class="tree-item"><span>Apparel</span><div class="tree-badges"><span class="badge b-never">COA: Never</span></div></div>
+        <div class="tree-item"><span>Mushroom Products</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
+
+        <!-- NEW entries -->
+        <div class="tree-item new-item">
+          <span>Disposable Vape / ENDS Device <span class="badge b-new">NEW</span></span>
+          <div class="tree-badges">
+            <span class="badge b-never">COA: Never</span>
+            <span class="badge b-fda">⚑ FDA Check</span>
+          </div>
+        </div>
+        <div class="tree-item new-item">
+          <span>Vape Cartridge <span class="badge b-new">NEW</span></span>
+          <div class="tree-badges">
+            <span class="badge b-never">COA: Never</span>
+            <span class="badge b-fda">⚑ FDA Check</span>
+          </div>
+        </div>
+        <div class="tree-item new-item">
+          <span>E-Liquid / Vape Juice <span class="badge b-new">NEW</span></span>
+          <div class="tree-badges">
+            <span class="badge b-never">COA: Never</span>
+            <span class="badge b-fda">⚑ FDA Check</span>
+          </div>
+        </div>
+        <div class="tree-item new-item">
+          <span>Cigalike / Pod Mod <span class="badge b-new">NEW</span></span>
+          <div class="tree-badges">
+            <span class="badge b-never">COA: Never</span>
+            <span class="badge b-fda">⚑ FDA Check</span>
+          </div>
+        </div>
+        <div class="tree-item new-item">
+          <span>Traditional Tobacco <span class="badge b-new">NEW</span></span>
+          <div class="tree-badges">
+            <span class="badge b-never">COA: Never</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit classification detail panel -->
+    <div class="mockup-label">MOCKUP B — Classification detail · Disposable Vape / ENDS Device</div>
+    <div class="modal" style="margin-bottom:24px; max-width:500px;">
+      <h4>Edit Classification</h4>
+      <div class="sub">Disposable Vape / ENDS Device</div>
+      <label class="form-label">Product Family</label>
+      <select class="form-select"><option>Finished Product</option></select>
+      <label class="form-label">COA Required</label>
+      <select class="form-select"><option>Never</option></select>
+      <label class="form-label">Compliance Flag</label>
+      <select class="form-select"><option>Requires FDA ENDS Authorization Check</option></select>
+      <label class="form-label">Auto-Classification Keywords</label>
+      <div class="keyword-chips">
+        <span class="chip chip-new">disposable vape <span class="remove">✕</span></span>
+        <span class="chip chip-new">e-cigarette <span class="remove">✕</span></span>
+        <span class="chip chip-new">vape pen <span class="remove">✕</span></span>
+        <span class="chip chip-new">pod system <span class="remove">✕</span></span>
+        <span class="chip chip-new">ENDS <span class="remove">✕</span></span>
+        <span class="chip chip-new">puff bar <span class="remove">✕</span></span>
+        <span class="chip chip-new">elf bar <span class="remove">✕</span></span>
+        <span class="chip chip-new">lost mary <span class="remove">✕</span></span>
+        <span class="chip" style="border-style:dashed;cursor:pointer;color:var(--blue);">+ Add keyword</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Save</button>
+      </div>
+    </div>
+
+    <!-- Product compliance view showing the new classification + FDA flag -->
+    <div class="mockup-label">MOCKUP C — Product Compliance table showing auto-classified tobacco/vape products</div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Classification</th>
+            <th>COA Status</th>
+            <th>FDA Authorization</th>
+            <th>Compliance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Black Bear CBD 2500mg Tincture</td>
+            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">Tinctures</span></td>
+            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">✓ Compliant</span></td>
+            <td><span style="color:var(--text-muted);font-size:11px;">N/A</span></td>
+            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">Compliant</span></td>
+          </tr>
+          <tr>
+            <td>Elf Bar 600 Disposable Vape — Mango Ice</td>
+            <td><span class="badge b-tobacco">Disposable Vape / ENDS</span></td>
+            <td><span style="color:var(--text-muted);font-size:11px;">Not required</span></td>
+            <td><span class="badge" style="background:#FFFBEB;color:#B45309;">⚑ Pending check</span></td>
+            <td><span class="badge" style="background:#FFFBEB;color:#B45309;">Pending</span></td>
+          </tr>
+          <tr>
+            <td>Hyde Edge 3300 Puffs Disposable</td>
+            <td><span class="badge b-tobacco">Disposable Vape / ENDS</span></td>
+            <td><span style="color:var(--text-muted);font-size:11px;">Not required</span></td>
+            <td><span class="badge" style="background:#FEF2F2;color:#B91C1C;">✕ Not on FDA List</span></td>
+            <td><span class="badge" style="background:#FEF2F2;color:#B91C1C;">🚫 Prohibited</span></td>
+          </tr>
+          <tr>
+            <td>VUSE Alto Pod — Tobacco Flavor</td>
+            <td><span class="badge b-tobacco">Disposable Vape / ENDS</span></td>
+            <td><span style="color:var(--text-muted);font-size:11px;">Not required</span></td>
+            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">✓ FDA Authorized</span></td>
+            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">Compliant</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Spec -->
+  <div>
+    <div class="card spec-panel">
+      <div class="card-header">
+        <h3>Ticket Specification</h3>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-secondary);">QP-XXXX</span>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Metadata</div>
+        <div class="spec-row"><span class="spec-key">Initiative</span><span class="spec-val">Product Classification Framework</span></div>
+        <div class="spec-row"><span class="spec-key">Sprint</span><span class="spec-val">Sprint 1 — Westtown Unblock</span></div>
+        <div class="spec-row"><span class="spec-key">Story Points</span><span class="spec-val story-pts">🎯 3</span></div>
+        <div class="spec-row"><span class="spec-key">Effort</span><span class="spec-val effort-tag">Light</span></div>
+        <div class="spec-row"><span class="spec-key">Label</span><span class="spec-val"><span class="badge" style="background:#EFF6FF;color:#1D4ED8;">CORE</span></span></div>
+        <div class="spec-row"><span class="spec-key">Blocks</span><span class="spec-val" style="font-size:11px;">FDA ENDS ticket (depends on this)</span></div>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Problem</div>
+        <p style="color:var(--text-secondary);line-height:1.6;">No tobacco or vape product types exist in Qredible's classification system. Westtown is bringing tobacco/vape merchant clients. Without these classifications, Q-ScanAI cannot identify them and no compliance rules apply.</p>
+        <p style="color:var(--text-secondary);line-height:1.6;margin-top:8px;"><strong>Additive only</strong> — zero existing records modified.</p>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">New Classifications</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
+            <span>Disposable Vape / ENDS Device</span><span class="badge b-never">Never</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
+            <span>Vape Cartridge</span><span class="badge b-never">Never</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
+            <span>E-Liquid / Vape Juice</span><span class="badge b-never">Never</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
+            <span>Cigalike / Pod Mod</span><span class="badge b-never">Never</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;">
+            <span>Traditional Tobacco</span><span class="badge b-never">Never</span>
+          </div>
+        </div>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Business Rules</div>
+        <div class="br-item"><span class="br-num">BR-1</span><span>All new classifications added under existing Finished Product category. Zero existing records modified.</span></div>
+        <div class="br-item"><span class="br-num">BR-2</span><span>COA Required = Never for all five new classifications.</span></div>
+        <div class="br-item"><span class="br-num">BR-3</span><span>Auto-classification keywords wired per classification per keyword table in spec.</span></div>
+        <div class="br-item"><span class="br-num">BR-4</span><span>Auto-classification threshold: ≥70% confidence auto-classifies; below 70% queues for manual review.</span></div>
+        <div class="br-item"><span class="br-num">BR-5</span><span>Products in any vape/ENDS classification (not Traditional Tobacco) are tagged requires-fda-ends-check for the companion FDA ENDS ticket.</span></div>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Acceptance Criteria</div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>All 5 classifications exist under Finished Product with COA Required = Never</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>"Elf Bar 600 Disposable Vape" auto-classifies as Disposable Vape / ENDS Device at ≥70%</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>No COA Required flag applied to auto-classified tobacco/vape products</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>New classifications appear in Product Compliance filter and Edit Product modal</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Vape/ENDS products tagged requires-fda-ends-check</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Zero existing classification records modified</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

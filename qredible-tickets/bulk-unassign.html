@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bulk Unassign COAs — Qredible Mockup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --blue:#3B82F6;--blue-dark:#2563EB;--green:#16A34A;--red:#DC2626;--orange:#D97706;--bg:#F8FAFC;--surface:#fff;--border:#E2E8F0;--text-primary:#0F172A;--text-secondary:#64748B;--text-muted:#94A3B8;--header-bg:#1E3A5F;--radius-card:10px;--radius-sm:6px; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text-primary);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;line-height:1.5}
+    .page-header{background:var(--header-bg);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+    .page-header h1{font-size:15px;font-weight:700}
+    .page-header .sub{font-size:11px;color:#90CAF9;margin-top:2px}
+    .breadcrumb{font-size:11px;color:#90CAF9;margin-bottom:4px}
+    .nav-back{color:#90CAF9;text-decoration:none;font-size:12px}
+    .main{padding:24px;display:grid;grid-template-columns:1fr 360px;gap:24px;max-width:1300px}
+    .card{background:white;border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden;margin-bottom:24px}
+    .card-header{background:#F8FAFC;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+    .card-header h3{font-size:13px;font-weight:600}
+    .toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+    .toolbar-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:500;color:var(--text-primary);background:white;cursor:pointer;white-space:nowrap}
+    .search{flex:1;min-width:180px}
+    .search input{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;outline:none}
+    .bulk-bar{display:flex;align-items:center;gap:8px;padding:9px 16px;background:#EFF6FF;border-bottom:1px solid #BFDBFE}
+    .bulk-bar-count{font-size:12px;font-weight:600;color:var(--blue-dark)}
+    .bulk-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:none}
+    .bulk-btn-outline{background:white;border:1px solid var(--border);color:var(--text-primary)}
+    .bulk-btn-danger{background:#FEF2F2;border:1px solid #FECACA;color:var(--red)}
+    .bulk-btn-primary{background:var(--blue);color:white}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{background:var(--header-bg);color:white;text-align:left;padding:9px 12px;font-size:11px;font-weight:600;white-space:nowrap}
+    td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+    tr.selected td{background:#EFF6FF}
+    tr:hover td{background:#F8FAFC}
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+    .b-compliant{background:#F0FDF4;color:#15803D}
+    .b-expired{background:#FFFBEB;color:#B45309}
+    .b-unassigned{background:#F1F5F9;color:#475569}
+    .dot-status{width:7px;height:7px;border-radius:50%;display:inline-block}
+    .dot-green{background:#22C55E} .dot-orange{background:#F59E0B} .dot-gray{background:#CBD5E0}
+
+    /* Confirm modal */
+    .modal{background:white;border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:0 8px 32px rgba(0,0,0,.15);padding:20px;width:380px}
+    .modal h4{font-size:14px;font-weight:700;margin-bottom:4px}
+    .modal .sub{font-size:12px;color:var(--text-secondary);margin-bottom:16px}
+    .modal-product-list{background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:16px;font-size:11px;line-height:1.8;max-height:120px;overflow-y:auto}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end}
+    .btn{padding:7px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:none}
+    .btn-primary{background:var(--blue);color:white}
+    .btn-danger{background:var(--red);color:white}
+    .btn-secondary{background:white;border:1px solid var(--border);color:var(--text-primary)}
+
+    /* Assign modal */
+    .form-label{font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:block}
+    .form-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;margin-bottom:12px}
+    .product-result{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#F8FAFC;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+    .product-result:hover{background:#EFF6FF;border-color:#BFDBFE}
+
+    .spec-panel{font-size:12px}
+    .spec-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+    .spec-section:last-child{border-bottom:none}
+    .spec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-secondary);margin-bottom:6px}
+    .spec-row{display:flex;justify-content:space-between;margin-bottom:4px}
+    .spec-key{color:var(--text-secondary)}
+    .spec-val{font-weight:600}
+    .br-item{display:flex;gap:8px;margin-bottom:8px;line-height:1.5}
+    .br-num{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;color:var(--blue);background:#EFF6FF;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+    .ac-item{display:flex;gap:8px;margin-bottom:6px;align-items:flex-start}
+    .ac-check{color:var(--text-muted);font-size:13px;flex-shrink:0}
+    .story-pts{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:20px;font-size:12px;font-weight:700;color:var(--blue-dark)}
+    .effort-tag{display:inline-flex;align-items:center;padding:3px 8px;background:#F0FDF4;border-radius:var(--radius-sm);font-size:11px;font-weight:600;color:#15803D}
+    .mockup-label{font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+  </style>
+</head>
+<body>
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="index.html" class="nav-back">← Sprint Mockups</a> / Audit Improvement Initiative</div>
+    <h1>Bulk Unassign / Assign COAs — COAs Tab Bulk Actions</h1>
+    <div class="sub">Q-Monitor / Product Compliance / COA Management</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="story-pts">🎯 2 pts</span>
+    <span class="effort-tag">Light</span>
+  </div>
+</div>
+<div class="main">
+  <div>
+    <!-- With bulk bar active (3 selected) -->
+    <div class="mockup-label">MOCKUP A — COAs Tab with 3 rows selected, bulk action bar active</div>
+    <div class="card">
+      <div class="bulk-bar">
+        <span class="bulk-btn-primary bulk-btn">☑ 3 selected</span>
+        <button class="bulk-btn bulk-btn-primary">🔗 Assign to Product</button>
+        <button class="bulk-btn bulk-btn-danger">✂ Unassign</button>
+        <button class="bulk-btn bulk-btn-outline" style="margin-left:auto;">✕ Clear selection</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" checked/></th>
+            <th>COA File</th>
+            <th>Assigned Product</th>
+            <th>Lab</th>
+            <th>COA Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="selected">
+            <td><input type="checkbox" checked/></td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;">UPLOAD-001.pdf</td>
+            <td><span class="badge b-unassigned">Unassigned</span></td>
+            <td>—</td>
+            <td><span class="badge b-unassigned"><span class="dot-status dot-gray"></span> Unassigned</span></td>
+            <td>⋯</td>
+          </tr>
+          <tr class="selected">
+            <td><input type="checkbox" checked/></td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;">UPLOAD-002.pdf</td>
+            <td><span class="badge b-unassigned">Unassigned</span></td>
+            <td>—</td>
+            <td><span class="badge b-unassigned"><span class="dot-status dot-gray"></span> Unassigned</span></td>
+            <td>⋯</td>
+          </tr>
+          <tr class="selected">
+            <td><input type="checkbox" checked/></td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;">BLK-GUMMY-500MG.pdf</td>
+            <td>Black Bear CBD Gummies 500mg</td>
+            <td>Badger Analytics</td>
+            <td><span class="badge b-compliant"><span class="dot-status dot-green"></span> Compliant</span></td>
+            <td>⋯</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;">BLK-TINCTURE-1000.pdf</td>
+            <td>Black Bear CBD Tincture 1000mg</td>
+            <td>Badger Analytics</td>
+            <td><span class="badge b-compliant"><span class="dot-status dot-green"></span> Compliant</span></td>
+            <td>⋯</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;">WW-DELTA9-OLD.pdf</td>
+            <td>Delta-9 Sleep Gummies 25mg</td>
+            <td>SC Labs</td>
+            <td><span class="badge b-expired"><span class="dot-status dot-orange"></span> Expired</span></td>
+            <td>⋯</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <!-- Unassign confirm -->
+      <div>
+        <div class="mockup-label">MOCKUP B — Confirm Unassign (1 assigned COA selected)</div>
+        <div class="modal">
+          <h4>Unassign COA</h4>
+          <div class="sub">This will remove the product association from 1 COA.</div>
+          <div class="modal-product-list">
+            📄 BLK-GUMMY-500MG.pdf → <strong>Black Bear CBD Gummies 500mg</strong>
+          </div>
+          <p style="font-size:11px;color:var(--text-secondary);margin-bottom:16px;">The COA will remain in the system as unassigned. This action is logged.</p>
+          <div class="modal-actions">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-danger">Unassign</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assign to product modal -->
+      <div>
+        <div class="mockup-label">MOCKUP C — Assign to Product modal (2 unassigned selected)</div>
+        <div class="modal">
+          <h4>Assign to Product</h4>
+          <div class="sub">Assign 2 COAs to a product.</div>
+          <label class="form-label">Search for product *</label>
+          <input class="form-input" type="text" placeholder="Search by product name or SKU…" value="Black Bear" />
+          <div style="margin-bottom:12px;display:flex;flex-direction:column;gap:4px;">
+            <div class="product-result">
+              <span>Black Bear CBD Gummies 500mg</span>
+              <span class="badge b-compliant" style="font-size:10px;">Has COA</span>
+            </div>
+            <div class="product-result" style="background:#EFF6FF;border-color:#BFDBFE;">
+              <span><strong>Black Bear CBD Tincture 1500mg</strong></span>
+              <span class="badge b-unassigned" style="font-size:10px;">No COA</span>
+            </div>
+            <div class="product-result">
+              <span>Black Bear Sleep Gummies 25mg</span>
+              <span class="badge b-expired" style="font-size:10px;">Expired</span>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Assign</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Spec panel -->
+  <div>
+    <div class="card spec-panel">
+      <div class="card-header">
+        <h3>Ticket Specification</h3>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-secondary);">QP-XXXX</span>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Metadata</div>
+        <div class="spec-row"><span class="spec-key">Initiative</span><span class="spec-val">Audit Improvement</span></div>
+        <div class="spec-row"><span class="spec-key">Story Points</span><span class="spec-val story-pts">🎯 2</span></div>
+        <div class="spec-row"><span class="spec-key">Effort</span><span class="spec-val effort-tag">Light</span></div>
+        <div class="spec-row"><span class="spec-key">Label</span><span class="spec-val"><span class="badge" style="background:#F5F3FF;color:#6D28D9;">PRODUCT COMPLIAN…</span></span></div>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Problem</div>
+        <p style="color:var(--text-secondary);line-height:1.6;">Bulk Unassign and Assign actions exist on the Products tab but not the COAs tab. Reviewers working COA-first cannot bulk-unassign without switching tabs, breaking their workflow.</p>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Business Rules</div>
+        <div class="br-item"><span class="br-num">BR-1</span><span>Unassign removes product association from selected COAs. Selection must include at least one assigned COA.</span></div>
+        <div class="br-item"><span class="br-num">BR-2</span><span>Assign opens product selector. Selection must include at least one unassigned COA.</span></div>
+        <div class="br-item"><span class="br-num">BR-3</span><span>Both actions available in bulk action bar on checkbox selection.</span></div>
+        <div class="br-item"><span class="br-num">BR-4</span><span>Both actions logged in COA audit history with user and timestamp.</span></div>
+        <div class="br-item"><span class="br-num">BR-5</span><span>Mixed selection (assigned + unassigned) — both buttons shown; each applies only to the COAs where the action is valid.</span></div>
+      </div>
+      <div class="spec-section">
+        <div class="spec-label">Acceptance Criteria</div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>COA rows in COAs tab selectable via checkbox</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Bulk action bar appears on any checkbox selection</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Unassign removes product association from all selected assigned COAs with confirmation</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Assign opens product selector, assigns all selected unassigned COAs to chosen product</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Both actions logged in COA audit history</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Table refreshes with correct updated state after action</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span>Mixed selection handled per BR-5</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
