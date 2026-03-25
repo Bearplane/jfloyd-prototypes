@@ -1,293 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Qredible Prototypes</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    @font-face { font-family: 'Uber Move'; src: local('Uber Move'), local('UberMove'); font-weight: 300 700; }
     :root {
-      --blue: #3B82F6;
-      --blue-dark: #2563EB;
-      --blue-light: #EFF6FF;
-      --teal: #0D9488;
-      --bg: #F8FAFC;
-      --surface: #FFFFFF;
-      --border: #E2E8F0;
-      --text-primary: #0F172A;
-      --text-secondary: #475569;
-      --text-muted: #94A3B8;
-      --header-bg: #1E3A5F;
-      --radius-card: 10px;
-      --radius-sm: 6px;
+      --font-ui: 'Uber Move', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --black: #1A202E; --subtitle: #657496; --grey-light: #EBEDF2; --border: #EBEDF2;
+      --bg: #F8FBFD; --surface: #FFFFFF; --header-bg: #1E3A5F;
+      --action-blue: #2563eb; --link: #376fd0;
+      --status-success-bg: rgba(0,213,129,.15); --status-validated: #2E7D32;
+      --status-warn-bg: rgba(237,108,2,.15); --status-pending: #ED6C02;
+      --status-info-bg: rgba(80,168,255,.15); --status-missing: #D32F2F;
+      --radius-card: 6px; --radius-btn: 5px;
+      --shadow-subtle: 0px 1px 2px 0px rgba(0,0,0,0.05);
+      --shadow-hover: 0 4px 16px rgba(0,0,0,0.1);
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      min-height: 100vh;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--black); font-family: var(--font-ui); font-size: 13px; font-weight: 400; line-height: 1.5; min-height: 100vh; }
 
     .page-header {
       background: var(--header-bg);
       color: white;
-      padding: 24px 40px;
+      padding: 20px 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
     }
-
-    .header-left { display: flex; align-items: center; gap: 16px; }
-
+    .header-left { display: flex; align-items: center; gap: 14px; }
     .header-logo {
-      width: 36px;
-      height: 36px;
-      background: var(--blue);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 700;
-      color: white;
-      flex-shrink: 0;
+      width: 34px; height: 34px;
+      background: var(--action-blue);
+      border-radius: var(--radius-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: white; flex-shrink: 0;
     }
-
-    .header-title h1 { font-size: 20px; font-weight: 700; }
-    .header-title .sub { font-size: 12px; color: #90CAF9; margin-top: 2px; }
-
-    .header-back a {
-      font-size: 12px;
-      color: #90CAF9;
-      text-decoration: none;
-      letter-spacing: 0.04em;
-      transition: color 0.2s;
-    }
+    .header-title h1 { font-size: 16px; font-weight: 600; }
+    .header-title .sub { font-size: 11px; color: #90CAF9; margin-top: 2px; font-weight: 300; }
+    .header-back a { font-size: 11px; color: #90CAF9; text-decoration: none; font-weight: 300; }
     .header-back a:hover { color: white; }
 
-    .page-body {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 48px 24px 80px;
-    }
+    .page-body { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
 
-    .section-header {
-      margin-bottom: 32px;
-    }
-
-    .section-header h2 {
-      font-size: 22px;
+    .section-label {
+      font-size: 10px;
       font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--subtitle);
+      margin-bottom: 14px;
+      margin-top: 32px;
     }
+    .section-label:first-child { margin-top: 0; }
 
-    .section-header p {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
 
     .proto-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-card);
-      padding: 24px;
+      padding: 18px 20px;
       text-decoration: none;
-      color: inherit;
+      color: var(--black);
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      gap: 10px;
+      box-shadow: var(--shadow-subtle);
+      transition: box-shadow .15s, border-color .15s, transform .12s;
     }
-
     .proto-card:hover {
-      border-color: var(--blue);
-      box-shadow: 0 4px 16px rgba(59,130,246,0.12), 0 1px 4px rgba(0,0,0,0.08);
+      border-color: #b1b9ca;
+      box-shadow: var(--shadow-hover);
       transform: translateY(-2px);
     }
 
-    .card-icon-wrap {
-      width: 44px;
-      height: 44px;
-      background: var(--blue-light);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
+    .card-icon {
+      width: 36px; height: 36px;
+      background: var(--status-info-bg);
+      border-radius: var(--radius-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
     }
+    .card-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+    .card-desc { font-size: 12px; color: var(--subtitle); font-weight: 300; line-height: 1.6; flex: 1; }
 
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
+    .card-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 4px; }
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-card);
+      font-size: 10px; font-weight: 700;
     }
+    .pill-ready   { background: var(--status-success-bg); color: var(--status-validated); }
+    .pill-review  { background: var(--status-info-bg); color: var(--action-blue); }
+    .pill-critical { background: rgba(211,47,47,.12); color: var(--status-missing); }
 
-    .card-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1.3;
-    }
+    .card-cta { font-size: 11px; font-weight: 600; color: var(--link); margin-top: 2px; }
+    .proto-card:hover .card-cta { color: var(--action-blue); }
 
-    .status-badge {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      padding: 3px 8px;
-      border-radius: 99px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; font-size: 11px; color: var(--subtitle); font-weight: 300; }
 
-    .badge-review {
-      background: #EFF6FF;
-      color: var(--blue-dark);
-      border: 1px solid #BFDBFE;
-    }
-
-    .badge-wip {
-      background: #FFF7ED;
-      color: #C2410C;
-      border: 1px solid #FED7AA;
-    }
-
-    .card-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      flex: 1;
-    }
-
-    .card-cta {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--blue);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: auto;
-    }
-
-    .proto-card:hover .card-cta { color: var(--blue-dark); }
-
-    .site-footer {
-      margin-top: 64px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .page-body { animation: fadeInUp 0.4s ease both; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .page-body { animation: fadeInUp .35s ease both; }
   </style>
 </head>
 <body>
-  <header class="page-header">
-    <div class="header-left">
-      <div class="header-logo">Q</div>
-      <div class="header-title">
-        <h1>Qredible Prototypes</h1>
-        <div class="sub">UI/UX Mockups &amp; Design References</div>
-      </div>
+
+<header class="page-header">
+  <div class="header-left">
+    <div class="header-logo">Q</div>
+    <div class="header-title">
+      <h1>Qredible Prototypes</h1>
+      <div class="sub">UI/UX Mockups &amp; Design References · Product Classification Framework + Audit Improvement</div>
     </div>
-    <div class="header-back">
-      <a href="../">← All Prototypes</a>
-    </div>
-  </header>
-
-  <div class="page-body">
-    <div class="section-header">
-      <h2>Sprint Mockups</h2>
-      <p>Interactive wireframes and design proposals. Click a card to explore.</p>
-    </div>
-
-    <div class="card-grid">
-
-      <a href="qredible-tickets/" class="proto-card">
-        <div class="card-icon-wrap">🗂️</div>
-        <div class="card-header">
-          <div class="card-name">Sprint Mockups Index</div>
-          <span class="status-badge badge-review">Index</span>
-        </div>
-        <p class="card-desc">All sprint mockups in one place — compliance workflows, COA management, and product classification screens.</p>
-        <span class="card-cta">Browse all →</span>
-      </a>
-
-      <a href="qredible-tickets/bulk-unassign.html" class="proto-card">
-        <div class="card-icon-wrap">📋</div>
-        <div class="card-header">
-          <div class="card-name">Bulk Unassign COAs</div>
-          <span class="status-badge badge-review">Ready for review</span>
-        </div>
-        <p class="card-desc">Bulk action flow for unassigning COAs from products. Multi-select interface with confirmation and audit trail.</p>
-        <span class="card-cta">View mockup →</span>
-      </a>
-
-      <a href="qredible-tickets/coa-inactive.html" class="proto-card">
-        <div class="card-icon-wrap">⚠️</div>
-        <div class="card-header">
-          <div class="card-name">COA Inactive State</div>
-          <span class="status-badge badge-review">Ready for review</span>
-        </div>
-        <p class="card-desc">Design for the inactive/expired COA state — visual indicators, messaging, and remediation path for compliance managers.</p>
-        <span class="card-cta">View mockup →</span>
-      </a>
-
-      <a href="qredible-tickets/coa-issue-category.html" class="proto-card">
-        <div class="card-icon-wrap">🏷️</div>
-        <div class="card-header">
-          <div class="card-name">COA Issue Category</div>
-          <span class="status-badge badge-review">Ready for review</span>
-        </div>
-        <p class="card-desc">Issue categorization interface for flagged COAs — category taxonomy, severity levels, and workflow routing.</p>
-        <span class="card-cta">View mockup →</span>
-      </a>
-
-      <a href="qredible-tickets/fda-ends.html" class="proto-card">
-        <div class="card-icon-wrap">🏛️</div>
-        <div class="card-header">
-          <div class="card-name">FDA ENDS Authorization Check</div>
-          <span class="status-badge badge-wip">Design proposal</span>
-        </div>
-        <p class="card-desc">Compliance check flow for FDA Electronic Nicotine Delivery Systems (ENDS) authorization verification at the product level.</p>
-        <span class="card-cta">View mockup →</span>
-      </a>
-
-      <a href="qredible-tickets/tobacco-classification.html" class="proto-card">
-        <div class="card-icon-wrap">🌿</div>
-        <div class="card-header">
-          <div class="card-name">Tobacco/Vape Classifications</div>
-          <span class="status-badge badge-review">Ready for review</span>
-        </div>
-        <p class="card-desc">Product classification UI for tobacco and vaping categories — type taxonomy, regulatory flags, and compliance domain assignment.</p>
-        <span class="card-cta">View mockup →</span>
-      </a>
-
-    </div>
-
-    <footer class="site-footer">
-      <p>Qredible · Internal Prototypes · Bearplane, LLC</p>
-    </footer>
   </div>
+  <div class="header-back"><a href="../">← All Prototypes</a></div>
+</header>
+
+<div class="page-body">
+
+  <div class="section-label">Audit Improvement Initiative</div>
+  <div class="card-grid">
+
+    <a href="qredible-tickets/coa-issue-category.html" class="proto-card">
+      <div class="card-icon">🏷️</div>
+      <div class="card-name">COA Issue Category &amp; Validation Status</div>
+      <p class="card-desc">BPO review workflow — structured issue categorization, system-flag vs human-confirmed distinction, Validation Issue status rollup.</p>
+      <div class="card-pills"><span class="pill pill-ready">Medium · Mockup ready</span></div>
+      <span class="card-cta">View mockup →</span>
+    </a>
+
+  </div>
+
+  <div class="section-label">Product Classification Framework — Sprint 1 · Westtown Unblock</div>
+  <div class="card-grid">
+
+    <a href="qredible-tickets/tobacco-classification.html" class="proto-card">
+      <div class="card-icon">🌿</div>
+      <div class="card-name">Tobacco/Vape Classifications + Product Compliance Status</div>
+      <p class="card-desc">New classification tree (5 tobacco/vape types), keyword config, COA = Never, FDA ENDS check flag. Includes Product Compliance Status column design and hover tooltip.</p>
+      <div class="card-pills">
+        <span class="pill pill-ready">Light · Mockup ready</span>
+        <span class="pill pill-critical">FLEX Critical</span>
+      </div>
+      <span class="card-cta">View mockup →</span>
+    </a>
+
+  </div>
+
+  <div class="section-label">No Mockup Required — Spec Only</div>
+  <div class="card-grid">
+
+    <div class="proto-card" style="opacity:.6;cursor:default;">
+      <div class="card-icon" style="background:var(--grey-light);">📋</div>
+      <div class="card-name">Bulk Unassign / Assign COAs from COAs Tab</div>
+      <p class="card-desc">Behavior-only ticket. No visual mockup needed — standard bulk action pattern.</p>
+      <div class="card-pills"><span class="pill" style="background:var(--grey-light);color:var(--subtitle);">Light · No mockup</span></div>
+    </div>
+
+    <div class="proto-card" style="opacity:.6;cursor:default;">
+      <div class="card-icon" style="background:var(--grey-light);">🏛️</div>
+      <div class="card-name">FDA ENDS Authorization List &amp; Compliance Check</div>
+      <p class="card-desc">Data/backend ticket. Visual output covered by Tobacco/Vape mockup (Product Compliance Status column).</p>
+      <div class="card-pills"><span class="pill" style="background:var(--grey-light);color:var(--subtitle);">Medium · No mockup</span></div>
+    </div>
+
+    <div class="proto-card" style="opacity:.6;cursor:default;">
+      <div class="card-icon" style="background:var(--grey-light);">🗂️</div>
+      <div class="card-name">Product Classification L2 Restructure</div>
+      <p class="card-desc">Data migration ticket. No UI mockup needed — filter panel and edit modal changes are straightforward structural updates.</p>
+      <div class="card-pills"><span class="pill" style="background:var(--grey-light);color:var(--subtitle);">Heavy · No mockup</span></div>
+    </div>
+
+  </div>
+
+  <div class="section-label">Already Covered in Jira</div>
+  <div class="card-grid">
+
+    <div class="proto-card" style="opacity:.5;cursor:default;">
+      <div class="card-icon" style="background:var(--grey-light);">⚠️</div>
+      <div class="card-name">COA Inactive State</div>
+      <p class="card-desc">Exists as QP-3526 — already in Jira and in QP4 sprint. No prototype needed.</p>
+      <div class="card-pills"><span class="pill" style="background:var(--grey-light);color:var(--subtitle);">QP-3526 · In sprint</span></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>Qredible · Internal Prototypes · Bearplane, LLC</p>
+  </footer>
+
+</div>
 </body>
 </html>

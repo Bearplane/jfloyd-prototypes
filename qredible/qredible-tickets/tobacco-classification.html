@@ -4,78 +4,329 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tobacco/Vape Classifications — Qredible Mockup</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    :root{--blue:#3B82F6;--blue-dark:#2563EB;--green:#16A34A;--red:#DC2626;--orange:#D97706;--purple:#7C3AED;--bg:#F8FAFC;--border:#E2E8F0;--text-primary:#0F172A;--text-secondary:#64748B;--text-muted:#94A3B8;--header-bg:#1E3A5F;--radius-card:10px;--radius-sm:6px}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--bg);color:var(--text-primary);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;line-height:1.5}
-    .page-header{background:var(--header-bg);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
-    .page-header h1{font-size:15px;font-weight:700}
-    .page-header .sub{font-size:11px;color:#90CAF9;margin-top:2px}
-    .breadcrumb{font-size:11px;color:#90CAF9;margin-bottom:4px}
-    .nav-back{color:#90CAF9;text-decoration:none;font-size:12px}
-    .main{padding:24px;display:grid;grid-template-columns:1fr 380px;gap:24px;max-width:1400px}
-    .card{background:white;border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden;margin-bottom:24px}
-    .card-header{background:#F8FAFC;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
-    .card-header h3{font-size:13px;font-weight:600}
-    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
-    .b-never{background:#F0FDF4;color:#15803D}
-    .b-always{background:#FEF2F2;color:#B91C1C}
-    .b-conditional{background:#FFFBEB;color:#B45309}
-    .b-new{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
-    .b-tobacco{background:#F5F0FF;color:#6D28D9}
-    .b-fda{background:#FFFBEB;color:#B45309}
+    /* ── Uber Move font stack (mirrors RTQ-Admin-UI GlobalStyle.tsx) ─────── */
+    @font-face {
+      font-family: 'Uber Move';
+      src: local('Uber Move'), local('UberMove');
+      font-weight: 400 700;
+    }
+    /* Fallback chain matches codebase: system-ui → Segoe UI → Roboto */
+    :root {
+      --font-ui: 'Uber Move', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-    /* Classification tree */
-    .tree{padding:12px 16px}
-    .tree-family{font-size:12px;font-weight:700;color:var(--text-primary);padding:8px 0 4px;display:flex;align-items:center;gap:6px}
-    .tree-item{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;margin-left:20px;border-left:2px solid var(--border);font-size:12px;cursor:pointer}
-    .tree-item:hover{background:#F8FAFC}
-    .tree-item.new-item{background:#F0F9FF;border-left-color:#3B82F6}
-    .tree-item.new-item:hover{background:#E0F2FE}
-    .tree-badges{display:flex;align-items:center;gap:6px}
+      /* ── ColorEnum (constants.ts) ─────────────────────────────────────── */
+      --field-color:   #F8FBFD;
+      --black:         #1A202E;
+      --platinum:      #ebedf2;
+      --slate-grey:    #b1b9ca;
+      --red-error-bg:  #f1d1d3;
+      --red-error-txt: #d32f2f;
 
-    /* Edit modal */
-    .modal{background:white;border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:0 8px 32px rgba(0,0,0,.15);padding:20px;width:400px}
-    .modal h4{font-size:14px;font-weight:700;margin-bottom:4px}
-    .modal .sub{font-size:12px;color:var(--text-secondary);margin-bottom:16px}
-    .form-label{font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:block}
-    .form-select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;margin-bottom:12px}
-    .form-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;margin-bottom:12px}
-    .keyword-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
-    .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#F1F5F9;border:1px solid var(--border);border-radius:20px;font-size:11px}
-    .chip-new{background:#EFF6FF;border-color:#BFDBFE;color:var(--blue-dark)}
-    .chip .remove{color:var(--text-muted);cursor:pointer;font-size:10px}
-    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
-    .btn{padding:7px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:none}
-    .btn-primary{background:var(--blue);color:white}
-    .btn-secondary{background:white;border:1px solid var(--border);color:var(--text-primary)}
+      /* ── ColorQP (enum-constants.ts) ──────────────────────────────────── */
+      --green:         #00d581;
+      --red:           #ff404a;
+      --grey:          #A7B2C7;
+      --grey-light:    #EBEDF2;
+      --blue-light:    #50A8FF;
+      --link:          #376fd0;
+      --subtitle:      #657496;
 
-    /* Compliance view badge */
-    .product-row{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:12px}
-    .product-row:last-child{border-bottom:none}
+      /* ── Theme variants.ts — DEFAULT ──────────────────────────────────── */
+      --primary:       #376fd0;        /* theme primary */
+      --action-blue:   #2563eb;        /* newer screens (Q-Scan AI style) */
+      --sidebar-bg:    #233044;
+      --header-bg:     #1E3A5F;        /* table header per audit file */
 
-    .spec-panel{font-size:12px}
-    .spec-section{padding:14px 16px;border-bottom:1px solid var(--border)}
-    .spec-section:last-child{border-bottom:none}
-    .spec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-secondary);margin-bottom:6px}
-    .spec-row{display:flex;justify-content:space-between;margin-bottom:4px}
-    .spec-key{color:var(--text-secondary)}
-    .spec-val{font-weight:600}
-    .br-item{display:flex;gap:8px;margin-bottom:8px;line-height:1.5}
-    .br-num{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;color:var(--blue);background:#EFF6FF;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
-    .ac-item{display:flex;gap:8px;margin-bottom:6px;align-items:flex-start}
-    .ac-check{color:var(--text-muted);font-size:13px;flex-shrink:0}
-    .story-pts{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:20px;font-size:12px;font-weight:700;color:var(--blue-dark)}
-    .effort-tag{display:inline-flex;align-items:center;padding:3px 8px;background:#F0FDF4;border-radius:var(--radius-sm);font-size:11px;font-weight:600;color:#15803D}
-    .mockup-label{font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px}
+      /* ── Status colors (ProductDetailHelper.tsx) ─────────────────────── */
+      --status-validated:  #2E7D32;
+      --status-missing:    #D32F2F;
+      --status-processing: #0288D1;
+      --status-pending:    #ED6C02;
+      --status-success-bg: rgba(0,213,129,.15);
+      --status-error-bg:   rgba(255,64,74,.15);
+      --status-warn-bg:    rgba(237,108,2,.15);
+      --status-info-bg:    rgba(80,168,255,.15);
 
-    table{width:100%;border-collapse:collapse;font-size:12px}
-    th{background:var(--header-bg);color:white;text-align:left;padding:9px 12px;font-size:11px;font-weight:600}
-    td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+      /* ── Surfaces / borders ───────────────────────────────────────────── */
+      --bg:            #F8FBFD;        /* field_color used as page bg */
+      --surface:       #FFFFFF;
+      --border:        #EBEDF2;        /* platinum */
+      --border-dark:   #b1b9ca;        /* slate_grey */
+
+      /* ── MUI component overrides ──────────────────────────────────────── */
+      --radius-card:   6px;            /* MuiCard override */
+      --radius-chip:   6px;            /* MuiChip override */
+      --radius-btn:    5px;            /* ButtonComponent */
+      --shadow-card:   10px 10px 30px rgb(0 0 0 / 0.1);
+      --shadow-subtle: 0px 1px 2px 0px rgba(0,0,0,0.05);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--black);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* ── Page header (mimics Q-Monitor tab bar + title) ─────────────────── */
+    .page-header {
+      background: var(--header-bg);
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-header h1 { font-size: 15px; font-weight: 600; }
+    .page-header .sub { font-size: 11px; color: #90CAF9; margin-top: 2px; }
+    .breadcrumb { font-size: 11px; color: #90CAF9; margin-bottom: 4px; }
+    .nav-back { color: #90CAF9; text-decoration: none; font-size: 12px; }
+
+    .main {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      max-width: 1400px;
+    }
+
+    /* ── Card (MuiCard: 6px radius, CardControl shadow) ─────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-subtle);
+    }
+    .card-header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-header h3 { font-size: 13px; font-weight: 600; color: var(--black); }
+
+    /* ── Chip / Badge (MuiChip: 6px radius, badge-status.tsx pattern) ───── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-chip);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .b-never    { background: var(--status-success-bg); color: var(--status-validated); }
+    .b-always   { background: var(--status-error-bg);   color: var(--status-missing); }
+    .b-cond     { background: var(--status-warn-bg);    color: var(--status-pending); }
+    .b-new      { background: var(--status-info-bg);    color: var(--action-blue); border: 1px solid rgba(80,168,255,.4); }
+    .b-tobacco  { background: rgba(124,58,237,.12);     color: #6D28D9; }
+    .b-fda      { background: var(--status-warn-bg);    color: var(--status-pending); }
+    .b-fda-ok   { background: var(--status-success-bg); color: var(--status-validated); }
+    .b-fda-fail { background: var(--status-error-bg);   color: var(--status-missing); }
+
+    /* ── Classification tree ─────────────────────────────────────────────── */
+    .tree { padding: 10px 16px; }
+    .tree-family {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      color: var(--subtitle);
+      padding: 8px 0 4px;
+    }
+    .tree-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 12px;
+      margin-left: 16px;
+      border-left: 2px solid var(--border);
+      font-size: 12px;
+      font-weight: 300;
+      cursor: pointer;
+    }
+    .tree-item:hover { background: var(--bg); }
+    .tree-item.new-item {
+      background: rgba(80,168,255,.06);
+      border-left-color: var(--action-blue);
+      font-weight: 400;
+    }
+    .tree-item.new-item:hover { background: rgba(80,168,255,.12); }
+    .tree-badges { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Modal / dialog ──────────────────────────────────────────────────── */
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 20px;
+      max-width: 480px;
+      margin-bottom: 20px;
+    }
+    .modal h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; color: var(--black); }
+    .modal .sub-title { font-size: 12px; color: var(--subtitle); margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--subtitle);
+      margin-bottom: 5px;
+    }
+    .form-select, .form-input {
+      width: 100%;
+      height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-chip);
+      font-size: 12px;
+      font-family: var(--font-ui);
+      font-weight: 300;
+      color: var(--black);
+      background: var(--surface);
+      margin-bottom: 12px;
+    }
+    .keyword-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: var(--grey-light);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-chip);
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .chip-new { background: var(--status-info-bg); border-color: rgba(80,168,255,.4); color: var(--action-blue); }
+    .chip .remove { color: var(--grey); cursor: pointer; font-size: 10px; }
+    .chip-add { border-style: dashed; cursor: pointer; color: var(--link); background: var(--surface); }
+
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+    /* ── Buttons (ButtonComponent: 32px height, 5px radius, 12px/600) ───── */
+    .btn {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: var(--radius-btn);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-ui);
+      cursor: pointer;
+      border: none;
+      text-transform: none;
+    }
+    .btn-primary  { background: var(--black); color: white; box-shadow: drop-shadow(0 1px 2px rgba(0,0,0,.2)); }
+    .btn-primary:hover { background: #1F3569; }
+    .btn-action   { background: var(--action-blue); color: white; }
+    .btn-small    { height: 24px; padding: 0 10px; font-size: 11px; font-weight: 300; border-radius: var(--radius-chip); background: var(--action-blue); color: white; border: none; cursor: pointer; }
+    .btn-secondary { background: var(--surface); border: 1px solid var(--border-dark); color: var(--black); }
+
+    /* ── Table (q-monitor-pure-table pattern) ────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead tr { background: var(--header-bg); }
+    th {
+      color: white;
+      text-align: left;
+      padding: 9px 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    td {
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      font-weight: 300;
+    }
+    tbody tr:hover { background: var(--bg); }
+
+    /* ── Tooltip ─────────────────────────────────────────────────────────── */
+    .tip-wrap { position: relative; display: inline-flex; }
+    .tip-wrap .tip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: #1A202E;
+      color: white;
+      padding: 8px 10px;
+      border-radius: var(--radius-chip);
+      font-size: 11px;
+      font-weight: 300;
+      white-space: nowrap;
+      z-index: 10;
+      box-shadow: var(--shadow-card);
+      min-width: 180px;
+      white-space: normal;
+    }
+    .tip-wrap:hover .tip { display: block; }
+
+    /* ── Mockup label ────────────────────────────────────────────────────── */
+    .mockup-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--subtitle);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 8px;
+    }
+
+    /* ── Spec panel ──────────────────────────────────────────────────────── */
+    .spec-panel { font-size: 12px; }
+    .spec-section { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .spec-section:last-child { border-bottom: none; }
+    .spec-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      color: var(--subtitle);
+      margin-bottom: 8px;
+    }
+    .spec-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
+    .spec-key { color: var(--subtitle); font-weight: 300; }
+    .spec-val { font-weight: 600; }
+    .br-item { display: flex; gap: 8px; margin-bottom: 8px; line-height: 1.5; }
+    .br-num {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--link);
+      background: var(--status-info-bg);
+      padding: 1px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .ac-item { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; font-weight: 300; }
+    .ac-check { color: var(--grey); font-size: 13px; flex-shrink: 0; }
+
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pill-pts   { background: var(--status-info-bg); color: var(--action-blue); border: 1px solid rgba(80,168,255,.4); }
+    .pill-light { background: var(--status-success-bg); color: var(--status-validated); }
   </style>
 </head>
 <body>
+
 <div class="page-header">
   <div>
     <div class="breadcrumb"><a href="index.html" class="nav-back">← Sprint Mockups</a> / Product Classification Framework</div>
@@ -83,71 +334,59 @@
     <div class="sub">Q-Audit / Q-Monitor / Product Classification — Westtown Unblock · Sprint 1</div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;">
-    <span class="story-pts">🎯 3 pts</span>
-    <span class="effort-tag">Light</span>
+    <span class="meta-pill pill-pts">3 pts</span>
+    <span class="meta-pill pill-light">Light</span>
   </div>
 </div>
+
 <div class="main">
   <div>
 
-    <!-- Classification tree with new entries -->
-    <div class="mockup-label">MOCKUP A — Q-Audit Product Classification Settings · New classifications highlighted</div>
+    <!-- MOCKUP A: Classification settings tree -->
+    <div class="mockup-label">Mockup A — Q-Audit Product Classification Settings · New classifications highlighted</div>
     <div class="card">
-      <div class="card-header"><h3>Product Classifications</h3><button style="padding:5px 12px;background:var(--blue);color:white;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">+ Add Classification</button></div>
+      <div class="card-header">
+        <h3>Product Classifications</h3>
+        <button class="btn-small">+ Add Classification</button>
+      </div>
       <div class="tree">
-        <div class="tree-family">📦 Finished Product</div>
+        <div class="tree-family">Finished Product</div>
 
         <div class="tree-item"><span>Tinctures</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
         <div class="tree-item"><span>Edibles</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
         <div class="tree-item"><span>Pre-Rolls</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
-        <div class="tree-item"><span>Beverages</span><div class="tree-badges"><span class="badge b-conditional">COA: Conditional</span></div></div>
+        <div class="tree-item"><span>Beverages</span><div class="tree-badges"><span class="badge b-cond">COA: Conditional</span></div></div>
         <div class="tree-item"><span>Accessories</span><div class="tree-badges"><span class="badge b-never">COA: Never</span></div></div>
-        <div class="tree-item"><span>Apparel</span><div class="tree-badges"><span class="badge b-never">COA: Never</span></div></div>
         <div class="tree-item"><span>Mushroom Products</span><div class="tree-badges"><span class="badge b-always">COA: Always</span></div></div>
 
-        <!-- NEW entries -->
         <div class="tree-item new-item">
-          <span>Disposable Vape / ENDS Device <span class="badge b-new">NEW</span></span>
-          <div class="tree-badges">
-            <span class="badge b-never">COA: Never</span>
-            <span class="badge b-fda">⚑ FDA Check</span>
-          </div>
+          <span>Disposable Vape / ENDS Device &nbsp;<span class="badge b-new">NEW</span></span>
+          <div class="tree-badges"><span class="badge b-never">COA: Never</span><span class="badge b-fda">⚑ FDA Check</span></div>
         </div>
         <div class="tree-item new-item">
-          <span>Vape Cartridge <span class="badge b-new">NEW</span></span>
-          <div class="tree-badges">
-            <span class="badge b-never">COA: Never</span>
-            <span class="badge b-fda">⚑ FDA Check</span>
-          </div>
+          <span>Vape Cartridge &nbsp;<span class="badge b-new">NEW</span></span>
+          <div class="tree-badges"><span class="badge b-never">COA: Never</span><span class="badge b-fda">⚑ FDA Check</span></div>
         </div>
         <div class="tree-item new-item">
-          <span>E-Liquid / Vape Juice <span class="badge b-new">NEW</span></span>
-          <div class="tree-badges">
-            <span class="badge b-never">COA: Never</span>
-            <span class="badge b-fda">⚑ FDA Check</span>
-          </div>
+          <span>E-Liquid / Vape Juice &nbsp;<span class="badge b-new">NEW</span></span>
+          <div class="tree-badges"><span class="badge b-never">COA: Never</span><span class="badge b-fda">⚑ FDA Check</span></div>
         </div>
         <div class="tree-item new-item">
-          <span>Cigalike / Pod Mod <span class="badge b-new">NEW</span></span>
-          <div class="tree-badges">
-            <span class="badge b-never">COA: Never</span>
-            <span class="badge b-fda">⚑ FDA Check</span>
-          </div>
+          <span>Cigalike / Pod Mod &nbsp;<span class="badge b-new">NEW</span></span>
+          <div class="tree-badges"><span class="badge b-never">COA: Never</span><span class="badge b-fda">⚑ FDA Check</span></div>
         </div>
         <div class="tree-item new-item">
-          <span>Traditional Tobacco <span class="badge b-new">NEW</span></span>
-          <div class="tree-badges">
-            <span class="badge b-never">COA: Never</span>
-          </div>
+          <span>Traditional Tobacco &nbsp;<span class="badge b-new">NEW</span></span>
+          <div class="tree-badges"><span class="badge b-never">COA: Never</span></div>
         </div>
       </div>
     </div>
 
-    <!-- Edit classification detail panel -->
-    <div class="mockup-label">MOCKUP B — Classification detail · Disposable Vape / ENDS Device</div>
-    <div class="modal" style="margin-bottom:24px; max-width:500px;">
+    <!-- MOCKUP B: Classification detail / edit -->
+    <div class="mockup-label">Mockup B — Edit Classification · Disposable Vape / ENDS Device</div>
+    <div class="modal">
       <h4>Edit Classification</h4>
-      <div class="sub">Disposable Vape / ENDS Device</div>
+      <div class="sub-title">Disposable Vape / ENDS Device</div>
       <label class="form-label">Product Family</label>
       <select class="form-select"><option>Finished Product</option></select>
       <label class="form-label">COA Required</label>
@@ -164,7 +403,7 @@
         <span class="chip chip-new">puff bar <span class="remove">✕</span></span>
         <span class="chip chip-new">elf bar <span class="remove">✕</span></span>
         <span class="chip chip-new">lost mary <span class="remove">✕</span></span>
-        <span class="chip" style="border-style:dashed;cursor:pointer;color:var(--blue);">+ Add keyword</span>
+        <span class="chip chip-add">+ Add keyword</span>
       </div>
       <div class="modal-actions">
         <button class="btn btn-secondary">Cancel</button>
@@ -172,114 +411,190 @@
       </div>
     </div>
 
-    <!-- Product compliance view showing the new classification + FDA flag -->
-    <div class="mockup-label">MOCKUP C — Product Compliance table showing auto-classified tobacco/vape products</div>
-    <div class="card">
-      <table>
+    <!-- MOCKUP C: Product Compliance table matching actual UI — with new Product Compliance Status column -->
+    <div class="mockup-label">Mockup C — Product Compliance table · New "Product Compliance Status" column (between Classification and COA Status)</div>
+    <div class="card" style="overflow-x:auto;">
+      <table style="min-width:900px;">
         <thead>
           <tr>
-            <th>Product Name</th>
+            <th style="width:28px;"><input type="checkbox"/></th>
+            <th style="width:32px;"></th>
+            <th>SKU</th>
+            <th>Product Definition</th>
             <th>Classification</th>
+            <th style="background:#2a4a6b;">Product Compliance Status <span style="font-size:9px;font-weight:400;background:rgba(255,255,255,.2);padding:1px 5px;border-radius:3px;margin-left:4px;">NEW</span></th>
             <th>COA Status</th>
-            <th>FDA Authorization</th>
-            <th>Compliance</th>
+            <th>Disposition</th>
+            <th>Listing Status</th>
           </tr>
         </thead>
         <tbody>
+          <!-- CBD row — existing behavior, Not Evaluated for now -->
           <tr>
-            <td>Black Bear CBD 2500mg Tincture</td>
-            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">Tinctures</span></td>
-            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">✓ Compliant</span></td>
-            <td><span style="color:var(--text-muted);font-size:11px;">N/A</span></td>
-            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">Compliant</span></td>
+            <td><input type="checkbox"/></td>
+            <td style="text-align:center;font-size:10px;color:var(--grey);">🖼</td>
+            <td style="font-size:11px;color:var(--subtitle);">164730-NOT-1</td>
+            <td style="font-weight:300;">0500 mg Full Spectrum CBD Oil Peppermint 1 Oz</td>
+            <td><span class="badge" style="background:rgba(0,213,129,.12);color:var(--status-validated);">Tinctures</span></td>
+            <td>
+              <div class="tip-wrap">
+                <span class="badge" style="background:var(--grey-light);color:var(--subtitle);">— Not Evaluated</span>
+                <div class="tip" style="min-width:220px;">No product-level checks apply<br/>to this classification yet.</div>
+              </div>
+            </td>
+            <td><span class="badge" style="background:rgba(0,213,129,.2);color:var(--status-validated);">COA Validated</span></td>
+            <td><span class="badge" style="background:rgba(0,213,129,.12);color:var(--status-validated);">Approved</span></td>
+            <td><span class="badge" style="background:rgba(0,213,129,.12);color:var(--status-validated);">In Stock</span></td>
           </tr>
+          <!-- Vape — FDA authorized -->
           <tr>
-            <td>Elf Bar 600 Disposable Vape — Mango Ice</td>
+            <td><input type="checkbox"/></td>
+            <td style="text-align:center;font-size:10px;color:var(--grey);">🖼</td>
+            <td style="font-size:11px;color:var(--subtitle);">WTN-VUSE-001</td>
+            <td style="font-weight:300;">VUSE Alto Pod — Tobacco Flavor</td>
             <td><span class="badge b-tobacco">Disposable Vape / ENDS</span></td>
-            <td><span style="color:var(--text-muted);font-size:11px;">Not required</span></td>
-            <td><span class="badge" style="background:#FFFBEB;color:#B45309;">⚑ Pending check</span></td>
-            <td><span class="badge" style="background:#FFFBEB;color:#B45309;">Pending</span></td>
+            <td>
+              <div class="tip-wrap">
+                <span class="badge b-fda-ok">✓ Compliant</span>
+                <div class="tip" style="min-width:240px;">
+                  <div style="font-weight:600;margin-bottom:6px;">Product Compliance Checks</div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <span>🏛</span><span style="font-weight:300;">FDA ENDS Authorization — <strong>Authorized</strong></span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td><span style="color:var(--grey);font-size:11px;font-weight:300;">Not required</span></td>
+            <td><span style="color:var(--grey);font-size:11px;font-weight:300;">—</span></td>
+            <td><span class="badge" style="background:rgba(0,213,129,.12);color:var(--status-validated);">In Stock</span></td>
           </tr>
-          <tr>
-            <td>Hyde Edge 3300 Puffs Disposable</td>
+          <!-- Vape — not on FDA list → Prohibited -->
+          <tr style="background:rgba(255,64,74,.04);">
+            <td><input type="checkbox"/></td>
+            <td style="text-align:center;font-size:10px;color:var(--grey);">🖼</td>
+            <td style="font-size:11px;color:var(--subtitle);">WTN-HYDE-002</td>
+            <td style="font-weight:300;">Hyde Edge 3300 Puffs Disposable</td>
             <td><span class="badge b-tobacco">Disposable Vape / ENDS</span></td>
-            <td><span style="color:var(--text-muted);font-size:11px;">Not required</span></td>
-            <td><span class="badge" style="background:#FEF2F2;color:#B91C1C;">✕ Not on FDA List</span></td>
-            <td><span class="badge" style="background:#FEF2F2;color:#B91C1C;">🚫 Prohibited</span></td>
+            <td>
+              <div class="tip-wrap">
+                <span class="badge b-fda-fail">🚫 Prohibited</span>
+                <div class="tip" style="min-width:260px;">
+                  <div style="font-weight:600;margin-bottom:6px;">Product Compliance Checks</div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <span>🏛</span><span style="font-weight:300;">FDA ENDS Authorization — <strong style="color:#ff7070;">Not on FDA List</strong></span>
+                  </div>
+                  <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.2);font-size:10px;color:#ffb3b3;">Products not on the FDA authorized<br/>ENDS list may not be sold.</div>
+                </div>
+              </div>
+            </td>
+            <td><span style="color:var(--grey);font-size:11px;font-weight:300;">Not required</span></td>
+            <td><span style="color:var(--grey);font-size:11px;font-weight:300;">—</span></td>
+            <td><span class="badge" style="background:rgba(0,213,129,.12);color:var(--status-validated);">In Stock</span></td>
           </tr>
+          <!-- Vape — pending check -->
           <tr>
-            <td>VUSE Alto Pod — Tobacco Flavor</td>
+            <td><input type="checkbox"/></td>
+            <td style="text-align:center;font-size:10px;color:var(--grey);">🖼</td>
+            <td style="font-size:11px;color:var(--subtitle);">WTN-ELF-003</td>
+            <td style="font-weight:300;">Elf Bar 600 Disposable Vape — Mango Ice</td>
             <td><span class="badge b-tobacco">Disposable Vape / ENDS</span></td>
-            <td><span style="color:var(--text-muted);font-size:11px;">Not required</span></td>
-            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">✓ FDA Authorized</span></td>
-            <td><span class="badge" style="background:#F0FDF4;color:#15803D;">Compliant</span></td>
+            <td>
+              <div class="tip-wrap">
+                <span class="badge" style="background:var(--status-warn-bg);color:var(--status-pending);">⚑ Needs Review</span>
+                <div class="tip" style="min-width:240px;">
+                  <div style="font-weight:600;margin-bottom:6px;">Product Compliance Checks</div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <span>🏛</span><span style="font-weight:300;">FDA ENDS Authorization — <strong style="color:#ffd080;">Pending</strong></span>
+                  </div>
+                  <div style="margin-top:6px;font-size:10px;color:#ffd080;">Check has not yet run. Trigger manually<br/>or wait for next scheduled evaluation.</div>
+                </div>
+              </div>
+            </td>
+            <td><span style="color:var(--grey);font-size:11px;font-weight:300;">Not required</span></td>
+            <td><span style="color:var(--grey);font-size:11px;font-weight:300;">—</span></td>
+            <td><span class="badge" style="background:rgba(0,213,129,.12);color:var(--status-validated);">In Stock</span></td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <!-- MOCKUP D: Tooltip detail showing categorical icons -->
+    <div class="mockup-label">Mockup D — Product Compliance Status badge hover tooltip · Prohibited state with categorical icon key</div>
+    <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;">
+      <!-- The badge -->
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;">
+        <div style="font-size:11px;color:var(--subtitle);font-weight:600;">Badge in table cell:</div>
+        <span class="badge b-fda-fail" style="cursor:default;">🚫 Prohibited</span>
+      </div>
+      <!-- The tooltip -->
+      <div style="background:#1A202E;color:white;padding:12px 14px;border-radius:var(--radius-card);font-size:12px;min-width:280px;box-shadow:var(--shadow-card);">
+        <div style="font-weight:600;margin-bottom:8px;font-size:12px;">Product Compliance Checks</div>
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+          <span style="font-size:14px;flex-shrink:0;">🏛</span>
+          <div>
+            <div style="font-weight:600;font-size:11px;">FDA ENDS Authorization</div>
+            <div style="font-weight:300;font-size:11px;color:#ff9999;">Not on FDA List — Prohibited</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,.15);margin:8px 0;"></div>
+        <div style="font-size:10px;color:#aaa;font-weight:300;">Icon key:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+          <span style="font-size:10px;color:#ddd;font-weight:300;">🏛 Authorization list</span>
+          <span style="font-size:10px;color:#ddd;font-weight:300;">🏷 Eligibility rule</span>
+          <span style="font-size:10px;color:#ddd;font-weight:300;">⚗️ Lab/attribute</span>
+          <span style="font-size:10px;color:#ddd;font-weight:300;">📍 Jurisdiction</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Spec -->
+  <!-- Spec panel -->
   <div>
     <div class="card spec-panel">
-      <div class="card-header">
-        <h3>Ticket Specification</h3>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-secondary);">QP-XXXX</span>
-      </div>
+      <div class="card-header"><h3>Ticket Specification</h3><span style="font-size:11px;color:var(--subtitle);">QP-XXXX</span></div>
       <div class="spec-section">
         <div class="spec-label">Metadata</div>
         <div class="spec-row"><span class="spec-key">Initiative</span><span class="spec-val">Product Classification Framework</span></div>
         <div class="spec-row"><span class="spec-key">Sprint</span><span class="spec-val">Sprint 1 — Westtown Unblock</span></div>
-        <div class="spec-row"><span class="spec-key">Story Points</span><span class="spec-val story-pts">🎯 3</span></div>
-        <div class="spec-row"><span class="spec-key">Effort</span><span class="spec-val effort-tag">Light</span></div>
-        <div class="spec-row"><span class="spec-key">Label</span><span class="spec-val"><span class="badge" style="background:#EFF6FF;color:#1D4ED8;">CORE</span></span></div>
-        <div class="spec-row"><span class="spec-key">Blocks</span><span class="spec-val" style="font-size:11px;">FDA ENDS ticket (depends on this)</span></div>
+        <div class="spec-row"><span class="spec-key">Effort</span><span class="meta-pill pill-light">Light</span></div>
+        <div class="spec-row"><span class="spec-key">Blocks</span><span class="spec-val" style="font-size:11px;font-weight:300;">FDA ENDS ticket (depends on this)</span></div>
       </div>
       <div class="spec-section">
         <div class="spec-label">Problem</div>
-        <p style="color:var(--text-secondary);line-height:1.6;">No tobacco or vape product types exist in Qredible's classification system. Westtown is bringing tobacco/vape merchant clients. Without these classifications, Q-ScanAI cannot identify them and no compliance rules apply.</p>
-        <p style="color:var(--text-secondary);line-height:1.6;margin-top:8px;"><strong>Additive only</strong> — zero existing records modified.</p>
+        <p style="color:var(--subtitle);line-height:1.6;font-weight:300;">No tobacco or vape product types exist in the classification system. Westtown is onboarding tobacco/vape clients. Without these classifications Q-ScanAI cannot identify them and no compliance rules apply.</p>
+        <p style="color:var(--subtitle);line-height:1.6;margin-top:8px;font-weight:300;"><strong style="font-weight:600;">Additive only</strong> — no existing records modified.</p>
       </div>
       <div class="spec-section">
         <div class="spec-label">New Classifications</div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
-            <span>Disposable Vape / ENDS Device</span><span class="badge b-never">Never</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
-            <span>Vape Cartridge</span><span class="badge b-never">Never</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
-            <span>E-Liquid / Vape Juice</span><span class="badge b-never">Never</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);">
-            <span>Cigalike / Pod Mod</span><span class="badge b-never">Never</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:4px 0;">
-            <span>Traditional Tobacco</span><span class="badge b-never">Never</span>
-          </div>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--border);font-weight:300;">Disposable Vape / ENDS Device<span class="badge b-never">Never</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--border);font-weight:300;">Vape Cartridge<span class="badge b-never">Never</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--border);font-weight:300;">E-Liquid / Vape Juice<span class="badge b-never">Never</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--border);font-weight:300;">Cigalike / Pod Mod<span class="badge b-never">Never</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:6px 0;font-weight:300;">Traditional Tobacco<span class="badge b-never">Never</span></div>
         </div>
       </div>
       <div class="spec-section">
         <div class="spec-label">Business Rules</div>
-        <div class="br-item"><span class="br-num">BR-1</span><span>All new classifications added under existing Finished Product category. Zero existing records modified.</span></div>
-        <div class="br-item"><span class="br-num">BR-2</span><span>COA Required = Never for all five new classifications.</span></div>
-        <div class="br-item"><span class="br-num">BR-3</span><span>Auto-classification keywords wired per classification per keyword table in spec.</span></div>
-        <div class="br-item"><span class="br-num">BR-4</span><span>Auto-classification threshold: ≥70% confidence auto-classifies; below 70% queues for manual review.</span></div>
-        <div class="br-item"><span class="br-num">BR-5</span><span>Products in any vape/ENDS classification (not Traditional Tobacco) are tagged requires-fda-ends-check for the companion FDA ENDS ticket.</span></div>
+        <div class="br-item"><span class="br-num">BR-1</span><span style="font-weight:300;">All new classifications added under Finished Product. No existing records modified.</span></div>
+        <div class="br-item"><span class="br-num">BR-2</span><span style="font-weight:300;">COA Required = Never for all five new classifications.</span></div>
+        <div class="br-item"><span class="br-num">BR-3</span><span style="font-weight:300;">Auto-classification keywords wired per keyword table in spec.</span></div>
+        <div class="br-item"><span class="br-num">BR-4</span><span style="font-weight:300;">≥70% confidence auto-classifies; below 70% queues for manual review.</span></div>
+        <div class="br-item"><span class="br-num">BR-5</span><span style="font-weight:300;">Vape/ENDS products (not Traditional Tobacco) tagged for FDA ENDS check.</span></div>
       </div>
       <div class="spec-section">
         <div class="spec-label">Acceptance Criteria</div>
-        <div class="ac-item"><span class="ac-check">☐</span><span>All 5 classifications exist under Finished Product with COA Required = Never</span></div>
-        <div class="ac-item"><span class="ac-check">☐</span><span>"Elf Bar 600 Disposable Vape" auto-classifies as Disposable Vape / ENDS Device at ≥70%</span></div>
-        <div class="ac-item"><span class="ac-check">☐</span><span>No COA Required flag applied to auto-classified tobacco/vape products</span></div>
-        <div class="ac-item"><span class="ac-check">☐</span><span>New classifications appear in Product Compliance filter and Edit Product modal</span></div>
-        <div class="ac-item"><span class="ac-check">☐</span><span>Vape/ENDS products tagged requires-fda-ends-check</span></div>
-        <div class="ac-item"><span class="ac-check">☐</span><span>Zero existing classification records modified</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span style="font-weight:300;">All 5 classifications exist under Finished Product with COA Required = Never</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span style="font-weight:300;">"Elf Bar 600 Disposable Vape" auto-classifies at ≥70% confidence</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span style="font-weight:300;">No COA Required flag on tobacco/vape products</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span style="font-weight:300;">New classifications in Product Compliance filter and Edit Product modal</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span style="font-weight:300;">Vape/ENDS products tagged requires-fda-ends-check</span></div>
+        <div class="ac-item"><span class="ac-check">☐</span><span style="font-weight:300;">Zero existing classifications modified</span></div>
       </div>
     </div>
   </div>
 </div>
+
 </body>
 </html>

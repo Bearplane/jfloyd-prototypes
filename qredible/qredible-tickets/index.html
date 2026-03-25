@@ -1,126 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Qredible — Sprint Mockups</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    @font-face { font-family: 'Uber Move'; src: local('Uber Move'), local('UberMove'); font-weight: 300 700; }
     :root {
-      --blue: #3B82F6;
-      --blue-dark: #2563EB;
-      --green: #16A34A;
-      --green-light: #22C55E;
-      --red: #DC2626;
-      --red-light: #EF4444;
-      --orange: #D97706;
-      --orange-light: #F59E0B;
-      --purple: #7C3AED;
-      --purple-light: #8B5CF6;
-      --teal: #0D9488;
-      --bg: #F8FAFC;
-      --surface: #FFFFFF;
-      --border: #E2E8F0;
-      --text-primary: #0F172A;
-      --text-secondary: #64748B;
-      --text-muted: #94A3B8;
-      --header-bg: #1E3A5F;
-      --radius-card: 10px;
-      --radius-sm: 6px;
+      --font-ui: 'Uber Move', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --black: #1A202E; --subtitle: #657496; --grey-light: #EBEDF2; --border: #EBEDF2;
+      --bg: #F8FBFD; --surface: #FFFFFF; --header-bg: #1E3A5F;
+      --action-blue: #2563eb; --link: #376fd0;
+      --status-success-bg: rgba(0,213,129,.15); --status-validated: #2E7D32;
+      --status-warn-bg: rgba(237,108,2,.15); --status-pending: #ED6C02;
+      --status-info-bg: rgba(80,168,255,.15);
+      --radius-card: 6px; --radius-chip: 6px; --radius-btn: 5px;
+      --shadow-subtle: 0px 1px 2px 0px rgba(0,0,0,0.05);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .page-header {
-      background: var(--header-bg);
-      color: white;
-      padding: 20px 36px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .page-header h1 { font-size: 18px; font-weight: 700; }
-    .page-header .sub { font-size: 12px; color: #90CAF9; margin-top: 2px; }
-    .nav {
-      background: white;
-      border-bottom: 1px solid var(--border);
-      padding: 0 36px;
-      display: flex;
-      gap: 4px;
-    }
-    .nav a {
-      display: block;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      text-decoration: none;
-      border-bottom: 2px solid transparent;
-    }
-    .nav a.active { color: var(--blue); border-bottom-color: var(--blue); }
-    .nav a:hover { color: var(--text-primary); }
-    .content { padding: 32px 36px; max-width: 1400px; }
-    h2 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .ticket-meta {
-      display: flex; gap: 12px; align-items: center;
-      margin-bottom: 24px; flex-wrap: wrap;
-    }
-    .badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    }
-    .badge-blue { background: #EFF6FF; color: #1D4ED8; }
-    .badge-green { background: #F0FDF4; color: #15803D; }
-    .badge-orange { background: #FFFBEB; color: #B45309; }
-    .badge-red { background: #FEF2F2; color: #B91C1C; }
-    .badge-purple { background: #F5F3FF; color: #6D28D9; }
-    .badge-gray { background: #F1F5F9; color: #475569; }
-    .section-label {
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 12px;
-      padding-bottom: 8px; border-bottom: 1px solid var(--border);
-    }
-    .mockup-frame {
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--black); font-family: var(--font-ui); font-size: 13px; font-weight: 400; line-height: 1.5; }
+    .header { background: var(--header-bg); color: white; padding: 16px 24px; }
+    .header h1 { font-size: 16px; font-weight: 600; }
+    .header .sub { font-size: 12px; color: #90CAF9; margin-top: 3px; font-weight: 300; }
+    .main { padding: 32px 24px; max-width: 900px; }
+    .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--subtitle); margin-bottom: 12px; margin-top: 28px; }
+    .section-title:first-child { margin-top: 0; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .card {
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-card);
-      overflow: hidden;
-      background: white;
-      margin-bottom: 32px;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: var(--black);
+      display: block;
+      box-shadow: var(--shadow-subtle);
+      transition: box-shadow .15s;
     }
-    .mockup-title {
-      background: #F8FAFC;
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); border-color: #b1b9ca; }
+    .card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .card-meta { font-size: 11px; color: var(--subtitle); font-weight: 300; margin-bottom: 10px; }
+    .pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-chip); font-size: 10px; font-weight: 700; }
+    .pill-light  { background: var(--status-success-bg); color: var(--status-validated); }
+    .pill-medium { background: var(--status-warn-bg); color: var(--status-pending); }
+    .pill-heavy  { background: rgba(255,64,74,.12); color: #D32F2F; }
+    .pill-mockup { background: var(--status-info-bg); color: var(--action-blue); margin-left: 6px; }
+    .card-pills { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .card-removed { opacity: .4; pointer-events: none; text-decoration: line-through; }
   </style>
 </head>
 <body>
-<div class="page-header">
-  <div>
-    <h1>Qredible Sprint Mockups</h1>
-    <div class="sub">Audit Improvement Initiative · Product Classification Framework — March 2026</div>
+
+<div class="header">
+  <h1>Qredible — Sprint Mockups</h1>
+  <div class="sub">Product Classification Framework + Audit Improvement Initiative · March 2026</div>
+</div>
+
+<div class="main">
+
+  <div class="section-title">Audit Improvement Initiative</div>
+  <div class="card-grid">
+
+    <a href="coa-issue-category.html" class="card">
+      <div class="card-title">COA Issue Category & Validation Status</div>
+      <div class="card-meta">Q-Monitor / BPO Review Workflow</div>
+      <div class="card-pills">
+        <span class="pill pill-medium">Medium</span>
+        <span class="pill pill-mockup">Mockup ✓</span>
+      </div>
+    </a>
+
   </div>
-</div>
-<div class="nav">
-  <a href="coa-inactive.html" class="active">COA Inactive State</a>
-  <a href="coa-issue-category.html">COA Issue Category</a>
-  <a href="bulk-unassign.html">Bulk Unassign COAs</a>
-  <a href="tobacco-classification.html">Tobacco/Vape Classifications</a>
-  <a href="fda-ends.html">FDA ENDS Check</a>
-  <a href="product-family.html">Product Family L2</a>
-</div>
-<div class="content">
-  <p style="color: var(--text-secondary); font-size:14px;">Select a ticket above to view its mockup and full specification.</p>
+
+  <div class="section-title">Product Classification Framework — Sprint 1</div>
+  <div class="card-grid">
+
+    <a href="tobacco-classification.html" class="card">
+      <div class="card-title">Add Tobacco/Vape Product Classifications</div>
+      <div class="card-meta">Q-Audit / Product Classification — Westtown Unblock</div>
+      <div class="card-pills">
+        <span class="pill pill-light">Light</span>
+        <span class="pill pill-mockup">Mockup ✓</span>
+      </div>
+    </a>
+
+    <div class="card" style="border-color:#b1b9ca;">
+      <div class="card-title">Introduce Product Compliance Status</div>
+      <div class="card-meta">Q-Monitor / Product Compliance — FLEX Critical · Ticket 6</div>
+      <div class="card-pills">
+        <span class="pill pill-medium">Medium</span>
+        <span class="pill" style="background:rgba(237,108,2,.15);color:#ED6C02;">Mockup in Tobacco ticket (C+D)</span>
+      </div>
+    </div>
+
+    <div class="card card-removed">
+      <div class="card-title">Bulk Unassign COAs from COAs Tab</div>
+      <div class="card-meta">No mockup needed — behavior-only ticket</div>
+      <div class="card-pills"><span class="pill pill-light">Light</span></div>
+    </div>
+
+    <div class="card card-removed">
+      <div class="card-title">FDA ENDS Authorization List</div>
+      <div class="card-meta">No mockup needed — data/backend ticket</div>
+      <div class="card-pills"><span class="pill pill-medium">Medium</span></div>
+    </div>
+
+    <div class="card card-removed">
+      <div class="card-title">Product Classification L2 Restructure</div>
+      <div class="card-meta">No mockup needed — data migration ticket</div>
+      <div class="card-pills"><span class="pill pill-heavy">Heavy</span></div>
+    </div>
+
+  </div>
+
+  <div class="section-title">Already Covered (not included)</div>
+  <div class="card-grid">
+    <div class="card card-removed">
+      <div class="card-title">COA Inactive State</div>
+      <div class="card-meta">Exists as QP-3526 — already in Jira</div>
+    </div>
+  </div>
+
 </div>
 </body>
 </html>
