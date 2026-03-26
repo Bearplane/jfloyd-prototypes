@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QP-3546 — Cross-Product COA Sharing</title>
+  <style>
+    :root {
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --blue: #3B82F6;
+      --blue-dark: #1E3A5F;
+      --green: #16A34A;
+      --red: #DC2626;
+      --red-dark: #B01E1E;
+      --gray: #64748B;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+      --table-header-bg: #FFE4E6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-ui);
+      background: #1E293B;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 80px;
+      gap: 56px;
+      color: var(--text);
+      font-size: 13px;
+    }
+    /* NAV */
+    .proto-nav { position:sticky;top:0;z-index:100;background:#0F172A;border-bottom:1px solid rgba(255,255,255,.08);padding:10px 20px;display:flex;align-items:center;gap:14px;width:100%; }
+    .proto-nav a { color:#94A3B8;text-decoration:none;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;transition:color .15s; }
+    .proto-nav a:hover { color:#F8FAFC; }
+    .proto-nav .nav-divider { color:#334155; }
+    .proto-nav .nav-current { color:#F8FAFC;font-size:12px;font-weight:600; }
+
+    .page-body { width:100%;max-width:1280px;padding:32px 16px 0;display:flex;flex-direction:column;gap:56px; }
+
+    h1.page-title { color:#94A3B8;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-align:center; }
+    .section-label { color:#94A3B8;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px; }
+    .annotation { background:#FFFBEB;border:1px dashed #FCD34D;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:10px;line-height:1.6; }
+    .annotation strong { font-weight:700; }
+    .new-pill { background:#334155;color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em; }
+
+    /* BADGES */
+    .badge { display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap; }
+    .b-missing    { background:#FEE2E2;color:var(--red-dark);border:1.5px solid #FECACA; }
+    .b-violative  { background:var(--red);color:white; }
+    .b-approved   { background:white;color:var(--green);border:1.5px solid var(--green); }
+    .b-validated  { background:white;color:var(--green);border:1.5px solid var(--green); }
+    .b-in-stock   { background:#DCFCE7;color:#166534;border:1px solid #BBF7D0; }
+    .b-pending-t  { color:var(--blue);font-weight:600;background:none;padding:0; }
+    .b-na-t       { color:var(--gray);font-weight:600;background:none;padding:0; }
+    .b-validated-dot { background:white;color:var(--green);border:1.5px dashed var(--green); cursor:pointer; text-decoration:none; }
+    .b-validated-dot:hover { background:#F0FDF4; }
+    .b-missing-dot   { background:#FEF2F2;color:var(--red-dark);border:1.5px dashed var(--red-dark);cursor:pointer; }
+    .b-shared-al  { background:#FEF3C7;color:#92400E;border:1px solid #FDE68A; }
+
+    /* TABLE */
+    .table-wrap { background:white;border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--border); }
+    .table-toolbar { background:white;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+    .search-fake { flex:1;min-width:200px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px 7px 28px;font-family:var(--font-ui);font-size:12px;color:var(--text-muted); }
+    .btn { padding:6px 12px;border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:12px;font-weight:600;border:none;cursor:pointer;white-space:nowrap; }
+    .btn-filters { background:var(--blue-dark);color:white; }
+    .btn-blue   { background:var(--blue);color:white; }
+    .btn-dark   { background:#334155;color:white; }
+    .btn-red    { background:#EF4444;color:white; }
+    .results-row { padding:8px 16px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;font-size:12px;color:var(--text-muted);gap:12px; }
+    .results-row .ml { margin-left:auto;display:flex;gap:16px; }
+    table { width:100%;border-collapse:collapse;font-size:12px; }
+    thead th { background:var(--table-header-bg);color:var(--text);font-weight:700;font-size:11px;padding:8px 10px;text-align:left;border-right:1px solid #FECDD3;white-space:nowrap; }
+    thead th.sorted { color:var(--blue); }
+    tbody tr { border-bottom:1px solid var(--border); }
+    tbody tr:hover { background:#F8FAFC; }
+    td { padding:8px 10px;vertical-align:middle;white-space:nowrap; }
+    td.sku { font-family:var(--font-mono);font-size:10px;color:var(--text-muted); }
+    td.product { white-space:normal;max-width:200px;line-height:1.4; }
+    .activity-icons { display:flex;align-items:center;gap:6px;color:#94A3B8;font-size:13px; }
+
+    /* MODAL */
+    .modal-backdrop { background:rgba(15,23,42,.55);border-radius:12px;padding:20px; }
+    .modal { background:white;border-radius:var(--radius-card);max-width:900px;margin:0 auto;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex; }
+    .modal-left { flex:1;padding:28px 28px 20px;overflow-y:auto;max-height:760px;border-right:1px solid var(--border); }
+    .modal-right { width:260px;flex-shrink:0;padding:24px;background:#F8FAFC; }
+    .modal-title { font-size:18px;font-weight:700;color:var(--text); }
+    .modal-subtitle { font-size:12px;color:var(--text-muted);margin-top:2px;margin-bottom:16px; }
+    .modal-tabs { display:flex;border-bottom:2px solid var(--border);margin-bottom:20px; }
+    .modal-tab { padding:8px 16px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px; }
+    .modal-tab.active { color:var(--blue);border-bottom-color:var(--blue); }
+    .form-field { margin-bottom:16px; }
+    .form-label { font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;display:flex;align-items:center;gap:6px; }
+    .form-input { width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-family:var(--font-ui);font-size:13px;color:var(--text);background:white; }
+    .form-select { width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 28px 8px 10px;font-family:var(--font-ui);font-size:13px;color:var(--text);background:white;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394A3B8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center; }
+    .helper-text { font-size:11px;color:var(--text-muted);margin-top:5px;line-height:1.4; }
+    .section-divider { border:none;border-top:1px solid var(--border);margin:16px 0; }
+    .tag-chip { display:inline-flex;align-items:center;gap:5px;background:var(--blue-dark);color:white;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px; }
+    .publish-row { display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;font-weight:600; }
+    .toggle-on { width:36px;height:20px;background:var(--green);border-radius:10px;position:relative; }
+    .toggle-on::after { content:'';position:absolute;right:3px;top:3px;width:14px;height:14px;background:white;border-radius:50%; }
+    .preview-card { border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:white; }
+    .preview-img { width:100%;height:80px;background:linear-gradient(135deg,#FEFCE8,#FEF9C3);display:flex;align-items:center;justify-content:center;font-size:28px; }
+    .preview-body { padding:10px; }
+    .preview-body .pname { font-size:12px;font-weight:600;margin-bottom:4px; }
+    .preview-body .pco { font-size:11px;color:var(--blue); }
+    .preview-body .ptag { display:inline-block;background:#F1F5F9;color:var(--text-muted);font-size:10px;padding:1px 6px;border-radius:3px;margin-top:4px; }
+    .preview-body .pprice { font-size:13px;font-weight:700;margin-top:6px; }
+
+    /* Shared-from box */
+    .shared-box { background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--radius-sm);padding:12px;margin-top:8px; }
+    .shared-box-label { font-size:11px;font-weight:700;color:#92400E;margin-bottom:6px;display:flex;align-items:center;gap:6px; }
+    .shared-source-link { color:var(--blue);font-weight:700;text-decoration:underline;cursor:pointer;font-size:12px; }
+
+    /* Readonly COA fields */
+    .readonly-block { background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-top:4px; }
+    .readonly-block .rb-label { font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px; }
+    .readonly-block .rb-val { font-size:12px;font-weight:600;color:var(--text); }
+    .readonly-block .rb-hint { font-size:10px;color:var(--text-muted);margin-top:2px; }
+
+    /* Linked products panel on source */
+    .linked-panel { background:#F8FAFC;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px; }
+    .linked-panel .lp-title { font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px; }
+    .linked-row { display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px; }
+    .linked-row:last-child { border-bottom:none; }
+    .linked-row a { color:var(--blue);font-weight:600;text-decoration:none;font-size:11px; }
+    .linked-row a:hover { text-decoration:underline; }
+
+    /* Comparison table */
+    .comparison { background:white;border-radius:var(--radius-card);border:1px solid var(--border);overflow:hidden; }
+    .comparison table { font-size:12px; }
+    .comparison thead th { padding:10px 14px;font-size:11px; }
+    .comparison tbody td { padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top; }
+    .comparison tbody tr:last-child td { border-bottom:none; }
+  </style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-current">QP-3546 — Cross-Product COA Sharing (Shared Assignment Level)</span>
+</nav>
+
+<div class="page-body">
+
+<h1 class="page-title">QP-3546 — Cross-Product COA Sharing · Mockup</h1>
+
+<!-- ══ SECTION 0: Concept ══ -->
+<div>
+  <p class="section-label">0 — The Problem: One COA, Five Products, No Good Solution Today</p>
+  <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);padding:24px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;">
+
+    <div style="flex:1;min-width:240px;">
+      <p style="font-weight:700;font-size:13px;margin-bottom:10px;">Same batch → 5 separate products</p>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text-muted);line-height:1.6;">
+        <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:6px;padding:8px 12px;">
+          <strong style="color:var(--text);">Remedy Shake 18.9%</strong><br>COA: <span class="badge b-validated" style="font-size:10px;">COA Validated</span>
+        </div>
+        <div style="text-align:center;color:#94A3B8;font-size:11px;">Same batch ↓ same COA file</div>
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:8px 12px;">
+          <strong style="color:var(--text);">Remedy Smalls 3.5g</strong><br>COA: <span class="badge b-missing" style="font-size:10px;">Missing</span> ← needs same COA
+        </div>
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:8px 12px;">
+          <strong style="color:var(--text);">Remedy Pre-Rolls 1g</strong><br>COA: <span class="badge b-missing" style="font-size:10px;">Missing</span> ← needs same COA
+        </div>
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:8px 12px;">
+          <strong style="color:var(--text);">Remedy Pre-Rolls 5-pack</strong><br>COA: <span class="badge b-missing" style="font-size:10px;">Missing</span> ← needs same COA
+        </div>
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:8px 12px;">
+          <strong style="color:var(--text);">Remedy Loose Flower 7g</strong><br>COA: <span class="badge b-missing" style="font-size:10px;">Missing</span> ← needs same COA
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:14px;">
+      <div style="border:1px solid #FECACA;border-radius:6px;padding:14px;background:#FEF2F2;">
+        <p style="font-weight:700;color:var(--red-dark);margin-bottom:6px;">❌ Today: upload 5 times</p>
+        <p style="font-size:12px;color:var(--text-muted);line-height:1.6;">Creates 5 separate COA records. If the batch expires or is updated, each copy must be updated individually. Copies drift out of sync. No way to see which products share a batch.</p>
+      </div>
+      <div style="border:1px solid #BBF7D0;border-radius:6px;padding:14px;background:#F0FDF4;">
+        <p style="font-weight:700;color:var(--green);margin-bottom:6px;">✅ After QP-3546: one record, shared</p>
+        <p style="font-size:12px;color:var(--text-muted);line-height:1.6;">Upload COA once to Remedy Shake (the source). Set the other 4 products to Assignment Level = Shared, pointing at Remedy Shake. One record. All reflect source status in real time. Clicking any dashed badge navigates straight to the source COA.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SECTION 1: Comparison table ══ -->
+<div>
+  <p class="section-label">1 — Shared vs Inherited: What's the Difference?</p>
+  <div class="comparison">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:160px;">Assignment Level</th>
+          <th>Scope</th>
+          <th>Typical Use</th>
+          <th>"From" selector</th>
+          <th>COA record</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge" style="background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;">Inherited</span></td>
+          <td>Sibling variants under the same parent only</td>
+          <td>Weight variants of the same strain (7g, 28g inherit from 3.5g)</td>
+          <td>Siblings only (same parent)</td>
+          <td>1 record, referenced by siblings</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-shared-al">Shared</span> <span class="new-pill" style="vertical-align:middle;">New</span></td>
+          <td>Any product in the full catalog</td>
+          <td>Same batch across different product forms (flower → pre-rolls → shake → smalls)</td>
+          <td>Full catalog search by name, SKU, or classification</td>
+          <td>1 record on source, all others reference it — no copies</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="annotation">
+    Both use a <strong>dashed badge</strong> in the compliance table. The tooltip and "From" navigation differ — Inherited shows the sibling variant name; Shared shows the source product name with a clickable link.
+  </div>
+</div>
+
+<!-- ══ SECTION 2: Compliance Table ══ -->
+<div>
+  <p class="section-label">2 — Product Compliance Table — Dashed Badges + Clickable Navigation</p>
+  <div class="table-wrap">
+    <div class="table-toolbar">
+      <div class="search-fake">🔍 Search products by definition, classification or SKU...</div>
+      <button class="btn btn-filters">🔽 Filters</button>
+      <button class="btn btn-blue">Add Product</button>
+      <button class="btn btn-blue">Scan for Products</button>
+      <button class="btn btn-red">Export</button>
+    </div>
+    <div class="results-row">
+      <strong>5 Products</strong>
+      <div class="ml"><span>Rows per page: <strong>25</strong></span></div>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox"/></th>
+          <th></th>
+          <th>SKU</th>
+          <th class="sorted">Product Definition ▲</th>
+          <th>Price</th>
+          <th>Classification</th>
+          <th>Listing Status</th>
+          <th>COA Status</th>
+          <th>Disposition</th>
+          <th>Date Added</th>
+          <th>Activity</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- SOURCE PRODUCT — owns the COA -->
+        <tr style="background:#FFFBEB;">
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku">RMD-SMO-1</td>
+          <td class="product">
+            <strong>Remedy Shake 18.9%</strong>
+            <div style="font-size:10px;color:var(--green);font-weight:600;margin-top:2px;">🔗 COA Source — 4 products share this COA</div>
+          </td>
+          <td>$12.00</td>
+          <td>Smokable Flower</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- SHARED product 1 -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku">RMD-SMO-2</td>
+          <td class="product">Remedy Smalls 3.5g</td>
+          <td>$18.00</td>
+          <td>Smokable Flower</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td>
+            <a class="badge b-validated-dot" href="#" title="Shared from: Remedy Shake 18.9% (RMD-SMO-1) — click to view source COA">
+              COA Validated ⤵
+            </a>
+          </td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- SHARED product 2 -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku">RMD-PRE-1</td>
+          <td class="product">Remedy Pre-Rolls 1g</td>
+          <td>$8.00</td>
+          <td>Pre-Rolls</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td>
+            <a class="badge b-validated-dot" href="#" title="Shared from: Remedy Shake 18.9% (RMD-SMO-1) — click to view source COA">
+              COA Validated ⤵
+            </a>
+          </td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- SHARED product 3 -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku">RMD-PRE-5</td>
+          <td class="product">Remedy Pre-Rolls 5-pack</td>
+          <td>$35.00</td>
+          <td>Pre-Rolls</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td>
+            <a class="badge b-validated-dot" href="#" title="Shared from: Remedy Shake 18.9% (RMD-SMO-1) — click to view source COA">
+              COA Validated ⤵
+            </a>
+          </td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- SHARED product 4 -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku">RMD-SMO-7</td>
+          <td class="product">Remedy Loose Flower 7g</td>
+          <td>$22.00</td>
+          <td>Smokable Flower</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td>
+            <a class="badge b-validated-dot" href="#" title="Shared from: Remedy Shake 18.9% (RMD-SMO-1) — click to view source COA">
+              COA Validated ⤵
+            </a>
+          </td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>COA Source row</strong> (amber bg) shows "🔗 COA Source — 4 products share this COA." <strong>Shared product rows</strong> show dashed "COA Validated ⤵" — the badge is a <strong>clickable link</strong> that navigates directly to the source product's COA tab. Hover tooltip shows the source name and SKU.
+  </div>
+</div>
+
+<!-- ══ SECTION 3: Product Builder — Shared product ══ -->
+<div>
+  <p class="section-label">3 — Product Builder: Setting Assignment Level = Shared (on a Shared product)</p>
+  <div class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-left">
+        <div class="modal-title">Product Builder</div>
+        <div class="modal-subtitle">Edit your product info</div>
+        <div class="modal-tabs">
+          <div class="modal-tab active">Basic</div>
+          <div class="modal-tab">Details</div>
+          <div class="modal-tab">Attributes</div>
+          <div class="modal-tab">Composition</div>
+          <div class="modal-tab">Packaging</div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">SKU</label>
+          <div style="display:flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;">
+            <span class="tag-chip">RMD-PRE-1 ×</span>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Title</label>
+          <input class="form-input" type="text" value="Remedy Pre-Rolls 1g" readonly/>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Classification</label>
+          <select class="form-select"><option>Pre-Rolls</option></select>
+        </div>
+
+        <hr class="section-divider"/>
+
+        <div class="form-field">
+          <label class="form-label">Does this product require a COA?</label>
+          <select class="form-select"><option>Yes</option></select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">COA Assignment Level <span class="new-pill">New</span></label>
+          <select class="form-select">
+            <option>Individual — requires own COA</option>
+            <option>Inherited — shares COA with sibling variant</option>
+            <option>Child — parent container, children hold COAs</option>
+            <option>Bundle — derives status from component products</option>
+            <option selected>Shared — uses COA from another catalog product</option>
+            <option>Not Required — no COA needed</option>
+          </select>
+          <div class="helper-text">Uses the COA record from another product anywhere in the catalog. Select the source product below.</div>
+        </div>
+
+        <!-- Shared From — appears when Shared is selected -->
+        <div class="form-field">
+          <div class="shared-box">
+            <div class="shared-box-label">🔗 Shared From (COA Source)</div>
+            <input class="form-input" type="text" value="Remedy Shake 18.9% (RMD-SMO-1)" style="margin-bottom:8px;" readonly/>
+            <div style="display:flex;align-items:center;gap:10px;font-size:12px;">
+              <span style="color:var(--text-muted);">Source COA status:</span>
+              <span class="badge b-validated" style="font-size:10px;">COA Validated</span>
+              <a href="#" class="shared-source-link">View source →</a>
+            </div>
+            <div class="helper-text" style="margin-top:6px;">COA details below are managed on the source product. They are read-only here.</div>
+          </div>
+        </div>
+
+        <!-- COA fields — read-only because Shared -->
+        <div class="form-field">
+          <label class="form-label">COA File</label>
+          <div class="readonly-block">
+            <div class="rb-label">Read-only — managed via source</div>
+            <div class="rb-val">Remedy-Shake-18.9-BatchA-COA.pdf</div>
+            <div class="rb-hint">Uploaded 01/10/2026 · Expires 01/10/2027</div>
+          </div>
+        </div>
+
+        <hr class="section-divider"/>
+
+        <div class="form-field">
+          <label class="form-label">Retail Price (per unit)</label>
+          <input class="form-input" type="text" value="8.00" readonly/>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Listing Status</label>
+          <select class="form-select"><option>In Stock</option></select>
+        </div>
+
+        <div style="margin-top:8px;">
+          <button style="background:var(--blue-dark);color:white;border:none;border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:13px;font-weight:600;padding:8px 20px;cursor:pointer;">Save</button>
+        </div>
+      </div>
+
+      <div class="modal-right">
+        <div class="publish-row"><span>Publish</span><div class="toggle-on"></div></div>
+        <div class="preview-card">
+          <div class="preview-img">🚬</div>
+          <div class="preview-body">
+            <div class="pname">Remedy Pre-Rolls 1g</div>
+            <div class="pco">🔵 Tweedle Farms</div>
+            <div class="ptag">Pre-Rolls</div>
+            <div class="pprice">$8.00 / unit</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:12px;font-size:12px;line-height:1.6;color:#92400E;">
+          <div style="font-weight:700;margin-bottom:4px;">🔗 COA Assignment</div>
+          <div>Level: <strong>Shared</strong></div>
+          <div>Source: Remedy Shake 18.9%</div>
+          <div style="margin-top:5px;"><span class="badge b-validated" style="font-size:10px;">COA Validated</span> <span style="font-size:10px;color:var(--text-muted);">(shared)</span></div>
+          <div style="margin-top:6px;"><a href="#" style="color:var(--blue);font-weight:700;font-size:11px;">View source →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    When <strong>Shared</strong> is selected, a "Shared From" search box appears (full catalog, not siblings-only). COA file fields become read-only with a note pointing to the source. "View source →" link in both the form and the right panel navigates directly to the source product's COA tab.
+  </div>
+</div>
+
+<!-- ══ SECTION 4: Product Builder — Source product ══ -->
+<div>
+  <p class="section-label">4 — Product Builder: Source Product View — "Linked Products" Panel</p>
+  <div class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-left">
+        <div class="modal-title">Product Builder</div>
+        <div class="modal-subtitle">Edit your product info</div>
+        <div class="modal-tabs">
+          <div class="modal-tab active">Basic</div>
+          <div class="modal-tab">Details</div>
+          <div class="modal-tab">Attributes</div>
+          <div class="modal-tab">Composition</div>
+          <div class="modal-tab">Packaging</div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">SKU</label>
+          <div style="display:flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;">
+            <span class="tag-chip">RMD-SMO-1 ×</span>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Title</label>
+          <input class="form-input" type="text" value="Remedy Shake 18.9%" readonly/>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Classification</label>
+          <select class="form-select"><option>Smokable Flower</option></select>
+        </div>
+
+        <hr class="section-divider"/>
+
+        <div class="form-field">
+          <label class="form-label">Does this product require a COA?</label>
+          <select class="form-select"><option>Yes</option></select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">COA Assignment Level</label>
+          <select class="form-select"><option selected>Individual — requires own COA</option></select>
+          <div class="helper-text">This product is the <strong>COA Source</strong> for 4 other products. Updating the COA here will update all linked products.</div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">COA File</label>
+          <div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+            <span>📄 Remedy-Shake-18.9-BatchA-COA.pdf</span>
+            <button style="background:none;border:1px solid var(--border);border-radius:4px;font-size:11px;padding:3px 8px;cursor:pointer;color:var(--text-muted);">Replace</button>
+          </div>
+          <div class="helper-text" style="color:#92400E;">⚠ Replacing this file will affect 4 linked products.</div>
+        </div>
+
+        <!-- Linked Products panel -->
+        <div class="form-field">
+          <label class="form-label">🔗 Linked Products (4 products share this COA) <span class="new-pill">New</span></label>
+          <div class="linked-panel">
+            <div class="lp-title">These products use this product's COA:</div>
+            <div class="linked-row">
+              <span>Remedy Smalls 3.5g</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="badge b-validated" style="font-size:10px;">Validated</span>
+                <a href="#">View →</a>
+              </div>
+            </div>
+            <div class="linked-row">
+              <span>Remedy Pre-Rolls 1g</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="badge b-validated" style="font-size:10px;">Validated</span>
+                <a href="#">View →</a>
+              </div>
+            </div>
+            <div class="linked-row">
+              <span>Remedy Pre-Rolls 5-pack</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="badge b-validated" style="font-size:10px;">Validated</span>
+                <a href="#">View →</a>
+              </div>
+            </div>
+            <div class="linked-row">
+              <span>Remedy Loose Flower 7g</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="badge b-validated" style="font-size:10px;">Validated</span>
+                <a href="#">View →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider"/>
+        <div class="form-field">
+          <label class="form-label">Listing Status</label>
+          <select class="form-select"><option>In Stock</option></select>
+        </div>
+        <div style="margin-top:8px;">
+          <button style="background:var(--blue-dark);color:white;border:none;border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:13px;font-weight:600;padding:8px 20px;cursor:pointer;">Save</button>
+        </div>
+      </div>
+
+      <div class="modal-right">
+        <div class="publish-row"><span>Publish</span><div class="toggle-on"></div></div>
+        <div class="preview-card">
+          <div class="preview-img">🌿</div>
+          <div class="preview-body">
+            <div class="pname">Remedy Shake 18.9%</div>
+            <div class="pco">🔵 Tweedle Farms</div>
+            <div class="ptag">Smokable Flower</div>
+            <div class="pprice">$12.00 / unit</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:12px;font-size:12px;line-height:1.6;color:#166534;">
+          <div style="font-weight:700;margin-bottom:4px;">🔗 COA Source</div>
+          <div style="color:var(--text-muted);">This product's COA is shared with <strong style="color:var(--text);">4 other products</strong>.</div>
+          <div style="margin-top:5px;"><span class="badge b-validated" style="font-size:10px;">COA Validated</span></div>
+          <div style="margin-top:5px;font-size:10px;color:var(--text-muted);">Expires: 01/10/2027</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>On the COA Source product:</strong> A "Linked Products" section shows all products currently Shared to this COA with their current status and a direct link to each. The "Replace COA" button shows a warning that 4 products will be affected. This is the single place where the COA file is managed.
+  </div>
+</div>
+
+<!-- ══ SECTION 5: Confirmation modal ══ -->
+<div>
+  <p class="section-label">5 — Confirmation Modal When Updating a Shared COA</p>
+  <div style="background:rgba(15,23,42,.4);border-radius:12px;padding:40px;display:flex;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:var(--radius-card);max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Update shared COA?</div>
+      <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:16px;">
+        You're replacing <strong>Remedy-Shake-18.9-BatchA-COA.pdf</strong>.<br>
+        This COA is shared with <strong>4 other products</strong>. Updating it will affect all of them immediately:
+      </p>
+      <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:20px;font-size:12px;line-height:1.8;color:var(--text-muted);">
+        • Remedy Smalls 3.5g<br>
+        • Remedy Pre-Rolls 1g<br>
+        • Remedy Pre-Rolls 5-pack<br>
+        • Remedy Loose Flower 7g
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button style="background:white;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--text-muted);padding:8px 18px;cursor:pointer;">Cancel</button>
+        <button style="background:var(--blue-dark);color:white;border:none;border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:13px;font-weight:600;padding:8px 18px;cursor:pointer;">Replace for all 5 products</button>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    Confirmation modal before saving a COA update on a source product. Lists all affected Shared products by name. The confirm button is explicit: "Replace for all 5 products" — no ambiguity about the scope of the change.
+  </div>
+</div>
+
+</div><!-- /page-body -->
+</body>
+</html>
