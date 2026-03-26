@@ -14,8 +14,6 @@
       --red: #DC2626;
       --red-dark: #B01E1E;
       --gray: #64748B;
-      --bg: #F8FAFC;
-      --surface: #FFFFFF;
       --border: #E2E8F0;
       --text: #0F172A;
       --text-muted: #64748B;
@@ -44,22 +42,25 @@
 
     /* ─── BADGES ─── */
     .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-    .b-missing    { background: #FEE2E2; color: var(--red-dark); border: 1.5px solid #FECACA; }
-    .b-violative  { background: var(--red); color: white; }
-    .b-in-stock   { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
-    .b-pending-t  { color: var(--blue); font-weight: 600; background: none; padding: 0; }
-    .b-na-t       { color: var(--gray); font-weight: 600; background: none; padding: 0; }
-    .b-validated  { background: white; color: var(--green); border: 1.5px solid var(--green); }
-    .b-approved   { background: white; color: var(--green); border: 1.5px solid var(--green); }
+    .b-missing      { background: #FEE2E2; color: var(--red-dark); border: 1.5px solid #FECACA; }
+    .b-violative    { background: var(--red); color: white; }
+    .b-in-stock     { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+    .b-pending-t    { color: var(--blue); font-weight: 600; background: none; padding: 0; }
+    .b-na-t         { color: var(--gray); font-weight: 600; background: none; padding: 0; }
+    .b-validated    { background: white; color: var(--green); border: 1.5px solid var(--green); }
+    .b-approved     { background: white; color: var(--green); border: 1.5px solid var(--green); }
+    .b-not-required { background: #F1F5F9; color: var(--gray); border: 1px solid #CBD5E1; }
     /* Dashed = inherited/rolled-up */
     .b-validated-dot { background: white; color: var(--green); border: 1.5px dashed var(--green); }
     .b-missing-dot   { background: #FEF2F2; color: var(--red-dark); border: 1.5px dashed var(--red-dark); }
-    /* Assignment Level */
-    .b-individual { background: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE; }
-    .b-child      { background: #EDE9FE; color: #5B21B6; border: 1px solid #DDD6FE; }
-    .b-inherited  { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
-    .b-bundle     { background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; }
-    .new-pill { background: #7C3AED; color: white; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: .05em; }
+    /* Assignment Level badges — for legend only, not shown in table */
+    .b-individual   { background: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE; }
+    .b-child        { background: #EDE9FE; color: #5B21B6; border: 1px solid #DDD6FE; }
+    .b-inherited    { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+    .b-bundle       { background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; }
+    .b-not-req-al   { background: #F1F5F9; color: var(--gray); border: 1px solid #CBD5E1; }
+    /* Plain "New" badge — no color association */
+    .new-pill { background: #334155; color: white; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: .05em; }
 
     /* ─── TABLE ─── */
     .table-wrap { background: white; border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--border); }
@@ -77,7 +78,6 @@
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     thead th { background: var(--table-header-bg); color: var(--text); font-weight: 700; font-size: 11px; padding: 8px 10px; text-align: left; border-right: 1px solid #FECDD3; white-space: nowrap; }
     thead th.sorted { color: var(--blue); }
-    thead th.new-col { background: #EDE9FE; color: #5B21B6; border-right-color: #C4B5FD; }
     thead th:first-child { width: 32px; }
     tbody tr { border-bottom: 1px solid var(--border); }
     tbody tr:hover { background: #F8FAFC; }
@@ -85,14 +85,14 @@
     tbody tr.child:hover { background: #E8EFFE; }
     td { padding: 8px 10px; vertical-align: middle; white-space: nowrap; }
     td.sku { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
-    td.product { white-space: normal; max-width: 180px; line-height: 1.4; }
+    td.product { white-space: normal; max-width: 200px; line-height: 1.4; }
     td.indent { padding-left: 28px !important; }
-    td.new-col { background: #FAF5FF; }
     .child-mark { display: inline-block; width: 10px; height: 10px; border-left: 2px solid #CBD5E1; border-bottom: 2px solid #CBD5E1; margin-right: 5px; vertical-align: middle; margin-bottom: 2px; }
     .activity-icons { display: flex; align-items: center; gap: 6px; color: #94A3B8; font-size: 13px; }
 
     /* ─── LEGEND ─── */
-    .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: white; border-radius: var(--radius-card); padding: 20px; border: 1px solid var(--border); }
+    .legend-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; background: white; border-radius: var(--radius-card); padding: 20px; border: 1px solid var(--border); }
+    @media (max-width: 900px) { .legend-grid { grid-template-columns: 1fr 1fr; } }
     .legend-item { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
     .legend-item .li-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .legend-item .li-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
@@ -101,31 +101,31 @@
     /* ─── MODAL ─── */
     .modal-backdrop { background: rgba(15,23,42,.55); border-radius: 12px; padding: 20px; }
     .modal { background: white; border-radius: var(--radius-card); max-width: 900px; margin: 0 auto; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.25); display: flex; }
-    .modal-left { flex: 1; padding: 28px 28px 20px; overflow-y: auto; max-height: 740px; border-right: 1px solid var(--border); }
+    .modal-left { flex: 1; padding: 28px 28px 20px; overflow-y: auto; max-height: 760px; border-right: 1px solid var(--border); }
     .modal-right { width: 260px; flex-shrink: 0; padding: 24px; background: #F8FAFC; }
     .modal-title { font-size: 18px; font-weight: 700; color: var(--text); }
     .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; margin-bottom: 16px; }
-    .modal-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+    .modal-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
     .modal-tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .modal-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
     .form-field { margin-bottom: 16px; }
-    .form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; display: block; }
+    .form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
     .form-input { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; font-family: var(--font-ui); font-size: 13px; color: var(--text); background: white; }
     .form-select { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 28px 8px 10px; font-family: var(--font-ui); font-size: 13px; color: var(--text); background: white; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394A3B8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
-    .form-select.new-field { border-color: #A78BFA; background-color: #FAF5FF; box-shadow: 0 0 0 2px rgba(139,92,246,.15); }
-    .helper-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
-    .helper-text.purple { color: #7C3AED; }
-    .tag-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-dark); color: white; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; margin: 2px; }
+    .helper-text { font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
+    .tag-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-dark); color: white; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
     .section-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-    .preview-label { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-    .preview-sublabel { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+    /* Inherits-from box */
+    .inherits-box { background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-top: 8px; }
+    .inherits-box .ib-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    /* Preview */
     .preview-card { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: white; }
     .preview-img { width: 100%; height: 90px; background: linear-gradient(135deg,#EEF2FF,#E0E7FF); display: flex; align-items: center; justify-content: center; font-size: 28px; }
     .preview-body { padding: 10px; }
-    .preview-body .pname { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .preview-body .pname { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
     .preview-body .pco { font-size: 11px; color: var(--blue); }
     .preview-body .ptag { display: inline-block; background: #F1F5F9; color: var(--text-muted); font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-top: 4px; }
-    .preview-body .pprice { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 6px; }
+    .preview-body .pprice { font-size: 13px; font-weight: 700; margin-top: 6px; }
     .publish-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: 13px; font-weight: 600; }
     .toggle-on { width: 36px; height: 20px; background: var(--green); border-radius: 10px; position: relative; }
     .toggle-on::after { content:''; position: absolute; right: 3px; top: 3px; width: 14px; height: 14px; background: white; border-radius: 50%; }
@@ -140,114 +140,79 @@
 </head>
 <body>
 
-<h1 class="page-title">QP-3544 — COA Assignment Level · Mockup v2</h1>
+<h1 class="page-title">QP-3544 — COA Assignment Level · Mockup v3</h1>
 
 <!-- ═══ SECTION 1: Legend ═══ -->
 <div class="mockup">
-  <p class="section-label">1 — COA Assignment Level — What Each Value Means</p>
+  <p class="section-label">1 — COA Assignment Level Values (set in Product Builder only — not a table column)</p>
   <div class="legend-grid">
 
     <div class="legend-item">
-      <div class="li-title">
-        <span class="badge b-individual">Individual</span>
-        <span style="font-size:11px;color:var(--text-muted);font-weight:400;">— default for all products</span>
-      </div>
-      <div class="li-desc">
-        This product requires its own COA directly assigned to it. Used for:<br>
-        • Standalone products with no children<br>
-        • Variant rows that each need their own COA (e.g. different strains)<br><br>
-        COA badge = <strong>solid outline</strong> (directly assigned).
-      </div>
-      <div class="li-example">
-        Shows: <span class="badge b-validated">COA Validated</span> or <span class="badge b-missing">Missing</span>
-      </div>
+      <div class="li-title"><span class="badge b-individual">Individual</span> <span style="font-size:11px;color:var(--text-muted);font-weight:400;">default</span></div>
+      <div class="li-desc">This product requires its own COA assigned directly to it. Used for standalone products and for variant rows that each need their own COA (e.g. different strains). COA Status badge = <strong>solid outline</strong>.</div>
+      <div class="li-example">Shows: <span class="badge b-validated">COA Validated</span> or <span class="badge b-missing">Missing</span></div>
     </div>
 
     <div class="legend-item">
-      <div class="li-title">
-        <span class="badge b-child">Child</span>
-        <span style="font-size:11px;color:var(--text-muted);font-weight:400;">— set on the parent row</span>
-      </div>
-      <div class="li-desc">
-        Set on a <strong>parent/container row</strong> to say: "I'm just a grouping row — my children each need their own COAs. Roll their statuses up to me."<br><br>
-        The parent row shows an <strong>aggregated (rolled-up)</strong> status derived from all Individual children. Dashed badge = derived, not directly assigned.
-      </div>
-      <div class="li-example">
-        Parent shows: <span class="badge b-validated-dot">COA Validated ⤵</span> or <span class="badge b-missing-dot">Missing ⤵</span>
-        <span style="font-size:10px;">(dashed = rolled up from children)</span>
-      </div>
+      <div class="li-title"><span class="badge b-not-req-al">Not Required</span></div>
+      <div class="li-desc">This product does not require a COA at all (e.g. accessories, apparel). No COA compliance is tracked. COA Status shows <strong>N/A</strong> — excluded from all COA counts.</div>
+      <div class="li-example">Shows: <span class="b-na-t">N/A</span> in COA Status</div>
     </div>
 
     <div class="legend-item">
-      <div class="li-title">
-        <span class="badge b-inherited">Inherited</span>
-        <span style="font-size:11px;color:var(--text-muted);font-weight:400;">— set on a variant row</span>
-      </div>
-      <div class="li-desc">
-        Set on a <strong>variant row</strong> that doesn't need its own COA — it shares a COA with another product. You select <em>which product it inherits from</em> via a "Inherits from" dropdown that appears when this is selected.<br><br>
-        Typically used for weight variants of the same strain (7g, 28g inherit from the 3.5g). Does <strong>not count</strong> toward Missing totals.
-      </div>
-      <div class="li-example">
-        Shows: <span class="badge b-validated-dot">COA Validated ⤵</span> or <span class="badge b-missing-dot">Missing ⤵</span>
-        <span style="font-size:10px;">(reflects source product's status)</span>
-      </div>
+      <div class="li-title"><span class="badge b-child">Child</span> <span style="font-size:11px;color:var(--text-muted);font-weight:400;">set on parent row</span></div>
+      <div class="li-desc">Set on a <strong>parent/container row</strong>. Children each need their own COAs. Parent shows an aggregated status rolled up from all Individual children. COA Status badge = <strong>dashed outline</strong> (rolled up, not directly assigned).</div>
+      <div class="li-example">Parent shows: <span class="badge b-validated-dot">COA Validated ⤵</span> or <span class="badge b-missing-dot">Missing ⤵</span></div>
     </div>
 
     <div class="legend-item">
-      <div class="li-title">
-        <span class="badge b-bundle">Bundle</span>
-        <span style="font-size:11px;color:var(--text-muted);font-weight:400;">— set on bundle products</span>
-      </div>
-      <div class="li-desc">
-        Set on a product that is composed of other existing catalog products (e.g. a gift set containing a vape + tincture + pre-roll). No COA needed directly — status derived from the component products.<br><br>
-        Does <strong>not count</strong> toward Missing totals.
-      </div>
-      <div class="li-example">
-        Shows: <span class="badge b-validated-dot">COA Validated ⤵</span>
-        <span style="font-size:10px;">(all components validated)</span>
-      </div>
+      <div class="li-title"><span class="badge b-inherited">Inherited</span> <span style="font-size:11px;color:var(--text-muted);font-weight:400;">set on variant row</span></div>
+      <div class="li-desc">This variant shares a COA with another product. An "Inherits COA From" selector appears to choose the source (sibling variants only). Does <strong>not count</strong> toward Missing totals. COA Status badge = <strong>dashed outline</strong>.</div>
+      <div class="li-example">Shows: <span class="badge b-validated-dot">COA Validated ⤵</span> or <span class="badge b-missing-dot">Missing ⤵</span></div>
+    </div>
+
+    <div class="legend-item">
+      <div class="li-title"><span class="badge b-bundle">Bundle</span></div>
+      <div class="li-desc">Product composed of other catalog products. No COA assigned directly — status derived from component products. Does <strong>not count</strong> toward Missing totals. COA Status badge = <strong>dashed outline</strong>.</div>
+      <div class="li-example">Shows: <span class="badge b-validated-dot">COA Validated ⤵</span></div>
     </div>
 
   </div>
 
-  <!-- Flow diagram in text form -->
   <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);padding:20px;margin-top:12px;">
-    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;">How inheritance direction works</p>
-    <div style="display:flex;gap:32px;flex-wrap:wrap;font-size:12px;">
-
-      <div style="flex:1;min-width:220px;border:1px solid #DDD6FE;border-radius:6px;padding:14px;background:#FAF5FF;">
-        <p style="font-weight:700;color:#5B21B6;margin-bottom:8px;">Option A — Children aggregate UP</p>
-        <p style="color:var(--text-muted);line-height:1.6;">
+    <p style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;">Inheritance direction — two valid patterns</p>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:12px;">
+      <div style="flex:1;min-width:220px;border:1px solid var(--border);border-radius:6px;padding:14px;">
+        <p style="font-weight:700;color:var(--text);margin-bottom:8px;">Option A — Children aggregate UP</p>
+        <p style="color:var(--text-muted);line-height:1.8;">
           Parent → <span class="badge b-child" style="font-size:10px;">Child</span><br>
-          Child 1 (Strain A 3.5g) → <span class="badge b-individual" style="font-size:10px;">Individual</span> ← COA here<br>
-          Child 2 (Strain A 7g) → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Child 1<br>
-          Child 3 (Strain B 3.5g) → <span class="badge b-individual" style="font-size:10px;">Individual</span> ← COA here<br><br>
-          Parent status = aggregate of all Individual children
+          Strain A 3.5g → <span class="badge b-individual" style="font-size:10px;">Individual</span> ← COA here<br>
+          Strain A 7g → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Strain A 3.5g<br>
+          Strain B 3.5g → <span class="badge b-individual" style="font-size:10px;">Individual</span> ← COA here<br>
+          Parent status = rollup from all Individual children
         </p>
       </div>
-
-      <div style="flex:1;min-width:220px;border:1px solid #BBF7D0;border-radius:6px;padding:14px;background:#F0FDF4;">
-        <p style="font-weight:700;color:#166534;margin-bottom:8px;">Option B — Parent COA inherited DOWN by variants</p>
-        <p style="color:var(--text-muted);line-height:1.6;">
+      <div style="flex:1;min-width:220px;border:1px solid var(--border);border-radius:6px;padding:14px;">
+        <p style="font-weight:700;color:var(--text);margin-bottom:8px;">Option B — COA flows DOWN from parent</p>
+        <p style="color:var(--text-muted);line-height:1.8;">
           Parent → <span class="badge b-individual" style="font-size:10px;">Individual</span> ← COA lives here<br>
-          Child 1 (Variant A) → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Parent<br>
-          Child 2 (Variant B) → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Parent<br>
-          Child 3 (Variant C) → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Parent<br><br>
-          Parent owns the COA; all children point at parent
+          Variant A → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Parent<br>
+          Variant B → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Parent<br>
+          Variant C → <span class="badge b-inherited" style="font-size:10px;">Inherited</span> from Parent<br>
+          Parent owns the COA; variants reflect its status
         </p>
       </div>
-
     </div>
   </div>
   <div class="annotation">
-    <strong>Key distinction:</strong> "Child" (set on parent) = children own COAs, parent aggregates UP. "Individual on parent + Inherited on children" = parent owns COA, status flows DOWN. Both are valid patterns — the assignment level on each row determines which direction.
+    <strong>COA Assignment Level is not a column in the compliance table.</strong> It is only set and visible inside the Product Builder modal. The dashed badge style in the table is the only visual indicator of inherited/rolled-up COA status.
   </div>
 </div>
 
 
 <!-- ═══ SECTION 2: Product Compliance Table ═══ -->
 <div class="mockup">
-  <p class="section-label">2 — Product Compliance Table (Mixed Variant Example — Blue Dream + OG Kush)</p>
+  <p class="section-label">2 — Product Compliance Table — Dashed Badge Visual Only (no COA Assignment Level column)</p>
   <div class="table-wrap">
     <div class="table-toolbar">
       <div class="search-fake">🔍 Search products by definition, classification or SKU...</div>
@@ -261,7 +226,7 @@
     <div class="results-row">
       <strong>8 Products</strong> | <span style="color:var(--blue);">⇕ Expand All</span> <span style="color:var(--blue);">⇕ Collapse All</span>
       <div class="ml">
-        <span>Last Scan: 03/25/2026 2:14 PM EST &nbsp;&nbsp; 8 products &nbsp;&nbsp; 2 COAs found</span>
+        <span>Last Scan: 03/25/2026 2:14 PM &nbsp;&nbsp; 8 products &nbsp;&nbsp; 2 COAs found</span>
         <span>Rows per page: <strong>25</strong></span>
       </div>
     </div>
@@ -275,10 +240,8 @@
           <th class="sorted">Product Definition ▲</th>
           <th>Price</th>
           <th>Classification</th>
-          <th>Approved ⓘ</th>
           <th>Listing Status</th>
-          <th>COA Status</th>
-          <th class="new-col">COA Assignment Level <span class="new-pill">NEW</span></th>
+          <th>COA Status <span class="new-pill">New</span></th>
           <th>Disposition</th>
           <th>Date Added</th>
           <th>Activity</th>
@@ -286,7 +249,7 @@
       </thead>
       <tbody>
 
-        <!-- PARENT: Child level (aggregates up) -->
+        <!-- PARENT: Child level — aggregates up — 1 child missing -->
         <tr>
           <td><input type="checkbox"/></td>
           <td style="color:#94A3B8;">▼</td>
@@ -294,10 +257,8 @@
           <td class="product"><strong>Hemp Flower Multi-Strain Bundle</strong></td>
           <td>$28.00</td>
           <td>Smokable Flower</td>
-          <td><span class="b-pending-t">Pending</span></td>
           <td><span class="badge b-in-stock">In Stock</span></td>
           <td><span class="badge b-missing-dot" title="Rolled up from children — OG Kush 3.5g is missing a COA">Missing ⤵</span></td>
-          <td class="new-col"><span class="badge b-child">Child</span></td>
           <td><span class="badge b-violative">⚠ Violative</span></td>
           <td>03/25/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
@@ -310,42 +271,36 @@
           <td class="product indent">Blue Dream Hemp Flower — 3.5g</td>
           <td>$28.00</td>
           <td>Smokable Flower</td>
-          <td><span class="b-na-t">N/A</span></td>
           <td><span class="badge b-in-stock">In Stock</span></td>
           <td><span class="badge b-validated">COA Validated</span></td>
-          <td class="new-col"><span class="badge b-individual">Individual</span></td>
           <td><span class="badge b-approved">Approved</span></td>
           <td>03/25/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
         </tr>
 
-        <!-- Child: Blue Dream 7g — Inherited from 3.5g -->
+        <!-- Child: Blue Dream 7g — Inherited -->
         <tr class="child">
           <td></td><td></td>
           <td class="sku indent"><span class="child-mark"></span>ACM-SMO-22-BD7</td>
           <td class="product indent">Blue Dream Hemp Flower — 7g</td>
           <td>$28.00</td>
           <td>Smokable Flower</td>
-          <td><span class="b-na-t">N/A</span></td>
           <td><span class="badge b-in-stock">In Stock</span></td>
-          <td><span class="badge b-validated-dot" title="Inherited from: Blue Dream 3.5g (ACM-SMO-22-BD35)">COA Validated ⤵</span></td>
-          <td class="new-col"><span class="badge b-inherited">Inherited</span></td>
+          <td><span class="badge b-validated-dot" title="Inherited from: Blue Dream Hemp Flower 3.5g (ACM-SMO-22-BD35)">COA Validated ⤵</span></td>
           <td><span class="badge b-approved">Approved</span></td>
           <td>03/25/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
         </tr>
 
-        <!-- Child: Blue Dream 28g — Inherited from 3.5g -->
+        <!-- Child: Blue Dream 28g — Inherited -->
         <tr class="child">
           <td></td><td></td>
           <td class="sku indent"><span class="child-mark"></span>ACM-SMO-22-BD28</td>
           <td class="product indent">Blue Dream Hemp Flower — 28g</td>
           <td>$62.00</td>
           <td>Smokable Flower</td>
-          <td><span class="b-na-t">N/A</span></td>
           <td><span class="badge b-in-stock">In Stock</span></td>
-          <td><span class="badge b-validated-dot" title="Inherited from: Blue Dream 3.5g (ACM-SMO-22-BD35)">COA Validated ⤵</span></td>
-          <td class="new-col"><span class="badge b-inherited">Inherited</span></td>
+          <td><span class="badge b-validated-dot" title="Inherited from: Blue Dream Hemp Flower 3.5g (ACM-SMO-22-BD35)">COA Validated ⤵</span></td>
           <td><span class="badge b-approved">Approved</span></td>
           <td>03/25/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
@@ -358,44 +313,38 @@
           <td class="product indent">OG Kush Hemp Flower — 3.5g</td>
           <td>$28.00</td>
           <td>Smokable Flower</td>
-          <td><span class="b-na-t">N/A</span></td>
           <td><span class="badge b-in-stock">In Stock</span></td>
           <td><span class="badge b-missing">Missing</span></td>
-          <td class="new-col"><span class="badge b-individual">Individual</span></td>
           <td><span class="badge b-violative">⚠ Violative</span></td>
           <td>03/25/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
         </tr>
 
-        <!-- Child: OG Kush 7g — Inherited from 3.5g (which is missing) -->
+        <!-- Child: OG Kush 7g — Inherited from OG Kush 3.5g (missing) -->
         <tr class="child">
           <td></td><td></td>
           <td class="sku indent"><span class="child-mark"></span>ACM-SMO-22-OK7</td>
           <td class="product indent">OG Kush Hemp Flower — 7g</td>
           <td>$28.00</td>
           <td>Smokable Flower</td>
-          <td><span class="b-na-t">N/A</span></td>
           <td><span class="badge b-in-stock">In Stock</span></td>
-          <td><span class="badge b-missing-dot" title="Inherited from: OG Kush 3.5g (ACM-SMO-22-OK35) — source COA is missing">Missing ⤵</span></td>
-          <td class="new-col"><span class="badge b-inherited">Inherited</span></td>
+          <td><span class="badge b-missing-dot" title="Inherited from: OG Kush Hemp Flower 3.5g (ACM-SMO-22-OK35) — source COA missing">Missing ⤵</span></td>
           <td><span class="badge b-violative">⚠ Violative</span></td>
           <td>03/25/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
         </tr>
 
-        <!-- Standalone Individual -->
+        <!-- Standalone — Not Required (accessory) -->
         <tr>
           <td><input type="checkbox"/></td><td></td>
-          <td class="sku">ACM-VAP-11</td>
-          <td class="product">Green Roads CBD Vape 1200mg — Blue Razz</td>
+          <td class="sku">ACM-ACC-04</td>
+          <td class="product">Glass Water Pipe — 10 Inch</td>
           <td>$29.99</td>
-          <td>Vape</td>
-          <td><span class="b-pending-t">Pending</span></td>
+          <td>Accessories</td>
           <td><span class="badge b-in-stock">In Stock</span></td>
-          <td><span class="badge b-validated">COA Validated</span></td>
-          <td class="new-col"><span class="badge b-individual">Individual</span></td>
-          <td><span class="badge b-violative">⚠ Violative</span></td>
-          <td>02/25/26</td>
+          <td><span class="b-na-t">N/A</span></td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td>01/10/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
         </tr>
 
@@ -406,10 +355,8 @@
           <td class="product">Starter Pack Bundle (Vape + Tincture + Pre-Roll)</td>
           <td>$69.99</td>
           <td>Bundle</td>
-          <td><span class="b-pending-t">Pending</span></td>
           <td><span class="badge b-in-stock">In Stock</span></td>
-          <td><span class="badge b-validated-dot" title="Derived from bundle components: ACM-VAP-11, ACM-TNC-3, ACM-PRE-8 — all validated">COA Validated ⤵</span></td>
-          <td class="new-col"><span class="badge b-bundle">Bundle</span></td>
+          <td><span class="badge b-validated-dot" title="Derived from bundle components — all validated">COA Validated ⤵</span></td>
           <td><span class="badge b-approved">Approved</span></td>
           <td>01/15/26</td>
           <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
@@ -420,8 +367,7 @@
     </div>
   </div>
   <div class="annotation">
-    <strong>Parent (Hemp Flower Multi-Strain Bundle):</strong> Assignment Level = Child → status rolled up from Individual children. BD 3.5g (Individual ✓) + OG Kush 3.5g (Individual, missing COA ✗) → parent shows dashed "Missing ⤵".<br>
-    <strong>Missing count = 1</strong> — only OG Kush 3.5g counts. BD 7g, BD 28g, OG Kush 7g (all Inherited) do not inflate the count. Bundle row also excluded.
+    <strong>No COA Assignment Level column.</strong> The only change visible in the table is the dashed ⤵ badge style on inherited/rolled-up COA statuses, and N/A for Not Required products. Hovering a dashed badge shows a tooltip identifying the source. The Approved column is removed per QP-3501 scope.
   </div>
 </div>
 
@@ -433,30 +379,31 @@
     <div class="count-card">
       <div class="cc-label">Before (current)</div>
       <div class="cc-value" style="color:#B01E1E;">6</div>
-      <div class="cc-note">All variants with no direct COA = Missing (including weight variants that share a strain COA)</div>
+      <div class="cc-note">All variants without a directly-assigned COA counted as Missing</div>
     </div>
     <div style="display:flex;align-items:center;font-size:24px;color:var(--gray);">→</div>
     <div class="count-card">
       <div class="cc-label">After (QP-3544)</div>
       <div class="cc-value" style="color:#16A34A;">1</div>
-      <div class="cc-note">Only Individual rows without a COA count. Inherited + Bundle rows excluded.</div>
+      <div class="cc-note">Only Individual rows without a COA count. Inherited, Child, Bundle, Not Required excluded.</div>
     </div>
     <div style="flex:2;min-width:240px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12px;line-height:1.8;color:var(--text-muted);">
       <strong style="color:var(--text);">What changed:</strong><br>
-      BD 7g → Inherited → <strong style="color:var(--green);">removed from count</strong><br>
-      BD 28g → Inherited → <strong style="color:var(--green);">removed from count</strong><br>
-      OG Kush 7g → Inherited → <strong style="color:var(--green);">removed from count</strong><br>
-      Bundle product → Bundle → <strong style="color:var(--green);">removed from count</strong><br>
-      Parent row → Child → <strong style="color:var(--green);">removed from count</strong> (aggregated)<br>
-      OG Kush 3.5g → Individual, no COA → <strong style="color:#B01E1E;">still counts (1)</strong>
+      BD 7g → Inherited → <strong style="color:#16A34A;">not counted</strong><br>
+      BD 28g → Inherited → <strong style="color:#16A34A;">not counted</strong><br>
+      OG Kush 7g → Inherited → <strong style="color:#16A34A;">not counted</strong><br>
+      Parent row → Child → <strong style="color:#16A34A;">not counted</strong> (aggregated only)<br>
+      Bundle → Bundle → <strong style="color:#16A34A;">not counted</strong><br>
+      Accessory → Not Required → <strong style="color:#16A34A;">not counted</strong><br>
+      OG Kush 3.5g → Individual, no COA → <strong style="color:#B01E1E;">counts as Missing (1)</strong>
     </div>
   </div>
 </div>
 
 
-<!-- ═══ SECTION 4: Product Builder — Inherited with source selector ═══ -->
+<!-- ═══ SECTION 4: Product Builder Modal ═══ -->
 <div class="mockup">
-  <p class="section-label">4 — Product Builder Modal — "Inherits From" Selector (appears when Inherited is selected)</p>
+  <p class="section-label">4 — Product Builder Modal — COA Assignment Level Field (only location it's exposed)</p>
   <div class="modal-backdrop">
     <div class="modal">
       <div class="modal-left">
@@ -489,7 +436,7 @@
 
         <hr class="section-divider"/>
 
-        <!-- Existing field -->
+        <!-- Existing field — kept as-is -->
         <div class="form-field">
           <label class="form-label">Does this product require a COA?</label>
           <select class="form-select">
@@ -501,35 +448,32 @@
         <!-- NEW: COA Assignment Level -->
         <div class="form-field">
           <label class="form-label">
-            COA Assignment Level &nbsp;<span class="new-pill">New</span>
+            COA Assignment Level
+            <span class="new-pill">New</span>
           </label>
-          <select class="form-select new-field">
-            <option>Individual — this product requires its own COA</option>
-            <option selected>Inherited — inherits from another product</option>
+          <select class="form-select">
+            <option>Individual — requires own COA</option>
+            <option selected>Inherited — shares COA with another product</option>
             <option>Child — parent container, children each hold COAs</option>
             <option>Bundle — derives status from component products</option>
+            <option>Not Required — no COA needed for this product</option>
           </select>
-          <div class="helper-text" style="color:#64748B;margin-top:5px;">
-            Set to <strong>Inherited</strong> — this variant shares a COA with a sibling. Select the source product below.
-          </div>
+          <div class="helper-text">Currently set to <strong>Inherited</strong> — select the source product below.</div>
         </div>
 
-        <!-- NEW: Inherits From — only shown when Inherited is selected -->
-        <div class="form-field" style="background:#FAF5FF;border:1px solid #DDD6FE;border-radius:var(--radius-sm);padding:12px;">
-          <label class="form-label" style="color:#5B21B6;">
-            ⤵ Inherits COA From
-          </label>
-          <select class="form-select new-field">
-            <option selected>Blue Dream Hemp Flower — 3.5g (ACM-SMO-22-BD35)</option>
-            <option>Blue Dream Hemp Flower — 28g (ACM-SMO-22-BD28)</option>
-            <option>OG Kush Hemp Flower — 3.5g (ACM-SMO-22-OK35)</option>
-          </select>
-          <div class="helper-text purple" style="margin-top:6px;">
-            Only sibling variants (same parent) are shown. This variant will reflect the COA status of the selected product.
-          </div>
-          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:12px;">
-            <span style="color:var(--text-muted);">Current status of source:</span>
-            <span class="badge b-validated">COA Validated</span>
+        <!-- Conditional: Inherits COA From — only shown when Inherited is selected -->
+        <div class="form-field">
+          <div class="inherits-box">
+            <div class="ib-label">⤵ Inherits COA From</div>
+            <select class="form-select">
+              <option selected>Blue Dream Hemp Flower — 3.5g (ACM-SMO-22-BD35)</option>
+              <option>Blue Dream Hemp Flower — 28g (ACM-SMO-22-BD28)</option>
+              <option>OG Kush Hemp Flower — 3.5g (ACM-SMO-22-OK35)</option>
+            </select>
+            <div class="helper-text" style="margin-top:6px;">
+              Only sibling variants (same parent) are shown. This variant reflects the COA status of the selected product.<br>
+              <span style="margin-top:4px;display:inline-block;">Source status: <span class="badge b-validated" style="font-size:10px;">COA Validated</span></span>
+            </div>
           </div>
         </div>
 
@@ -569,22 +513,17 @@
             <div class="pprice">$28.00 / unit</div>
           </div>
         </div>
-
-        <div style="margin-top:14px;background:#FAF5FF;border:1px solid #DDD6FE;border-radius:6px;padding:12px;font-size:12px;line-height:1.6;">
-          <div style="font-weight:700;color:#5B21B6;margin-bottom:4px;">COA Assignment</div>
-          <div style="color:var(--text-muted);">Level: <strong>Inherited</strong></div>
-          <div style="color:var(--text-muted);">Source: Blue Dream 3.5g</div>
-          <div style="margin-top:6px;">
-            <span style="color:var(--green);font-weight:600;">● COA Validated</span>
-            <span style="color:var(--text-muted);font-size:10px;"> (inherited)</span>
-          </div>
+        <div style="margin-top:14px;background:#F8FAFC;border:1px solid var(--border);border-radius:6px;padding:12px;font-size:12px;line-height:1.6;color:var(--text-muted);">
+          <div style="font-weight:700;color:var(--text);margin-bottom:4px;">COA Assignment</div>
+          <div>Level: <strong>Inherited</strong></div>
+          <div>Source: Blue Dream 3.5g</div>
+          <div style="margin-top:5px;"><span class="badge b-validated" style="font-size:10px;">COA Validated</span> <span style="font-size:10px;">(inherited)</span></div>
         </div>
       </div>
-
     </div>
   </div>
   <div class="annotation">
-    <strong>"Inherits COA From" selector</strong> appears conditionally when COA Assignment Level = Inherited is selected. Shows only sibling variants (same parent) in the dropdown. Also displays the current COA status of the selected source so the user knows what they're inheriting before saving.
+    <strong>COA Assignment Level</strong> is a new field in the Product Builder modal only — it does not appear as a column in the compliance table. The "Inherits COA From" selector appears conditionally when Inherited is selected and is hidden for all other values. The <span class="new-pill">New</span> badge marks it for dev team reference.
   </div>
 </div>
 
