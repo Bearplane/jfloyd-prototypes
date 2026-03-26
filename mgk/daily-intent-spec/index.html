@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DailyIntentPanel — Unity Implementation Spec</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── DESIGN TOKENS ── */
+    :root {
+      --tan:              #e3ca98;
+      --dark-btn:         #1a2020;
+      --darker-bg:        #1b2121;
+      --green:            #00a81b;
+      --red:              #d66a6a;
+      --preview-bg:       #0d0a06;
+      --inspector-bg:     #0f1117;
+      --inspector-border: #2a2f3d;
+      --inspector-header: #1a1f2e;
+      --inspector-label:  #8b95b0;
+      --inspector-value:  #e8eaf0;
+      --inspector-key:    #79b8ff;
+      --inspector-comp:   #f97583;
+      --inspector-warn:   #ffab70;
+      --inspector-check:  #6bcb77;
+      --text-cream:       #f0e8d0;
+      --text-gold:        #e4c870;
+      --text-muted:       #8a7050;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--preview-bg);
+      color: var(--tan);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 13px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ════════════════════════════════════════════
+       TOP BAR
+    ════════════════════════════════════════════ */
+    .top-bar {
+      background: #080604;
+      border-bottom: 1px solid rgba(227,202,152,0.12);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .back-link {
+      color: rgba(227,202,152,0.5);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border: 1px solid rgba(227,202,152,0.2);
+      border-radius: 3px;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .back-link:hover { color: var(--tan); border-color: var(--tan); }
+    .top-bar h1 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--tan);
+      letter-spacing: 0.05em;
+    }
+    .top-bar .badge {
+      font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid;
+    }
+    .badge-spec { border-color: #ffab70; color: #ffab70; background: rgba(255,171,112,0.08); }
+    .badge-est  { border-color: var(--tan); color: var(--tan); background: rgba(227,202,152,0.08); }
+
+    /* ════════════════════════════════════════════
+       CHECKLIST PANEL
+    ════════════════════════════════════════════ */
+    .checklist-panel {
+      height: 220px;
+      border-bottom: 1px solid var(--inspector-border);
+      display: flex;
+      flex-direction: column;
+      background: #080b0f;
+      flex-shrink: 0;
+    }
+    .checklist-header {
+      background: var(--inspector-header);
+      border-bottom: 1px solid var(--inspector-border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .checklist-header h2 {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-gold);
+      letter-spacing: 0.05em;
+    }
+    .checklist-header .subtitle {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+    .checklist-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+      display: flex;
+    }
+    .checklist-col {
+      flex: 1;
+      padding: 0 14px;
+      border-right: 1px solid var(--inspector-border);
+    }
+    .checklist-col:last-child { border-right: none; }
+    .checklist-col-title {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--inspector-label);
+      margin-bottom: 6px;
+    }
+    .check-item {
+      display: flex;
+      gap: 8px;
+      padding: 3px 0;
+      font-size: 10px;
+      line-height: 1.4;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .check-num {
+      color: var(--inspector-label);
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 9px;
+      flex-shrink: 0;
+      width: 18px;
+      text-align: right;
+      padding-top: 1px;
+    }
+    .check-text { color: var(--text-cream); flex: 1; }
+    .check-text .mono { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--inspector-key); font-size: 9px; }
+    .check-text .val  { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--inspector-warn); font-size: 9px; }
+    .check-text .path { font-family: ui-monospace, Menlo, Consolas, monospace; color: #79b8ff; font-size: 9px; }
+    .check-item.section-break .check-text { font-weight: 700; color: var(--text-gold); }
+    .check-item.section-break { margin-top: 6px; }
+
+    /* ════════════════════════════════════════════
+       MAIN LAYOUT
+    ════════════════════════════════════════════ */
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .content-row {
+      flex: 1 1 0;
+      min-height: 0;
+      position: relative;
+    }
+
+    /* ════════════════════════════════════════════
+       PREVIEW SIDE
+    ════════════════════════════════════════════ */
+    .preview-side {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 700px;
+      min-width: 360px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--preview-bg);
+      background-image:
+        radial-gradient(ellipse at 50% 50%, rgba(70,42,8,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse at 50% 0%, rgba(40,25,5,0.4) 0%, transparent 55%);
+      padding: 14px 16px;
+    }
+
+    /* ════════════════════════════════════════════
+       DRAG DIVIDER
+    ════════════════════════════════════════════ */
+    .drag-divider {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 700px;
+      width: 5px;
+      cursor: col-resize;
+      background: var(--inspector-border);
+      transition: background 0.15s;
+      z-index: 10;
+    }
+    .drag-divider:hover, .drag-divider.dragging { background: #58a6ff; }
+
+    /* ════════════════════════════════════════════
+       DEV PANEL
+    ════════════════════════════════════════════ */
+    .dev-panel {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 705px;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-left: 1px solid var(--inspector-border);
+    }
+
+    /* ════════════════════════════════════════════
+       PREVIEW INNER
+    ════════════════════════════════════════════ */
+    .preview-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .preview-col-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(227,202,152,0.2);
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ════════════════════════════════════════════
+       STATE SELECTOR (day-btn style)
+    ════════════════════════════════════════════ */
+    .day-selector {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+    .day-btn {
+      background: var(--dark-btn);
+      border: 1px solid rgba(227,202,152,0.3);
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--tan);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 20px;
+      letter-spacing: 0.04em;
+      opacity: 0.45;
+      transition: opacity 0.15s, border-color 0.15s;
+    }
+    .day-btn:hover { opacity: 0.85; border-color: rgba(227,202,152,0.65); }
+    .day-btn.active { opacity: 1.0; border-color: var(--tan); }
+
+    /* ════════════════════════════════════════════
+       FULL-SCREEN OVERLAY MOCK
+    ════════════════════════════════════════════ */
+    .overlay-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 668px;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.75);
+      border: 1px solid rgba(227,202,152,0.08);
+      border-radius: 3px;
+      padding: 20px;
+    }
+    .overlay-bg-label {
+      position: absolute;
+      top: 6px; left: 10px;
+      font-size: 8px;
+      color: rgba(227,202,152,0.2);
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      letter-spacing: 0.06em;
+    }
+
+    /* ════════════════════════════════════════════
+       INTENT MODAL
+    ════════════════════════════════════════════ */
+    .intent-modal {
+      width: 560px;
+      max-width: 100%;
+      position: relative;
+      background-color: #130e05;
+      background-image: url('../assets/ui2/BackgroundColor.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      border: 2px solid rgba(227,202,152,0.55);
+      border-radius: 4px;
+      box-shadow:
+        0 16px 64px rgba(0,0,0,0.95),
+        0 0 0 4px rgba(227,202,152,0.04),
+        inset 0 0 40px rgba(180,130,40,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Modal Header ── */
+    .modal-header {
+      padding: 18px 24px 10px;
+      text-align: center;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--tan);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .modal-subtitle {
+      font-size: 11px;
+      color: var(--tan);
+      opacity: 0.5;
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+    }
+    .modal-divider {
+      height: 10px;
+      margin: 8px 20px 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/SidePattern.png');
+      mask-image: url('../assets/ui2/SidePattern.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      opacity: 0.3;
+    }
+
+    /* ── Intent List ── */
+    .intent-list {
+      padding: 10px 16px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* ── Intent Button ── */
+    .intent-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #1a2020;
+      border: 1px solid rgba(227,202,152,0.25);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, filter 0.15s;
+      text-align: left;
+      width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .intent-btn:hover:not(.locked):not(.selected-btn) {
+      border-color: rgba(227,202,152,0.65);
+      filter: brightness(1.15);
+    }
+    .intent-btn.locked {
+      opacity: 0.42;
+      cursor: default;
+      pointer-events: none;
+    }
+    .intent-btn.selected-btn {
+      border-color: var(--tan);
+      box-shadow:
+        0 0 0 1px rgba(227,202,152,0.35),
+        0 0 18px rgba(227,202,152,0.18),
+        inset 0 0 12px rgba(227,202,152,0.05);
+      background: #1f2820;
+    }
+
+    /* ── Icon ── */
+    .intent-icon {
+      width: 28px;
+      height: 28px;
+      display: inline-block;
+      flex-shrink: 0;
+      background-color: var(--tan);
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+    .i-sword    { -webkit-mask-image: url('../assets/ui2/Sword.png');    mask-image: url('../assets/ui2/Sword.png'); }
+    .i-coin     { -webkit-mask-image: url('../assets/ui2/Coin.png');     mask-image: url('../assets/ui2/Coin.png'); }
+    .i-hammer   { -webkit-mask-image: url('../assets/ui2/Hammer.png');   mask-image: url('../assets/ui2/Hammer.png'); }
+    .i-star     { -webkit-mask-image: url('../assets/ui2/Star.png');     mask-image: url('../assets/ui2/Star.png'); }
+    .i-favors   { -webkit-mask-image: url('../assets/ui2/Favors.png');   mask-image: url('../assets/ui2/Favors.png'); }
+
+    /* ── Label Group ── */
+    .intent-label-group {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .intent-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--tan);
+      letter-spacing: 0.04em;
+    }
+    .intent-desc {
+      font-size: 10px;
+      color: var(--tan);
+      opacity: 0.5;
+      line-height: 1.4;
+    }
+    .intent-lock-info {
+      font-size: 9px;
+      color: var(--inspector-warn);
+      opacity: 0.85;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      margin-top: 1px;
+    }
+
+    /* ── Lock Icon ── */
+    .lock-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+    .lock-icon.hidden { display: none; }
+
+    /* ── Selected indicator ── */
+    .selected-check {
+      position: absolute;
+      top: 6px; right: 8px;
+      font-size: 10px;
+      color: var(--tan);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      display: none;
+    }
+    .intent-btn.selected-btn .selected-check { display: block; }
+
+    /* ── Footer ── */
+    .modal-footer {
+      padding: 6px 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .skip-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--tan);
+      opacity: 0.32;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 4px 12px;
+      transition: opacity 0.15s;
+    }
+    .skip-btn:hover { opacity: 0.65; }
+
+    /* ════════════════════════════════════════════
+       HIERARCHY
+    ════════════════════════════════════════════ */
+    .hierarchy-col {
+      background: #0c0e14;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      height: 38%;
+      min-height: 120px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--inspector-border);
+    }
+    .hierarchy-header {
+      background: var(--inspector-header);
+      border-bottom: 1px solid var(--inspector-border);
+      padding: 8px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--inspector-label);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .tree { padding: 8px 0; flex: 1; overflow-y: auto; }
+    .tree-node {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #c9d1d9;
+      transition: background 0.1s;
+      white-space: nowrap;
+      border-left: 2px solid transparent;
+    }
+    .tree-node:hover { background: rgba(79,100,149,0.15); }
+    .tree-node.selected { background: rgba(56,139,253,0.15); border-left-color: #58a6ff; color: #e6edf3; }
+    .tree-node .indent { display: inline-block; flex-shrink: 0; }
+    .tree-node .icon { font-size: 10px; flex-shrink: 0; opacity: 0.7; }
+    .tree-node .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .tree-node .components { font-size: 9px; color: #6e7681; margin-left: 4px; flex-shrink: 0; }
+    .tree-node.canvas-node { color: #79b8ff; }
+    .tree-node.script-node { border-left-color: rgba(249,117,131,0.4); }
+
+    /* ════════════════════════════════════════════
+       INSPECTOR
+    ════════════════════════════════════════════ */
+    .inspector-col {
+      background: var(--inspector-bg);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+    .inspector-header {
+      background: var(--inspector-header);
+      border-bottom: 1px solid var(--inspector-border);
+      padding: 8px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--inspector-label);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .inspector-content { flex: 1; overflow-y: auto; }
+    .inspector-go-header {
+      padding: 10px 12px 6px;
+      border-bottom: 1px solid var(--inspector-border);
+    }
+    .go-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--inspector-value);
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+    .go-meta { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; }
+    .go-meta-item { font-size: 10px; color: var(--inspector-label); }
+    .go-meta-item span { color: var(--inspector-value); }
+    .go-active { color: var(--inspector-check) !important; }
+
+    .component-block { border-bottom: 1px solid var(--inspector-border); }
+    .comp-header {
+      padding: 6px 12px;
+      background: rgba(30,40,60,0.4);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--inspector-comp);
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .comp-header:hover { background: rgba(40,55,85,0.4); }
+    .comp-header .comp-icon { font-size: 11px; }
+    .comp-body { padding: 6px 12px 10px; }
+    .prop-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 4px;
+      padding: 2px 0;
+      font-size: 11px;
+      align-items: baseline;
+    }
+    .prop-key {
+      color: var(--inspector-label);
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .prop-val {
+      color: var(--inspector-value);
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 10px;
+      word-break: break-all;
+    }
+    .prop-val.est  { color: var(--inspector-warn); }
+    .prop-val.path { color: #79b8ff; font-size: 9px; word-break: break-all; }
+    .bool-true  { color: var(--inspector-check); }
+    .bool-false { color: #f97583; }
+
+    .sf-block {
+      background: rgba(255,171,112,0.05);
+      border: 1px solid rgba(255,171,112,0.2);
+      border-radius: 4px;
+      padding: 6px 8px;
+      margin: 4px 0;
+    }
+    .sf-title { font-size: 9px; color: var(--inspector-warn); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .sf-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4px;
+      font-size: 10px;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      color: var(--inspector-value);
+      padding: 1px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .sf-row:last-child { border-bottom: none; }
+    .sf-field  { color: var(--inspector-warn); }
+    .sf-target { color: #79b8ff; }
+    .section-divider {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--inspector-label);
+      padding: 8px 12px 2px;
+      border-bottom: 1px solid var(--inspector-border);
+    }
+    .sub-block {
+      margin: 4px 0;
+      border: 1px solid rgba(120,130,160,0.18);
+      border-radius: 3px;
+      background: rgba(20,25,35,0.5);
+    }
+    .sub-block-title {
+      font-size: 9px;
+      color: var(--inspector-label);
+      padding: 3px 8px;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      border-bottom: 1px solid rgba(120,130,160,0.18);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .sub-block-body { padding: 4px 8px; }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="/" class="back-link">← Mockups</a>
+  <h1>🎯 DailyIntentPanel — Daily Intent Panel</h1>
+  <span class="badge badge-spec">SPEC</span>
+  <span class="badge badge-est">ESTIMATED</span>
+</div>
+
+<!-- CHECKLIST STRIP -->
+<div class="checklist-panel">
+  <div class="checklist-header">
+    <h2>🛠 Implementation Checklist — DailyIntentPanel.cs</h2>
+    <span class="subtitle">Scene setup · Button wiring · Chapter unlock checks · Animation</span>
+  </div>
+  <div class="checklist-body">
+
+    <!-- COL 1: Scene Setup -->
+    <div class="checklist-col">
+      <div class="checklist-col-title">SCENE SETUP</div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Canvas &amp; Overlay</div></div>
+      <div class="check-item"><div class="check-num">1</div><div class="check-text"><span class="mono">Canvas</span> sortOrder: <span class="val">100</span> — renders above all game UI</div></div>
+      <div class="check-item"><div class="check-num">2</div><div class="check-text"><span class="mono">OverlayBackground</span> — full-screen Image, color <span class="val">rgba(0,0,0,0.75)</span></div></div>
+      <div class="check-item"><div class="check-num">3</div><div class="check-text"><span class="mono">IntentModal</span> anchored center, sizeDelta <span class="val">(560, 480)</span>, pivot <span class="val">(0.5, 0.5)</span></div></div>
+      <div class="check-item"><div class="check-num">4</div><div class="check-text"><span class="mono">TitleText</span> + <span class="mono">SubtitleText</span> wired to DailyIntentPanel fields</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Button Wiring</div></div>
+      <div class="check-item"><div class="check-num">5</div><div class="check-text">Each btn onClick → <span class="mono">SelectIntent(IntentType.X)</span></div></div>
+      <div class="check-item"><div class="check-num">6</div><div class="check-text"><span class="mono">_skipButton</span> → <span class="mono">SelectIntent(IntentType.None)</span></div></div>
+      <div class="check-item"><div class="check-num">7</div><div class="check-text">PlayerPrefs key: <span class="val">"DailyIntentShownDay"</span></div></div>
+    </div>
+
+    <!-- COL 2: Logic -->
+    <div class="checklist-col">
+      <div class="checklist-col-title">SHOW LOGIC</div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Coroutine &amp; Gating</div></div>
+      <div class="check-item"><div class="check-num">8</div><div class="check-text"><span class="mono">TryShowPanel()</span> coroutine — compare epochDay vs <span class="val">lastShownDay</span></div></div>
+      <div class="check-item"><div class="check-num">9</div><div class="check-text"><span class="mono">IsTutorialFarEnough()</span> — needs GuildCreation + HeroCreation + OfficerCommands</div></div>
+      <div class="check-item"><div class="check-num">10</div><div class="check-text"><span class="mono">RefreshButtonVisibility()</span> — per-button chapter unlock checks</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Chapter Unlock Requirements</div></div>
+      <div class="check-item"><div class="check-num">11</div><div class="check-text"><span class="mono">ConquerBtn</span> — requires <span class="val">SoloDungeonsI</span> complete</div></div>
+      <div class="check-item"><div class="check-num">12</div><div class="check-text"><span class="mono">GoldBtn</span> — requires <span class="val">SellingItems</span> complete</div></div>
+      <div class="check-item"><div class="check-num">13</div><div class="check-text"><span class="mono">MaterialsBtn</span> — requires <span class="val">GoodsVendors</span> complete</div></div>
+    </div>
+
+    <!-- COL 3: Lock / Anim -->
+    <div class="checklist-col">
+      <div class="checklist-col-title">LOCK STATES &amp; ANIMATION</div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Chapter Unlock (cont.)</div></div>
+      <div class="check-item"><div class="check-num">14</div><div class="check-text"><span class="mono">HeroesBtn</span> — requires <span class="val">HeroCreation</span> + <span class="val">OfficerCommands</span></div></div>
+      <div class="check-item"><div class="check-num">15</div><div class="check-text"><span class="mono">ExploreBtn</span> — requires <span class="val">FavorCompletion</span> complete</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Lock State Logic</div></div>
+      <div class="check-item"><div class="check-num">16</div><div class="check-text">Locked: <span class="mono">button.interactable=false</span>, <span class="mono">CanvasGroup.alpha=0.4</span></div></div>
+      <div class="check-item"><div class="check-num">17</div><div class="check-text">Safety fallback: if all locked → unlock Heroes + Explore</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Animation</div></div>
+      <div class="check-item"><div class="check-num">18</div><div class="check-text"><span class="mono">DismissPanel()</span>: <span class="path">LeanTween.alphaCanvas</span> fade out <span class="val">0.15s</span></div></div>
+      <div class="check-item"><div class="check-num">19</div><div class="check-text"><span class="mono">ShowPanel()</span>: <span class="mono">blocksRaycasts=true</span>, LeanTween fade in <span class="val">0.15s</span></div></div>
+      <div class="check-item"><div class="check-num">20</div><div class="check-text"><span class="mono">OnDestroy()</span>: <span class="path">RemoveAllListeners</span> on all buttons</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN: CONTENT ROW -->
+<div class="main">
+  <div class="content-row">
+
+    <!-- PREVIEW SIDE -->
+    <div class="preview-side" id="preview-side">
+      <div class="preview-col">
+        <div class="preview-col-label">In-Game Preview — DailyIntentPanel · Full-screen overlay modal</div>
+
+        <!-- State Switcher -->
+        <div class="day-selector">
+          <button class="day-btn active" onclick="showState(0,this)"><span>Early Game (Locked)</span></button>
+          <button class="day-btn" onclick="showState(1,this)"><span>Mid Game (All Open)</span></button>
+          <button class="day-btn" onclick="showState(2,this)"><span>Selected: ⚔</span></button>
+        </div>
+
+        <!-- Overlay mock -->
+        <div class="overlay-wrapper">
+          <div class="overlay-bg-label">OverlayBackground · Image · rgba(0,0,0,0.75)</div>
+
+          <!-- Intent Modal -->
+          <div class="intent-modal" id="intent-modal">
+
+            <!-- Header -->
+            <div class="modal-header">
+              <div class="modal-title">What will you focus on today?</div>
+              <div class="modal-subtitle">Day 44 · Choose your intent for this epoch</div>
+            </div>
+            <div class="modal-divider"></div>
+
+            <!-- Intent List -->
+            <div class="intent-list">
+
+              <!-- ConquerDungeon -->
+              <button class="intent-btn locked"
+                      id="btn-conquer"
+                      data-intent="conquer"
+                      onclick="selectIntent(this,'conquer')"
+                      onclick_tree="tn-conquer">
+                <span class="intent-icon i-sword"></span>
+                <span class="intent-label-group">
+                  <span class="intent-label">⚔ Conquer a Dungeon</span>
+                  <span class="intent-desc">Clear at least one dungeon today</span>
+                  <span class="intent-lock-info" id="lock-info-conquer">🔒 Complete SoloDungeonsI first</span>
+                </span>
+                <span class="lock-icon" id="lock-icon-conquer">🔒</span>
+                <span class="selected-check">✔ SELECTED</span>
+              </button>
+
+              <!-- MaximizeGold -->
+              <button class="intent-btn locked"
+                      id="btn-gold"
+                      data-intent="gold"
+                      onclick="selectIntent(this,'gold')">
+                <span class="intent-icon i-coin"></span>
+                <span class="intent-label-group">
+                  <span class="intent-label">💰 Maximize Gold Sales</span>
+                  <span class="intent-desc">Push sales revenue to the limit today</span>
+                  <span class="intent-lock-info" id="lock-info-gold">🔒 Complete SellingItems first</span>
+                </span>
+                <span class="lock-icon" id="lock-icon-gold">🔒</span>
+                <span class="selected-check">✔ SELECTED</span>
+              </button>
+
+              <!-- StockMaterials -->
+              <button class="intent-btn locked"
+                      id="btn-materials"
+                      data-intent="materials"
+                      onclick="selectIntent(this,'materials')">
+                <span class="intent-icon i-hammer"></span>
+                <span class="intent-label-group">
+                  <span class="intent-label">🌿 Stock Up on Materials</span>
+                  <span class="intent-desc">Fill the stockrooms with gathered goods</span>
+                  <span class="intent-lock-info" id="lock-info-materials">🔒 Complete GoodsVendors first</span>
+                </span>
+                <span class="lock-icon" id="lock-icon-materials">🔒</span>
+                <span class="selected-check">✔ SELECTED</span>
+              </button>
+
+              <!-- LevelHeroes -->
+              <button class="intent-btn"
+                      id="btn-heroes"
+                      data-intent="heroes"
+                      onclick="selectIntent(this,'heroes')">
+                <span class="intent-icon i-star"></span>
+                <span class="intent-label-group">
+                  <span class="intent-label">⭐ Level Up Heroes</span>
+                  <span class="intent-desc">Focus on training and hero advancement</span>
+                  <span class="intent-lock-info" id="lock-info-heroes" style="display:none">🔒 Complete HeroCreation + OfficerCommands first</span>
+                </span>
+                <span class="lock-icon hidden" id="lock-icon-heroes">🔒</span>
+                <span class="selected-check">✔ SELECTED</span>
+              </button>
+
+              <!-- Explore -->
+              <button class="intent-btn"
+                      id="btn-explore"
+                      data-intent="explore"
+                      onclick="selectIntent(this,'explore')">
+                <span class="intent-icon i-favors"></span>
+                <span class="intent-label-group">
+                  <span class="intent-label">🗺 Explore the World</span>
+                  <span class="intent-desc">Complete favors and discover new territories</span>
+                  <span class="intent-lock-info" id="lock-info-explore" style="display:none">🔒 Complete FavorCompletion first</span>
+                </span>
+                <span class="lock-icon hidden" id="lock-icon-explore">🔒</span>
+                <span class="selected-check">✔ SELECTED</span>
+              </button>
+
+            </div><!-- /intent-list -->
+
+            <!-- Footer / Skip -->
+            <div class="modal-footer">
+              <button class="skip-btn" id="btn-skip" onclick="selectIntent(null,'skip')">Skip for Today</button>
+            </div>
+
+          </div><!-- /intent-modal -->
+        </div><!-- /overlay-wrapper -->
+
+      </div>
+    </div><!-- /preview-side -->
+
+    <!-- DRAG DIVIDER -->
+    <div class="drag-divider" id="drag-divider"></div>
+
+    <!-- DEV PANEL -->
+    <div class="dev-panel" id="dev-panel">
+
+      <!-- HIERARCHY -->
+      <div class="hierarchy-col">
+        <div class="hierarchy-header">☰ Hierarchy — DailyIntentPanel Scene</div>
+        <div class="tree">
+
+          <div class="tree-node canvas-node" style="padding-left:8px">
+            <span class="indent" style="width:0px"></span>
+            <span class="icon">🎬</span>
+            <span class="name">Canvas</span>
+            <span class="components">Canvas, CanvasScaler, GraphicRaycaster — sortOrder: 100</span>
+          </div>
+
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:14px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">OverlayBackground</span>
+            <span class="components">Image — full screen, rgba(0,0,0,0.75)</span>
+          </div>
+
+          <div class="tree-node script-node" id="tn-modal" onclick="selectFromTree(this,'modal')" style="padding-left:8px">
+            <span class="indent" style="width:14px"></span>
+            <span class="icon">📦</span>
+            <span class="name">IntentModal</span>
+            <span class="components">CanvasGroup, DailyIntentPanel</span>
+          </div>
+
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:28px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">ModalPanel</span>
+            <span class="components">RectTransform, Image — BackgroundColor.png</span>
+          </div>
+
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:42px"></span>
+            <span class="icon">📦</span>
+            <span class="name">Header</span>
+            <span class="components">VerticalLayoutGroup</span>
+          </div>
+
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">T</span>
+            <span class="name">TitleText</span>
+            <span class="components">TMP_Text — "What will you focus on today?"</span>
+          </div>
+
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">T</span>
+            <span class="name">SubtitleText</span>
+            <span class="components">TMP_Text — "Day {epoch} · Choose your focus"</span>
+          </div>
+
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">—</span>
+            <span class="name">DividerLine</span>
+            <span class="components">Image — SidePattern.png</span>
+          </div>
+
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:42px"></span>
+            <span class="icon">📋</span>
+            <span class="name">IntentList</span>
+            <span class="components">VerticalLayoutGroup</span>
+          </div>
+
+          <!-- ConquerBtn -->
+          <div class="tree-node script-node" id="tn-conquer" data-intent="conquer" onclick="selectFromTree(this,'conquer')" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">⚔</span>
+            <span class="name">ConquerBtn</span>
+            <span class="components">Button — DailyIntentPanel._conquerButton</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">BtnBG</span>
+            <span class="components">Image — BackgroundColor.png</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">IconHolder</span>
+            <span class="components">Image — Sword.png mask-tinted #e3ca98</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">📦</span>
+            <span class="name">LabelGroup</span>
+            <span class="components">HorizontalLayoutGroup</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:84px"></span>
+            <span class="icon">T</span>
+            <span class="name">IntentLabel</span>
+            <span class="components">TMP_Text — "Conquer a Dungeon"</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:84px"></span>
+            <span class="icon">T</span>
+            <span class="name">IntentDesc</span>
+            <span class="components">TMP_Text — "Clear at least one dungeon today"</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">🔒</span>
+            <span class="name">LockIcon</span>
+            <span class="components">Image — conditionally active</span>
+          </div>
+
+          <!-- GoldBtn -->
+          <div class="tree-node script-node" id="tn-gold" data-intent="gold" onclick="selectFromTree(this,'gold')" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">💰</span>
+            <span class="name">GoldBtn</span>
+            <span class="components">Button — DailyIntentPanel._goldButton</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">BtnBG / IconHolder / LabelGroup / LockIcon</span>
+            <span class="components">same structure as ConquerBtn — Coin.png icon</span>
+          </div>
+
+          <!-- MaterialsBtn -->
+          <div class="tree-node script-node" id="tn-materials" data-intent="materials" onclick="selectFromTree(this,'materials')" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">🌿</span>
+            <span class="name">MaterialsBtn</span>
+            <span class="components">Button — DailyIntentPanel._materialsButton</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">BtnBG / IconHolder / LabelGroup / LockIcon</span>
+            <span class="components">same structure — Hammer.png icon</span>
+          </div>
+
+          <!-- HeroesBtn -->
+          <div class="tree-node script-node" id="tn-heroes" data-intent="heroes" onclick="selectFromTree(this,'heroes')" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">⭐</span>
+            <span class="name">HeroesBtn</span>
+            <span class="components">Button — DailyIntentPanel._heroesButton</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">BtnBG / IconHolder / LabelGroup / LockIcon</span>
+            <span class="components">same structure — Star.png icon</span>
+          </div>
+
+          <!-- ExploreBtn -->
+          <div class="tree-node script-node" id="tn-explore" data-intent="explore" onclick="selectFromTree(this,'explore')" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">🗺</span>
+            <span class="name">ExploreBtn</span>
+            <span class="components">Button — DailyIntentPanel._exploreButton</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">🖼</span>
+            <span class="name">BtnBG / IconHolder / LabelGroup / LockIcon</span>
+            <span class="components">same structure — Favors.png icon</span>
+          </div>
+
+          <!-- Footer -->
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:42px"></span>
+            <span class="icon">📦</span>
+            <span class="name">Footer</span>
+          </div>
+          <div class="tree-node script-node" id="tn-skip" data-intent="skip" onclick="selectFromTree(this,'skip')" style="padding-left:8px">
+            <span class="indent" style="width:56px"></span>
+            <span class="icon">⬜</span>
+            <span class="name">SkipButton</span>
+            <span class="components">Button — DailyIntentPanel._skipButton</span>
+          </div>
+          <div class="tree-node" style="padding-left:8px">
+            <span class="indent" style="width:70px"></span>
+            <span class="icon">T</span>
+            <span class="name">SkipText</span>
+            <span class="components">TMP_Text — "Skip for Today"</span>
+          </div>
+
+        </div><!-- /tree -->
+      </div><!-- /hierarchy-col -->
+
+      <!-- INSPECTOR -->
+      <div class="inspector-col">
+        <div class="inspector-header">🔍 Inspector — DailyIntentPanel</div>
+        <div class="inspector-content">
+
+          <!-- GameObject Header -->
+          <div class="inspector-go-header">
+            <div class="go-name">IntentModal</div>
+            <div class="go-meta">
+              <div class="go-meta-item">Tag: <span>Untagged</span></div>
+              <div class="go-meta-item">Layer: <span>UI</span></div>
+              <div class="go-meta-item go-active">✔ Active</div>
+            </div>
+          </div>
+
+          <!-- RectTransform -->
+          <div class="component-block">
+            <div class="comp-header"><span class="comp-icon">📐</span> RectTransform</div>
+            <div class="comp-body">
+              <div class="prop-row"><div class="prop-key">Anchor Preset</div><div class="prop-val">Center / Middle</div></div>
+              <div class="prop-row"><div class="prop-key">Pos X / Y / Z</div><div class="prop-val">0, 0, 0</div></div>
+              <div class="prop-row"><div class="prop-key">Width / Height</div><div class="prop-val">560 / 480</div></div>
+              <div class="prop-row"><div class="prop-key">Pivot</div><div class="prop-val">0.5, 0.5</div></div>
+              <div class="prop-row"><div class="prop-key">Rotation</div><div class="prop-val">0, 0, 0</div></div>
+              <div class="prop-row"><div class="prop-key">Scale</div><div class="prop-val">1, 1, 1</div></div>
+            </div>
+          </div>
+
+          <!-- CanvasGroup -->
+          <div class="component-block">
+            <div class="comp-header"><span class="comp-icon">🎭</span> CanvasGroup</div>
+            <div class="comp-body">
+              <div class="prop-row"><div class="prop-key">Alpha</div><div class="prop-val">0 <span style="color:var(--inspector-warn);font-size:9px">(starts hidden)</span></div></div>
+              <div class="prop-row"><div class="prop-key">Interactable</div><div class="prop-val bool-true">true</div></div>
+              <div class="prop-row"><div class="prop-key">Blocks Raycasts</div><div class="prop-val bool-false">false <span style="color:var(--inspector-warn);font-size:9px">(set true on show)</span></div></div>
+              <div class="prop-row"><div class="prop-key">Ignore Parent Groups</div><div class="prop-val bool-false">false</div></div>
+            </div>
+          </div>
+
+          <!-- DailyIntentPanel Script -->
+          <div class="component-block">
+            <div class="comp-header"><span class="comp-icon">📝</span> DailyIntentPanel (Script)</div>
+            <div class="comp-body">
+
+              <div class="section-divider">Panel Config</div>
+              <div class="prop-row"><div class="prop-key">_panelRoot</div><div class="prop-val path">CanvasGroup (IntentModal)</div></div>
+              <div class="prop-row"><div class="prop-key">_fadeInDuration</div><div class="prop-val est">0.15f</div></div>
+              <div class="prop-row"><div class="prop-key">_fadeOutDuration</div><div class="prop-val est">0.15f</div></div>
+              <div class="prop-row"><div class="prop-key">_showDelay</div><div class="prop-val est">0.8f</div></div>
+              <div class="prop-row"><div class="prop-key">PREFS_SHOWN_DAY</div><div class="prop-val">"DailyIntentShownDay"</div></div>
+
+              <div class="section-divider">Button References</div>
+              <div class="prop-row"><div class="prop-key">_conquerButton</div><div class="prop-val path">Button (ConquerBtn)</div></div>
+              <div class="prop-row"><div class="prop-key">_goldButton</div><div class="prop-val path">Button (GoldBtn)</div></div>
+              <div class="prop-row"><div class="prop-key">_materialsButton</div><div class="prop-val path">Button (MaterialsBtn)</div></div>
+              <div class="prop-row"><div class="prop-key">_heroesButton</div><div class="prop-val path">Button (HeroesBtn)</div></div>
+              <div class="prop-row"><div class="prop-key">_exploreButton</div><div class="prop-val path">Button (ExploreBtn)</div></div>
+              <div class="prop-row"><div class="prop-key">_skipButton</div><div class="prop-val path">Button (SkipButton)</div></div>
+
+              <div class="section-divider">Tutorial Gate</div>
+              <div class="sf-block">
+                <div class="sf-title">IsTutorialFarEnough() — all must be complete</div>
+                <div class="sf-row"><div class="sf-field">GuildCreation</div><div class="sf-target">ChapterManager.IsComplete(…)</div></div>
+                <div class="sf-row"><div class="sf-field">HeroCreation</div><div class="sf-target">ChapterManager.IsComplete(…)</div></div>
+                <div class="sf-row"><div class="sf-field">OfficerCommands</div><div class="sf-target">ChapterManager.IsComplete(…)</div></div>
+              </div>
+
+              <div class="section-divider">Chapter Unlock Requirements</div>
+              <div class="sub-block">
+                <div class="sub-block-title">RefreshButtonVisibility() — per-button</div>
+                <div class="sub-block-body">
+                  <div class="prop-row"><div class="prop-key">ConquerDungeon</div><div class="prop-val path">SoloDungeonsI complete</div></div>
+                  <div class="prop-row"><div class="prop-key">MaximizeGold</div><div class="prop-val path">SellingItems complete</div></div>
+                  <div class="prop-row"><div class="prop-key">StockMaterials</div><div class="prop-val path">GoodsVendors complete</div></div>
+                  <div class="prop-row"><div class="prop-key">LevelHeroes</div><div class="prop-val path">HeroCreation + OfficerCommands</div></div>
+                  <div class="prop-row"><div class="prop-key">Explore</div><div class="prop-val path">FavorCompletion complete</div></div>
+                </div>
+              </div>
+
+              <div class="section-divider">Lock State</div>
+              <div class="prop-row"><div class="prop-key">Locked: interactable</div><div class="prop-val bool-false">false</div></div>
+              <div class="prop-row"><div class="prop-key">Locked: CanvasGroup.alpha</div><div class="prop-val est">0.4f</div></div>
+              <div class="prop-row"><div class="prop-key">Safety Fallback</div><div class="prop-val">if all locked → unlock Heroes + Explore</div></div>
+
+              <div class="section-divider">SelectIntent Flow</div>
+              <div class="sf-block">
+                <div class="sf-title">SelectIntent(IntentType intent)</div>
+                <div class="sf-row"><div class="sf-field">SetTodayIntent</div><div class="sf-target">DailyReportManager.Instance.SetTodayIntent(intent)</div></div>
+                <div class="sf-row"><div class="sf-field">SavePrefs</div><div class="sf-target">PlayerPrefs.SetInt("DailyIntentShownDay", epochDay)</div></div>
+                <div class="sf-row"><div class="sf-field">DismissPanel</div><div class="sf-target">LeanTween.alphaCanvas(…, 0f, 0.15f)</div></div>
+              </div>
+
+              <div class="section-divider">Show Panel Flow</div>
+              <div class="sf-block">
+                <div class="sf-title">TryShowPanel() Coroutine</div>
+                <div class="sf-row"><div class="sf-field">Guard: epoch day</div><div class="sf-target">if epochDay == lastShownDay → skip</div></div>
+                <div class="sf-row"><div class="sf-field">Guard: tutorial</div><div class="sf-target">IsTutorialFarEnough() → skip if false</div></div>
+                <div class="sf-row"><div class="sf-field">Delay</div><div class="sf-target">yield WaitForSeconds(_showDelay = 0.8f)</div></div>
+                <div class="sf-row"><div class="sf-field">Refresh locks</div><div class="sf-target">RefreshButtonVisibility()</div></div>
+                <div class="sf-row"><div class="sf-field">Show</div><div class="sf-target">blocksRaycasts=true · LeanTween alphaCanvas 0.15f</div></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Image (BackgroundColor.png) -->
+          <div class="component-block">
+            <div class="comp-header"><span class="comp-icon">🖼</span> Image (ModalPanel)</div>
+            <div class="comp-body">
+              <div class="prop-row"><div class="prop-key">Source Image</div><div class="prop-val path">Assets/UI2/BackgroundColor.png</div></div>
+              <div class="prop-row"><div class="prop-key">Image Type</div><div class="prop-val">Sliced</div></div>
+              <div class="prop-row"><div class="prop-key">Color</div><div class="prop-val">#130e05 (dark tint)</div></div>
+            </div>
+          </div>
+
+        </div><!-- /inspector-content -->
+      </div><!-- /inspector-col -->
+
+    </div><!-- /dev-panel -->
+
+  </div><!-- /content-row -->
+</div><!-- /main -->
+
+<script>
+  // ── State definitions ──
+  const STATES = {
+    0: { // Early Game — only heroes + explore unlocked
+      locked: ['conquer', 'gold', 'materials'],
+      unlocked: ['heroes', 'explore'],
+      selected: null
+    },
+    1: { // Mid Game — all unlocked, none selected
+      locked: [],
+      unlocked: ['conquer', 'gold', 'materials', 'heroes', 'explore'],
+      selected: null
+    },
+    2: { // Selected — ConquerDungeon selected
+      locked: [],
+      unlocked: ['conquer', 'gold', 'materials', 'heroes', 'explore'],
+      selected: 'conquer'
+    }
+  };
+
+  const LOCK_INFO = {
+    conquer:   '🔒 Complete SoloDungeonsI first',
+    gold:      '🔒 Complete SellingItems first',
+    materials: '🔒 Complete GoodsVendors first',
+    heroes:    '🔒 Complete HeroCreation + OfficerCommands first',
+    explore:   '🔒 Complete FavorCompletion first'
+  };
+
+  let currentState = 0;
+
+  function showState(idx, btnEl) {
+    currentState = idx;
+
+    // Update day-btn active state
+    document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+
+    const state = STATES[idx];
+
+    // Apply lock/unlock/selected to buttons
+    ['conquer', 'gold', 'materials', 'heroes', 'explore'].forEach(intent => {
+      const btn = document.getElementById('btn-' + intent);
+      const lockIcon = document.getElementById('lock-icon-' + intent);
+      const lockInfo = document.getElementById('lock-info-' + intent);
+
+      // Reset
+      btn.classList.remove('locked', 'selected-btn');
+
+      if (state.locked.includes(intent)) {
+        btn.classList.add('locked');
+        if (lockIcon) lockIcon.classList.remove('hidden');
+        if (lockInfo) lockInfo.style.display = '';
+      } else {
+        if (lockIcon) lockIcon.classList.add('hidden');
+        if (lockInfo) lockInfo.style.display = 'none';
+        if (state.selected === intent) {
+          btn.classList.add('selected-btn');
+        }
+      }
+    });
+  }
+
+  // ── Intent button click (preview) → highlight tree node ──
+  function selectIntent(btn, intent) {
+    if (!btn) return;
+
+    // In mid/selected state: allow selection
+    const state = STATES[currentState];
+    if (state.locked.includes(intent)) return;
+
+    // Clear all selected
+    document.querySelectorAll('.intent-btn').forEach(b => b.classList.remove('selected-btn'));
+    btn.classList.add('selected-btn');
+
+    // Mirror in tree
+    document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('selected'));
+    const treeNode = document.getElementById('tn-' + intent);
+    if (treeNode) {
+      treeNode.classList.add('selected');
+      treeNode.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  // ── Tree node click → highlight preview button ──
+  function selectFromTree(treeEl, intent) {
+    document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('selected'));
+    treeEl.classList.add('selected');
+
+    // Only highlight non-skip, non-modal intents in preview
+    if (['conquer','gold','materials','heroes','explore'].includes(intent)) {
+      document.querySelectorAll('.intent-btn').forEach(b => b.classList.remove('selected-btn'));
+      const btn = document.getElementById('btn-' + intent);
+      const state = STATES[currentState];
+      if (btn && !state.locked.includes(intent)) {
+        btn.classList.add('selected-btn');
+        btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  }
+
+  // ── Drag-to-resize dev panel ──
+  (function() {
+    const divider = document.getElementById('drag-divider');
+    const devPanel = document.getElementById('dev-panel');
+    let dragging = false, startX = 0, startW = 0;
+
+    divider.addEventListener('mousedown', e => {
+      dragging = true;
+      startX = e.clientX;
+      startW = parseInt(divider.style.left || '700', 10);
+      divider.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const delta = e.clientX - startX;
+      const newLeft = Math.min(window.innerWidth - 200, Math.max(300, startW + delta));
+      const previewSide = document.querySelector('.preview-side');
+      divider.style.left = newLeft + 'px';
+      devPanel.style.left = (newLeft + 5) + 'px';
+      if (previewSide) previewSide.style.width = newLeft + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      divider.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    });
+  })();
+
+  // Init to early game
+  showState(0, null);
+  document.querySelectorAll('.day-btn')[0].classList.add('active');
+</script>
+</body>
+</html>
