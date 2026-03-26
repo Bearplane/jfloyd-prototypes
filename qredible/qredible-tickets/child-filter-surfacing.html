@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QP-3476 — Surface Child Products Matching Filter</title>
+  <style>
+    :root {
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --blue: #3B82F6;
+      --blue-dark: #1E3A5F;
+      --green: #16A34A;
+      --red: #DC2626;
+      --red-dark: #B01E1E;
+      --gray: #64748B;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+      --table-header-bg: #FFE4E6;
+      --filter-green: #16A34A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-ui);
+      background: #1E293B;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 56px;
+      color: var(--text);
+      font-size: 13px;
+    }
+    h1.page-title { color: #94A3B8; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-align: center; }
+    .section-label { color: #94A3B8; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+    .mockup { width: 100%; max-width: 1280px; }
+    .annotation { background: #FFFBEB; border: 1px dashed #FCD34D; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #78350F; margin-top: 10px; line-height: 1.6; }
+    .annotation strong { font-weight: 700; }
+    .new-pill { background: #334155; color: white; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: .05em; }
+
+    /* ── BADGES ── */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .b-missing    { background: #FEE2E2; color: var(--red-dark); border: 1.5px solid #FECACA; }
+    .b-violative  { background: var(--red); color: white; }
+    .b-approved   { background: white; color: var(--green); border: 1.5px solid var(--green); }
+    .b-validated  { background: white; color: var(--green); border: 1.5px solid var(--green); }
+    .b-in-stock   { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+    .b-pending-t  { color: var(--blue); font-weight: 600; background: none; padding: 0; }
+    .b-na-t       { color: var(--gray); font-weight: 600; background: none; padding: 0; }
+
+    /* ── TABLE SCAFFOLD ── */
+    .table-wrap { background: white; border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--border); }
+
+    .table-toolbar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .search-fake {
+      flex: 1; min-width: 220px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px 7px 30px;
+      font-family: var(--font-ui);
+      font-size: 12px;
+      color: var(--text-muted);
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+    }
+    .btn { padding: 6px 12px; border-radius: var(--radius-sm); font-family: var(--font-ui); font-size: 12px; font-weight: 600; border: none; cursor: pointer; white-space: nowrap; }
+    .btn-filters-green { background: var(--filter-green); color: white; display: flex; align-items: center; gap: 6px; }
+    .btn-filters-count { background: white; color: var(--filter-green); border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .btn-blue { background: var(--blue); color: white; }
+    .btn-dark { background: #334155; color: white; }
+    .btn-red  { background: #EF4444; color: white; }
+
+    .filter-chips-row {
+      padding: 6px 16px 8px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .filter-chip {
+      background: #FEF9C3;
+      border: 1px solid #FDE68A;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #854D0E;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .filter-chip .x { cursor: pointer; opacity: .6; }
+    .clear-all { color: #EF4444; font-size: 11px; font-weight: 600; margin-left: auto; cursor: pointer; }
+
+    .results-row {
+      padding: 8px 16px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      gap: 12px;
+    }
+    .results-row strong { color: var(--text); }
+    .results-row .ml { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th {
+      background: var(--table-header-bg);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 11px;
+      padding: 8px 10px;
+      text-align: left;
+      border-right: 1px solid #FECDD3;
+      white-space: nowrap;
+    }
+    thead th.sorted { color: var(--blue); }
+    thead th:first-child { width: 32px; }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:hover { background: #F8FAFC; }
+
+    /* NORMAL child rows */
+    tbody tr.child { background: #F1F5F9; }
+
+    /* DIMMED parent — matches nothing but has matching children */
+    tbody tr.dimmed-parent { opacity: 0.4; }
+    tbody tr.dimmed-parent td { background: white; }
+
+    /* SURFACED child — matching child under dimmed parent */
+    tbody tr.surfaced-child {
+      background: #F1F5F9;
+      opacity: 1;
+    }
+    tbody tr.surfaced-child td {
+      border-left: 3px solid var(--red-dark);
+    }
+
+    td { padding: 8px 10px; vertical-align: middle; white-space: nowrap; }
+    td.sku { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+    td.product { white-space: normal; max-width: 200px; line-height: 1.4; }
+    td.indent { padding-left: 28px !important; }
+    .child-mark { display: inline-block; width: 10px; height: 10px; border-left: 2px solid #CBD5E1; border-bottom: 2px solid #CBD5E1; margin-right: 5px; vertical-align: middle; margin-bottom: 2px; }
+    .activity-icons { display: flex; align-items: center; gap: 6px; color: #94A3B8; font-size: 13px; }
+
+    /* Pagination */
+    .pagination-row {
+      padding: 10px 16px;
+      background: white;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .page-btn {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: white;
+      font-size: 12px;
+      padding: 4px 10px;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+    .page-btn.active { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
+
+    /* ── FILTER PANEL ── */
+    .filter-panel {
+      background: white;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border);
+      max-width: 340px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    }
+    .fp-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fp-header span { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--text-muted); text-transform: uppercase; }
+    .fp-header .clear { color: #EF4444; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .fp-group { border-bottom: 1px solid var(--border); }
+    .fp-group-label {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .fp-group-label .all-badge { background: #DCFCE7; color: var(--green); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 4px; }
+    .fp-rows { padding: 4px 16px 10px; }
+    .fp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .fp-row.selected { color: var(--text); font-weight: 600; }
+    .fp-row .count { font-weight: 700; }
+    .fp-row .count.red { color: var(--red-dark); }
+    .fp-row .count.green { color: var(--green); }
+    .fp-row .count.gray { color: var(--text-muted); }
+    .fp-row .count.new { color: var(--blue); }
+    .fp-note { font-size: 10px; color: var(--text-muted); padding: 0 16px 8px; line-height: 1.5; }
+    .fp-apply { background: var(--filter-green); color: white; border: none; width: 100%; padding: 12px; font-family: var(--font-ui); font-size: 13px; font-weight: 700; cursor: pointer; }
+
+    /* ── BEFORE/AFTER WRAPPER ── */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+    .split-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 6px 12px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+    .label-before { background: #FEE2E2; color: #991B1B; }
+    .label-after  { background: #DCFCE7; color: #166534; }
+
+    .zero-state {
+      padding: 40px 20px;
+      text-align: center;
+      background: white;
+    }
+    .zero-state .big { font-size: 32px; margin-bottom: 10px; }
+    .zero-state .msg { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .zero-state .count-lie {
+      display: inline-block;
+      margin-top: 12px;
+      background: #FEF9C3;
+      border: 1px solid #FDE68A;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 12px;
+      color: #854D0E;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<h1 class="page-title">QP-3476 — Surface Child Products Matching Filter · Mockup</h1>
+
+
+<!-- ══════════════════════════════
+  SECTION 1: The Problem
+══════════════════════════════ -->
+<div class="mockup">
+  <p class="section-label">1 — The Problem: Filter by COA Status = Missing → Parent row hides matching children</p>
+
+  <div class="split">
+
+    <!-- BEFORE -->
+    <div>
+      <span class="split-label label-before">Before — Current Behavior</span>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <div class="search-fake">Search products by definition, classification or SKU or COA file name...</div>
+          <button class="btn btn-filters-green">
+            <span>▼ Filters</span>
+            <span class="btn-filters-count">1</span>
+          </button>
+          <button class="btn btn-blue">Add Product</button>
+          <button class="btn btn-blue">Scan for Products</button>
+          <button class="btn btn-red">Export</button>
+        </div>
+        <div class="filter-chips-row">
+          <span style="color:var(--text-muted);">Active:</span>
+          <span class="filter-chip">COA Status: Missing <span class="x">×</span></span>
+          <span class="clear-all">Clear all</span>
+        </div>
+        <div class="results-row">
+          <strong>3 of 4598 Products (filtered)</strong>
+          <span>|</span>
+          <span style="color:var(--blue);">⇕ Expand All</span>
+          <span style="color:var(--blue);">⇕ Collapse All</span>
+          <div class="ml"><span>Rows per page: <strong>25</strong></span></div>
+        </div>
+
+        <!-- Zero state - children are invisible -->
+        <div class="zero-state">
+          <div class="big">🔍</div>
+          <div class="msg">
+            <strong>No products visible</strong><br>
+            The 3 products matching "COA Status: Missing" are all child products.<br>
+            Their parent (42804-PRE-2) has COA Validated and is not shown.<br>
+            Without the parent row, the children cannot render.
+          </div>
+          <div class="count-lie">⚠ System says "3 of 4598 Products (filtered)" but shows 0 rows</div>
+        </div>
+
+        <div class="pagination-row">
+          <span style="color:#EF4444;font-size:11px;">Showing 26 to 3 of 3 products</span>
+          <div><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">›</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AFTER -->
+    <div>
+      <span class="split-label label-after">After — Fixed Behavior <span class="new-pill" style="vertical-align:middle;">New</span></span>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <div class="search-fake">Search products by definition, classification or SKU or COA file name...</div>
+          <button class="btn btn-filters-green">
+            <span>▼ Filters</span>
+            <span class="btn-filters-count">1</span>
+          </button>
+          <button class="btn btn-blue">Add Product</button>
+          <button class="btn btn-blue">Scan for Products</button>
+          <button class="btn btn-red">Export</button>
+        </div>
+        <div class="filter-chips-row">
+          <span style="color:var(--text-muted);">Active:</span>
+          <span class="filter-chip">COA Status: Missing <span class="x">×</span></span>
+          <span class="clear-all">Clear all</span>
+        </div>
+        <div class="results-row">
+          <strong>3 of 4598 Products (filtered)</strong>
+          <span>|</span>
+          <span style="color:var(--blue);">⇕ Expand All</span>
+          <span style="color:var(--blue);">⇕ Collapse All</span>
+          <div class="ml"><span>Rows per page: <strong>25</strong></span></div>
+        </div>
+
+        <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox"/></th>
+              <th></th>
+              <th>SKU</th>
+              <th class="sorted">Product Definition ▲</th>
+              <th>Price</th>
+              <th>Classification</th>
+              <th>Listing Status</th>
+              <th>COA Status</th>
+              <th>Disposition</th>
+              <th>Date Added</th>
+              <th>Activity</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- DIMMED PARENT — doesn't match filter, shown only as container -->
+            <tr class="dimmed-parent" title="This product does not match the active filter. Shown as context for matching child products below.">
+              <td></td>
+              <td style="color:#94A3B8;font-size:10px;">▼</td>
+              <td class="sku">42804-PRE-2</td>
+              <td class="product">
+                1 Gram THCA Indoor Exotic Pre-rolls
+                <div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-style:italic;">Not a filter match — shown as context</div>
+              </td>
+              <td>$14.99</td>
+              <td>Pre-Rolls</td>
+              <td><span class="badge b-in-stock">In Stock</span></td>
+              <td><span class="badge b-validated">COA Validated</span></td>
+              <td><span class="badge b-violative">⚠ Violative</span></td>
+              <td>12/31/2025</td>
+              <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+            </tr>
+
+            <!-- SURFACED CHILD V1 — matches filter (Missing) -->
+            <tr class="surfaced-child">
+              <td><input type="checkbox"/></td>
+              <td></td>
+              <td class="sku indent"><span class="child-mark"></span>42804-PRE-2-V1</td>
+              <td class="product indent">1 Gram THCA Indoor Exotic Pre-rolls — 1 pack</td>
+              <td>—</td>
+              <td>Pre-Rolls</td>
+              <td><span class="badge b-in-stock">In Stock</span></td>
+              <td><span class="badge b-missing">Missing</span></td>
+              <td>—</td>
+              <td>12/31/2025</td>
+              <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+            </tr>
+
+            <!-- SURFACED CHILD V2 -->
+            <tr class="surfaced-child">
+              <td><input type="checkbox"/></td>
+              <td></td>
+              <td class="sku indent"><span class="child-mark"></span>42804-PRE-2-V2</td>
+              <td class="product indent">1 Gram THCA Indoor Exotic Pre-rolls — 5 pack</td>
+              <td>—</td>
+              <td>Pre-Rolls</td>
+              <td><span class="badge b-in-stock">In Stock</span></td>
+              <td><span class="badge b-missing">Missing</span></td>
+              <td>—</td>
+              <td>12/31/2025</td>
+              <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+            </tr>
+
+            <!-- SURFACED CHILD V3 -->
+            <tr class="surfaced-child">
+              <td><input type="checkbox"/></td>
+              <td></td>
+              <td class="sku indent"><span class="child-mark"></span>42804-PRE-2-V3</td>
+              <td class="product indent">1 Gram THCA Indoor Exotic Pre-rolls — 10 pack</td>
+              <td>—</td>
+              <td>Pre-Rolls</td>
+              <td><span class="badge b-in-stock">In Stock</span></td>
+              <td><span class="badge b-missing">Missing</span></td>
+              <td>—</td>
+              <td>12/31/2025</td>
+              <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+            </tr>
+
+          </tbody>
+        </table>
+        </div>
+
+        <div class="pagination-row">
+          <span>1–3 of 3 products</span>
+          <div><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">›</button></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="annotation">
+    <strong>Dimmed parent row</strong> — opacity reduced (~40%), shown expanded by default, italic note "Not a filter match — shown as context." Children with red left border = the actual filter matches at full opacity. Pagination text fixed: "1–3 of 3 products" not "Showing 26 to 3 of 3 products."
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+  SECTION 2: Mixed case — parent AND some children match
+══════════════════════════════ -->
+<div class="mockup">
+  <p class="section-label">2 — Mixed Case: Parent matches filter + some children match → parent full opacity, non-matching children hidden</p>
+  <div class="table-wrap">
+    <div class="table-toolbar">
+      <div class="search-fake">Search products by definition, classification or SKU or COA file name...</div>
+      <button class="btn btn-filters-green"><span>▼ Filters</span><span class="btn-filters-count">1</span></button>
+      <button class="btn btn-blue">Add Product</button>
+      <button class="btn btn-blue">Scan for Products</button>
+      <button class="btn btn-red">Export</button>
+    </div>
+    <div class="filter-chips-row">
+      <span style="color:var(--text-muted);">Active:</span>
+      <span class="filter-chip">COA Status: Missing <span class="x">×</span></span>
+      <span class="clear-all">Clear all</span>
+    </div>
+    <div class="results-row">
+      <strong>4 of 4598 Products (filtered)</strong>
+      <span>|</span>
+      <span style="color:var(--blue);">⇕ Expand All</span>
+      <div class="ml"><span>Rows per page: <strong>25</strong></span></div>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox"/></th>
+          <th></th>
+          <th>SKU</th>
+          <th class="sorted">Product Definition ▲</th>
+          <th>Price</th>
+          <th>Classification</th>
+          <th>Listing Status</th>
+          <th>COA Status</th>
+          <th>Disposition</th>
+          <th>Date Added</th>
+          <th>Activity</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- STANDALONE product that matches — full opacity, no children -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku">42804-PRE-5</td>
+          <td class="product">1 Gram Pre-Rolls — Watermelon Z</td>
+          <td>—</td>
+          <td>Pre-Rolls</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-missing">Missing</span></td>
+          <td>—</td>
+          <td>02/16/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- PARENT that ALSO matches + has some matching children -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td style="color:#94A3B8;">▼</td>
+          <td class="sku">42804-PRE-9</td>
+          <td class="product">Bubba Kush Hemp Flower</td>
+          <td>$28.00</td>
+          <td>Smokable Flower</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-missing">Missing</span></td>
+          <td><span class="badge b-violative">⚠ Violative</span></td>
+          <td>12/31/2025</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- Child that MATCHES — full opacity, red left border -->
+        <tr class="surfaced-child">
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku indent"><span class="child-mark"></span>42804-PRE-9-V1</td>
+          <td class="product indent">Bubba Kush Hemp Flower — 7g</td>
+          <td>$28.00</td>
+          <td>Smokable Flower</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-missing">Missing</span></td>
+          <td>—</td>
+          <td>02/25/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- Child that MATCHES -->
+        <tr class="surfaced-child">
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku indent"><span class="child-mark"></span>42804-PRE-9-V2</td>
+          <td class="product indent">Bubba Kush Hemp Flower — 28g</td>
+          <td>$28.00</td>
+          <td>Smokable Flower</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-missing">Missing</span></td>
+          <td>—</td>
+          <td>02/25/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+        <!-- NOTE: non-matching child (COA Validated) is hidden — not shown in filtered results -->
+
+      </tbody>
+    </table>
+    </div>
+    <div class="pagination-row">
+      <span>1–4 of 4 products</span>
+      <div><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">›</button></div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>When parent independently matches:</strong> parent row = full opacity (it's a real result). Matching children shown with red left border. Non-matching child (Bubba Kush 3.5g with COA Validated) is hidden — not shown. Count = 4 (1 standalone + 1 parent + 2 matching children).
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+  SECTION 3: Filter Panel — Updated Counts
+══════════════════════════════ -->
+<div class="mockup">
+  <p class="section-label">3 — Filter Panel: COA Status Counts Now Include Child Products</p>
+
+  <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;">
+
+    <!-- BEFORE filter panel -->
+    <div>
+      <span class="split-label label-before" style="display:block;margin-bottom:10px;">Before — Children excluded from counts</span>
+      <div class="filter-panel">
+        <div class="fp-header">
+          <span>Filter Products</span>
+          <span class="clear">Clear all</span>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">▼ COA Status <span class="all-badge">All</span></div>
+          <div class="fp-rows">
+            <div class="fp-row"><span>Missing</span><span class="count red">848</span></div>
+            <div class="fp-row"><span>COA Validated</span><span class="count green">2,596</span></div>
+            <div class="fp-row"><span>Manual Review</span><span class="count gray">1</span></div>
+            <div class="fp-row"><span>System Flagged</span><span class="count gray">2</span></div>
+          </div>
+          <div class="fp-note">⚠ These counts only reflect parent/standalone products. Child products with Missing COA status are not counted here.</div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Disposition <span class="all-badge">All</span></div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Compliance Issue <span class="all-badge">All</span></div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Classification (41)</div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Listing Status (4598)</div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Requires COA</div>
+        </div>
+        <div class="fp-group" style="border-bottom:none;">
+          <div class="fp-group-label">► Date Added</div>
+        </div>
+        <button class="fp-apply">Apply Filters</button>
+      </div>
+    </div>
+
+    <!-- AFTER filter panel -->
+    <div>
+      <span class="split-label label-after" style="display:block;margin-bottom:10px;">After — Children included in counts <span class="new-pill" style="vertical-align:middle;">New</span></span>
+      <div class="filter-panel">
+        <div class="fp-header">
+          <span>Filter Products</span>
+          <span class="clear">Clear all</span>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">▼ COA Status <span class="all-badge">All</span></div>
+          <div class="fp-rows">
+            <div class="fp-row"><span>Missing</span><span class="count red">1,203</span></div>
+            <div class="fp-row"><span>COA Validated</span><span class="count green">3,847</span></div>
+            <div class="fp-row"><span>Manual Review</span><span class="count gray">1</span></div>
+            <div class="fp-row"><span>System Flagged</span><span class="count gray">2</span></div>
+          </div>
+          <div class="fp-note" style="color:var(--green);">✓ Counts now include child products. Selecting Missing will surface all products — including children whose parent has a different status.</div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Disposition <span class="all-badge">All</span></div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Compliance Issue <span class="all-badge">All</span></div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Classification (41)</div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Listing Status (4598)</div>
+        </div>
+        <div class="fp-group">
+          <div class="fp-group-label">► Requires COA</div>
+        </div>
+        <div class="fp-group" style="border-bottom:none;">
+          <div class="fp-group-label">► Date Added</div>
+        </div>
+        <button class="fp-apply">Apply Filters</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="annotation">
+    <strong>Filter counts include all products</strong> — parent, standalone, and child. Missing goes from 848 → 1,203 once child products are counted. This also fixes the scenario where filtering by a value only present on children shows a non-zero count but zero visible rows.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+  SECTION 4: Edge Cases
+══════════════════════════════ -->
+<div class="mockup">
+  <p class="section-label">4 — Behavior Summary</p>
+  <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);padding:20px;">
+    <table style="font-size:12px;line-height:1.7;">
+      <thead>
+        <tr style="background:var(--table-header-bg);">
+          <th style="padding:8px 14px;text-align:left;font-size:11px;">Scenario</th>
+          <th style="padding:8px 14px;text-align:left;font-size:11px;">Parent row</th>
+          <th style="padding:8px 14px;text-align:left;font-size:11px;">Child rows</th>
+          <th style="padding:8px 14px;text-align:left;font-size:11px;">Count includes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 14px;">Parent matches, no children match</td>
+          <td style="padding:8px 14px;color:var(--green);font-weight:600;">Full opacity</td>
+          <td style="padding:8px 14px;color:var(--text-muted);">Hidden (collapsed default)</td>
+          <td style="padding:8px 14px;">Parent only</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 14px;">Parent matches, some children also match</td>
+          <td style="padding:8px 14px;color:var(--green);font-weight:600;">Full opacity, expanded</td>
+          <td style="padding:8px 14px;">Matching children shown (red left border), non-matching hidden</td>
+          <td style="padding:8px 14px;">Parent + matching children</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 14px;">Parent does NOT match, children match</td>
+          <td style="padding:8px 14px;color:var(--text-muted);font-weight:600;">Dimmed (~40% opacity), expanded, italic note</td>
+          <td style="padding:8px 14px;">Matching children shown at full opacity (red left border), non-matching hidden</td>
+          <td style="padding:8px 14px;">Matching children only (parent not counted)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 14px;">Neither parent nor children match</td>
+          <td style="padding:8px 14px;color:var(--text-muted);">Hidden</td>
+          <td style="padding:8px 14px;color:var(--text-muted);">Hidden</td>
+          <td style="padding:8px 14px;color:var(--text-muted);">Neither</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 14px;">Filter cleared</td>
+          <td style="padding:8px 14px;">Returns to full opacity</td>
+          <td style="padding:8px 14px;">Returns to collapsed default</td>
+          <td style="padding:8px 14px;">All products</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
