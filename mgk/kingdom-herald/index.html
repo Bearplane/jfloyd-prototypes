@@ -4,33 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UIKingdomHerald — Unity Implementation Spec</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    /* ── DESIGN TOKENS ── */
+    /* ── DESIGN TOKENS — Real In-Game UI2 System ── */
     :root {
-      --bg-deep:          #1a1530;
-      --bg-panel:         #e8d4a8;
-      --bg-card:          #d4b870;
-      --bg-card-raised:   #caa858;
-      --bg-card-active:   #be9840;
-      --bg-footer:        #c8a860;
-      --border-gold:      #c8a050;
-      --border-muted:     #8a6530;
-      --text-parch-head:  #2a1a08;
-      --text-parch-body:  #3a2010;
-      --text-parch-muted: #6a4020;
-      --text-cream:       #f0e8d0;
-      --text-gold:        #e4c870;
-      --text-subgold:     #c8a870;
-      --text-muted:       #8a7050;
-      --text-green:       #22C55E;
-      --text-red:         #EF4444;
-      --text-orange:      #F59E0B;
-      --text-purple:      #A78BFA;
-      --btn-bg:           #2a1a08;
-      --btn-border:       #c8a050;
-      --btn-text:         #c8a050;
-      --bar-fill:         #c8a050;
+      --tan:          #e3ca98;   /* primary text, icon tint, borders */
+      --dark-btn:     #1a2020;   /* SmallButton bg tint */
+      --darker-bg:    #1b2121;   /* progress track, dark overlay */
+      --green:        #00a81b;   /* progress fill, success */
+      --green-dk:     #0a721d;   /* progress track alt */
+      --red:          #d66a6a;   /* deaths, failures */
+      --red-bright:   #ff1300;
+      --white:        #ffffff;
+
+      /* Preview */
+      --preview-bg:   #0d0a06;
+
+      /* Dev panel (unchanged from original) */
       --inspector-bg:     #0f1117;
       --inspector-border: #2a2f3d;
       --inspector-header: #1a1f2e;
@@ -40,13 +30,17 @@
       --inspector-comp:   #f97583;
       --inspector-warn:   #ffab70;
       --inspector-check:  #6bcb77;
+      --text-cream:       #f0e8d0;
+      --text-gold:        #e4c870;
+      --text-muted:       #8a7050;
+      --border-muted:     #8a6530;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg-deep);
-      color: var(--text-cream);
+      background: var(--preview-bg);
+      color: var(--tan);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       font-size: 13px;
       min-height: 100vh;
@@ -54,30 +48,46 @@
       flex-direction: column;
     }
 
-    /* ── TOP BAR ── */
+    /* ════════════════════════════════════════════
+       TOP BAR
+    ════════════════════════════════════════════ */
     .top-bar {
-      background: #0a0806;
-      border-bottom: 1px solid var(--border-muted);
+      background: #080604;
+      border-bottom: 1px solid rgba(227,202,152,0.12);
       padding: 10px 20px;
       display: flex;
       align-items: center;
       gap: 16px;
       flex-shrink: 0;
     }
-    .top-bar h1 { font-size: 14px; font-weight: 700; color: var(--text-gold); letter-spacing: 0.05em; }
+    .top-bar h1 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--tan);
+      letter-spacing: 0.05em;
+    }
     .top-bar .badge {
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
       font-size: 10px;
       padding: 2px 8px;
       border-radius: 3px;
       border: 1px solid;
     }
-    .badge-real { border-color: var(--text-green); color: var(--text-green); background: rgba(34,197,94,0.08); }
-    .badge-spec { border-color: var(--inspector-warn); color: var(--inspector-warn); background: rgba(255,171,112,0.08); }
-    .badge-est  { border-color: var(--text-subgold); color: var(--text-subgold); background: rgba(200,168,112,0.08); }
-    .top-bar .legend { margin-left: auto; display: flex; gap: 12px; font-size: 10px; color: var(--text-muted); align-items: center; }
+    .badge-real { border-color: #22C55E; color: #22C55E; background: rgba(34,197,94,0.08); }
+    .badge-spec { border-color: #ffab70; color: #ffab70; background: rgba(255,171,112,0.08); }
+    .badge-est  { border-color: var(--tan); color: var(--tan); background: rgba(227,202,152,0.08); }
+    .top-bar .legend {
+      margin-left: auto;
+      display: flex;
+      gap: 12px;
+      font-size: 10px;
+      color: rgba(227,202,152,0.35);
+      align-items: center;
+    }
 
-    /* ── MAIN LAYOUT: prototype front and center ── */
+    /* ════════════════════════════════════════════
+       MAIN LAYOUT
+    ════════════════════════════════════════════ */
     .main {
       flex: 1;
       display: flex;
@@ -86,146 +96,190 @@
       overflow: hidden;
     }
 
-    /* Right side wraps hierarchy + inspector stacked */
-    .dev-panel {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border-left: 1px solid var(--inspector-border);
-      width: 360px;
-      min-width: 200px;
-      max-width: 700px;
-      flex-shrink: 0;
-    }
-
-    /* ── DRAG DIVIDER ── */
-    .drag-divider {
-      width: 5px;
-      cursor: col-resize;
-      background: var(--inspector-border);
-      flex-shrink: 0;
-      transition: background 0.15s;
-      position: relative;
-      z-index: 10;
-    }
-    .drag-divider:hover, .drag-divider.dragging { background: #58a6ff; }
-
-    /* ── GAME PREVIEW: primary, centered ── */
+    /* ════════════════════════════════════════════
+       GAME PREVIEW COLUMN
+    ════════════════════════════════════════════ */
     .preview-col {
       flex: 1;
       min-width: 0;
-      background: var(--bg-deep);
-      background-image: radial-gradient(ellipse at 50% 40%, rgba(60,40,100,0.45) 0%, transparent 65%);
+      background: var(--preview-bg);
+      background-image:
+        radial-gradient(ellipse at 50% 65%, rgba(70,42,8,0.30) 0%, transparent 68%),
+        radial-gradient(ellipse at 50% 0%, rgba(40,25,5,0.4) 0%, transparent 55%);
       overflow-y: auto;
-      padding: 32px 40px;
+      padding: 24px 32px 32px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 14px;
     }
     .preview-col-label {
-      font-size: 10px;
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #6a5888;
+      letter-spacing: 0.12em;
+      color: rgba(227,202,152,0.2);
       width: 100%;
-      max-width: 760px;
+      max-width: 680px;
     }
 
-    /* Day selector */
+    /* ════════════════════════════════════════════
+       DAY SELECTOR
+    ════════════════════════════════════════════ */
     .day-selector {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       width: 100%;
       justify-content: center;
     }
     .day-btn {
-      background: rgba(42,26,8,0.6);
-      border: 1px solid var(--border-muted);
-      color: var(--text-subgold);
-      font-size: 9px;
-      font-family: 'IBM Plex Mono', monospace;
-      padding: 4px 10px;
-      border-radius: 3px;
+      position: relative;
+      background: none;
+      border: none;
       cursor: pointer;
-      transition: all 0.15s;
+      color: var(--tan);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 20px;
+      letter-spacing: 0.04em;
+      opacity: 0.45;
+      transition: opacity 0.15s;
+      z-index: 0;
     }
-    .day-btn:hover { border-color: var(--border-gold); color: var(--text-gold); }
-    .day-btn.active { background: rgba(200,160,80,0.15); border-color: var(--border-gold); color: var(--text-gold); }
+    .day-btn span { position: relative; z-index: 1; }
+    /* SmallButton bg */
+    .day-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--dark-btn);
+      -webkit-mask-image: url('../assets/ui2/SmallButton.png');
+      mask-image: url('../assets/ui2/SmallButton.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      z-index: 0;
+    }
+    /* Border42 overlay */
+    .day-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
+      mask-image: url('../assets/ui2/Border42@10x.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      opacity: 0.3;
+      z-index: 0;
+    }
+    .day-btn:hover { opacity: 0.75; }
+    .day-btn.active { opacity: 1.0; }
+    .day-btn.active::after { opacity: 1.0; }
 
-    /* ── GAME PANEL (parchment) ── */
+    /* ════════════════════════════════════════════
+       GAME PANEL — Panel.png (dark charcoal + gold border)
+    ════════════════════════════════════════════ */
     .game-panel {
-      width: 720px;
-      background: linear-gradient(160deg, #e8d4a8 0%, #d4c090 100%);
-      border: 2px solid var(--border-gold);
-      border-radius: 4px;
+      width: 680px;
       position: relative;
       display: flex;
       flex-direction: column;
       cursor: default;
+      /* Panel.png at native tint reveals embedded dark charcoal + gold ornamental border */
+      background-color: #111008;
+      background-image: url('../assets/ui2/Panel.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
       box-shadow:
-        0 4px 32px rgba(0,0,0,0.65),
-        0 0 0 1px rgba(200,160,80,0.4),
-        inset 0 0 18px rgba(180,140,60,0.15);
-    }
-    .game-panel::before {
-      content: '✦  ✦';
-      position: absolute;
-      top: 4px; left: 4px; right: 4px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--border-gold);
-      line-height: 1;
-      pointer-events: none;
-    }
-    .game-panel::after {
-      content: '✦  ✦';
-      position: absolute;
-      bottom: 4px; left: 4px; right: 4px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--border-gold);
-      line-height: 1;
-      pointer-events: none;
+        0 12px 60px rgba(0,0,0,0.9),
+        0 0 0 1px rgba(227,202,152,0.08);
     }
 
+    /* ════════════════════════════════════════════
+       PANEL HEADER
+    ════════════════════════════════════════════ */
     .panel-header {
-      padding: 14px 20px 6px;
+      padding: 20px 28px 8px;
       text-align: center;
-      border-bottom: 1px solid var(--border-gold);
     }
-    .panel-title { font-size: 14px; font-weight: 700; color: var(--text-parch-head); letter-spacing: 0.06em; }
-    .panel-subtitle { font-size: 10px; color: var(--text-parch-body); margin-top: 2px; }
+    .panel-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--tan);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .panel-title-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-block;
+      flex-shrink: 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/GuildFlag.png');
+      mask-image: url('../assets/ui2/GuildFlag.png');
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+    .panel-subtitle {
+      font-size: 11px;
+      color: var(--tan);
+      opacity: 0.55;
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+    /* SidePattern divider */
+    .panel-divider {
+      height: 10px;
+      margin: 8px 20px 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/SidePattern.png');
+      mask-image: url('../assets/ui2/SidePattern.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      opacity: 0.35;
+    }
 
-    /* Intent banner */
+    /* ════════════════════════════════════════════
+       INTENT BANNER
+    ════════════════════════════════════════════ */
     .intent-banner {
-      margin: 4px 10px 0;
-      padding: 4px 8px;
+      margin: 6px 20px 0;
+      padding: 6px 14px;
       border-radius: 3px;
-      font-size: 9px;
+      font-size: 10px;
       text-align: center;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.04em;
+      color: var(--tan);
     }
     .intent-achieved {
-      background: rgba(34,197,94,0.15);
-      border: 1px solid rgba(34,197,94,0.4);
-      color: #1a5c2a;
+      background: rgba(0,168,27,0.10);
+      border: 1px solid rgba(0,168,27,0.45);
+      box-shadow: 0 0 10px rgba(0,168,27,0.12), inset 0 0 8px rgba(0,168,27,0.05);
     }
     .intent-missed {
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.3);
-      color: #7a1a1a;
+      background: rgba(214,106,106,0.10);
+      border: 1px solid rgba(214,106,106,0.40);
     }
 
-    /* Content area — 2 columns */
+    /* ════════════════════════════════════════════
+       PANEL CONTENT — 2-column layout
+    ════════════════════════════════════════════ */
     .panel-content {
       display: flex;
       flex: 1;
-      padding: 6px 8px;
-      gap: 6px;
+      padding: 8px 16px 10px;
+      gap: 8px;
       min-height: 0;
       overflow-y: auto;
     }
@@ -237,262 +291,480 @@
       min-width: 0;
     }
 
-    /* Section cards */
+    /* ════════════════════════════════════════════
+       SECTION CARDS — BackgroundColor.png
+    ════════════════════════════════════════════ */
     .section-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-muted);
-      border-radius: 4px;
-      padding: 7px 9px;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
       position: relative;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 4px;
+      /* BackgroundColor.png — dark rounded rect with warm amber glow bottom-right */
+      background-color: #130e05;
+      background-image: url('../assets/ui2/BackgroundColor.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      transition: filter 0.15s;
     }
-    .section-card:hover { border-color: var(--border-gold); background: var(--bg-card-raised); }
-    .section-card.selected { border-color: var(--border-gold); background: var(--bg-card-active); box-shadow: 0 0 0 1px var(--border-gold); }
-    .section-card.empty { opacity: 0.55; }
+    /* Border42 overlay — tan border stroke */
+    .section-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
+      mask-image: url('../assets/ui2/Border42@10x.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      opacity: 0.18;
+      pointer-events: none;
+      border-radius: 4px;
+    }
+    .section-card:hover { filter: brightness(1.18); }
+    .section-card:hover::after { opacity: 0.38; }
+    .section-card.selected { filter: brightness(1.12); }
+    .section-card.selected::after { opacity: 0.75; }
+    .section-card.empty { opacity: 0.58; }
 
+    /* ── Section title with sprite icon ── */
     .section-title {
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
-      color: var(--text-parch-head);
+      color: var(--tan);
       letter-spacing: 0.07em;
-      margin-bottom: 4px;
       text-transform: uppercase;
       text-align: center;
-      border-bottom: 1px solid rgba(138,101,48,0.3);
-      padding-bottom: 3px;
+      padding-bottom: 5px;
+      margin-bottom: 5px;
+      border-bottom: 1px solid rgba(227,202,152,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      position: relative;
+      z-index: 1;
     }
+    /* Generic icon base — white-on-transparent tinted via mask-image */
+    .sec-icon {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      flex-shrink: 0;
+      background-color: var(--tan);
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+    .i-coin     { -webkit-mask-image: url('../assets/ui2/Coin.png');       mask-image: url('../assets/ui2/Coin.png'); }
+    .i-merchant { -webkit-mask-image: url('../assets/ui2/Merchant.png');   mask-image: url('../assets/ui2/Merchant.png'); }
+    .i-sword    { -webkit-mask-image: url('../assets/ui2/Sword.png');      mask-image: url('../assets/ui2/Sword.png'); }
+    .i-star     { -webkit-mask-image: url('../assets/ui2/Star.png');       mask-image: url('../assets/ui2/Star.png'); }
+    .i-heart    { -webkit-mask-image: url('../assets/ui2/Heart.png');      mask-image: url('../assets/ui2/Heart.png'); }
+    .i-favors   { -webkit-mask-image: url('../assets/ui2/Favors.png');     mask-image: url('../assets/ui2/Favors.png'); }
+    .i-hammer   { -webkit-mask-image: url('../assets/ui2/Hammer.png');     mask-image: url('../assets/ui2/Hammer.png'); }
+    .i-guild    { -webkit-mask-image: url('../assets/ui2/GuildFlag.png');  mask-image: url('../assets/ui2/GuildFlag.png'); }
+    .i-startan  { -webkit-mask-image: url('../assets/ui2/StarTan.png');    mask-image: url('../assets/ui2/StarTan.png'); }
+    .i-chest    { -webkit-mask-image: url('../assets/ui2/Chest.png');      mask-image: url('../assets/ui2/Chest.png'); }
+    .i-crown    { -webkit-mask-image: url('../assets/ui2/crown 1.png');    mask-image: url('../assets/ui2/crown 1.png'); }
+
+    /* ── Section rows ── */
     .section-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      font-size: 10px;
-      padding: 1px 0;
+      padding: 1.5px 0;
+      position: relative;
+      z-index: 1;
     }
-    .section-row .label { color: var(--text-parch-muted); font-size: 9px; }
-    .section-row .value { color: var(--text-parch-body); font-family: 'IBM Plex Mono', monospace; font-size: 10px; }
-    .section-row .value.up { color: #1a6a30; font-weight: 600; }
-    .section-row .value.down { color: #7a1a1a; }
-    .section-row .value.gold { color: #7a5500; font-weight: 600; }
-    .section-row .best { color: var(--text-parch-muted); font-size: 9px; font-style: italic; }
+    .section-row .label {
+      font-size: 10px;
+      color: var(--tan);
+      opacity: 0.6;
+    }
+    .section-row .value {
+      font-size: 11px;
+      color: var(--tan);
+      font-weight: 600;
+    }
+    .section-row .value.up   { color: #5de87a; }
+    .section-row .value.down { color: var(--red); }
+    .section-row .value.gold { color: var(--tan); font-weight: 700; }
+    .section-row .best       { font-size: 10px; color: var(--tan); opacity: 0.42; font-style: italic; }
 
-    /* Sub-list inside section */
-    .sub-list { margin-top: 3px; }
+    /* ── Sub lists ── */
+    .sub-list { margin-top: 4px; position: relative; z-index: 1; }
     .sub-item {
-      font-size: 9px;
-      color: var(--text-parch-body);
-      padding: 1px 0;
+      font-size: 10px;
+      color: var(--tan);
+      padding: 2px 0 2px 10px;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      border-bottom: 1px solid rgba(138,101,48,0.15);
+      border-bottom: 1px solid rgba(227,202,152,0.07);
+      position: relative;
+    }
+    .sub-item::before {
+      content: '·';
+      position: absolute;
+      left: 2px;
+      color: var(--tan);
+      opacity: 0.35;
     }
     .sub-item:last-child { border-bottom: none; }
-    .sub-item .sub-name { color: var(--text-parch-body); }
-    .sub-item .sub-val { font-family: 'IBM Plex Mono', monospace; color: var(--text-parch-muted); font-size: 9px; }
-    .sub-item .sub-val.highlight { color: #1a6a30; font-weight: 600; }
-    .sub-item .sub-val.death { color: #7a1a1a; }
-    .sub-item::before { content: '·'; color: var(--border-muted); margin-right: 4px; flex-shrink: 0; }
+    .sub-item .sub-name  { opacity: 0.75; }
+    .sub-item .sub-val   { opacity: 0.48; font-size: 10px; }
+    .sub-item .sub-val.highlight { color: #5de87a; opacity: 1; font-weight: 700; }
+    .sub-item .sub-val.death     { color: var(--red); opacity: 1; }
     .more-indicator {
       font-size: 9px;
-      color: var(--text-parch-muted);
+      color: var(--tan);
+      opacity: 0.35;
       text-align: center;
-      margin-top: 2px;
+      margin-top: 3px;
       font-style: italic;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Rapport milestone (special highlight) */
+    /* ── Rapport milestone ── */
     .rapport-milestone {
-      background: rgba(167,139,250,0.12);
-      border: 1px solid rgba(167,139,250,0.3);
+      background: rgba(160,130,240,0.07);
+      border: 1px solid rgba(160,130,240,0.22);
       border-radius: 3px;
-      padding: 3px 6px;
-      margin-top: 2px;
-      font-size: 9px;
-      color: #4a2a6a;
+      padding: 4px 8px;
+      margin-top: 4px;
+      font-size: 10px;
+      color: var(--tan);
       text-align: center;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Achievement badge */
+    /* ── Achievement badge ── */
     .achievement-badge {
-      background: rgba(200,160,80,0.18);
-      border: 1px solid var(--border-gold);
+      background: rgba(227,202,152,0.07);
+      border: 1px solid rgba(227,202,152,0.25);
       border-radius: 3px;
-      padding: 3px 6px;
-      margin-top: 2px;
+      padding: 3px 7px;
+      margin-top: 3px;
       font-size: 9px;
-      color: #5a3a00;
+      color: var(--tan);
       text-align: center;
-      font-weight: 600;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Materials grid */
+    /* ── Materials grid ── */
     .materials-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2px;
-      margin-top: 3px;
+      gap: 3px;
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
     }
     .mat-item {
-      font-size: 9px;
-      color: var(--text-parch-body);
+      font-size: 10px;
+      color: var(--tan);
+      opacity: 0.7;
       display: flex;
       justify-content: space-between;
-      padding: 1px 3px;
-      background: rgba(42,26,8,0.08);
+      padding: 2px 4px;
+      background: rgba(227,202,152,0.04);
       border-radius: 2px;
     }
-    .mat-item .mat-qty { font-family: 'IBM Plex Mono', monospace; color: var(--text-parch-muted); }
+    .mat-item .mat-qty { opacity: 0.55; }
 
-    /* Vault / King's Vault section */
-    .vault-section {
-      background: linear-gradient(135deg, #c8a050 0%, #a07830 100%);
-      border: 1px solid #a07830;
+    /* ── Progress bar ── */
+    .bar-wrap { margin-top: 4px; position: relative; z-index: 1; }
+    .bar-track {
+      height: 7px;
+      background: var(--darker-bg);
       border-radius: 4px;
-      padding: 7px 9px;
-      position: relative;
+      overflow: hidden;
     }
-    .vault-title {
+    .bar-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    /* ── Streak banner ── */
+    .streak-banner {
+      background: rgba(0,168,27,0.08);
+      border: 1px solid rgba(0,168,27,0.28);
+      border-radius: 3px;
+      padding: 3px 8px;
       font-size: 9px;
+      color: #5de87a;
+      text-align: center;
+      font-weight: 600;
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+    }
+    .streak-broken {
+      background: rgba(214,106,106,0.08);
+      border-color: rgba(214,106,106,0.28);
+      color: var(--red);
+    }
+
+    /* ── Node tag (hover tooltip) ── */
+    .node-tag {
+      position: absolute;
+      top: 3px;
+      right: 5px;
+      font-size: 7px;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      color: var(--tan);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .section-card:hover .node-tag,
+    .vault-section:hover .node-tag { opacity: 0.45; }
+
+    /* ════════════════════════════════════════════
+       VAULT SECTION — special card
+    ════════════════════════════════════════════ */
+    .vault-section {
+      position: relative;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 4px;
+      background-color: #130e05;
+      background-image: url('../assets/ui2/BackgroundColor.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      transition: filter 0.15s;
+    }
+    .vault-section::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
+      mask-image: url('../assets/ui2/Border42@10x.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      opacity: 0.35;
+      pointer-events: none;
+      border-radius: 4px;
+    }
+    .vault-section:hover { filter: brightness(1.18); }
+    .vault-section:hover::after { opacity: 0.55; }
+    .vault-section.selected::after { opacity: 0.85; }
+
+    .vault-title {
+      font-size: 10px;
       font-weight: 700;
-      color: #2a1a00;
+      color: var(--tan);
       letter-spacing: 0.07em;
       text-transform: uppercase;
       text-align: center;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(227,202,152,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+      z-index: 1;
     }
     .vault-token-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 9px;
-      margin-bottom: 4px;
+      font-size: 10px;
+      margin-bottom: 3px;
+      position: relative;
+      z-index: 1;
     }
-    .vault-token-label { color: #3a2000; }
+    .vault-token-label { color: var(--tan); opacity: 0.6; }
     .vault-token-val {
-      font-family: 'IBM Plex Mono', monospace;
-      color: #2a1a00;
+      color: var(--tan);
       font-weight: 700;
-      font-size: 11px;
+      font-size: 13px;
     }
     .vault-cats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 3px;
-      margin-top: 3px;
+      gap: 4px;
+      margin-top: 5px;
+      position: relative;
+      z-index: 1;
     }
     .vault-cat {
-      background: rgba(42,26,8,0.15);
+      background: rgba(227,202,152,0.04);
+      border: 1px solid rgba(227,202,152,0.10);
       border-radius: 3px;
-      padding: 3px 5px;
+      padding: 4px 5px;
     }
-    .vault-cat-name { font-size: 8px; color: #3a2000; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .vault-cat-name {
+      font-size: 9px;
+      color: var(--tan);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.75;
+    }
     .vault-cat-bar-track {
       height: 5px;
-      background: rgba(42,26,8,0.25);
+      background: var(--darker-bg);
       border-radius: 3px;
-      margin-top: 2px;
+      margin-top: 3px;
       overflow: hidden;
     }
     .vault-cat-bar-fill {
       height: 100%;
-      background: #2a1a00;
+      background: var(--green);
       border-radius: 3px;
       transition: width 0.3s;
     }
     .vault-cat-tier {
       font-size: 8px;
-      color: #3a2000;
+      color: var(--tan);
+      opacity: 0.45;
       text-align: right;
-      margin-top: 1px;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
-    /* Deathless streak banner */
-    .streak-banner {
-      background: rgba(34,197,94,0.12);
-      border: 1px solid rgba(34,197,94,0.35);
-      border-radius: 3px;
-      padding: 3px 7px;
-      font-size: 9px;
-      color: #1a5c2a;
-      text-align: center;
-      font-weight: 600;
       margin-top: 2px;
     }
-    .streak-broken {
-      background: rgba(239,68,68,0.1);
-      border-color: rgba(239,68,68,0.3);
-      color: #7a1a1a;
-    }
 
-    /* Progress bar generic */
-    .bar-wrap { margin-top: 3px; }
-    .bar-track {
-      height: 6px;
-      background: rgba(42,26,8,0.25);
-      border-radius: 3px;
-      border: 1px solid var(--border-muted);
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: var(--bar-fill);
-    }
-
-    /* Footer */
+    /* ════════════════════════════════════════════
+       PANEL FOOTER
+    ════════════════════════════════════════════ */
     .panel-footer {
-      background: var(--bg-footer);
-      border-top: 1px solid var(--border-gold);
-      padding: 5px 10px;
+      background: rgba(12,8,3,0.75);
+      border-top: 1px solid rgba(227,202,152,0.12);
+      padding: 8px 16px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
+    /* Nav buttons — SmallButton.png bg + Border42.png border */
     .nav-btn {
-      background: var(--btn-bg);
-      border: 1px solid var(--btn-border);
-      color: var(--btn-text);
-      font-size: 9px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 20px;
+      position: relative;
+      background: none;
+      border: none;
       cursor: pointer;
+      color: var(--tan);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 18px;
       letter-spacing: 0.04em;
-      white-space: nowrap;
+      transition: filter 0.15s;
+      z-index: 0;
     }
-    .nav-btn:hover { background: #3a2810; color: #e4c870; }
+    .nav-btn span { position: relative; z-index: 1; }
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--dark-btn);
+      -webkit-mask-image: url('../assets/ui2/SmallButton.png');
+      mask-image: url('../assets/ui2/SmallButton.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      z-index: 0;
+    }
+    .nav-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
+      mask-image: url('../assets/ui2/Border42@10x.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      z-index: 0;
+    }
+    .nav-btn:hover { filter: brightness(1.25); }
+    .nav-btn:disabled {
+      opacity: 0.32;
+      cursor: default;
+      filter: none;
+    }
     .page-indicator {
       flex: 1;
       text-align: center;
-      font-size: 9px;
-      color: var(--text-parch-body);
-      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--tan);
+      opacity: 0.5;
     }
     .close-btn {
-      width: 18px; height: 18px;
-      background: var(--btn-bg);
-      border: 1px solid var(--btn-border);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      width: 26px;
+      height: 26px;
+      background: none;
+      border: none;
       cursor: pointer;
-      font-size: 9px;
-      color: var(--btn-text);
+      color: var(--tan);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 0;
     }
-    .node-tag {
+    .close-btn span { position: relative; z-index: 1; }
+    .close-btn::before {
+      content: '';
       position: absolute;
-      top: 2px; right: 2px;
-      font-size: 7px;
-      font-family: 'IBM Plex Mono', monospace;
-      color: var(--border-muted);
-      opacity: 0;
-      pointer-events: none;
+      inset: 0;
+      background-color: var(--dark-btn);
+      -webkit-mask-image: url('../assets/ui2/SmallButton.png');
+      mask-image: url('../assets/ui2/SmallButton.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      z-index: 0;
     }
-    .section-card:hover .node-tag { opacity: 0.8; }
+    .close-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--tan);
+      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
+      mask-image: url('../assets/ui2/Border42@10x.png');
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      z-index: 0;
+    }
+    .close-btn:hover { filter: brightness(1.25); }
 
-    /* ── HIERARCHY TREE (inside dev-panel) ── */
+    /* ════════════════════════════════════════════
+       DRAG DIVIDER
+    ════════════════════════════════════════════ */
+    .drag-divider {
+      width: 5px;
+      cursor: col-resize;
+      background: var(--inspector-border);
+      flex-shrink: 0;
+      transition: background 0.15s;
+      position: relative;
+      z-index: 10;
+    }
+    .drag-divider:hover, .drag-divider.dragging { background: #58a6ff; }
+
+    /* ════════════════════════════════════════════
+       DEV PANEL
+    ════════════════════════════════════════════ */
+    .dev-panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-left: 1px solid var(--inspector-border);
+      width: 360px;
+      min-width: 200px;
+      max-width: 700px;
+      flex-shrink: 0;
+    }
+
+    /* ── Hierarchy ── */
     .hierarchy-col {
       background: #0c0e14;
       overflow-y: auto;
@@ -521,7 +793,7 @@
       gap: 4px;
       padding: 3px 8px;
       cursor: pointer;
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
       font-size: 11px;
       color: #c9d1d9;
       transition: background 0.1s;
@@ -530,15 +802,15 @@
     }
     .tree-node:hover { background: rgba(79,100,149,0.15); }
     .tree-node.selected { background: rgba(56,139,253,0.15); border-left-color: #58a6ff; color: #e6edf3; }
-    .tree-node .indent { display: inline-block; width: 14px; flex-shrink: 0; }
+    .tree-node .indent { display: inline-block; flex-shrink: 0; }
     .tree-node .icon { font-size: 10px; flex-shrink: 0; opacity: 0.7; }
     .tree-node .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     .tree-node .components { font-size: 9px; color: #6e7681; margin-left: 4px; flex-shrink: 0; }
-    .tree-node.scene-root { color: var(--inspector-warn); font-weight: 700; font-size: 12px; background: rgba(255,171,112,0.05); }
+    .tree-node.scene-root  { color: var(--inspector-warn); font-weight: 700; font-size: 12px; background: rgba(255,171,112,0.05); }
     .tree-node.canvas-node { color: #79b8ff; }
     .tree-node.script-node { border-left-color: rgba(249,117,131,0.4); }
 
-    /* ── RIGHT COLUMN: INSPECTOR ── */
+    /* ── Inspector ── */
     .inspector-col {
       background: var(--inspector-bg);
       overflow-y: auto;
@@ -567,7 +839,7 @@
       font-size: 13px;
       font-weight: 700;
       color: var(--inspector-value);
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
     }
     .go-meta { display: flex; gap: 12px; margin-top: 4px; }
     .go-meta-item { font-size: 10px; color: var(--inspector-label); }
@@ -602,7 +874,7 @@
     }
     .prop-key {
       color: var(--inspector-label);
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
       font-size: 10px;
       white-space: nowrap;
       overflow: hidden;
@@ -610,7 +882,7 @@
     }
     .prop-val {
       color: var(--inspector-value);
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
       font-size: 10px;
       word-break: break-all;
     }
@@ -633,13 +905,13 @@
       grid-template-columns: 1fr auto;
       gap: 4px;
       font-size: 10px;
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
       color: var(--inspector-value);
       padding: 1px 0;
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .sf-row:last-child { border-bottom: none; }
-    .sf-field { color: var(--inspector-warn); }
+    .sf-field  { color: var(--inspector-warn); }
     .sf-target { color: #79b8ff; }
     .section-divider {
       font-size: 9px;
@@ -650,7 +922,9 @@
       border-bottom: 1px solid var(--inspector-border);
     }
 
-    /* ── BOTTOM PANEL: IMPLEMENTATION CHECKLIST ── */
+    /* ════════════════════════════════════════════
+       CHECKLIST PANEL
+    ════════════════════════════════════════════ */
     .checklist-panel {
       height: 300px;
       border-top: 2px solid var(--border-muted);
@@ -675,7 +949,6 @@
       overflow-y: auto;
       padding: 8px 0;
       display: flex;
-      gap: 0;
     }
     .checklist-col {
       flex: 1;
@@ -701,7 +974,7 @@
     }
     .check-num {
       color: var(--inspector-label);
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
       font-size: 9px;
       flex-shrink: 0;
       width: 18px;
@@ -709,9 +982,9 @@
       padding-top: 1px;
     }
     .check-text { color: var(--text-cream); flex: 1; }
-    .check-text .mono { font-family: 'IBM Plex Mono', monospace; color: var(--inspector-key); font-size: 9px; }
-    .check-text .val  { font-family: 'IBM Plex Mono', monospace; color: var(--inspector-warn); font-size: 9px; }
-    .check-text .path { font-family: 'IBM Plex Mono', monospace; color: #79b8ff; font-size: 9px; }
+    .check-text .mono { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--inspector-key); font-size: 9px; }
+    .check-text .val  { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--inspector-warn); font-size: 9px; }
+    .check-text .path { font-family: ui-monospace, Menlo, Consolas, monospace; color: #79b8ff; font-size: 9px; }
     .check-item.section-break .check-text { font-weight: 700; color: var(--text-gold); }
     .check-item.section-break { margin-top: 6px; }
   </style>
@@ -736,28 +1009,29 @@
 
   <!-- ═══════════════════════════════ LEFT: GAME PREVIEW ═══════════════════════════════ -->
   <div class="preview-col">
-    <div class="preview-col-label">▸ GAME PREVIEW</div>
+    <div class="preview-col-label">▸ GAME PREVIEW — UI2 Asset System</div>
 
     <!-- Day selector -->
     <div class="day-selector">
-      <button class="day-btn" onclick="showDay(0)">Day 42</button>
-      <button class="day-btn active" onclick="showDay(1)">Day 43 ←</button>
-      <button class="day-btn" onclick="showDay(2)">Day 44</button>
+      <button class="day-btn" onclick="showDay(0)"><span>Day 42</span></button>
+      <button class="day-btn active" onclick="showDay(1)"><span>Day 43 ←</span></button>
+      <button class="day-btn" onclick="showDay(2)"><span>Day 44</span></button>
     </div>
 
-    <!-- ===== PANEL DAY 43 (DEFAULT) ===== -->
+    <!-- ═════════════════════════ PANEL DAY 43 (DEFAULT) ═════════════════════════ -->
     <div class="game-panel" id="panel-day43">
 
-      <!-- Header -->
       <div class="panel-header">
-        <div class="panel-title">📜 Kingdom Herald</div>
+        <div class="panel-title">
+          <span class="sec-icon i-guild panel-title-icon"></span>
+          Kingdom Herald
+        </div>
         <div class="panel-subtitle">Day 43 — Epoch End Summary</div>
+        <div class="panel-divider"></div>
       </div>
 
-      <!-- Intent banner -->
       <div class="intent-banner intent-achieved">⚔ Intent: Conquer Dungeon — ACHIEVED ✓</div>
 
-      <!-- Content -->
       <div class="panel-content">
 
         <!-- LEFT COLUMN -->
@@ -766,7 +1040,10 @@
           <!-- GOLD & ECONOMY -->
           <div class="section-card selected" onclick="selectCard(this,'sc-gold')" data-section="sc-gold">
             <span class="node-tag">GoldEconomy</span>
-            <div class="section-title">⚜ Gold & Economy</div>
+            <div class="section-title">
+              <span class="sec-icon i-coin"></span>
+              Gold &amp; Economy
+            </div>
             <div class="section-row">
               <span class="label">Earned</span>
               <span class="value gold">+4,820g</span>
@@ -788,7 +1065,10 @@
           <!-- ITEMS SOLD -->
           <div class="section-card" onclick="selectCard(this,'sc-items')" data-section="sc-items">
             <span class="node-tag">ItemsSold</span>
-            <div class="section-title">🏪 Storefront Sales</div>
+            <div class="section-title">
+              <span class="sec-icon i-merchant"></span>
+              Storefront Sales
+            </div>
             <div class="section-row">
               <span class="label">Items Sold</span>
               <span class="value">12</span>
@@ -808,7 +1088,10 @@
           <!-- DUNGEONS CLEARED -->
           <div class="section-card" onclick="selectCard(this,'sc-dungeons')" data-section="sc-dungeons">
             <span class="node-tag">DungeonsCleared</span>
-            <div class="section-title">⚔ Dungeons Cleared</div>
+            <div class="section-title">
+              <span class="sec-icon i-sword"></span>
+              Dungeons Cleared
+            </div>
             <div class="section-row">
               <span class="label">Cleared Today</span>
               <span class="value up">3</span>
@@ -832,7 +1115,10 @@
           <!-- HEROES LEVELED -->
           <div class="section-card" onclick="selectCard(this,'sc-herolevels')" data-section="sc-herolevels">
             <span class="node-tag">HeroesLeveledUp</span>
-            <div class="section-title">⭐ Heroes Leveled Up</div>
+            <div class="section-title">
+              <span class="sec-icon i-star"></span>
+              Heroes Leveled Up
+            </div>
             <div class="section-row">
               <span class="label">Level-Ups Today</span>
               <span class="value up">2</span>
@@ -852,7 +1138,10 @@
           <!-- HERO DEATHS -->
           <div class="section-card empty" onclick="selectCard(this,'sc-deaths')" data-section="sc-deaths">
             <span class="node-tag">HeroDeaths</span>
-            <div class="section-title">💀 Hero Deaths</div>
+            <div class="section-title">
+              <span class="sec-icon i-heart"></span>
+              Hero Deaths
+            </div>
             <div class="section-row">
               <span class="label">Deaths Today</span>
               <span class="value">0</span>
@@ -868,7 +1157,10 @@
           <!-- FAVORS -->
           <div class="section-card" onclick="selectCard(this,'sc-favors')" data-section="sc-favors">
             <span class="node-tag">FavorsCompleted</span>
-            <div class="section-title">📋 Favors Completed</div>
+            <div class="section-title">
+              <span class="sec-icon i-favors"></span>
+              Favors Completed
+            </div>
             <div class="section-row">
               <span class="label">Completed</span>
               <span class="value up">7</span>
@@ -882,7 +1174,10 @@
           <!-- GATHERING / MATERIALS -->
           <div class="section-card" onclick="selectCard(this,'sc-materials')" data-section="sc-materials">
             <span class="node-tag">MaterialsGathered</span>
-            <div class="section-title">⛏ Materials Gathered</div>
+            <div class="section-title">
+              <span class="sec-icon i-hammer"></span>
+              Materials Gathered
+            </div>
             <div class="section-row">
               <span class="label">Total Items</span>
               <span class="value">34</span>
@@ -898,21 +1193,27 @@
           <!-- RAPPORT MILESTONES -->
           <div class="section-card" onclick="selectCard(this,'sc-rapport')" data-section="sc-rapport">
             <span class="node-tag">RapportMilestones</span>
-            <div class="section-title">🤝 Rapport Milestones</div>
+            <div class="section-title">
+              <span class="sec-icon i-heart"></span>
+              Rapport Milestones
+            </div>
             <div class="section-row">
               <span class="label">New Milestones</span>
               <span class="value up">1</span>
             </div>
             <div class="rapport-milestone">
               ★ Kira reached 75 Rapport — now Allied!<br>
-              <span style="font-size:8px;color:#6a4890">Will join without a missive</span>
+              <span style="font-size:9px;opacity:0.6">Will join without a missive</span>
             </div>
           </div>
 
           <!-- GUILD RANK PROGRESS -->
           <div class="section-card" onclick="selectCard(this,'sc-guild')" data-section="sc-guild">
             <span class="node-tag">GuildRankProgress</span>
-            <div class="section-title">🏰 Guild Progress</div>
+            <div class="section-title">
+              <span class="sec-icon i-guild"></span>
+              Guild Progress
+            </div>
             <div class="section-row">
               <span class="label">Rank XP Gained</span>
               <span class="value up">+340</span>
@@ -920,7 +1221,7 @@
             <div class="bar-wrap">
               <div class="bar-track"><div class="bar-fill" style="width:68%"></div></div>
             </div>
-            <div class="section-row" style="margin-top:2px">
+            <div class="section-row" style="margin-top:3px">
               <span class="best">Rank IV — Knight</span>
               <span class="best">68% to Rank V</span>
             </div>
@@ -929,7 +1230,10 @@
           <!-- ALL-TIME BESTS -->
           <div class="section-card" onclick="selectCard(this,'sc-bests')" data-section="sc-bests">
             <span class="node-tag">AllTimeBests</span>
-            <div class="section-title">🏆 All-Time Records</div>
+            <div class="section-title">
+              <span class="sec-icon i-startan"></span>
+              All-Time Records
+            </div>
             <div class="section-row">
               <span class="label">Best Single Day Gold</span>
               <span class="value gold">8,430g</span>
@@ -950,14 +1254,18 @@
 
           <!-- KING'S VAULT -->
           <div class="vault-section" onclick="selectCard(this,'sc-vault')" data-section="sc-vault">
-            <div class="vault-title">👑 King's Vault Progress</div>
+            <span class="node-tag">VaultProgressCard</span>
+            <div class="vault-title">
+              <span class="sec-icon i-crown" style="width:16px;height:16px"></span>
+              King's Vault Progress
+            </div>
             <div class="vault-token-row">
               <span class="vault-token-label">Tokens Available</span>
               <span class="vault-token-val">⬡ 7</span>
             </div>
             <div class="vault-token-row">
               <span class="vault-token-label">Week resets in</span>
-              <span style="font-family: 'IBM Plex Mono'; font-size:9px; color:#3a2000;">4 days</span>
+              <span style="font-size:10px;color:var(--tan);opacity:0.55">4 days</span>
             </div>
             <div class="vault-cats">
               <div class="vault-cat">
@@ -993,212 +1301,254 @@
 
       <!-- Footer -->
       <div class="panel-footer">
-        <button class="nav-btn" onclick="showDay(0)">◀ Prev</button>
+        <button class="nav-btn" onclick="showDay(0)"><span>◀ Prev</span></button>
         <span class="page-indicator">Day 43 of 44  ·  30-day history</span>
-        <button class="nav-btn" onclick="showDay(2)">Next ▶</button>
-        <div class="close-btn">✕</div>
+        <button class="nav-btn" onclick="showDay(2)"><span>Next ▶</span></button>
+        <div class="close-btn"><span>✕</span></div>
       </div>
 
     </div><!-- /panel day43 -->
 
-    <!-- ===== PANEL DAY 42 ===== -->
+    <!-- ═════════════════════════ PANEL DAY 42 ═════════════════════════ -->
     <div class="game-panel" id="panel-day42" style="display:none">
+
       <div class="panel-header">
-        <div class="panel-title">📜 Kingdom Herald</div>
+        <div class="panel-title">
+          <span class="sec-icon i-guild panel-title-icon"></span>
+          Kingdom Herald
+        </div>
         <div class="panel-subtitle">Day 42 — Epoch End Summary</div>
+        <div class="panel-divider"></div>
       </div>
+
       <div class="intent-banner intent-missed">💰 Intent: Maximize Gold — NOT ACHIEVED (earned 2,100g, needed 3,720g)</div>
+
       <div class="panel-content">
         <div class="panel-column">
           <div class="section-card">
-            <div class="section-title">⚜ Gold & Economy</div>
+            <div class="section-title"><span class="sec-icon i-coin"></span> Gold &amp; Economy</div>
             <div class="section-row"><span class="label">Earned</span><span class="value gold">+2,100g</span></div>
             <div class="section-row"><span class="label">Spent</span><span class="value down">-890g</span></div>
             <div class="section-row"><span class="label">Net</span><span class="value">+1,210g</span></div>
           </div>
           <div class="section-card empty">
-            <div class="section-title">🏪 Storefront Sales</div>
+            <div class="section-title"><span class="sec-icon i-merchant"></span> Storefront Sales</div>
             <div class="section-row"><span class="label">Items Sold</span><span class="value">4</span></div>
             <div class="section-row"><span class="label">Best Sale</span><span class="value gold">Runic Shield — 620g</span></div>
           </div>
           <div class="section-card">
-            <div class="section-title">⚔ Dungeons Cleared</div>
+            <div class="section-title"><span class="sec-icon i-sword"></span> Dungeons Cleared</div>
             <div class="section-row"><span class="label">Cleared Today</span><span class="value">1</span></div>
             <div class="sub-list">
               <div class="sub-item"><span class="sub-name">Ashcroft Ruins</span><span class="sub-val">Aldric, Vex</span></div>
             </div>
           </div>
           <div class="section-card empty">
-            <div class="section-title">⭐ Heroes Leveled Up</div>
+            <div class="section-title"><span class="sec-icon i-star"></span> Heroes Leveled Up</div>
             <div class="section-row"><span class="label">Level-Ups Today</span><span class="value">0</span></div>
-            <div class="more-indicator" style="color:var(--text-parch-muted);">— none today —</div>
+            <div class="more-indicator">— none today —</div>
           </div>
           <div class="section-card">
-            <div class="section-title">💀 Hero Deaths</div>
+            <div class="section-title"><span class="sec-icon i-heart"></span> Hero Deaths</div>
             <div class="section-row"><span class="label">Deaths Today</span><span class="value down">1</span></div>
             <div class="sub-list">
               <div class="sub-item"><span class="sub-name">Lyra</span><span class="sub-val death">Hospitalized</span></div>
             </div>
+            <div class="streak-banner streak-broken">💀 Death
             <div class="streak-banner streak-broken">💀 Deathless streak broken (was 4 days)</div>
           </div>
-        </div>
+        </div><!-- /panel-column left -->
+
         <div class="panel-column">
-          <div class="section-card empty">
-            <div class="section-title">📋 Favors Completed</div>
+          <div class="section-card empty" onclick="selectCard(this,'sc-favors')" data-section="sc-favors">
+            <span class="node-tag">FavorsCard</span>
+            <div class="section-title"><span class="sec-icon i-favors"></span> Favors Completed</div>
             <div class="section-row"><span class="label">Completed</span><span class="value">2</span></div>
+            <div class="section-row"><span class="label">Est. Value</span><span class="value gold">~160g</span></div>
           </div>
-          <div class="section-card">
-            <div class="section-title">⛏ Materials Gathered</div>
+          <div class="section-card" onclick="selectCard(this,'sc-materials')" data-section="sc-materials">
+            <span class="node-tag">MaterialsCard</span>
+            <div class="section-title"><span class="sec-icon i-hammer"></span> Materials Gathered</div>
             <div class="section-row"><span class="label">Total Items</span><span class="value">18</span></div>
             <div class="materials-grid">
               <div class="mat-item"><span>Deepstone Ore</span><span class="mat-qty">×10</span></div>
               <div class="mat-item"><span>Ironwood</span><span class="mat-qty">×8</span></div>
             </div>
           </div>
-          <div class="section-card empty">
-            <div class="section-title">🤝 Rapport Milestones</div>
+          <div class="section-card empty" onclick="selectCard(this,'sc-rapport')" data-section="sc-rapport">
+            <span class="node-tag">RapportCard</span>
+            <div class="section-title"><span class="sec-icon i-heart"></span> Rapport Milestones</div>
             <div class="section-row"><span class="label">New Milestones</span><span class="value">0</span></div>
             <div class="more-indicator">— none today —</div>
           </div>
-          <div class="section-card">
-            <div class="section-title">🏰 Guild Progress</div>
-            <div class="section-row"><span class="label">Rank XP Gained</span><span class="value">+120</span></div>
-            <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:52%"></div></div></div>
-          </div>
-          <div class="section-card">
-            <div class="section-title">🏆 All-Time Records</div>
-            <div class="section-row"><span class="label">Best Single Day Gold</span><span class="value gold">8,430g</span></div>
-            <div class="section-row"><span class="label">Longest Deathless</span><span class="value up">12 days</span></div>
-          </div>
-          <div class="vault-section">
-            <div class="vault-title">👑 King's Vault Progress</div>
-            <div class="vault-token-row"><span class="vault-token-label">Tokens Available</span><span class="vault-token-val">⬡ 6</span></div>
-            <div class="vault-cats">
-              <div class="vault-cat"><div class="vault-cat-name">⚔ Combatant</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:40%"></div></div><div class="vault-cat-tier">Tier 2/5</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">🤝 Ambassador</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:40%"></div></div><div class="vault-cat-tier">Tier 2/5</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">⚜ Mercantile</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:60%"></div></div><div class="vault-cat-tier">Tier 3/5</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">🔨 Craftsman</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:20%"></div></div><div class="vault-cat-tier">Tier 1/5</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">🎖 Director</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:0%"></div></div><div class="vault-cat-tier">Tier 0/5</div></div>
+          <div class="section-card" onclick="selectCard(this,'sc-guild')" data-section="sc-guild">
+            <span class="node-tag">GuildProgressCard</span>
+            <div class="section-title"><span class="sec-icon i-guild"></span> Guild Progress</div>
+            <div class="section-row"><span class="label">Rank XP Gained</span><span class="value">+85</span></div>
+            <div class="bar-wrap">
+              <div class="bar-track"><div class="bar-fill" style="width:52%"></div></div>
             </div>
           </div>
-        </div>
-      </div>
+          <div class="section-card" onclick="selectCard(this,'sc-bests')" data-section="sc-bests">
+            <span class="node-tag">AllTimeBestsCard</span>
+            <div class="section-title"><span class="sec-icon i-startan"></span> All-Time Bests</div>
+            <div class="section-row"><span class="label">Best Gold Day</span><span class="value gold">4,820g (Day 43)</span></div>
+            <div class="section-row"><span class="label">Most Dungeons</span><span class="value">3</span></div>
+            <div class="section-row"><span class="label">Best Sale</span><span class="value gold">Shadowfang — 950g</span></div>
+          </div>
+          <div class="vault-section" onclick="selectCard(this,'sc-vault')" data-section="sc-vault">
+            <span class="node-tag">VaultProgressCard</span>
+            <div class="vault-title"><span class="sec-icon i-crown"></span> King's Vault</div>
+            <div class="vault-token-row">
+              <span class="vault-token-label">Tokens This Week</span>
+              <span class="vault-token-val">6 / 26</span>
+            </div>
+            <div class="vault-token-row">
+              <span class="vault-token-label">Resets in</span>
+              <span class="vault-token-val" style="font-size:11px">3 days</span>
+            </div>
+            <div class="vault-cats">
+              <div class="vault-cat"><div class="vault-cat-name">Combatant</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:20%"></div></div><div class="vault-cat-tier">Tier 1/5</div></div>
+              <div class="vault-cat"><div class="vault-cat-name">Ambassador</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:40%"></div></div><div class="vault-cat-tier">Tier 2/5</div></div>
+              <div class="vault-cat"><div class="vault-cat-name">Mercantile</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:20%"></div></div><div class="vault-cat-tier">Tier 1/5</div></div>
+              <div class="vault-cat"><div class="vault-cat-name">Craftsman</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:60%"></div></div><div class="vault-cat-tier">Tier 3/5</div></div>
+              <div class="vault-cat" style="grid-column:1/-1"><div class="vault-cat-name">Director</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:0%"></div></div><div class="vault-cat-tier">Tier 0/5</div></div>
+            </div>
+          </div>
+        </div><!-- /panel-column right -->
+      </div><!-- /panel-content -->
+
       <div class="panel-footer">
-        <button class="nav-btn" disabled>◀ Prev</button>
-        <span class="page-indicator">Day 42 of 44  ·  30-day history</span>
-        <button class="nav-btn" onclick="showDay(1)">Next ▶</button>
-        <div class="close-btn">✕</div>
+        <button class="nav-btn"><span>← Prev</span></button>
+        <span class="page-indicator">Day 42</span>
+        <button class="nav-btn"><span>Next →</span></button>
+        <button class="close-btn"><span>✕</span></button>
       </div>
+
     </div><!-- /panel day42 -->
 
-    <!-- ===== PANEL DAY 44 (BIG DAY) ===== -->
+    <!-- ═════════════════════════ PANEL DAY 44 ═════════════════════════ -->
     <div class="game-panel" id="panel-day44" style="display:none">
+
       <div class="panel-header">
-        <div class="panel-title">📜 Kingdom Herald</div>
+        <div class="panel-title">
+          <span class="sec-icon i-guild panel-title-icon"></span>
+          Kingdom Herald
+        </div>
         <div class="panel-subtitle">Day 44 — Epoch End Summary</div>
+        <div class="panel-divider"></div>
       </div>
-      <div class="intent-banner intent-achieved">⭐ Intent: Level Heroes — ACHIEVED ✓</div>
+
+      <div class="intent-banner intent-missed">🏕 Intent: Stock Materials — NOT ACHIEVED (gathered 42, needed 50+)</div>
+
       <div class="panel-content">
         <div class="panel-column">
-          <div class="section-card">
-            <div class="section-title">⚜ Gold & Economy</div>
-            <div class="section-row"><span class="label">Earned</span><span class="value gold">+8,430g ★ NEW BEST</span></div>
-            <div class="section-row"><span class="label">Spent</span><span class="value down">-2,100g</span></div>
-            <div class="section-row"><span class="label">Net</span><span class="value up">+6,330g</span></div>
+          <div class="section-card" onclick="selectCard(this,'sc-gold')" data-section="sc-gold">
+            <span class="node-tag">GoldEconomyCard</span>
+            <div class="section-title"><span class="sec-icon i-coin"></span> Gold &amp; Economy</div>
+            <div class="section-row"><span class="label">Earned</span><span class="value gold">+3,100g</span></div>
+            <div class="section-row"><span class="label">Spent</span><span class="value down">-2,400g</span></div>
+            <div class="section-row"><span class="label">Net</span><span class="value up">+700g</span></div>
           </div>
-          <div class="section-card">
-            <div class="section-title">🏪 Storefront Sales</div>
-            <div class="section-row"><span class="label">Items Sold</span><span class="value">21</span></div>
-            <div class="section-row"><span class="label">Best Sale</span><span class="value gold">Void Crystal Staff — 2,800g ★</span></div>
+          <div class="section-card" onclick="selectCard(this,'sc-items')" data-section="sc-items">
+            <span class="node-tag">ItemsSoldCard</span>
+            <div class="section-title"><span class="sec-icon i-merchant"></span> Storefront Sales</div>
+            <div class="section-row"><span class="label">Items Sold</span><span class="value">7</span></div>
+            <div class="section-row"><span class="label">Best Sale</span><span class="value gold">Iron Plate — 720g</span></div>
             <div class="sub-list">
-              <div class="sub-item"><span class="sub-name">Void Crystal Staff</span><span class="sub-val">2,800g</span></div>
-              <div class="sub-item"><span class="sub-name">Soulfire Tome</span><span class="sub-val">1,200g</span></div>
-              <div class="sub-item"><span class="sub-name">Ironclad Breastplate</span><span class="sub-val">780g</span></div>
+              <div class="sub-item"><span class="sub-name">Iron Plate</span><span class="sub-val">720g</span></div>
+              <div class="sub-item"><span class="sub-name">Herb Bundles ×5</span><span class="sub-val">250g</span></div>
+              <div class="sub-item"><span class="sub-name">Oak Staff</span><span class="sub-val">380g</span></div>
             </div>
-            <div class="more-indicator">+ 18 more items</div>
+            <div class="more-indicator">+ 4 more</div>
           </div>
-          <div class="section-card">
-            <div class="section-title">⚔ Dungeons Cleared</div>
-            <div class="section-row"><span class="label">Cleared Today</span><span class="value up">5</span></div>
+          <div class="section-card" onclick="selectCard(this,'sc-dungeons')" data-section="sc-dungeons">
+            <span class="node-tag">DungeonsClearedCard</span>
+            <div class="section-title"><span class="sec-icon i-sword"></span> Dungeons Cleared</div>
+            <div class="section-row"><span class="label">Cleared Today</span><span class="value">0</span></div>
+            <div class="more-indicator">— none today —</div>
+          </div>
+          <div class="section-card empty" onclick="selectCard(this,'sc-herolevels')" data-section="sc-herolevels">
+            <span class="node-tag">HeroLevelCard</span>
+            <div class="section-title"><span class="sec-icon i-star"></span> Heroes Leveled Up</div>
+            <div class="section-row"><span class="label">Level-Ups Today</span><span class="value">0</span></div>
+            <div class="more-indicator">— none today —</div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-deaths')" data-section="sc-deaths">
+            <span class="node-tag">HeroDeathCard</span>
+            <div class="section-title"><span class="sec-icon i-heart"></span> Hero Deaths</div>
+            <div class="section-row"><span class="label">Deaths Today</span><span class="value down">2</span></div>
             <div class="sub-list">
-              <div class="sub-item"><span class="sub-name">Ashcroft Ruins</span><span class="sub-val">Theron, Lyra</span></div>
-              <div class="sub-item"><span class="sub-name">Frostfall Keep</span><span class="sub-val">Mira, Aldric</span></div>
-              <div class="sub-item"><span class="sub-name">Ember Depths</span><span class="sub-val">Vex, Kira</span></div>
+              <div class="sub-item"><span class="sub-name">Mira</span><span class="sub-val death">Hospitalized</span></div>
+              <div class="sub-item"><span class="sub-name">Kira</span><span class="sub-val death">Hospitalized</span></div>
             </div>
-            <div class="more-indicator">+ 2 more dungeons</div>
-          </div>
-          <div class="section-card">
-            <div class="section-title">⭐ Heroes Leveled Up</div>
-            <div class="section-row"><span class="label">Level-Ups Today</span><span class="value up">4</span></div>
-            <div class="sub-list">
-              <div class="sub-item"><span class="sub-name">Theron</span><span class="sub-val highlight">→ Lv 25</span></div>
-              <div class="sub-item"><span class="sub-name">Aldric</span><span class="sub-val highlight">→ Lv 22</span></div>
-              <div class="sub-item"><span class="sub-name">Vex</span><span class="sub-val highlight">→ Lv 20</span></div>
-            </div>
-            <div class="more-indicator">+ 1 more</div>
-          </div>
-          <div class="section-card empty">
-            <div class="section-title">💀 Hero Deaths</div>
-            <div class="section-row"><span class="label">Deaths Today</span><span class="value">0</span></div>
-            <div class="streak-banner">🛡 Deathless Streak: 6 days</div>
+            <div class="streak-banner streak-broken">💀 Deathless streak reset</div>
           </div>
         </div>
         <div class="panel-column">
-          <div class="section-card">
-            <div class="section-title">📋 Favors Completed</div>
-            <div class="section-row"><span class="label">Completed</span><span class="value up">11</span></div>
-            <div class="section-row"><span class="label">Gold Paid Out</span><span class="value gold">≈ 1,650g</span></div>
+          <div class="section-card" onclick="selectCard(this,'sc-favors')" data-section="sc-favors">
+            <span class="node-tag">FavorsCard</span>
+            <div class="section-title"><span class="sec-icon i-favors"></span> Favors Completed</div>
+            <div class="section-row"><span class="label">Completed</span><span class="value">5</span></div>
           </div>
-          <div class="section-card">
-            <div class="section-title">⛏ Materials Gathered</div>
-            <div class="section-row"><span class="label">Total Items</span><span class="value">62</span></div>
+          <div class="section-card" onclick="selectCard(this,'sc-materials')" data-section="sc-materials">
+            <span class="node-tag">MaterialsCard</span>
+            <div class="section-title"><span class="sec-icon i-hammer"></span> Materials Gathered</div>
+            <div class="section-row"><span class="label">Total Items</span><span class="value">42</span></div>
             <div class="materials-grid">
-              <div class="mat-item"><span>Ironwood</span><span class="mat-qty">×18</span></div>
-              <div class="mat-item"><span>Deepstone Ore</span><span class="mat-qty">×15</span></div>
-              <div class="mat-item"><span>Frostbloom</span><span class="mat-qty">×14</span></div>
-              <div class="mat-item"><span>Shellback Hide</span><span class="mat-qty">×8</span></div>
-              <div class="mat-item"><span>Voidweave Silk</span><span class="mat-qty">×5</span></div>
-              <div class="mat-item"><span>Ember Coal</span><span class="mat-qty">×2</span></div>
+              <div class="mat-item"><span>Ironwood</span><span class="mat-qty">×15</span></div>
+              <div class="mat-item"><span>Silkweed</span><span class="mat-qty">×12</span></div>
+              <div class="mat-item"><span>Deepstone</span><span class="mat-qty">×8</span></div>
+              <div class="mat-item"><span>Duskbloom</span><span class="mat-qty">×7</span></div>
             </div>
           </div>
-          <div class="section-card">
-            <div class="section-title">🤝 Rapport Milestones</div>
-            <div class="section-row"><span class="label">New Milestones</span><span class="value up">2</span></div>
-            <div class="rapport-milestone">★ Aldric reached 50 Rapport — now Friendly!</div>
-            <div class="rapport-milestone" style="margin-top:3px;">★★ Vex reached 100 Rapport — Devoted! Seeking to join!</div>
+          <div class="section-card" onclick="selectCard(this,'sc-rapport')" data-section="sc-rapport">
+            <span class="node-tag">RapportCard</span>
+            <div class="section-title"><span class="sec-icon i-heart"></span> Rapport Milestones</div>
+            <div class="section-row"><span class="label">New Milestones</span><span class="value">1</span></div>
+            <div class="rapport-milestone">💜 Kira — Rapport 75: Allied ★</div>
           </div>
-          <div class="section-card">
-            <div class="section-title">🏰 Guild Progress</div>
-            <div class="section-row"><span class="label">Rank XP Gained</span><span class="value up">+580</span></div>
-            <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div></div>
-            <div class="section-row" style="margin-top:2px;"><span class="best">Rank V incoming!</span><span class="best">85% to rank up</span></div>
+          <div class="section-card" onclick="selectCard(this,'sc-guild')" data-section="sc-guild">
+            <span class="node-tag">GuildProgressCard</span>
+            <div class="section-title"><span class="sec-icon i-guild"></span> Guild Progress</div>
+            <div class="section-row"><span class="label">Rank XP Gained</span><span class="value">+120</span></div>
+            <div class="bar-wrap">
+              <div class="bar-track"><div class="bar-fill" style="width:68%"></div></div>
+            </div>
           </div>
-          <div class="section-card">
-            <div class="section-title">🏆 All-Time Records</div>
-            <div class="section-row"><span class="label">Best Single Day Gold</span><span class="value gold">8,430g ★ NEW</span></div>
-            <div class="section-row"><span class="label">Best Dungeons/Day</span><span class="value up">5 ★ NEW</span></div>
-            <div class="section-row"><span class="label">Best Item Sale</span><span class="value gold">2,800g ★ NEW</span></div>
+          <div class="section-card" onclick="selectCard(this,'sc-bests')" data-section="sc-bests">
+            <span class="node-tag">AllTimeBestsCard</span>
+            <div class="section-title"><span class="sec-icon i-startan"></span> All-Time Bests</div>
+            <div class="section-row"><span class="label">Best Gold Day</span><span class="value gold">4,820g (Day 43)</span></div>
+            <div class="section-row"><span class="label">Most Dungeons</span><span class="value">3 (Day 43)</span></div>
+            <div class="section-row"><span class="label">Best Sale</span><span class="value gold">Shadowfang — 950g</span></div>
+            <div class="section-row"><span class="label">Deathless Record</span><span class="value">4 days</span></div>
           </div>
-          <div class="vault-section">
-            <div class="vault-title">👑 King's Vault Progress</div>
-            <div class="vault-token-row"><span class="vault-token-label">Tokens Available</span><span class="vault-token-val">⬡ 11</span></div>
-            <div class="vault-token-row"><span class="vault-token-label">Week resets in</span><span style="font-family:'IBM Plex Mono';font-size:9px;color:#3a2000;">3 days</span></div>
+          <div class="vault-section" onclick="selectCard(this,'sc-vault')" data-section="sc-vault">
+            <span class="node-tag">VaultProgressCard</span>
+            <div class="vault-title"><span class="sec-icon i-crown"></span> King's Vault</div>
+            <div class="vault-token-row">
+              <span class="vault-token-label">Tokens This Week</span>
+              <span class="vault-token-val">8 / 26</span>
+            </div>
             <div class="vault-cats">
-              <div class="vault-cat"><div class="vault-cat-name">⚔ Combatant</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:100%"></div></div><div class="vault-cat-tier" style="color:#7a5500;font-weight:700">Tier 5/5 ✓</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">🤝 Ambassador</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:60%"></div></div><div class="vault-cat-tier">Tier 3/5</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">⚜ Mercantile</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:100%"></div></div><div class="vault-cat-tier" style="color:#7a5500;font-weight:700">Tier 5/5 ✓</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">🔨 Craftsman</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:40%"></div></div><div class="vault-cat-tier">Tier 2/5</div></div>
-              <div class="vault-cat"><div class="vault-cat-name">🎖 Director</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:20%"></div></div><div class="vault-cat-tier">Tier 1/5</div></div>
+              <div class="vault-cat"><div class="vault-cat-name">Combatant</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:0%"></div></div><div class="vault-cat-tier">Tier 0/5</div></div>
+              <div class="vault-cat"><div class="vault-cat-name">Ambassador</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:60%"></div></div><div class="vault-cat-tier">Tier 3/5</div></div>
+              <div class="vault-cat"><div class="vault-cat-name">Mercantile</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:40%"></div></div><div class="vault-cat-tier">Tier 2/5</div></div>
+              <div class="vault-cat"><div class="vault-cat-name">Craftsman</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:80%"></div></div><div class="vault-cat-tier">Tier 4/5</div></div>
+              <div class="vault-cat" style="grid-column:1/-1"><div class="vault-cat-name">Director</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:20%"></div></div><div class="vault-cat-tier">Tier 1/5</div></div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="panel-footer">
-        <button class="nav-btn" onclick="showDay(1)">◀ Prev</button>
-        <span class="page-indicator">Day 44 of 44  ·  30-day history</span>
-        <button class="nav-btn" disabled>Next ▶</button>
-        <div class="close-btn">✕</div>
+        <button class="nav-btn"><span>← Prev</span></button>
+        <span class="page-indicator">Day 44</span>
+        <button class="nav-btn"><span>Next →</span></button>
+        <button class="close-btn"><span>✕</span></button>
       </div>
+
     </div><!-- /panel day44 -->
 
   </div><!-- /preview-col -->
@@ -1206,10 +1556,8 @@
   <!-- ── DRAG DIVIDER ── -->
   <div class="drag-divider" id="drag-divider"></div>
 
-  <!-- ── DEV PANEL (hierarchy + inspector stacked) ── -->
+  <!-- ── DEV PANEL ── -->
   <div class="dev-panel" id="dev-panel">
-
-  <!-- ═══════════════════════════════ HIERARCHY ═══════════════════════════════ -->
   <div class="hierarchy-col">
     <div class="hierarchy-header">☰ Hierarchy — KingdomHeraldPanel</div>
     <div class="tree">
