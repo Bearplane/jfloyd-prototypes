@@ -94,6 +94,7 @@
       flex-direction: column;
       min-height: 0;
       overflow: hidden;
+      height: 100%; /* receive the 1fr height from body grid */
     }
 
     /* ════════════════════════════════════════════
@@ -684,9 +685,11 @@
     }
     /* ── CONTENT ROW: horizontal layout container ── */
     .content-row {
-      flex: 1;
+      flex: 1 1 0;
       min-height: 0;
       position: relative; /* contains absolutely-positioned children */
+      /* abs children need explicit height on container */
+      /* height comes from flex: body(grid 1fr) -> main(flex-col) -> content-row(flex:1) */
     }
     .preview-side {
       position: absolute;
@@ -950,6 +953,7 @@
 </head>
 <body>
 
+<!-- TOP BAR -->
 <!-- ── TOP BAR ── -->
 <div class="top-bar">
   <h1>📜 UIKingdomHerald — Kingdom Herald Panel</h1>
@@ -963,8 +967,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════ TOP: CHECKLIST ═══════════════════════════════ -->
-<!-- ═══════════════════════════════ BOTTOM: CHECKLIST ═══════════════════════════════ -->
+<!-- CHECKLIST STRIP (top) -->
 <div class="checklist-panel">
   <div class="checklist-header">
     <h2>🛠 Implementation Checklist — KingdomHeraldPanel</h2>
@@ -1054,25 +1057,18 @@
   </div>
 </div>
 
-
-<!-- ── MAIN 3-COLUMN LAYOUT ── -->
+<!-- MAIN AREA -->
 <div class="main">
   <div class="content-row">
 
-  <!-- ═══════════════════════════════ LEFT: PREVIEW SIDE ═══════════════════════════════ -->
-  <div class="preview-side">
-  <div class="preview-col">
-    <div class="preview-col-label">▸ GAME PREVIEW — UI2 Asset System</div>
-
-    <!-- Day selector -->
-    <div class="day-selector">
+    <!-- LEFT: PREVIEW SIDE -->
+    <div class="preview-side">
+      <div class="day-selector">
       <button class="day-btn" onclick="showDay(0)"><span>Day 42</span></button>
       <button class="day-btn active" onclick="showDay(1)"><span>Day 43 ←</span></button>
       <button class="day-btn" onclick="showDay(2)"><span>Day 44</span></button>
     </div>
-
-    <!-- ═════════════════════════ PANEL DAY 43 (DEFAULT) ═════════════════════════ -->
-    <div class="game-panel" id="panel-day43">
+      <div class="game-panel" id="panel-day43">
 
       <div class="panel-header">
         <div class="panel-title">
@@ -1362,10 +1358,8 @@
         <div class="close-btn"><span>✕</span></div>
       </div>
 
-    </div><!-- /panel day43 -->
-
-    <!-- ═════════════════════════ PANEL DAY 42 ═════════════════════════ -->
-    <div class="game-panel" id="panel-day42" style="display:none">
+    </div>
+      <div class="game-panel" id="panel-day42" style="display:none">
 
       <div class="panel-header">
         <div class="panel-title">
@@ -1619,14 +1613,140 @@
 
     </div><!-- /panel day44 -->
 
-  </div><!-- /preview-col -->
-  </div><!-- /preview-side -->
+  </div>
+      <div class="game-panel" id="panel-day44" style="display:none">
 
-  <!-- ── DRAG DIVIDER ── -->
-  <div class="drag-divider" id="drag-divider"></div>
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="sec-icon i-guild panel-title-icon"></span>
+          Kingdom Herald
+        </div>
+        <div class="panel-subtitle">Day 44 — Epoch End Summary</div>
+        <div class="panel-divider"></div>
+      </div>
 
-  <!-- ── DEV PANEL ── -->
-  <div class="dev-panel" id="dev-panel">
+      <div class="intent-banner intent-missed">🏕 Intent: Stock Materials — NOT ACHIEVED (gathered 42, needed 50+)</div>
+
+      <div class="panel-content">
+        <div class="panel-column">
+          <div class="section-card" onclick="selectCard(this,'sc-gold')" data-section="sc-gold">
+            <span class="node-tag">GoldEconomyCard</span>
+            <div class="section-title"><span class="sec-icon i-coin"></span> Gold &amp; Economy</div>
+            <div class="section-row"><span class="label">Earned</span><span class="value gold">+3,100g</span></div>
+            <div class="section-row"><span class="label">Spent</span><span class="value down">-2,400g</span></div>
+            <div class="section-row"><span class="label">Net</span><span class="value up">+700g</span></div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-items')" data-section="sc-items">
+            <span class="node-tag">ItemsSoldCard</span>
+            <div class="section-title"><span class="sec-icon i-merchant"></span> Storefront Sales</div>
+            <div class="section-row"><span class="label">Items Sold</span><span class="value">7</span></div>
+            <div class="section-row"><span class="label">Best Sale</span><span class="value gold">Iron Plate — 720g</span></div>
+            <div class="sub-list">
+              <div class="sub-item"><span class="sub-name">Iron Plate</span><span class="sub-val">720g</span></div>
+              <div class="sub-item"><span class="sub-name">Herb Bundles ×5</span><span class="sub-val">250g</span></div>
+              <div class="sub-item"><span class="sub-name">Oak Staff</span><span class="sub-val">380g</span></div>
+            </div>
+            <div class="more-indicator">+ 4 more</div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-dungeons')" data-section="sc-dungeons">
+            <span class="node-tag">DungeonsClearedCard</span>
+            <div class="section-title"><span class="sec-icon i-sword"></span> Dungeons Cleared</div>
+            <div class="section-row"><span class="label">Cleared Today</span><span class="value">0</span></div>
+            <div class="more-indicator">— none today —</div>
+          </div>
+          <div class="section-card empty" onclick="selectCard(this,'sc-herolevels')" data-section="sc-herolevels">
+            <span class="node-tag">HeroLevelCard</span>
+            <div class="section-title"><span class="sec-icon i-star"></span> Heroes Leveled Up</div>
+            <div class="section-row"><span class="label">Level-Ups Today</span><span class="value">0</span></div>
+            <div class="more-indicator">— none today —</div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-deaths')" data-section="sc-deaths">
+            <span class="node-tag">HeroDeathCard</span>
+            <div class="section-title"><span class="sec-icon i-heart"></span> Hero Deaths</div>
+            <div class="section-row"><span class="label">Deaths Today</span><span class="value down">2</span></div>
+            <div class="sub-list">
+              <div class="sub-item"><span class="sub-name">Mira</span><span class="sub-val death">Hospitalized</span></div>
+              <div class="sub-item"><span class="sub-name">Kira</span><span class="sub-val death">Hospitalized</span></div>
+            </div>
+            <div class="streak-banner streak-broken">💀 Deathless streak reset</div>
+          </div>
+        </div>
+        <div class="panel-column">
+          <div class="section-card" onclick="selectCard(this,'sc-favors')" data-section="sc-favors">
+            <span class="node-tag">FavorsCard</span>
+            <div class="section-title"><span class="sec-icon i-favors"></span> Favors Completed</div>
+            <div class="section-row"><span class="label">Completed</span><span class="value">5</span></div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-materials')" data-section="sc-materials">
+            <span class="node-tag">MaterialsCard</span>
+            <div class="section-title"><span class="sec-icon i-hammer"></span> Materials Gathered</div>
+            <div class="section-row"><span class="label">Total Items</span><span class="value">42</span></div>
+            <div class="materials-grid">
+              <div class="mat-item"><span>Ironwood</span><span class="mat-qty">×15</span></div>
+              <div class="mat-item"><span>Silkweed</span><span class="mat-qty">×12</span></div>
+              <div class="mat-item"><span>Deepstone</span><span class="mat-qty">×8</span></div>
+              <div class="mat-item"><span>Duskbloom</span><span class="mat-qty">×7</span></div>
+            </div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-rapport')" data-section="sc-rapport">
+            <span class="node-tag">RapportCard</span>
+            <div class="section-title"><span class="sec-icon i-heart"></span> Rapport Milestones</div>
+            <div class="section-row"><span class="label">New Milestones</span><span class="value">1</span></div>
+            <div class="rapport-milestone">💜 Kira — Rapport 75: Allied ★</div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-guild')" data-section="sc-guild">
+            <span class="node-tag">GuildProgressCard</span>
+            <div class="section-title"><span class="sec-icon i-guild"></span> Guild Progress</div>
+            <div class="section-row"><span class="label">Rank XP Gained</span><span class="value">+120</span></div>
+            <div class="bar-wrap">
+              <div class="bar-track"><div class="bar-fill" style="width:68%"></div></div>
+            </div>
+          </div>
+          <div class="section-card" onclick="selectCard(this,'sc-bests')" data-section="sc-bests">
+            <span class="node-tag">AllTimeBestsCard</span>
+            <div class="section-title"><span class="sec-icon i-startan"></span> All-Time Bests</div>
+            <div class="section-row"><span class="label">Best Gold Day</span><span class="value gold">4,820g (Day 43)</span></div>
+            <div class="section-row"><span class="label">Most Dungeons</span><span class="value">3 (Day 43)</span></div>
+            <div class="section-row"><span class="label">Best Sale</span><span class="value gold">Shadowfang — 950g</span></div>
+            <div class="section-row"><span class="label">Deathless Record</span><span class="value">4 days</span></div>
+          </div>
+        </div><!-- /panel-column right -->
+      </div><!-- /panel-content -->
+
+      <!-- King's Vault — full width bottom row -->
+      <div class="vault-full-row">
+      <div class="vault-section" onclick="selectCard(this,'sc-vault')" data-section="sc-vault">
+                  <span class="node-tag">VaultProgressCard</span>
+                  <div class="vault-title"><span class="sec-icon i-crown"></span> King's Vault</div>
+                  <div class="vault-token-row">
+                    <span class="vault-token-label">Tokens This Week</span>
+                    <span class="vault-token-val">8 / 26</span>
+                  </div>
+                  <div class="vault-cats">
+                    <div class="vault-cat"><div class="vault-cat-name">Combatant</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:0%"></div></div><div class="vault-cat-tier">Tier 0/5</div></div>
+                    <div class="vault-cat"><div class="vault-cat-name">Ambassador</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:60%"></div></div><div class="vault-cat-tier">Tier 3/5</div></div>
+                    <div class="vault-cat"><div class="vault-cat-name">Mercantile</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:40%"></div></div><div class="vault-cat-tier">Tier 2/5</div></div>
+                    <div class="vault-cat"><div class="vault-cat-name">Craftsman</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:80%"></div></div><div class="vault-cat-tier">Tier 4/5</div></div>
+                    <div class="vault-cat" style="grid-column:1/-1"><div class="vault-cat-name">Director</div><div class="vault-cat-bar-track"><div class="vault-cat-bar-fill" style="width:20%"></div></div><div class="vault-cat-tier">Tier 1/5</div></div>
+                  </div>
+                </div>
+      </div><!-- /vault-full-row -->
+
+      <div class="panel-footer">
+        <button class="nav-btn"><span>← Prev</span></button>
+        <span class="page-indicator">Day 44</span>
+        <button class="nav-btn"><span>Next →</span></button>
+        <button class="close-btn"><span>✕</span></button>
+      </div>
+
+    </div>
+    </div><!-- /preview-side -->
+
+    <!-- DRAG DIVIDER -->
+    <div class="drag-divider" id="drag-divider"></div>
+
+    <!-- RIGHT: DEV PANEL -->
+    <div class="dev-panel" id="dev-panel">
   <div class="hierarchy-col">
     <div class="hierarchy-header">☰ Hierarchy — KingdomHeraldPanel</div>
     <div class="tree">
@@ -1917,10 +2037,9 @@
     </div>
   </div><!-- /inspector-col -->
 
-  </div><!-- /dev-panel -->
+  </div>
 
   </div><!-- /content-row -->
-
 </div><!-- /main -->
 
 <script>
@@ -2011,5 +2130,7 @@
   // Init
   showDay(1);
 </script>
+</body>
+
 </body>
 </html>
