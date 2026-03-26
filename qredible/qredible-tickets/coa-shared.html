@@ -545,7 +545,10 @@
         <div class="form-field">
           <label class="form-label">🔗 Linked Products (4 products share this COA) <span class="new-pill">New</span></label>
           <div class="linked-panel">
-            <div class="lp-title">These products use this product's COA:</div>
+            <div class="lp-title" style="justify-content:space-between;">
+              <span>These products use this product's COA:</span>
+              <button style="background:var(--blue-dark);color:white;border:none;border-radius:4px;font-size:10px;font-weight:700;padding:3px 9px;cursor:pointer;">+ Link a product</button>
+            </div>
             <div class="linked-row">
               <span>Remedy Smalls 3.5g</span>
               <div style="display:flex;align-items:center;gap:8px;">
@@ -612,9 +615,106 @@
   </div>
 </div>
 
-<!-- ══ SECTION 5: Confirmation modal ══ -->
+<!-- ══ SECTION 5: How linking works — the search/select interaction ══ -->
 <div>
-  <p class="section-label">5 — Confirmation Modal When Updating a Shared COA</p>
+  <p class="section-label">5 — How Linking Works: The "Shared From" Search Flow</p>
+
+  <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);padding:24px;display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
+
+    <!-- Step diagram -->
+    <div style="flex:1;min-width:260px;">
+      <p style="font-weight:700;font-size:13px;margin-bottom:14px;color:var(--text);">Where the link is established</p>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;">
+
+        <div style="border:1px solid #BBF7D0;border-radius:6px;padding:12px;background:#F0FDF4;">
+          <div style="font-weight:700;color:var(--green);margin-bottom:4px;">① From the Shared product (primary path)</div>
+          <div style="color:var(--text-muted);line-height:1.6;">Open Product Builder on the product that <em>needs</em> the COA (e.g. Remedy Pre-Rolls 1g). Set COA Assignment Level = <strong>Shared</strong>. The "Shared From" search field appears — search for and select the source product. Save. Link is established.</div>
+        </div>
+
+        <div style="text-align:center;color:#94A3B8;font-size:11px;">OR</div>
+
+        <div style="border:1px solid var(--border);border-radius:6px;padding:12px;background:#F8FAFC;">
+          <div style="font-weight:700;color:var(--text);margin-bottom:4px;">② From the Source product (convenience path)</div>
+          <div style="color:var(--text-muted);line-height:1.6;">Open Product Builder on the COA Source product (e.g. Remedy Shake). In the Linked Products panel, click <strong>"+ Link a product"</strong>. Search and select the product to link. This sets that product's Assignment Level to Shared and points it back here — same result as path ①.</div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:16px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:12px;font-size:12px;color:var(--text-muted);line-height:1.6;">
+        <strong style="color:var(--red-dark);">One record, one truth:</strong> Both paths create the same link. There is no COA copy. The Shared product holds a reference to the source's COA record. If the source COA is replaced or expires, all Shared products reflect that immediately — no manual updates needed.
+      </div>
+    </div>
+
+    <!-- Search field interaction mock -->
+    <div style="flex:1;min-width:280px;">
+      <p style="font-weight:700;font-size:13px;margin-bottom:14px;color:var(--text);">"Shared From" search — what it looks like</p>
+
+      <!-- Empty state -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Blank (just selected Shared)</div>
+        <div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;color:var(--text-muted);background:white;">Search products by name, SKU, or classification...</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Searches the full product catalog — not limited to siblings or same parent.</div>
+      </div>
+
+      <!-- Typing state -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">After typing "remedy"</div>
+        <div style="border:1px solid var(--blue);border-radius:var(--radius-sm);background:white;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.1);">
+          <input style="width:100%;border:none;padding:8px 10px;font-family:var(--font-ui);font-size:13px;color:var(--text);outline:none;" type="text" value="remedy"/>
+          <div style="border-top:1px solid var(--border);">
+            <!-- Dropdown results -->
+            <div style="padding:7px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#EFF6FF;">
+              <div>
+                <div style="font-weight:600;font-size:12px;">Remedy Shake 18.9%</div>
+                <div style="font-size:10px;color:var(--text-muted);">RMD-SMO-1 · Smokable Flower · <span style="color:var(--green);font-weight:600;">COA Validated</span></div>
+              </div>
+              <span style="font-size:10px;color:var(--blue);font-weight:700;">Select →</span>
+            </div>
+            <div style="padding:7px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+              <div>
+                <div style="font-weight:600;font-size:12px;">Remedy Smalls 3.5g</div>
+                <div style="font-size:10px;color:var(--text-muted);">RMD-SMO-2 · Smokable Flower · <span style="color:var(--text-muted);">Shared from Remedy Shake</span></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-muted);">Already shared</span>
+            </div>
+            <div style="padding:7px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+              <div>
+                <div style="font-weight:600;font-size:12px;">Remedy Loose Flower 7g</div>
+                <div style="font-size:10px;color:var(--text-muted);">RMD-SMO-7 · Smokable Flower · <span style="color:var(--text-muted);">Shared from Remedy Shake</span></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-muted);">Already shared</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Products already Shared from this source are shown as disabled (grayed, "Already shared") so you don't create duplicates.</div>
+      </div>
+
+      <!-- Selected state -->
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">After selecting</div>
+        <div style="border:1px solid #FDE68A;border-radius:var(--radius-sm);background:#FFFBEB;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:600;font-size:12px;color:var(--text);">🔗 Remedy Shake 18.9% (RMD-SMO-1)</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+              <span class="badge b-validated" style="font-size:10px;">COA Validated</span>
+              <span style="font-size:10px;color:var(--text-muted);">Expires 01/10/2027</span>
+            </div>
+          </div>
+          <button style="background:none;border:none;font-size:16px;color:#94A3B8;cursor:pointer;">✕</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>Linking is always initiated from the Shared product</strong> (primary) or optionally pushed from the source's Linked Products panel (convenience). The search field is full-catalog. Products already sharing this COA are shown as disabled in results so you can't accidentally double-link. After selecting, the source's current COA status and expiry are previewed before saving.
+  </div>
+</div>
+
+
+<!-- ══ SECTION 6: Confirmation modal ══ -->
+<div>
+  <p class="section-label">6 — Confirmation Modal When Updating a Shared COA</p>
   <div style="background:rgba(15,23,42,.4);border-radius:12px;padding:40px;display:flex;align-items:center;justify-content:center;">
     <div style="background:white;border-radius:var(--radius-card);max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
       <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Update shared COA?</div>
