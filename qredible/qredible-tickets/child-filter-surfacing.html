@@ -287,10 +287,154 @@
 
 
 <!-- ══════════════════════════════
+  SECTION 0: Variant Count Badge — Always On
+══════════════════════════════ -->
+<div class="mockup">
+  <p class="section-label">0 — Variant Count Badge: Always visible on parent rows (no filter active)</p>
+  <div class="table-wrap">
+    <div class="table-toolbar">
+      <div class="search-fake">Search products by definition, classification or SKU or COA file name...</div>
+      <button class="btn btn-filters-green"><span>▼ Filters</span></button>
+      <button class="btn btn-blue">Add Product</button>
+      <button class="btn btn-blue">Scan for Products</button>
+      <button class="btn btn-red">Export</button>
+    </div>
+    <div class="results-row">
+      <strong>4598 Products</strong>
+      <span>|</span>
+      <span style="color:var(--blue);">⇕ Expand All</span>
+      <span style="color:var(--blue);">⇕ Collapse All</span>
+      <div class="ml"><span>Rows per page: <strong>25</strong></span></div>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox"/></th>
+          <th></th>
+          <th>SKU</th>
+          <th class="sorted">Product Definition ▲</th>
+          <th>Price</th>
+          <th>Classification</th>
+          <th>Listing Status</th>
+          <th>COA Status</th>
+          <th>Disposition</th>
+          <th>Date Added</th>
+          <th>Activity</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- Standalone — no badge -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td></td>
+          <td class="sku">42804-PRE-5</td>
+          <td class="product">1 Gram Pre-Rolls — Watermelon Z</td>
+          <td>$14.99</td>
+          <td>Pre-Rolls</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-missing">Missing</span></td>
+          <td>—</td>
+          <td>02/16/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- Parent with 3 variants — badge always shown, no filter active -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td style="color:#94A3B8;">▶</td>
+          <td class="sku">42804-PRE-2</td>
+          <td class="product">
+            1 Gram THCA Indoor Exotic Pre-rolls
+            <span class="variant-badge">3 variants</span>
+          </td>
+          <td>$14.99</td>
+          <td>Pre-Rolls</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td><span class="badge b-violative">⚠ Violative</span></td>
+          <td>12/31/2025</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- Parent with 8 variants — collapsed -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td style="color:#94A3B8;">▶</td>
+          <td class="sku">42804-SMO-9</td>
+          <td class="product">
+            Bubba Kush Hemp Flower
+            <span class="variant-badge">8 variants</span>
+          </td>
+          <td>$28.00</td>
+          <td>Smokable Flower</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-missing">Missing</span></td>
+          <td><span class="badge b-violative">⚠ Violative</span></td>
+          <td>12/31/2025</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+
+        <!-- Parent expanded, showing all children — badge still gray "5 variants" -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td style="color:#94A3B8;">▼</td>
+          <td class="sku">42804-EDI-12</td>
+          <td class="product">
+            Delta-9 Gummies 25mg
+            <span class="variant-badge">5 variants</span>
+          </td>
+          <td>$29.99</td>
+          <td>Edibles</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+        <tr class="child">
+          <td></td><td></td>
+          <td class="sku indent"><span class="child-mark"></span>42804-EDI-12-V1</td>
+          <td class="product indent">Delta-9 Gummies 25mg — Mixed Berry</td>
+          <td>$29.99</td><td>Edibles</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td>—</td><td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+        <tr class="child">
+          <td></td><td></td>
+          <td class="sku indent"><span class="child-mark"></span>42804-EDI-12-V2</td>
+          <td class="product indent">Delta-9 Gummies 25mg — Watermelon</td>
+          <td>$29.99</td><td>Edibles</td>
+          <td><span class="badge b-in-stock">In Stock</span></td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td>—</td><td>01/10/2026</td>
+          <td><div class="activity-icons"><span>⧉</span><span>🗂</span><span>💬</span><span>⋮</span></div></td>
+        </tr>
+        <tr class="child" style="opacity:.5;">
+          <td></td><td></td>
+          <td class="sku indent" style="font-style:italic;color:#94A3B8;">+ 3 more variants</td>
+          <td class="product indent" style="color:#94A3B8;font-style:italic;">collapsed</td>
+          <td colspan="7"></td>
+        </tr>
+
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>Variant count badge is always present</strong> on any parent product row that has children — regardless of whether a filter is active. No filter active = gray "N variants." When a filter hides some children, it updates to amber "X of N variants" so the user immediately knows variants are being filtered out. Standalone products (no children) have no badge.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
   SECTION 1: The Problem
 ══════════════════════════════ -->
 <div class="mockup">
-  <p class="section-label">1 — The Problem: Filter by COA Status = Missing → Parent row hides matching children</p>
+  <p class="section-label">1 — Filter Active: Badge updates to amber "X of N variants" when children are hidden by filter</p>
 
   <div class="split">
 
@@ -737,10 +881,17 @@
           <td style="padding:8px 14px;color:var(--text-muted);">Hidden</td>
           <td style="padding:8px 14px;color:var(--text-muted);">Neither</td>
         </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 14px;">No filter active (default state)</td>
+          <td style="padding:8px 14px;">Full opacity</td>
+          <td style="padding:8px 14px;">Gray "N variants" (always shown on parents with children)</td>
+          <td style="padding:8px 14px;">Collapsed (default)</td>
+          <td style="padding:8px 14px;">All products</td>
+        </tr>
         <tr>
           <td style="padding:8px 14px;">Filter cleared</td>
           <td style="padding:8px 14px;">Returns to full opacity</td>
-          <td style="padding:8px 14px;color:var(--text-muted);">Badge removed</td>
+          <td style="padding:8px 14px;">Returns to gray "N variants"</td>
           <td style="padding:8px 14px;">Returns to collapsed default</td>
           <td style="padding:8px 14px;">All products</td>
         </tr>
