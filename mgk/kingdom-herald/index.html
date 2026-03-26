@@ -92,6 +92,7 @@
     .main {
       display: flex;
       flex-direction: row;
+      align-items: stretch;
       overflow: hidden;
       min-height: 0;
     }
@@ -100,19 +101,26 @@
        GAME PREVIEW COLUMN
     ════════════════════════════════════════════ */
     .preview-col {
-      flex: 1;
-      min-width: 0;
-      min-height: 0;
+      /* Fixed width column — day selector + game panel stacked vertically */
+      /* position:sticky so it stays in view while dev-panel scrolls */
+      flex: 0 0 auto;
+      width: 700px;
+      min-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
       overflow-y: auto;
       background: var(--preview-bg);
       background-image:
         radial-gradient(ellipse at 50% 65%, rgba(70,42,8,0.30) 0%, transparent 68%),
         radial-gradient(ellipse at 50% 0%, rgba(40,25,5,0.4) 0%, transparent 55%);
-      padding: 16px 24px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      height: 100%;
+      box-sizing: border-box;
     }
     .preview-col-label {
       font-size: 9px;
@@ -162,14 +170,13 @@
        GAME PANEL — Panel.png (dark charcoal + gold border)
     ════════════════════════════════════════════ */
     .game-panel {
-      width: 680px;
-      max-width: 100%;
+      width: 100%;
+      max-width: 660px;
       position: relative;
       display: flex;
       flex-direction: column;
       cursor: default;
       flex-shrink: 0;
-      /* Dark panel background with gold ornamental border */
       background-color: #0f0c05;
       border: 2px solid rgba(227,202,152,0.55);
       border-radius: 3px;
@@ -261,15 +268,13 @@
     ════════════════════════════════════════════ */
     .panel-content {
       display: flex;
-      padding: 8px 16px 10px;
-      gap: 8px;
-      overflow-y: auto;
-      max-height: 520px;
+      padding: 7px 14px 8px;
+      gap: 7px;
     }
     .panel-column {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       flex: 1;
       min-width: 0;
     }
@@ -280,15 +285,27 @@
     .section-card {
       position: relative;
       cursor: pointer;
-      padding: 8px 10px;
+      padding: 7px 9px;
       border-radius: 4px;
-      /* BackgroundColor.png — dark rounded rect with warm amber glow bottom-right */
       background-color: #130e05;
       background-image: url('../assets/ui2/BackgroundColor.png');
       background-size: 100% 100%;
       background-repeat: no-repeat;
-      transition: filter 0.15s;
+      border: 1px solid rgba(227,202,152,0.18);
+      box-sizing: border-box;
+      overflow: hidden; /* internal scroll per card */
     }
+    /* Fixed heights per card so left/right columns are even */
+    .section-card[data-section="sc-gold"]       { min-height: 92px; }
+    .section-card[data-section="sc-items"]      { min-height: 138px; }
+    .section-card[data-section="sc-dungeons"]   { min-height: 118px; }
+    .section-card[data-section="sc-herolevels"] { min-height: 90px; }
+    .section-card[data-section="sc-deaths"]     { min-height: 84px; }
+    .section-card[data-section="sc-favors"]     { min-height: 76px; }
+    .section-card[data-section="sc-materials"]  { min-height: 106px; }
+    .section-card[data-section="sc-rapport"]    { min-height: 90px; }
+    .section-card[data-section="sc-guild"]      { min-height: 76px; }
+    .section-card[data-section="sc-bests"]      { min-height: 110px; }
     .section-card {
       border: 1px solid rgba(227,202,152,0.18);
     }
@@ -670,14 +687,13 @@
        DEV PANEL
     ════════════════════════════════════════════ */
     .dev-panel {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border-left: 1px solid var(--inspector-border);
-      width: 360px;
+      flex: 1;
       min-width: 200px;
       max-width: 700px;
-      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-left: 1px solid var(--inspector-border);
     }
 
     /* ── Hierarchy ── */
@@ -1962,7 +1978,7 @@
 
     document.addEventListener('mousemove', e => {
       if (!dragging) return;
-      const delta = startX - e.clientX; // dragging left = making panel wider
+      const delta = e.clientX - startX; // drag right = bigger dev-panel
       const newW = Math.min(700, Math.max(200, startW + delta));
       devPanel.style.width = newW + 'px';
     });
