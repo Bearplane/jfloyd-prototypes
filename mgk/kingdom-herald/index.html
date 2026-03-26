@@ -43,7 +43,8 @@
       color: var(--tan);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       font-size: 13px;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
@@ -166,14 +167,14 @@
       display: flex;
       flex-direction: column;
       cursor: default;
-      /* Panel.png at native tint reveals embedded dark charcoal + gold ornamental border */
-      background-color: #111008;
-      background-image: url('../assets/ui2/Panel.png');
-      background-size: 100% 100%;
-      background-repeat: no-repeat;
+      /* Dark panel background with gold ornamental border */
+      background-color: #0f0c05;
+      border: 2px solid rgba(227,202,152,0.55);
+      border-radius: 3px;
       box-shadow:
         0 12px 60px rgba(0,0,0,0.9),
-        0 0 0 1px rgba(227,202,152,0.08);
+        0 0 0 4px rgba(227,202,152,0.06),
+        inset 0 0 30px rgba(180,130,40,0.06);
     }
 
     /* ════════════════════════════════════════════
@@ -840,8 +841,8 @@
        CHECKLIST PANEL
     ════════════════════════════════════════════ */
     .checklist-panel {
-      height: 300px;
-      border-top: 2px solid var(--border-muted);
+      height: 220px;
+      border-bottom: 1px solid var(--inspector-border);
       display: flex;
       flex-direction: column;
       background: #080b0f;
@@ -917,6 +918,98 @@
     <span><span class="badge badge-est" style="padding:1px 6px">gold</span> = estimated / mock</span>
   </div>
 </div>
+
+<!-- ═══════════════════════════════ TOP: CHECKLIST ═══════════════════════════════ -->
+<!-- ═══════════════════════════════ BOTTOM: CHECKLIST ═══════════════════════════════ -->
+<div class="checklist-panel">
+  <div class="checklist-header">
+    <h2>🛠 Implementation Checklist — KingdomHeraldPanel</h2>
+    <span class="subtitle">All metrics from DailyReport · Goal categories · Display rules · TODOs</span>
+  </div>
+  <div class="checklist-body">
+
+    <!-- COL 1: Data Layer -->
+    <div class="checklist-col">
+      <div class="checklist-col-title">DATA LAYER — DailyReport</div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Gold / Economy</div></div>
+      <div class="check-item"><div class="check-num">1</div><div class="check-text"><span class="mono">DailyReport.goldEarned</span> — call <span class="mono">RecordGoldEarned(amount)</span> from ModifyGold</div></div>
+      <div class="check-item"><div class="check-num">2</div><div class="check-text"><span class="mono">DailyReport.goldSpent</span> — call <span class="mono">RecordGoldSpent(amount)</span> from purchase flows</div></div>
+      <div class="check-item"><div class="check-num">3</div><div class="check-text"><span class="mono">DailyReport.itemsSold</span> — call <span class="mono">RecordItemSold(name, price)</span> — ⚠ needs dedicated OnItemSold event</div></div>
+      <div class="check-item"><div class="check-num">4</div><div class="check-text"><span class="mono">DailyReport.bestItemSold</span> {itemName, salePrice} — auto-updated in RecordItemSold</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Combat / Dungeons</div></div>
+      <div class="check-item"><div class="check-num">5</div><div class="check-text"><span class="mono">DailyReport.dungeonsCleared</span> — List&lt;DungeonClearEntry&gt; — fires on <span class="mono">OnDungeonClearInfoAdded</span></div></div>
+      <div class="check-item"><div class="check-num">6</div><div class="check-text"><span class="mono">DungeonClearEntry</span> {dungeonName, heroNames, clearTimeSeconds} — clearTimeSeconds not yet wired</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Heroes</div></div>
+      <div class="check-item"><div class="check-num">7</div><div class="check-text"><span class="mono">DailyReport.heroesLeveledUp</span> — List&lt;HeroLevelEntry&gt; — fires on <span class="mono">Hero.OnLevelUp</span> per hero</div></div>
+      <div class="check-item"><div class="check-num">8</div><div class="check-text"><span class="mono">DailyReport.heroDeaths</span> — List&lt;string&gt; (hero names) — fires on <span class="mono">Hero.OnDeath</span></div></div>
+      <div class="check-item"><div class="check-num">9</div><div class="check-text"><span class="mono">DailyReport.rapportMilestones</span> — List&lt;RapportMilestoneEntry&gt; — call <span class="mono">RecordRapportMilestone(name, value)</span></div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Economy / Guild</div></div>
+      <div class="check-item"><div class="check-num">10</div><div class="check-text"><span class="mono">DailyReport.materialsGathered</span> — List&lt;MaterialEntry&gt; — call <span class="mono">RecordMaterialGathered(name, qty)</span></div></div>
+      <div class="check-item"><div class="check-num">11</div><div class="check-text"><span class="mono">DailyReport.favorsCompleted</span> — int — HandleFavorChange() dedup via _countedFavorIds HashSet</div></div>
+      <div class="check-item"><div class="check-num">12</div><div class="check-text"><span class="mono">DailyReport.guildRankProgress</span> — int delta — call <span class="mono">RecordGuildRankProgress(delta)</span></div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Intent System</div></div>
+      <div class="check-item"><div class="check-num">13</div><div class="check-text"><span class="mono">DailyReport.todayIntent</span> — IntentType (None, ConquerDungeon, MaximizeGold, StockMaterials, LevelHeroes, Explore)</div></div>
+      <div class="check-item"><div class="check-num">14</div><div class="check-text"><span class="mono">DailyReport.intentAchieved</span> — bool — evaluated at EpochEnd via EvaluateIntent()</div></div>
+    </div>
+
+    <!-- COL 2: Goals / Vault -->
+    <div class="checklist-col">
+      <div class="checklist-col-title">KING'S VAULT — Goal Categories</div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">GoalCategory Enum (Goal.cs)</div></div>
+      <div class="check-item"><div class="check-num">1</div><div class="check-text"><span class="val">Combatant (1)</span> — dungeons, kills, rare spawns, dungeon rank-ups</div></div>
+      <div class="check-item"><div class="check-num">2</div><div class="check-text"><span class="val">Ambassador (2)</span> — quests, adventures, rep levels, favors</div></div>
+      <div class="check-item"><div class="check-num">3</div><div class="check-text"><span class="val">Mercantile (3)</span> — item sales, gold earned, trade route completions, weight sold</div></div>
+      <div class="check-item"><div class="check-num">4</div><div class="check-text"><span class="val">Craftsman (4)</span> — crafting, gathering (wood/ore/herb), salvage, recipe unlocks</div></div>
+      <div class="check-item"><div class="check-num">5</div><div class="check-text"><span class="val">Director (5)</span> — hero management, guild ops, officer missions</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Weekly Vault Mechanics</div></div>
+      <div class="check-item"><div class="check-num">6</div><div class="check-text">Vault resets every 7 epochs — <span class="mono">epoch % 7 == 0</span> triggers <span class="mono">GoalManager.HandleWeeklyChest()</span></div></div>
+      <div class="check-item"><div class="check-num">7</div><div class="check-text">Each GoalCategory has 5 tiers. Token earned per tier: <span class="mono">TokenAmountForGoal = currentTier > 0 ? 1 : 0</span></div></div>
+      <div class="check-item"><div class="check-num">8</div><div class="check-text">Bonus token: <span class="mono">+1</span> if ALL 5 categories have currentTier ≥ 1 (max weekly = 26 tokens)</div></div>
+      <div class="check-item"><div class="check-num">9</div><div class="check-text">Tokens accumulate in <span class="mono">VaultManager._vaultTokens</span>. Spent on WeeklyVault rewards</div></div>
+      <div class="check-item"><div class="check-num">10</div><div class="check-text">VaultManager keeps last 3 weekly vaults in <span class="mono">availableVaults</span> list</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Vault Reward Types by Category</div></div>
+      <div class="check-item"><div class="check-num">11</div><div class="check-text"><span class="val">Combatant</span> — equippable gear items (level-scaled, tiers 1–5 progressively better)</div></div>
+      <div class="check-item"><div class="check-num">12</div><div class="check-text"><span class="val">Ambassador</span> — merchant rep, town rep, selected-town combo at tier 5</div></div>
+      <div class="check-item"><div class="check-num">13</div><div class="check-text"><span class="val">Craftsman</span> — GuildMaterial lootboxes, Scroll items (crafting patterns)</div></div>
+      <div class="check-item"><div class="check-num">14</div><div class="check-text"><span class="val">Director</span> — Invitations, gear, Gold lootbox, StarCoin bundle</div></div>
+      <div class="check-item"><div class="check-num">15</div><div class="check-text"><span class="val">Mercantile</span> — Gold lootboxes of increasing scale (tier 1-5)</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Goal Tier Progression</div></div>
+      <div class="check-item"><div class="check-num">16</div><div class="check-text">Goals advance via <span class="mono">GoalManager.AdvanceGoal(float, GoalCategory)</span> — activity points accumulate</div></div>
+      <div class="check-item"><div class="check-num">17</div><div class="check-text">Tier up fires <span class="mono">Goal.OnTierChange</span> + <span class="mono">VaultManager.TriggerAlterToken()</span> + reward claim</div></div>
+      <div class="check-item"><div class="check-num">18</div><div class="check-text">Tier 5 = goal complete for the week. Tier 5 reward: Item #1022018 (shared across categories)</div></div>
+    </div>
+
+    <!-- COL 3: Display Rules & Rapport -->
+    <div class="checklist-col">
+      <div class="checklist-col-title">DISPLAY RULES + RAPPORT SYSTEM</div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Section Visibility Rules</div></div>
+      <div class="check-item"><div class="check-num">1</div><div class="check-text">Gold/Economy — <span class="val">always show</span></div></div>
+      <div class="check-item"><div class="check-num">2</div><div class="check-text">Items Sold — <span class="val">always show</span>; sub-list: top 3 by price + "+N more"</div></div>
+      <div class="check-item"><div class="check-num">3</div><div class="check-text">Dungeons Cleared — <span class="val">always show</span>; show all if ≤3, show 3 + "+N more" if >3</div></div>
+      <div class="check-item"><div class="check-num">4</div><div class="check-text">Heroes Leveled — <span class="val">always show</span>; ≤5 listed; sorted by newLevel desc; "+N more" overflow</div></div>
+      <div class="check-item"><div class="check-num">5</div><div class="check-text">Hero Deaths — <span class="val">always show</span>; 0-state = deathless streak banner; deaths listed (cap 5)</div></div>
+      <div class="check-item"><div class="check-num">6</div><div class="check-text">Favors — <span class="val">always show</span>; count + approx gold paid</div></div>
+      <div class="check-item"><div class="check-num">7</div><div class="check-text">Materials — <span class="val">hide card if 0</span>; 2-col grid max 6 types shown; "+N more types"</div></div>
+      <div class="check-item"><div class="check-num">8</div><div class="check-text">Rapport Milestones — <span class="val">always show</span>; 0-state dimmed "none today"; all milestones listed (rare)</div></div>
+      <div class="check-item"><div class="check-num">9</div><div class="check-text">Guild Progress — <span class="val">always show</span>; show delta XP + progress bar to next rank</div></div>
+      <div class="check-item"><div class="check-num">10</div><div class="check-text">All-Time Bests — <span class="val">always show</span>; ★ marker if any stat was beaten today</div></div>
+      <div class="check-item"><div class="check-num">11</div><div class="check-text">King's Vault — <span class="val">always show</span>; 5-cat bars + token count + days to reset</div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Rapport System (RapportManager.cs)</div></div>
+      <div class="check-item"><div class="check-num">12</div><div class="check-text">Rapport range: 0–100. Passive gain: +0.05/epoch (capped at 30 passively)</div></div>
+      <div class="check-item"><div class="check-num">13</div><div class="check-text">Favor completed: +5. Dungeon w/ officers: +10. HeroView watched: +2. Storefront sell: +1. Guild convo: +1</div></div>
+      <div class="check-item"><div class="check-num">14</div><div class="check-text">Milestones: 50 = Friendly (acceptance +20%), 75 = Allied (free recruit), 100 = Devoted (auto-approaches)</div></div>
+      <div class="check-item"><div class="check-num">15</div><div class="check-text">RapportMilestoneEntry {heroName, milestoneValue} — recorded via <span class="mono">RecordRapportMilestone()</span></div></div>
+      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Open Work Items</div></div>
+      <div class="check-item"><div class="check-num">16</div><div class="check-text">⚠ <span class="val">Add OnItemSold(Item, int) event</span> to PlayerManager — fire from SellItem/ToggleSale for clean item tracking</div></div>
+      <div class="check-item"><div class="check-num">17</div><div class="check-text">⚠ <span class="val">Add intentStreakCount</span> to AllTimeBests in DailyReportData.cs (PRs #791/#792)</div></div>
+      <div class="check-item"><div class="check-num">18</div><div class="check-text">⚠ <span class="val">Wire clearTimeSeconds</span> in DungeonClearEntry — DungeonGroup needs to track dungeon duration</div></div>
+      <div class="check-item"><div class="check-num">19</div><div class="check-text">⚠ <span class="val">Call CheckAchievements(_today)</span> inside FinaliseDay() before UpdateAllTimeBests() — see AchievementHooks.cs</div></div>
+      <div class="check-item"><div class="check-num">20</div><div class="check-text">⚠ <span class="val">Call RecordRapportMilestone()</span> from RapportManager.CheckRapportMilestones() — currently only sends notifications</div></div>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- ── MAIN 3-COLUMN LAYOUT ── -->
 <div class="main">
@@ -1765,96 +1858,6 @@
   </div><!-- /dev-panel -->
 
 </div><!-- /main -->
-
-<!-- ═══════════════════════════════ BOTTOM: CHECKLIST ═══════════════════════════════ -->
-<div class="checklist-panel">
-  <div class="checklist-header">
-    <h2>🛠 Implementation Checklist — KingdomHeraldPanel</h2>
-    <span class="subtitle">All metrics from DailyReport · Goal categories · Display rules · TODOs</span>
-  </div>
-  <div class="checklist-body">
-
-    <!-- COL 1: Data Layer -->
-    <div class="checklist-col">
-      <div class="checklist-col-title">DATA LAYER — DailyReport</div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Gold / Economy</div></div>
-      <div class="check-item"><div class="check-num">1</div><div class="check-text"><span class="mono">DailyReport.goldEarned</span> — call <span class="mono">RecordGoldEarned(amount)</span> from ModifyGold</div></div>
-      <div class="check-item"><div class="check-num">2</div><div class="check-text"><span class="mono">DailyReport.goldSpent</span> — call <span class="mono">RecordGoldSpent(amount)</span> from purchase flows</div></div>
-      <div class="check-item"><div class="check-num">3</div><div class="check-text"><span class="mono">DailyReport.itemsSold</span> — call <span class="mono">RecordItemSold(name, price)</span> — ⚠ needs dedicated OnItemSold event</div></div>
-      <div class="check-item"><div class="check-num">4</div><div class="check-text"><span class="mono">DailyReport.bestItemSold</span> {itemName, salePrice} — auto-updated in RecordItemSold</div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Combat / Dungeons</div></div>
-      <div class="check-item"><div class="check-num">5</div><div class="check-text"><span class="mono">DailyReport.dungeonsCleared</span> — List&lt;DungeonClearEntry&gt; — fires on <span class="mono">OnDungeonClearInfoAdded</span></div></div>
-      <div class="check-item"><div class="check-num">6</div><div class="check-text"><span class="mono">DungeonClearEntry</span> {dungeonName, heroNames, clearTimeSeconds} — clearTimeSeconds not yet wired</div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Heroes</div></div>
-      <div class="check-item"><div class="check-num">7</div><div class="check-text"><span class="mono">DailyReport.heroesLeveledUp</span> — List&lt;HeroLevelEntry&gt; — fires on <span class="mono">Hero.OnLevelUp</span> per hero</div></div>
-      <div class="check-item"><div class="check-num">8</div><div class="check-text"><span class="mono">DailyReport.heroDeaths</span> — List&lt;string&gt; (hero names) — fires on <span class="mono">Hero.OnDeath</span></div></div>
-      <div class="check-item"><div class="check-num">9</div><div class="check-text"><span class="mono">DailyReport.rapportMilestones</span> — List&lt;RapportMilestoneEntry&gt; — call <span class="mono">RecordRapportMilestone(name, value)</span></div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Economy / Guild</div></div>
-      <div class="check-item"><div class="check-num">10</div><div class="check-text"><span class="mono">DailyReport.materialsGathered</span> — List&lt;MaterialEntry&gt; — call <span class="mono">RecordMaterialGathered(name, qty)</span></div></div>
-      <div class="check-item"><div class="check-num">11</div><div class="check-text"><span class="mono">DailyReport.favorsCompleted</span> — int — HandleFavorChange() dedup via _countedFavorIds HashSet</div></div>
-      <div class="check-item"><div class="check-num">12</div><div class="check-text"><span class="mono">DailyReport.guildRankProgress</span> — int delta — call <span class="mono">RecordGuildRankProgress(delta)</span></div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Intent System</div></div>
-      <div class="check-item"><div class="check-num">13</div><div class="check-text"><span class="mono">DailyReport.todayIntent</span> — IntentType (None, ConquerDungeon, MaximizeGold, StockMaterials, LevelHeroes, Explore)</div></div>
-      <div class="check-item"><div class="check-num">14</div><div class="check-text"><span class="mono">DailyReport.intentAchieved</span> — bool — evaluated at EpochEnd via EvaluateIntent()</div></div>
-    </div>
-
-    <!-- COL 2: Goals / Vault -->
-    <div class="checklist-col">
-      <div class="checklist-col-title">KING'S VAULT — Goal Categories</div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">GoalCategory Enum (Goal.cs)</div></div>
-      <div class="check-item"><div class="check-num">1</div><div class="check-text"><span class="val">Combatant (1)</span> — dungeons, kills, rare spawns, dungeon rank-ups</div></div>
-      <div class="check-item"><div class="check-num">2</div><div class="check-text"><span class="val">Ambassador (2)</span> — quests, adventures, rep levels, favors</div></div>
-      <div class="check-item"><div class="check-num">3</div><div class="check-text"><span class="val">Mercantile (3)</span> — item sales, gold earned, trade route completions, weight sold</div></div>
-      <div class="check-item"><div class="check-num">4</div><div class="check-text"><span class="val">Craftsman (4)</span> — crafting, gathering (wood/ore/herb), salvage, recipe unlocks</div></div>
-      <div class="check-item"><div class="check-num">5</div><div class="check-text"><span class="val">Director (5)</span> — hero management, guild ops, officer missions</div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Weekly Vault Mechanics</div></div>
-      <div class="check-item"><div class="check-num">6</div><div class="check-text">Vault resets every 7 epochs — <span class="mono">epoch % 7 == 0</span> triggers <span class="mono">GoalManager.HandleWeeklyChest()</span></div></div>
-      <div class="check-item"><div class="check-num">7</div><div class="check-text">Each GoalCategory has 5 tiers. Token earned per tier: <span class="mono">TokenAmountForGoal = currentTier > 0 ? 1 : 0</span></div></div>
-      <div class="check-item"><div class="check-num">8</div><div class="check-text">Bonus token: <span class="mono">+1</span> if ALL 5 categories have currentTier ≥ 1 (max weekly = 26 tokens)</div></div>
-      <div class="check-item"><div class="check-num">9</div><div class="check-text">Tokens accumulate in <span class="mono">VaultManager._vaultTokens</span>. Spent on WeeklyVault rewards</div></div>
-      <div class="check-item"><div class="check-num">10</div><div class="check-text">VaultManager keeps last 3 weekly vaults in <span class="mono">availableVaults</span> list</div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Vault Reward Types by Category</div></div>
-      <div class="check-item"><div class="check-num">11</div><div class="check-text"><span class="val">Combatant</span> — equippable gear items (level-scaled, tiers 1–5 progressively better)</div></div>
-      <div class="check-item"><div class="check-num">12</div><div class="check-text"><span class="val">Ambassador</span> — merchant rep, town rep, selected-town combo at tier 5</div></div>
-      <div class="check-item"><div class="check-num">13</div><div class="check-text"><span class="val">Craftsman</span> — GuildMaterial lootboxes, Scroll items (crafting patterns)</div></div>
-      <div class="check-item"><div class="check-num">14</div><div class="check-text"><span class="val">Director</span> — Invitations, gear, Gold lootbox, StarCoin bundle</div></div>
-      <div class="check-item"><div class="check-num">15</div><div class="check-text"><span class="val">Mercantile</span> — Gold lootboxes of increasing scale (tier 1-5)</div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Goal Tier Progression</div></div>
-      <div class="check-item"><div class="check-num">16</div><div class="check-text">Goals advance via <span class="mono">GoalManager.AdvanceGoal(float, GoalCategory)</span> — activity points accumulate</div></div>
-      <div class="check-item"><div class="check-num">17</div><div class="check-text">Tier up fires <span class="mono">Goal.OnTierChange</span> + <span class="mono">VaultManager.TriggerAlterToken()</span> + reward claim</div></div>
-      <div class="check-item"><div class="check-num">18</div><div class="check-text">Tier 5 = goal complete for the week. Tier 5 reward: Item #1022018 (shared across categories)</div></div>
-    </div>
-
-    <!-- COL 3: Display Rules & Rapport -->
-    <div class="checklist-col">
-      <div class="checklist-col-title">DISPLAY RULES + RAPPORT SYSTEM</div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Section Visibility Rules</div></div>
-      <div class="check-item"><div class="check-num">1</div><div class="check-text">Gold/Economy — <span class="val">always show</span></div></div>
-      <div class="check-item"><div class="check-num">2</div><div class="check-text">Items Sold — <span class="val">always show</span>; sub-list: top 3 by price + "+N more"</div></div>
-      <div class="check-item"><div class="check-num">3</div><div class="check-text">Dungeons Cleared — <span class="val">always show</span>; show all if ≤3, show 3 + "+N more" if >3</div></div>
-      <div class="check-item"><div class="check-num">4</div><div class="check-text">Heroes Leveled — <span class="val">always show</span>; ≤5 listed; sorted by newLevel desc; "+N more" overflow</div></div>
-      <div class="check-item"><div class="check-num">5</div><div class="check-text">Hero Deaths — <span class="val">always show</span>; 0-state = deathless streak banner; deaths listed (cap 5)</div></div>
-      <div class="check-item"><div class="check-num">6</div><div class="check-text">Favors — <span class="val">always show</span>; count + approx gold paid</div></div>
-      <div class="check-item"><div class="check-num">7</div><div class="check-text">Materials — <span class="val">hide card if 0</span>; 2-col grid max 6 types shown; "+N more types"</div></div>
-      <div class="check-item"><div class="check-num">8</div><div class="check-text">Rapport Milestones — <span class="val">always show</span>; 0-state dimmed "none today"; all milestones listed (rare)</div></div>
-      <div class="check-item"><div class="check-num">9</div><div class="check-text">Guild Progress — <span class="val">always show</span>; show delta XP + progress bar to next rank</div></div>
-      <div class="check-item"><div class="check-num">10</div><div class="check-text">All-Time Bests — <span class="val">always show</span>; ★ marker if any stat was beaten today</div></div>
-      <div class="check-item"><div class="check-num">11</div><div class="check-text">King's Vault — <span class="val">always show</span>; 5-cat bars + token count + days to reset</div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Rapport System (RapportManager.cs)</div></div>
-      <div class="check-item"><div class="check-num">12</div><div class="check-text">Rapport range: 0–100. Passive gain: +0.05/epoch (capped at 30 passively)</div></div>
-      <div class="check-item"><div class="check-num">13</div><div class="check-text">Favor completed: +5. Dungeon w/ officers: +10. HeroView watched: +2. Storefront sell: +1. Guild convo: +1</div></div>
-      <div class="check-item"><div class="check-num">14</div><div class="check-text">Milestones: 50 = Friendly (acceptance +20%), 75 = Allied (free recruit), 100 = Devoted (auto-approaches)</div></div>
-      <div class="check-item"><div class="check-num">15</div><div class="check-text">RapportMilestoneEntry {heroName, milestoneValue} — recorded via <span class="mono">RecordRapportMilestone()</span></div></div>
-      <div class="check-item section-break"><div class="check-num">§</div><div class="check-text">Open Work Items</div></div>
-      <div class="check-item"><div class="check-num">16</div><div class="check-text">⚠ <span class="val">Add OnItemSold(Item, int) event</span> to PlayerManager — fire from SellItem/ToggleSale for clean item tracking</div></div>
-      <div class="check-item"><div class="check-num">17</div><div class="check-text">⚠ <span class="val">Add intentStreakCount</span> to AllTimeBests in DailyReportData.cs (PRs #791/#792)</div></div>
-      <div class="check-item"><div class="check-num">18</div><div class="check-text">⚠ <span class="val">Wire clearTimeSeconds</span> in DungeonClearEntry — DungeonGroup needs to track dungeon duration</div></div>
-      <div class="check-item"><div class="check-num">19</div><div class="check-text">⚠ <span class="val">Call CheckAchievements(_today)</span> inside FinaliseDay() before UpdateAllTimeBests() — see AchievementHooks.cs</div></div>
-      <div class="check-item"><div class="check-num">20</div><div class="check-text">⚠ <span class="val">Call RecordRapportMilestone()</span> from RapportManager.CheckRapportMilestones() — currently only sends notifications</div></div>
-    </div>
-
-  </div>
-</div>
 
 <script>
   // Day panel switching
