@@ -90,37 +90,17 @@
        MAIN LAYOUT
     ════════════════════════════════════════════ */
     .main {
-      display: flex;
-      flex-direction: row;
-      align-items: stretch;
+      display: block;
+      height: 100%;
       overflow: hidden;
-      min-height: 0;
     }
 
     /* ════════════════════════════════════════════
        GAME PREVIEW COLUMN
     ════════════════════════════════════════════ */
     .preview-col {
-      /* Fixed width column — day selector + game panel stacked vertically */
-      /* position:sticky so it stays in view while dev-panel scrolls */
-      flex: 0 0 auto;
-      width: 700px;
-      min-width: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 20px;
-      overflow-y: auto;
-      background: var(--preview-bg);
-      background-image:
-        radial-gradient(ellipse at 50% 65%, rgba(70,42,8,0.30) 0%, transparent 68%),
-        radial-gradient(ellipse at 50% 0%, rgba(40,25,5,0.4) 0%, transparent 55%);
-      position: sticky;
-      top: 0;
-      align-self: flex-start;
-      height: 100%;
-      box-sizing: border-box;
+      /* preview-col is now just an alias — styling handled by .preview-side */
+      display: contents;
     }
     .preview-col-label {
       font-size: 9px;
@@ -689,11 +669,36 @@
     .dev-panel {
       flex: 1;
       min-width: 200px;
-      max-width: 700px;
+      max-width: 60vw;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
       border-left: 1px solid var(--inspector-border);
+    }
+    /* ── CONTENT ROW: horizontal layout container ── */
+    .content-row {
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    .preview-side {
+      flex: 0 0 auto;
+      width: 700px;
+      min-width: 360px;
+      max-width: 50vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      overflow-y: auto;
+      background: var(--preview-bg);
+      background-image:
+        radial-gradient(ellipse at 50% 65%, rgba(70,42,8,0.30) 0%, transparent 68%),
+        radial-gradient(ellipse at 50% 0%, rgba(40,25,5,0.4) 0%, transparent 55%);
+      box-sizing: border-box;
     }
 
     /* ── Hierarchy ── */
@@ -1049,8 +1054,10 @@
 
 <!-- ── MAIN 3-COLUMN LAYOUT ── -->
 <div class="main">
+  <div class="content-row">
 
-  <!-- ═══════════════════════════════ LEFT: GAME PREVIEW ═══════════════════════════════ -->
+  <!-- ═══════════════════════════════ LEFT: PREVIEW SIDE ═══════════════════════════════ -->
+  <div class="preview-side">
   <div class="preview-col">
     <div class="preview-col-label">▸ GAME PREVIEW — UI2 Asset System</div>
 
@@ -1610,6 +1617,7 @@
     </div><!-- /panel day44 -->
 
   </div><!-- /preview-col -->
+  </div><!-- /preview-side -->
 
   <!-- ── DRAG DIVIDER ── -->
   <div class="drag-divider" id="drag-divider"></div>
@@ -1907,6 +1915,8 @@
   </div><!-- /inspector-col -->
 
   </div><!-- /dev-panel -->
+
+  </div><!-- /content-row -->
 
 </div><!-- /main -->
 
