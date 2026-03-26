@@ -90,8 +90,9 @@
        MAIN LAYOUT
     ════════════════════════════════════════════ */
     .main {
-      flex: 1;
+      flex: 1 1 0;
       min-height: 0;
+      height: 0; /* force flex child height to come from parent, not content */
       display: flex;
       flex-direction: row;
       overflow: hidden;
@@ -101,19 +102,23 @@
        GAME PREVIEW COLUMN
     ════════════════════════════════════════════ */
     .preview-col {
+      /* flex child of .main — takes remaining horizontal space */
       flex: 1;
       min-width: 0;
+      min-height: 0; /* CRITICAL: allows flex to constrain height */
+      overflow-y: auto; /* only .preview-col itself scrolls, not the page */
       background: var(--preview-bg);
       background-image:
         radial-gradient(ellipse at 50% 65%, rgba(70,42,8,0.30) 0%, transparent 68%),
         radial-gradient(ellipse at 50% 0%, rgba(40,25,5,0.4) 0%, transparent 55%);
-      overflow-y: auto;
-      min-height: 0;
       padding: 16px 24px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 14px;
+      /* height must come from .main, not from content */
+      height: 100%;
+      box-sizing: border-box;
     }
     .preview-col-label {
       font-size: 9px;
