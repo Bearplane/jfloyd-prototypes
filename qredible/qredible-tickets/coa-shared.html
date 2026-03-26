@@ -133,9 +133,14 @@
 
     /* Comparison table */
     .comparison { background:white;border-radius:var(--radius-card);border:1px solid var(--border);overflow:hidden; }
-    .comparison table { font-size:12px; }
+    .comparison table { font-size:12px;table-layout:fixed;width:100%; }
+    .comparison table th:nth-child(1) { width:140px; }
+    .comparison table th:nth-child(2) { width:22%; }
+    .comparison table th:nth-child(3) { width:28%; }
+    .comparison table th:nth-child(4) { width:20%; }
+    .comparison table th:nth-child(5) { width:auto; }
     .comparison thead th { padding:10px 14px;font-size:11px; }
-    .comparison tbody td { padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top; }
+    .comparison tbody td { padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;white-space:normal;line-height:1.5; }
     .comparison tbody tr:last-child td { border-bottom:none; }
   </style>
 </head>
