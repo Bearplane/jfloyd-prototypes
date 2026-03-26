@@ -147,34 +147,15 @@
       z-index: 0;
     }
     .day-btn span { position: relative; z-index: 1; }
-    /* SmallButton bg */
-    .day-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--dark-btn);
-      -webkit-mask-image: url('../assets/ui2/SmallButton.png');
-      mask-image: url('../assets/ui2/SmallButton.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      z-index: 0;
+    .day-btn::before { display: none; }
+    .day-btn::after  { display: none; }
+    .day-btn {
+      background: var(--dark-btn);
+      border: 1px solid rgba(227,202,152,0.3);
+      border-radius: 4px;
     }
-    /* Border42 overlay */
-    .day-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--tan);
-      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
-      mask-image: url('../assets/ui2/Border42@10x.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      opacity: 0.3;
-      z-index: 0;
-    }
-    .day-btn:hover { opacity: 0.75; }
-    .day-btn.active { opacity: 1.0; }
-    .day-btn.active::after { opacity: 1.0; }
+    .day-btn:hover { opacity: 0.85; border-color: rgba(227,202,152,0.65); }
+    .day-btn.active { opacity: 1.0; border-color: var(--tan); }
 
     /* ════════════════════════════════════════════
        GAME PANEL — Panel.png (dark charcoal + gold border)
@@ -306,24 +287,12 @@
       background-repeat: no-repeat;
       transition: filter 0.15s;
     }
-    /* Border42 overlay — tan border stroke */
-    .section-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--tan);
-      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
-      mask-image: url('../assets/ui2/Border42@10x.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      opacity: 0.18;
-      pointer-events: none;
-      border-radius: 4px;
+    .section-card {
+      border: 1px solid rgba(227,202,152,0.18);
     }
-    .section-card:hover { filter: brightness(1.18); }
-    .section-card:hover::after { opacity: 0.38; }
-    .section-card.selected { filter: brightness(1.12); }
-    .section-card.selected::after { opacity: 0.75; }
+    .section-card::after { display: none; }
+    .section-card:hover { filter: brightness(1.18); border-color: rgba(227,202,152,0.4); }
+    .section-card.selected { filter: brightness(1.12); border-color: var(--tan); }
     .section-card.empty { opacity: 0.58; }
 
     /* ── Section title with sprite icon ── */
@@ -543,22 +512,12 @@
       background-repeat: no-repeat;
       transition: filter 0.15s;
     }
-    .vault-section::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--tan);
-      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
-      mask-image: url('../assets/ui2/Border42@10x.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      opacity: 0.35;
-      pointer-events: none;
-      border-radius: 4px;
+    .vault-section {
+      border: 1px solid rgba(227,202,152,0.35);
     }
-    .vault-section:hover { filter: brightness(1.18); }
-    .vault-section:hover::after { opacity: 0.55; }
-    .vault-section.selected::after { opacity: 0.85; }
+    .vault-section::after { display: none; }
+    .vault-section:hover { filter: brightness(1.18); border-color: rgba(227,202,152,0.6); }
+    .vault-section.selected { border-color: var(--tan); }
 
     .vault-title {
       font-size: 10px;
@@ -646,11 +605,11 @@
       align-items: center;
       gap: 8px;
     }
-    /* Nav buttons — SmallButton.png bg + Border42.png border */
+    /* Nav buttons */
     .nav-btn {
-      position: relative;
-      background: none;
-      border: none;
+      background: var(--dark-btn);
+      border: 1px solid var(--tan);
+      border-radius: 4px;
       cursor: pointer;
       color: var(--tan);
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -659,31 +618,9 @@
       padding: 5px 18px;
       letter-spacing: 0.04em;
       transition: filter 0.15s;
-      z-index: 0;
     }
-    .nav-btn span { position: relative; z-index: 1; }
-    .nav-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--dark-btn);
-      -webkit-mask-image: url('../assets/ui2/SmallButton.png');
-      mask-image: url('../assets/ui2/SmallButton.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      z-index: 0;
-    }
-    .nav-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--tan);
-      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
-      mask-image: url('../assets/ui2/Border42@10x.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      z-index: 0;
-    }
+    .nav-btn span { position: relative; }
+    .nav-btn::before, .nav-btn::after { display: none; }
     .nav-btn:hover { filter: brightness(1.25); }
     .nav-btn:disabled {
       opacity: 0.32;
@@ -698,42 +635,19 @@
       opacity: 0.5;
     }
     .close-btn {
-      position: relative;
       width: 26px;
       height: 26px;
-      background: none;
-      border: none;
+      background: var(--dark-btn);
+      border: 1px solid var(--tan);
+      border-radius: 4px;
       cursor: pointer;
       color: var(--tan);
       font-size: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 0;
     }
-    .close-btn span { position: relative; z-index: 1; }
-    .close-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--dark-btn);
-      -webkit-mask-image: url('../assets/ui2/SmallButton.png');
-      mask-image: url('../assets/ui2/SmallButton.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      z-index: 0;
-    }
-    .close-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: var(--tan);
-      -webkit-mask-image: url('../assets/ui2/Border42@10x.png');
-      mask-image: url('../assets/ui2/Border42@10x.png');
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      z-index: 0;
-    }
+    .close-btn::before, .close-btn::after { display: none; }
     .close-btn:hover { filter: brightness(1.25); }
 
     /* ════════════════════════════════════════════
