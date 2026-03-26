@@ -61,6 +61,18 @@
       gap: 16px;
       flex-shrink: 0;
     }
+    .back-link {
+      color: rgba(227,202,152,0.5);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border: 1px solid rgba(227,202,152,0.2);
+      border-radius: 3px;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .back-link:hover { color: var(--tan); border-color: var(--tan); }
     .top-bar h1 {
       font-size: 14px;
       font-weight: 700;
@@ -956,6 +968,7 @@
 <!-- TOP BAR -->
 <!-- ── TOP BAR ── -->
 <div class="top-bar">
+  <a href="/mgk/" class="back-link">← Mockups</a>
   <h1>📜 UIKingdomHerald — Kingdom Herald Panel</h1>
   <span class="badge badge-real">DATA REAL</span>
   <span class="badge badge-spec">SPEC</span>
