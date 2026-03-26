@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>COA Management Modal — Assignment Level States</title>
+  <style>
+    :root {
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --blue: #3B82F6;
+      --blue-dark: #1E3A5F;
+      --green: #16A34A;
+      --red: #DC2626;
+      --red-dark: #B01E1E;
+      --gray: #64748B;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+      --table-header-bg: #FFE4E6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-ui);
+      background: #1E293B;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 80px;
+      gap: 56px;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .proto-nav { position:sticky;top:0;z-index:100;background:#0F172A;border-bottom:1px solid rgba(255,255,255,.08);padding:10px 20px;display:flex;align-items:center;gap:14px;width:100%; }
+    .proto-nav a { color:#94A3B8;text-decoration:none;font-size:12px;font-weight:600; }
+    .proto-nav a:hover { color:#F8FAFC; }
+    .proto-nav .nav-divider { color:#334155; }
+    .proto-nav .nav-current { color:#F8FAFC;font-size:12px;font-weight:600; }
+
+    .page-body { width:100%;max-width:1200px;padding:32px 16px 0;display:flex;flex-direction:column;gap:56px; }
+    h1.page-title { color:#94A3B8;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-align:center; }
+    .section-label { color:#94A3B8;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px; }
+    .annotation { background:#FFFBEB;border:1px dashed #FCD34D;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:10px;line-height:1.6; }
+    .annotation strong { font-weight:700; }
+    .new-pill { background:#334155;color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em; }
+
+    /* BADGES */
+    .badge { display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap; }
+    .b-validated  { background:white;color:var(--green);border:1.5px solid var(--green); }
+    .b-validated-dot { background:white;color:var(--green);border:1.5px dashed var(--green); }
+    .b-missing    { background:#FEE2E2;color:var(--red-dark);border:1.5px solid #FECACA; }
+    .b-approved   { background:white;color:var(--green);border:1.5px solid var(--green); }
+    .b-shared-al  { background:#FEF3C7;color:#92400E;border:1px solid #FDE68A; }
+    .b-inherited  { background:#F0FDF4;color:#166534;border:1px solid #BBF7D0; }
+    .b-individual { background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE; }
+    .b-child-al   { background:#EDE9FE;color:#5B21B6;border:1px solid #DDD6FE; }
+
+    /* MODAL */
+    .modal-wrap {
+      background: rgba(15,23,42,.4);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .modal {
+      background: white;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .modal-header {
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .modal-header-left h2 { font-size: 16px; font-weight: 700; }
+    .modal-header-left .sku { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+    .modal-subheader {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 8px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #F8FAFC;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-actions { display: flex; gap: 8px; align-items: center; }
+    .btn { padding:6px 14px;border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:12px;font-weight:600;border:none;cursor:pointer;white-space:nowrap; }
+    .btn-primary { background:var(--blue-dark);color:white; }
+    .btn-ghost   { background:white;border:1px solid var(--border);color:var(--text-muted); }
+    .btn-disabled { background:#F1F5F9;color:#CBD5E1;cursor:not-allowed;border:1px solid var(--border); }
+
+    /* BANNERS */
+    .banner {
+      padding: 10px 16px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .banner-shared   { background:#FFFBEB;border-color:#FDE68A;color:#92400E; }
+    .banner-inherited{ background:#F0FDF4;border-color:#BBF7D0;color:#166534; }
+    .banner-child    { background:#EDE9FE;border-color:#DDD6FE;color:#5B21B6; }
+    .banner a { font-weight:700;text-decoration:underline;cursor:pointer; }
+    .banner-shared a { color:#92400E; }
+    .banner-inherited a { color:#166534; }
+    .banner-child a { color:#5B21B6; }
+
+    /* TABLE */
+    table { width:100%;border-collapse:collapse;font-size:12px; }
+    thead th { background:var(--table-header-bg);color:var(--text);font-weight:700;font-size:11px;padding:8px 12px;text-align:left;border-right:1px solid #FECDD3;white-space:nowrap; }
+    tbody tr { border-bottom:1px solid var(--border); }
+    tbody tr:hover { background:#F8FAFC; }
+    td { padding:8px 12px;vertical-align:middle;white-space:nowrap; }
+    td.filename { font-family:var(--font-mono);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis; }
+    td.product-from-coa { max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .copy-icon { font-size:11px;color:#94A3B8;cursor:pointer;margin-left:4px; }
+    .row-actions { display:flex;gap:6px;align-items:center; }
+    .icon-btn { background:white;border:1px solid var(--border);border-radius:4px;padding:3px 7px;font-size:12px;color:var(--text-muted);cursor:pointer; }
+    .icon-btn.disabled { background:#F8FAFC;color:#CBD5E1;cursor:not-allowed;border-color:#E2E8F0; }
+    .expiry { font-family:var(--font-mono);font-size:11px; }
+    .expiry.expired { color:var(--red); }
+
+    /* EMPTY STATE */
+    .empty-state { padding:40px 24px;text-align:center;color:var(--text-muted); }
+    .empty-state .icon { font-size:32px;margin-bottom:10px; }
+    .empty-state p { font-size:13px;line-height:1.6;margin-bottom:14px; }
+
+    /* COAs TAB row */
+    .coas-row { display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;background:white; }
+    .coas-row .fn { font-family:var(--font-mono);font-size:11px;flex:2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .coas-row .prod { flex:2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted); }
+    .shared-link-badge { display:inline-flex;align-items:center;gap:4px;background:#FEF3C7;border:1px solid #FDE68A;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;color:#92400E;cursor:pointer;white-space:nowrap; }
+    .shared-link-badge:hover { background:#FDE68A; }
+  </style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-current">COA Management Modal — Assignment Level Behavior (QP-3517 / QP-3518 / QP-3519 + QP-3544 / QP-3546)</span>
+</nav>
+
+<div class="page-body">
+<h1 class="page-title">COA Management Modal — How Assignment Level Changes Behavior</h1>
+
+<!-- ══ SUMMARY TABLE ══ -->
+<div>
+  <p class="section-label">0 — Behavior Summary by Assignment Level</p>
+  <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);overflow:hidden;">
+    <table style="table-layout:fixed;">
+      <thead>
+        <tr>
+          <th style="width:140px;">Assignment Level</th>
+          <th style="width:20%;">Modal accessible?</th>
+          <th style="width:20%;">+ Assign COA button</th>
+          <th style="width:20%;">Reassign button</th>
+          <th>COA rows shown</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge b-individual">Individual</span></td>
+          <td style="color:var(--green);font-weight:600;">✅ Yes</td>
+          <td style="color:var(--green);font-weight:600;">✅ Active</td>
+          <td style="color:var(--green);font-weight:600;">✅ Active</td>
+          <td>Assigned COAs for this product. Normal behavior.</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-shared-al">Shared</span></td>
+          <td style="color:var(--green);font-weight:600;">✅ Yes</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td>Source product's COA shown (read-only). "Shared from [Product] →" banner with link to source.</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-inherited">Inherited</span></td>
+          <td style="color:var(--green);font-weight:600;">✅ Yes</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td>Sibling source's COA shown (read-only). "Inherited from [Variant] →" banner with link.</td>
+        </tr>
+        <tr>
+          <td><span class="badge b-child-al">Child</span></td>
+          <td style="color:var(--green);font-weight:600;">✅ Yes</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td>Read-only list of all children's COAs for reference. "This product is a container — COAs are managed on individual child products" banner.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--gray);">Not Required</td>
+          <td style="color:var(--red-dark);font-weight:600;">🚫 No button</td>
+          <td style="color:#CBD5E1;">—</td>
+          <td style="color:#CBD5E1;">—</td>
+          <td>Modal not accessible. No COA Management button shown on this product row.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--gray);">Bundle</td>
+          <td style="color:var(--green);font-weight:600;">✅ Yes</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td style="color:#CBD5E1;font-weight:600;">🚫 Hidden</td>
+          <td>Read-only list of component products' COAs. "COA status derived from bundle components" banner.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ STATE 1: Individual — normal ══ -->
+<div>
+  <p class="section-label">1 — Individual (normal behavior from QP-3517/3518/3519)</p>
+  <div class="modal-wrap">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h2>1:1 CBD:CBG Oil</h2>
+          <div class="sku">SKU: CBG111000</div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary">+ Assign COA</button>
+          <button class="btn btn-ghost">✕</button>
+        </div>
+      </div>
+      <div class="modal-subheader">
+        <span>Certificate of Analysis (COA) Details · <strong>2 COAs</strong></span>
+        <span class="badge b-individual" style="font-size:10px;">Individual</span>
+      </div>
+      <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox"/></th>
+            <th>File Name</th>
+            <th>Product Name from COA</th>
+            <th>Batch Number</th>
+            <th>COA Status</th>
+            <th>Disposition</th>
+            <th>COA URL</th>
+            <th>Expiration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td class="filename">CBD CBG Oil 500MG.pdf <span class="copy-icon">⎘</span></td>
+            <td class="product-from-coa">1:1 CBD:CBG Oil 500mg</td>
+            <td style="font-family:var(--font-mono);font-size:10px;">25G163-01</td>
+            <td><span class="badge b-validated">COA Validated</span></td>
+            <td><span class="badge b-approved">Approved</span></td>
+            <td><span style="color:var(--blue);font-family:var(--font-mono);font-size:10px;">+ Add URL</span></td>
+            <td class="expiry">08/02/27 (24 mo)</td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="View COA">👁</button>
+                <button class="icon-btn" title="Reassign">⇄</button>
+                <button class="icon-btn">⋮</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td class="filename">CBD CBG Oil 1000MG.pdf <span class="copy-icon">⎘</span></td>
+            <td class="product-from-coa">1:1 CBD:CBG Oil 1000mg</td>
+            <td style="font-family:var(--font-mono);font-size:10px;">25G163-02</td>
+            <td><span class="badge b-validated">COA Validated</span></td>
+            <td><span class="badge b-approved">Approved</span></td>
+            <td><span style="color:var(--blue);font-family:var(--font-mono);font-size:10px;">+ Add URL</span></td>
+            <td class="expiry">08/04/27 (24 mo)</td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="View COA">👁</button>
+                <button class="icon-btn" title="Reassign">⇄</button>
+                <button class="icon-btn">⋮</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">Normal Individual state — matches current QP-3517 design with + Assign COA and active Reassign (⇄) buttons.</div>
+</div>
+
+<!-- ══ STATE 2: Shared ══ -->
+<div>
+  <p class="section-label">2 — Shared: COA managed on another product</p>
+  <div class="modal-wrap">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h2>Remedy Pre-Rolls 1g</h2>
+          <div class="sku">SKU: RMD-PRE-1</div>
+        </div>
+        <div class="modal-actions">
+          <!-- No Assign or Reassign — Shared product -->
+          <button class="btn btn-ghost">✕</button>
+        </div>
+      </div>
+      <div class="modal-subheader">
+        <span>Certificate of Analysis (COA) Details · <strong>1 COA (shared)</strong></span>
+        <span class="badge b-shared-al" style="font-size:10px;">Shared</span>
+      </div>
+      <!-- Shared banner -->
+      <div class="banner banner-shared">
+        🔗 This product's COA is managed on a source product.
+        To upload, replace, or reassign this COA, go to the source: <a>Remedy Shake 18.9% (RMD-SMO-1) →</a>
+      </div>
+      <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" disabled/></th>
+            <th>File Name</th>
+            <th>Product Name from COA</th>
+            <th>Batch Number</th>
+            <th>COA Status</th>
+            <th>Disposition</th>
+            <th>COA URL</th>
+            <th>Expiration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="opacity:.75;">
+            <td><input type="checkbox" disabled/></td>
+            <td class="filename">Remedy-Shake-18.9-BatchA-COA.pdf</td>
+            <td class="product-from-coa">Remedy Shake 18.9%</td>
+            <td style="font-family:var(--font-mono);font-size:10px;">RMDY-2026-A</td>
+            <td><span class="badge b-validated-dot" title="Shared from Remedy Shake 18.9%">COA Validated ⤵</span></td>
+            <td><span class="badge b-approved">Approved</span></td>
+            <td><span style="color:var(--blue);font-family:var(--font-mono);font-size:10px;">View URL ⎘</span></td>
+            <td class="expiry">01/10/27 (12 mo)</td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="View COA">👁</button>
+                <button class="icon-btn disabled" title="Reassign disabled — managed on source product" disabled>⇄</button>
+                <button class="icon-btn">⋮</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="annotation">
+    <strong>Shared state:</strong> + Assign COA and Reassign buttons are hidden from the header. The banner explains the COA is managed on the source and provides a direct link. The COA row is slightly dimmed, uses the dashed badge, and Reassign (⇄) is disabled. View (👁) still works. The overflow menu (⋮) can offer "Go to source" but no assign/unassign actions.
+  </div>
+</div>
+
+<!-- ══ STATE 3: Inherited ══ -->
+<div>
+  <p class="section-label">3 — Inherited: COA managed on a sibling variant</p>
+  <div class="modal-wrap">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h2>Blue Dream Hemp Flower — 7g</h2>
+          <div class="sku">SKU: ACM-SMO-22-BD7</div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost">✕</button>
+        </div>
+      </div>
+      <div class="modal-subheader">
+        <span>Certificate of Analysis (COA) Details · <strong>1 COA (inherited)</strong></span>
+        <span class="badge b-inherited" style="font-size:10px;">Inherited</span>
+      </div>
+      <div class="banner banner-inherited">
+        ⤵ This variant inherits its COA from a sibling.
+        To manage this COA, go to the source variant: <a>Blue Dream Hemp Flower — 3.5g (ACM-SMO-22-BD35) →</a>
+      </div>
+      <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" disabled/></th>
+            <th>File Name</th>
+            <th>Product Name from COA</th>
+            <th>Batch Number</th>
+            <th>COA Status</th>
+            <th>Disposition</th>
+            <th>Expiration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="opacity:.75;">
+            <td><input type="checkbox" disabled/></td>
+            <td class="filename">BlueDream-COA-Batch22A.pdf</td>
+            <td class="product-from-coa">Blue Dream Hemp Flower</td>
+            <td style="font-family:var(--font-mono);font-size:10px;">BD-2026-22A</td>
+            <td><span class="badge b-validated-dot">COA Validated ⤵</span></td>
+            <td><span class="badge b-approved">Approved</span></td>
+            <td class="expiry">03/15/27 (12 mo)</td>
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn">👁</button>
+                <button class="icon-btn disabled" disabled title="Inherited — manage on source variant">⇄</button>
+                <button class="icon-btn">⋮</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="annotation"><strong>Inherited state:</strong> Same pattern as Shared but the banner references the sibling variant. View works, Reassign is disabled, Assign buttons hidden.</div>
+</div>
+
+<!-- ══ STATE 4: Child (parent container) ══ -->
+<div>
+  <p class="section-label">4 — Child: Parent container — COAs live on child products</p>
+  <div class="modal-wrap">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h2>Hemp Flower Multi-Strain Bundle</h2>
+          <div class="sku">SKU: ACM-SMO-22</div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost">✕</button>
+        </div>
+      </div>
+      <div class="modal-subheader">
+        <span>Certificate of Analysis (COA) Details · <strong>3 COAs across children</strong></span>
+        <span class="badge b-child-al" style="font-size:10px;">Child</span>
+      </div>
+      <div class="banner banner-child">
+        ⬇ This is a container product. COAs are managed on individual child products, not on this parent row. Showing children's COAs for reference only.
+      </div>
+      <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" disabled/></th>
+            <th>Child Product</th>
+            <th>File Name</th>
+            <th>COA Status</th>
+            <th>Expiration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="opacity:.8;">
+            <td><input type="checkbox" disabled/></td>
+            <td style="font-size:12px;font-weight:600;color:var(--text-muted);">Blue Dream 3.5g</td>
+            <td class="filename">BlueDream-COA-Batch22A.pdf</td>
+            <td><span class="badge b-validated">COA Validated</span></td>
+            <td class="expiry">03/15/27</td>
+            <td><div class="row-actions"><button class="icon-btn">👁</button><a href="#" style="font-size:11px;color:var(--blue);font-weight:600;">Go to product →</a></div></td>
+          </tr>
+          <tr style="opacity:.8;">
+            <td><input type="checkbox" disabled/></td>
+            <td style="font-size:12px;font-weight:600;color:var(--text-muted);">OG Kush 3.5g</td>
+            <td class="filename"><span style="color:var(--text-muted);font-style:italic;">No COA assigned</span></td>
+            <td><span class="badge b-missing">Missing</span></td>
+            <td class="expiry">—</td>
+            <td><div class="row-actions"><a href="#" style="font-size:11px;color:var(--blue);font-weight:600;">Go to product →</a></div></td>
+          </tr>
+          <tr style="opacity:.8;">
+            <td><input type="checkbox" disabled/></td>
+            <td style="font-size:12px;font-weight:600;color:var(--text-muted);">Blue Dream 7g</td>
+            <td class="filename">BlueDream-COA-Batch22A.pdf <span style="font-size:9px;color:var(--text-muted);">(inherited)</span></td>
+            <td><span class="badge b-validated-dot">COA Validated ⤵</span></td>
+            <td class="expiry">03/15/27</td>
+            <td><div class="row-actions"><button class="icon-btn">👁</button><a href="#" style="font-size:11px;color:var(--blue);font-weight:600;">Go to product →</a></div></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="annotation"><strong>Child (parent container) state:</strong> Modal shows a read-only summary of all children's COA states for at-a-glance review. "Go to product →" links navigate to the specific child's product/COA. No assign or reassign possible at the parent level — must go to individual children.</div>
+</div>
+
+<!-- ══ COAs Tab ══ -->
+<div>
+  <p class="section-label">5 — COAs Tab: Shared indicator on COA rows</p>
+  <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);overflow:hidden;">
+    <!-- Tab header mimicking real UI -->
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);background:#F8FAFC;display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+      <span style="font-weight:600;color:var(--text);">3646 of 0 COAs (filtered)</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" style="font-size:11px;">Upload COAs</button>
+        <button class="btn btn-ghost" style="font-size:11px;">Export</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox"/></th>
+          <th>Company</th>
+          <th>Product Assignment</th>
+          <th>File Name</th>
+          <th>Batch Date</th>
+          <th>Batch Number</th>
+          <th>Date Added</th>
+          <th>Status</th>
+          <th>Disposition</th>
+          <th>Activity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Normal unassigned COA -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td style="font-size:11px;">Tweedle Farms</td>
+          <td style="font-size:11px;color:var(--text-muted);">UNASSIGNED</td>
+          <td class="filename">Remedy-Smalls-18.9.pdf</td>
+          <td style="font-size:11px;">02/15/2026</td>
+          <td style="font-family:var(--font-mono);font-size:10px;">RMDY-2026-A</td>
+          <td style="font-size:11px;">03/01/2026</td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td style="color:#94A3B8;">⧉ 🖊 ✉ 💬</td>
+          <td><button class="icon-btn">⋮</button></td>
+        </tr>
+
+        <!-- COA that IS a source for shared products — shows shared badge -->
+        <tr style="background:#FFFBEB;">
+          <td><input type="checkbox"/></td>
+          <td style="font-size:11px;">Tweedle Farms</td>
+          <td style="font-size:11px;">
+            Remedy Shake 18.9%
+            <div style="margin-top:3px;">
+              <span class="shared-link-badge" title="Click to see all 4 products sharing this COA">🔗 Shared · 4 products</span>
+            </div>
+          </td>
+          <td class="filename">Remedy-Shake-18.9-BatchA-COA.pdf</td>
+          <td style="font-size:11px;">01/10/2026</td>
+          <td style="font-family:var(--font-mono);font-size:10px;">RMDY-2026-A</td>
+          <td style="font-size:11px;">01/10/2026</td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td style="color:#94A3B8;">⧉ 🖊 ✉ 💬</td>
+          <td><button class="icon-btn">⋮</button></td>
+        </tr>
+
+        <!-- Normal assigned COA -->
+        <tr>
+          <td><input type="checkbox"/></td>
+          <td style="font-size:11px;">Winona Hemp Co.</td>
+          <td style="font-size:11px;">Sleep Gummies</td>
+          <td class="filename">BBL_6830_Sleep_Gummies.pdf</td>
+          <td style="font-size:11px;">09/16/2024</td>
+          <td style="font-family:var(--font-mono);font-size:10px;">BBL_6830</td>
+          <td style="font-size:11px;">01/29/2026</td>
+          <td><span class="badge b-validated">COA Validated</span></td>
+          <td><span class="badge b-approved">Approved</span></td>
+          <td style="color:#94A3B8;">⧉ 🖊 ✉ 💬</td>
+          <td><button class="icon-btn">⋮</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="annotation">
+    <strong>COAs Tab:</strong> Source COA rows (those shared to other products) show an amber "🔗 Shared · N products" badge in the Product Assignment column. Clicking this badge could expand or navigate to the list of Shared products. The COA record itself is only shown once — there are no duplicate rows for Shared products. Non-source COAs (Inherited, Child, Bundle) do not add extra rows to the COAs tab since they hold no COA records themselves.
+  </div>
+</div>
+
+</div><!-- /page-body -->
+</body>
+</html>
