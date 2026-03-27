@@ -273,8 +273,16 @@
       font-size: 12px; color: var(--text); vertical-align: middle;
     }
     .modal-table td:first-child { padding-left: 16px; }
-    .modal-table tr.inactive-row td { opacity: 0.5; }
-    .modal-table tr.inactive-row { background: #FAFAFA; }
+    /* State-based row treatments (QP-3526) */
+    tr.row-active td:first-child   { border-left: 4px solid transparent; }
+    tr.row-inactive td:first-child { border-left: 4px solid #CBD5E1; }
+    tr.row-archived td:first-child { border-left: 4px solid #334155; }
+    tr.row-inactive { background: #F8FAFC; }
+    tr.row-archived { background: #F1F5F9; }
+    /* State badges */
+    .b-state-active   { background:#F0FDF4; color:#166534; border:1.5px solid #BBF7D0; }
+    .b-state-inactive { background:#F1F5F9; color:#475569; border:1.5px solid #CBD5E1; }
+    .b-state-archived { background:#1E293B; color:#F8FAFC; }
 
     .file-name { font-family: var(--font-mono); font-size: 11px; color: #334155; }
     .expiry-warn { display: flex; align-items: center; gap: 4px; }
@@ -387,7 +395,8 @@
       font-size: 12px; color: var(--text); vertical-align: middle;
     }
     .coas-table td:first-child { padding-left: 16px; }
-    .coas-table tr.coa-inactive td { opacity: 0.48; background: #FAFAFA; }
+    /* coa-inactive kept for backward compat but row-* classes preferred */
+    .coas-table tr.coa-inactive td { background: #F8FAFC; }
     .coas-table tr:last-child td { border-bottom: none; }
     .coas-table-wrap {
       border-radius: 0 0 var(--radius-card) var(--radius-card);
@@ -607,7 +616,7 @@
         <div class="modal-header">
           <div class="modal-title-group">
             <div class="modal-title">COA Management — Product A</div>
-            <div class="modal-subtitle">Manage certificates of analysis for this product · 2 COAs total</div>
+            <div class="modal-subtitle">Manage certificates of analysis for this product · 3 COAs total (1 active, 1 inactive, 1 archived)</div>
           </div>
           <div class="modal-header-actions">
             <!-- NEW: View Selector -->
@@ -652,12 +661,13 @@
                 <th>COA Status</th>
                 <th>Disposition</th>
                 <th>Expiration</th>
+                <th>State</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <!-- ROW 1: Active valid COA — full opacity -->
-              <tr>
+              <!-- ROW 1: Active valid COA -->
+              <tr class="row-active">
                 <td><div class="cb"></div></td>
                 <td><div class="file-name">Batch 2026-A — valid.pdf</div></td>
                 <td style="font-size:12px;">Product A — Gummy Bears 500mg</td>
@@ -669,27 +679,25 @@
                   <div style="font-size:10px;color:#64748B;">12 mo remaining</div>
                 </td>
                 <td>
+                  <span class="badge b-state-active">Active</span>
+                </td>
+                <td>
                   <div style="display:flex;gap:6px;">
                     <button class="btn btn-secondary btn-sm">View</button>
                     <button class="btn btn-secondary btn-sm">···</button>
                   </div>
                 </td>
               </tr>
-              <!-- ROW 2: Inactive expired COA — dimmed -->
-              <tr class="inactive-row">
+              <!-- ROW 2: Inactive expired COA — left border + light bg, no opacity dimming -->
+              <tr class="row-inactive">
                 <td><div class="cb"></div></td>
                 <td>
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <div class="file-name">Batch 2025-A — expired.pdf</div>
-                    <span class="badge b-inactive" style="font-size:10px;">Inactive</span>
-                  </div>
+                  <div class="file-name">Batch 2025-A — expired.pdf</div>
                 </td>
                 <td style="font-size:12px;">Product A — Gummy Bears 500mg</td>
                 <td style="font-family:var(--font-mono);font-size:11px;">2025-A-008</td>
                 <td>
-                  <div class="status-with-badge">
-                    <span class="badge b-expired">⚠ COA Validated (expired)</span>
-                  </div>
+                  <span class="badge b-expired">⚠ COA Validated (expired)</span>
                 </td>
                 <td><span style="color:#94A3B8;font-size:12px;">—</span></td>
                 <td>
@@ -702,9 +710,46 @@
                   </div>
                 </td>
                 <td>
+                  <div>
+                    <span class="badge b-state-inactive">Inactive</span>
+                    <div style="font-size:10px;color:#94A3B8;margin-top:3px;">Expired · Valid COA exists</div>
+                  </div>
+                </td>
+                <td>
                   <div style="display:flex;gap:6px;">
-                    <button class="btn btn-secondary btn-sm" style="opacity:.6;">View</button>
-                    <button class="btn btn-secondary btn-sm" style="opacity:.6;">···</button>
+                    <button class="btn btn-secondary btn-sm">View</button>
+                    <button class="btn btn-secondary btn-sm">···</button>
+                  </div>
+                </td>
+              </tr>
+              <!-- ROW 3: Archived COA — dark left border + darker bg -->
+              <tr class="row-archived">
+                <td><div class="cb"></div></td>
+                <td>
+                  <div class="file-name">OLD-Super-Batch-2023.pdf</div>
+                </td>
+                <td style="font-size:12px;">Product A — Gummy Bears 500mg</td>
+                <td style="font-family:var(--font-mono);font-size:11px;">2023-OLD</td>
+                <td>
+                  <span class="badge b-validated">✓ COA Validated</span>
+                </td>
+                <td><span class="badge b-approved">Approved</span></td>
+                <td>
+                  <div class="expiry-warn">
+                    <span class="warn-icon">⚠</span>
+                    <div>
+                      <div style="font-size:12px;font-weight:600;color:#DC2626;">01/15/24</div>
+                      <div style="font-size:10px;color:#94A3B8;">EXPIRED</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge b-state-archived">Archived</span>
+                </td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-secondary btn-sm">View</button>
+                    <button class="btn btn-secondary btn-sm">···</button>
                   </div>
                 </td>
               </tr>
@@ -713,8 +758,9 @@
         </div>
 
         <div style="padding:10px 16px;background:#F8FAFC;border-top:1px solid var(--border);font-size:11px;color:#64748B;display:flex;gap:12px;align-items:center;">
-          <span>2 COAs total (1 active, 1 inactive)</span>
+          <span>3 COAs total (1 active, 1 inactive, 1 archived)</span>
           <span style="flex:1;"></span>
+          <span style="color:#94A3B8;">Active — in scope for audit · Inactive — expired with valid replacement · Archived — manually archived by user</span>
           <span>Per page: 25 ▼</span>
         </div>
       </div>
@@ -722,10 +768,10 @@
 
     <div class="two-col">
       <div class="annotation">
-        <strong>View Selector (NEW):</strong> A dropdown in the modal header lets users switch between <strong>Default</strong> (all COAs including inactive) and <strong>Audit</strong> (active COAs only). Not a filter chip — it's a mode toggle.
+        <strong>View Selector (NEW):</strong> A dropdown in the modal header lets users switch between <strong>Default</strong> (all COAs including inactive/archived) and <strong>Audit</strong> (active COAs only). Not a filter chip — it's a mode toggle.
       </div>
       <div class="annotation">
-        <strong>Inactive Badge:</strong> Expired COAs that have a valid replacement show an <code>Inactive</code> gray badge inline with the file name. The entire row is dimmed to 50% opacity. The badge is gray/muted — visually clear but not alarming. Not red, not orange.
+        <strong>State Column (QP-3526):</strong> Replaced the inline <code>Inactive</code> badge approach with a dedicated <strong>State</strong> column. <strong>Inactive</strong> rows get a grey left border + light grey background (logic-driven, lighter treatment). <strong>Archived</strong> rows get a dark left border + slightly darker background (user-action-driven, heavier visual weight). No opacity dimming — all rows fully readable.
       </div>
     </div>
   </div>
@@ -772,7 +818,7 @@
           <span class="status-label">Product Status:</span>
           <span class="badge b-validated">✓ COA Validated</span>
           <span style="flex:1;"></span>
-          <span style="font-size:11px;color:#64748B;">1 inactive COA hidden · <a href="#" style="color:var(--blue);text-decoration:none;font-weight:600;">Switch to Default view to see all</a></span>
+          <span style="font-size:11px;color:#64748B;">1 inactive + 1 archived hidden · <a href="#" style="color:var(--blue);text-decoration:none;font-weight:600;">Switch to Default view to see all</a></span>
         </div>
 
         <!-- Filters -->
@@ -796,12 +842,13 @@
                 <th>COA Status</th>
                 <th>Disposition</th>
                 <th>Expiration</th>
+                <th>State</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <!-- ONLY the active COA is shown in Audit View -->
-              <tr>
+              <!-- ONLY the active COA is shown in Audit View — inactive + archived both hidden -->
+              <tr class="row-active">
                 <td><div class="cb"></div></td>
                 <td><div class="file-name">Batch 2026-A — valid.pdf</div></td>
                 <td style="font-size:12px;">Product A — Gummy Bears 500mg</td>
@@ -811,6 +858,9 @@
                 <td>
                   <div style="font-size:12px;font-weight:600;color:#166534;">01/10/27</div>
                   <div style="font-size:10px;color:#64748B;">12 mo remaining</div>
+                </td>
+                <td>
+                  <span class="badge b-state-active">Active</span>
                 </td>
                 <td>
                   <div style="display:flex;gap:6px;">
@@ -824,7 +874,7 @@
         </div>
 
         <div style="padding:10px 16px;background:#EFF6FF;border-top:1px solid #BFDBFE;font-size:11px;color:#1E3A5F;display:flex;gap:12px;align-items:center;">
-          <span>1 active COA shown · 1 inactive COA hidden</span>
+          <span>1 active COA shown · 1 inactive + 1 archived hidden</span>
           <span style="flex:1;"></span>
           <span style="font-size:11px;font-weight:600;color:#1E40AF;">Export will include 1 row only</span>
         </div>
@@ -833,10 +883,10 @@
 
     <div class="two-col">
       <div class="annotation">
-        <strong>Audit View Indicator:</strong> A persistent blue bar between the modal header and the filter chips area shows "Audit View Active." This is <em>not</em> a filter chip — it's a mode indicator. It also shows how many inactive COAs are hidden and offers a one-click return to Default view.
+        <strong>Audit View Indicator:</strong> A persistent blue bar shows "Audit View Active." Not a filter chip — a mode indicator. Shows how many inactive/archived COAs are hidden and offers a one-click return to Default view.
       </div>
       <div class="annotation">
-        <strong>Export Behavior:</strong> When Audit View is active, the Export button exports <em>only the visible rows</em> — active COAs only. The button label changes to "Export visible" to communicate this. Status also updates to COA Validated since the inactive expired COA is excluded.
+        <strong>Audit View hides Inactive + Archived (⚠️ TBD):</strong> Both inactive (logic-driven) and archived (user-action) rows are hidden in Audit View in this mockup. Implementation decision: archived rows <em>may</em> warrant always-visible treatment since they represent explicit user intent. Confirm with team — this is marked TBD.
       </div>
     </div>
   </div>
@@ -1007,7 +1057,7 @@
         </div>
       </div>
 
-      <!-- COAs table — "All" view with inactive rows visible but dimmed -->
+      <!-- COAs table — "All" view with State column, inactive/archived row treatments -->
       <div class="coas-table-wrap">
         <table class="coas-table">
           <thead>
@@ -1019,54 +1069,51 @@
               <th>COA Status</th>
               <th>Compliance Domain</th>
               <th>Expiration</th>
+              <th>State</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
 
-            <!-- Row 1: Active valid COA — full opacity -->
-            <tr>
+            <!-- Row 1: Active valid COA — Product A -->
+            <tr class="row-active">
               <td><div class="cb"></div></td>
               <td><div class="file-name">Batch 2026-A — valid.pdf</div></td>
               <td style="font-size:12px;">Product A — Gummy Bears 500mg</td>
               <td style="font-family:var(--font-mono);font-size:11px;">2026-A-001</td>
-              <td>
-                <span class="badge b-validated">✓ COA Validated</span>
-              </td>
+              <td><span class="badge b-validated">✓ COA Validated</span></td>
               <td style="font-size:12px;">CBD</td>
               <td>
                 <div style="font-size:12px;font-weight:600;color:#166534;">01/10/27</div>
                 <div style="font-size:10px;color:#64748B;">12 mo</div>
               </td>
+              <td><span class="badge b-state-active">Active</span></td>
               <td><button class="btn btn-secondary btn-sm">View</button></td>
             </tr>
 
-            <!-- Row 2: Inactive COA — dimmed with badge -->
-            <tr class="coa-inactive">
+            <!-- Row 2: Inactive COA — grey left border, light grey bg, State column badge -->
+            <tr class="row-inactive">
               <td><div class="cb"></div></td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div class="file-name">Batch 2025-A — expired.pdf</div>
-                  <span class="badge b-inactive" style="font-size:10px;">Inactive</span>
-                </div>
-              </td>
+              <td><div class="file-name">Batch 2025-A — expired.pdf</div></td>
               <td style="font-size:12px;">Product A — Gummy Bears 500mg</td>
               <td style="font-family:var(--font-mono);font-size:11px;">2025-A-008</td>
-              <td>
-                <div class="status-with-badge">
-                  <span class="badge b-expired">⚠ Expired</span>
-                </div>
-              </td>
+              <td><span class="badge b-expired">⚠ Expired</span></td>
               <td style="font-size:12px;">CBD</td>
               <td>
                 <div style="font-size:12px;font-weight:600;color:#DC2626;">01/10/26</div>
                 <div style="font-size:10px;color:#94A3B8;">EXPIRED</div>
               </td>
-              <td><button class="btn btn-secondary btn-sm" style="opacity:.6;">View</button></td>
+              <td>
+                <div>
+                  <span class="badge b-state-inactive">Inactive</span>
+                  <div style="font-size:10px;color:#94A3B8;margin-top:3px;">Expired · Valid COA exists</div>
+                </div>
+              </td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
             </tr>
 
-            <!-- Row 3: Normal product C COA — full opacity -->
-            <tr>
+            <!-- Row 3: Active valid COA — Product C -->
+            <tr class="row-active">
               <td><div class="cb"></div></td>
               <td><div class="file-name">Batch 2026-C1 — cert.pdf</div></td>
               <td style="font-size:12px;">Product C — Capsules 25mg</td>
@@ -1077,52 +1124,49 @@
                 <div style="font-size:12px;font-weight:600;color:#166534;">06/15/27</div>
                 <div style="font-size:10px;color:#64748B;">15 mo</div>
               </td>
+              <td><span class="badge b-state-active">Active</span></td>
               <td><button class="btn btn-secondary btn-sm">View</button></td>
             </tr>
 
-            <!-- Row 4: Another inactive COA — dimmed -->
-            <tr class="coa-inactive">
+            <!-- Row 4: Another inactive COA — grey border + light bg -->
+            <tr class="row-inactive">
               <td><div class="cb"></div></td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div class="file-name">Batch 2024-B — expired.pdf</div>
-                  <span class="badge b-inactive" style="font-size:10px;">Inactive</span>
-                </div>
-              </td>
+              <td><div class="file-name">Batch 2024-B — expired.pdf</div></td>
               <td style="font-size:12px;">Product C — Capsules 25mg</td>
               <td style="font-family:var(--font-mono);font-size:11px;">2024-B-005</td>
-              <td>
-                <div class="status-with-badge">
-                  <span class="badge b-expired">⚠ Expired</span>
-                </div>
-              </td>
+              <td><span class="badge b-expired">⚠ Expired</span></td>
               <td style="font-size:12px;">CBD</td>
               <td>
                 <div style="font-size:12px;font-weight:600;color:#DC2626;">03/20/25</div>
                 <div style="font-size:10px;color:#94A3B8;">EXPIRED</div>
               </td>
-              <td><button class="btn btn-secondary btn-sm" style="opacity:.6;">View</button></td>
+              <td>
+                <div>
+                  <span class="badge b-state-inactive">Inactive</span>
+                  <div style="font-size:10px;color:#94A3B8;margin-top:3px;">Expired · Valid COA exists</div>
+                </div>
+              </td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
             </tr>
 
-            <!-- Row 5: Product B — active expired (NOT inactive — no replacement) -->
-            <tr>
+            <!-- Row 5: Product B — Active state (expired, no replacement — still in scope for audit) -->
+            <tr class="row-active">
               <td><div class="cb"></div></td>
               <td><div class="file-name">Batch 2024-A — expired.pdf</div></td>
               <td style="font-size:12px;">Product B — Tincture 1000mg</td>
               <td style="font-family:var(--font-mono);font-size:11px;">2024-A-002</td>
-              <td>
-                <span class="badge b-expired">⚠ Expired</span>
-              </td>
+              <td><span class="badge b-expired">⚠ Expired</span></td>
               <td style="font-size:12px;">CBD</td>
               <td>
                 <div style="font-size:12px;font-weight:600;color:#DC2626;">08/01/25</div>
                 <div style="font-size:10px;color:#DC2626;">EXPIRED — no replacement</div>
               </td>
+              <td><span class="badge b-state-active">Active</span></td>
               <td><button class="btn btn-secondary btn-sm">View</button></td>
             </tr>
 
             <!-- Row 6: Product D — active -->
-            <tr>
+            <tr class="row-active">
               <td><div class="cb"></div></td>
               <td><div class="file-name">Batch 2026-D — valid.pdf</div></td>
               <td style="font-size:12px;">Product D — Oil 750mg</td>
@@ -1133,6 +1177,23 @@
                 <div style="font-size:12px;font-weight:600;color:#166534;">11/30/27</div>
                 <div style="font-size:10px;color:#64748B;">20 mo</div>
               </td>
+              <td><span class="badge b-state-active">Active</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+
+            <!-- Row 7: Archived COA — dark left border + darker bg -->
+            <tr class="row-archived">
+              <td><div class="cb"></div></td>
+              <td><div class="file-name">OLD-Archive-Batch-2022.pdf</div></td>
+              <td style="font-size:12px;">Product D — Oil 750mg</td>
+              <td style="font-family:var(--font-mono);font-size:11px;">2022-D-ARCH</td>
+              <td><span class="badge b-validated">✓ COA Validated</span></td>
+              <td style="font-size:12px;">CBD</td>
+              <td>
+                <div style="font-size:12px;font-weight:600;color:#DC2626;">05/10/23</div>
+                <div style="font-size:10px;color:#94A3B8;">EXPIRED</div>
+              </td>
+              <td><span class="badge b-state-archived">Archived</span></td>
               <td><button class="btn btn-secondary btn-sm">View</button></td>
             </tr>
 
@@ -1140,9 +1201,10 @@
         </table>
 
         <div style="padding:10px 16px;background:#F8FAFC;border-top:1px solid var(--border);font-size:11px;color:#64748B;display:flex;gap:12px;align-items:center;">
-          <span>6 COAs total · 2 inactive (dimmed) · 1 expired with no replacement</span>
+          <span>7 COAs total · 2 inactive · 1 archived · 4 active</span>
           <span style="flex:1;"></span>
-          <span>Switch to <strong>Audit view</strong> to hide inactive rows · Rows per page: 25 ▼</span>
+          <span style="color:#94A3B8;">Active — in scope for audit · Inactive — expired with valid replacement · Archived — manually archived by user</span>
+          <span>Rows per page: 25 ▼</span>
         </div>
       </div>
 
@@ -1150,16 +1212,16 @@
 
     <div class="two-col">
       <div class="annotation">
-        <strong>COAs Tab — All View:</strong> Inactive COAs appear dimmed (~50% opacity) with the gray <code>Inactive</code> badge in the file name column. Expired COAs with NO valid replacement (Product B) are <em>not</em> inactive — they appear at full opacity with the Expired badge only. The distinction is visible.
+        <strong>State Column (QP-3526):</strong> Each row now shows its state explicitly. <strong>Inactive</strong> rows (logic-driven: expired with valid replacement) get a grey left border + light grey background with subtitle "Expired · Valid COA exists". <strong>Archived</strong> rows (user-action-driven) get a dark slate left border + slightly darker background — heavier visual weight communicates intentional archival. <strong>Active</strong> rows have no left border and white background. No opacity dimming on any row.
       </div>
       <div class="annotation">
-        <strong>COAs Tab — View Toggle (NEW):</strong> A small [All] / [Audit] segmented control in the COAs tab toolbar. In Audit mode, inactive rows are completely hidden. Switching does not reset user filter chips — the view toggle is orthogonal to search/filter state.
+        <strong>Product B distinction:</strong> Product B's expired COA has no valid replacement — it is NOT inactive. It gets an <code>Active</code> state badge because it's still the governing COA for that product (even though it's expired, it's still in scope for audit / causing Violative). Critical visual contrast: active-but-expired vs inactive-and-superseded.
       </div>
     </div>
 
   </div>
 
-  <!-- FOOTER SUMMARY -->
+    <!-- FOOTER SUMMARY -->
   <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);padding:24px 28px;">
     <div style="font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:14px;">📐 Implementation Notes</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
