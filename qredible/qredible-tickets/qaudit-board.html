@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QP-3548 — Q-Audit Board: Search + Advanced Filters + Export</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --blue: #3B82F6;
+      --blue-dark: #1E3A5F;
+      --green: #16A34A;
+      --red: #DC2626;
+      --border: #E2E8F0;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+      --table-header-bg: #FFE4E6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-ui);
+      background: #1E293B;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 80px;
+      gap: 56px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    /* Proto nav */
+    .proto-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: #0F172A;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 10px 20px;
+      display: flex; align-items: center; gap: 14px;
+      width: 100%;
+    }
+    .proto-nav a { color: #94A3B8; text-decoration: none; font-size: 12px; font-weight: 600; }
+    .proto-nav a:hover { color: #F8FAFC; }
+    .proto-nav .nav-divider { color: #334155; }
+    .proto-nav .nav-current { color: #F8FAFC; font-size: 12px; font-weight: 600; }
+    .proto-nav .ticket-badge {
+      margin-left: auto; background: #1E3A5F; color: #93C5FD;
+      font-size: 11px; font-weight: 700; padding: 3px 10px;
+      border-radius: 4px; letter-spacing: .04em;
+    }
+
+    /* Page wrapper */
+    .page-body { width: 100%; max-width: 1440px; padding: 32px 16px 0; display: flex; flex-direction: column; gap: 56px; }
+    h1.page-title { color: #94A3B8; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-align: center; margin-bottom: 4px; }
+    p.page-subtitle { color: #64748B; font-size: 12px; text-align: center; }
+    .section-label { color: #94A3B8; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+    .annotation {
+      background: #FFFBEB; border: 2px dashed #FCD34D;
+      border-radius: 6px; padding: 10px 14px;
+      font-size: 12px; color: #78350F; margin-top: 10px; line-height: 1.6;
+    }
+    .annotation strong { font-weight: 700; }
+
+    /* === APP CHROME === */
+    .app-frame {
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.35);
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    /* Top nav */
+    .app-topnav {
+      background: var(--blue-dark);
+      padding: 0 20px;
+      height: 52px;
+      display: flex; align-items: center; gap: 20px;
+      flex-shrink: 0;
+    }
+    .app-brand {
+      color: white; font-size: 16px; font-weight: 700;
+      letter-spacing: -.3px; display: flex; align-items: center; gap: 8px;
+    }
+    .app-brand-icon {
+      width: 26px; height: 26px; background: var(--blue);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 12px; font-weight: 800;
+    }
+    .app-topnav-tabs {
+      display: flex; gap: 0; margin-left: 24px;
+    }
+    .app-tab {
+      padding: 0 18px; height: 52px;
+      display: flex; align-items: center;
+      color: rgba(255,255,255,.6);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; border-bottom: 2px solid transparent;
+    }
+    .app-tab.active {
+      color: white; border-bottom-color: var(--blue);
+      background: rgba(255,255,255,.05);
+    }
+    .app-topnav-right {
+      margin-left: auto; display: flex; align-items: center; gap: 12px;
+    }
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #3B82F6; color: white; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Layout body */
+    .app-body { display: flex; flex: 1; min-height: 680px; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 56px; background: var(--blue-dark);
+      display: flex; flex-direction: column;
+      align-items: center; padding: 16px 0; gap: 8px;
+      flex-shrink: 0;
+    }
+    .sidebar-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.5); cursor: pointer; font-size: 16px;
+    }
+    .sidebar-icon.active { background: rgba(59,130,246,.25); color: #93C5FD; }
+
+    /* Main content */
+    .main-content { flex: 1; padding: 20px 24px; overflow: auto; background: var(--bg); display: flex; flex-direction: column; gap: 16px; }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 12px 16px;
+    }
+    .search-input-wrap {
+      position: relative; flex: 1; min-width: 220px; max-width: 340px;
+    }
+    .search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: #94A3B8; font-size: 13px;
+    }
+    .search-input {
+      width: 100%; padding: 7px 10px 7px 30px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 12px; font-family: var(--font-ui); color: var(--text);
+      background: var(--bg); outline: none;
+    }
+    .search-input::placeholder { color: #94A3B8; }
+    .search-input:focus { border-color: var(--blue); }
+    .search-input.active { border-color: var(--blue); background: #EFF6FF; }
+    .filter-select {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 7px 28px 7px 10px; font-size: 12px; font-family: var(--font-ui);
+      color: var(--text); background: var(--bg);
+      appearance: none; outline: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center;
+      min-width: 130px;
+    }
+    .filter-select.active { border-color: var(--blue); background-color: #EFF6FF; }
+    .toolbar-divider { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+    .toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .btn-export {
+      display: flex; align-items: center; gap: 6px;
+      background: #DC2626; color: white;
+      border: none; border-radius: var(--radius-sm);
+      padding: 7px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: var(--font-ui);
+    }
+    .filter-count-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--blue); color: white;
+      font-size: 9px; font-weight: 700;
+    }
+
+    /* Active filter banner */
+    .filter-banner {
+      background: #EFF6FF; border: 1px solid #BFDBFE;
+      border-radius: var(--radius-sm); padding: 8px 14px;
+      font-size: 12px; color: #1E40AF;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .filter-banner strong { font-weight: 600; }
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #DBEAFE; color: #1D4ED8;
+      border: 1px solid #BFDBFE; border-radius: 20px;
+      padding: 2px 8px; font-size: 11px; font-weight: 600;
+    }
+
+    /* Board columns */
+    .board { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; flex: 1; }
+
+    .column { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .column-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-radius: var(--radius-card);
+      font-size: 13px; font-weight: 700;
+    }
+    .col-reject { background: #FEE2E2; color: #991B1B; }
+    .col-todo { background: #F1F5F9; color: #475569; }
+    .col-accept { background: #DCFCE7; color: #166534; }
+    .col-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      font-size: 11px; font-weight: 700;
+    }
+    .col-reject .col-count { background: #FCA5A5; color: #991B1B; }
+    .col-todo .col-count { background: #CBD5E1; color: #475569; }
+    .col-accept .col-count { background: #86EFAC; color: #166534; }
+
+    /* Kanban cards */
+    .kanban-card {
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .kanban-card.dimmed { opacity: .35; }
+    .kanban-card.highlighted { border-color: #3B82F6; box-shadow: 0 0 0 2px #BFDBFE; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .card-company { font-size: 13px; font-weight: 700; color: var(--text); }
+    .card-address { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+    .doc-badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 7px; border-radius: 4px;
+      font-size: 10px; font-weight: 700; letter-spacing: .03em;
+    }
+    .doc-retail { background: #DBEAFE; color: #1E40AF; }
+    .doc-distributor { background: #EDE9FE; color: #5B21B6; }
+    .doc-mfg { background: #FEF3C7; color: #92400E; }
+    .doc-cultivator { background: #DCFCE7; color: #166534; }
+    .exp-date { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+    .exp-expired { color: #DC2626; font-weight: 600; }
+    .exp-soon { color: #D97706; font-weight: 600; }
+    .days-chip {
+      display: inline-flex; align-items: center;
+      padding: 2px 6px; border-radius: 4px;
+      font-size: 10px; font-weight: 600;
+      background: #F1F5F9; color: #64748B;
+    }
+    .days-chip.warn { background: #FEF9C3; color: #854D0E; }
+    .days-chip.alert { background: #FEE2E2; color: #991B1B; }
+
+    /* Empty state */
+    .col-empty {
+      background: white; border: 2px dashed var(--border);
+      border-radius: var(--radius-card); padding: 24px;
+      text-align: center; color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* Section divider */
+    .section-divider {
+      display: flex; align-items: center; gap: 16px;
+      color: #94A3B8; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+    }
+    .section-divider::before, .section-divider::after {
+      content: ''; flex: 1; height: 1px; background: #334155;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Proto nav -->
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span class="nav-divider">›</span>
+  <a href="./">Qredible Tickets</a>
+  <span class="nav-divider">›</span>
+  <span class="nav-current">QP-3548 — Q-Audit Board: Search + Filters + Export</span>
+  <span class="ticket-badge">QP-3548</span>
+</nav>
+
+<div class="page-body">
+
+  <div style="text-align:center;padding-top:8px;">
+    <h1 class="page-title">Q-Audit · License Validation Board</h1>
+    <p class="page-subtitle">QP-3548 — Text search, state filter, days-in-queue filter, expiration status filter, export</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       STATE 1 — BASELINE (No filters active)
+  ═══════════════════════════════════════════════ -->
+  <div>
+    <p class="section-label">State 1 — Baseline (No Filters Active)</p>
+
+    <div class="app-frame">
+      <!-- Top nav -->
+      <div class="app-topnav">
+        <div class="app-brand">
+          <div class="app-brand-icon">Q</div>
+          Q-Audit
+        </div>
+        <div class="app-topnav-tabs">
+          <div class="app-tab active">Audit</div>
+          <div class="app-tab">Finances</div>
+          <div class="app-tab">Reports</div>
+          <div class="app-tab">Settings</div>
+        </div>
+        <div class="app-topnav-right">
+          <div style="color:rgba(255,255,255,.5);font-size:12px;">Qredible Admin</div>
+          <div class="avatar">JF</div>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="sidebar-icon active">🏢</div>
+          <div class="sidebar-icon">📊</div>
+          <div class="sidebar-icon">📋</div>
+          <div class="sidebar-icon">🔍</div>
+          <div class="sidebar-icon" style="margin-top:auto;">⚙️</div>
+        </div>
+
+        <div class="main-content">
+
+          <!-- Toolbar (state 1: no filter active) -->
+          <div class="toolbar" style="border: 2px dashed #FCD34D; position: relative;">
+            <div style="position:absolute;top:-10px;left:14px;background:#FFFBEB;padding:0 6px;font-size:10px;font-weight:700;color:#92400E;letter-spacing:.05em;">NEW FEATURES</div>
+
+            <!-- NEW: Search input -->
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" placeholder="Search by company name, address, or document ID…"/>
+            </div>
+
+            <div class="toolbar-divider"></div>
+
+            <!-- Existing filters -->
+            <select class="filter-select">
+              <option>All Companies</option>
+              <option>Green Leaf Dispensary</option>
+              <option>Elevated Wellness</option>
+            </select>
+            <select class="filter-select">
+              <option>All Document Types</option>
+              <option>Retail License</option>
+              <option>Distributor License</option>
+              <option>Manufacturer License</option>
+            </select>
+            <select class="filter-select">
+              <option>Sort: Newest First</option>
+              <option>Sort: Oldest First</option>
+              <option>Sort: Days in Queue ↑</option>
+            </select>
+
+            <div class="toolbar-divider"></div>
+
+            <!-- NEW filters -->
+            <select class="filter-select">
+              <option>All States</option>
+              <option>California</option>
+              <option>Colorado</option>
+              <option>Nevada</option>
+              <option>Oregon</option>
+              <option>Washington</option>
+            </select>
+            <select class="filter-select">
+              <option>Days in Queue: All</option>
+              <option>0–30 days</option>
+              <option>31–90 days</option>
+              <option>90+ days</option>
+            </select>
+            <select class="filter-select">
+              <option>Expiration: All</option>
+              <option>Expired</option>
+              <option>Expiring Soon</option>
+              <option>Valid</option>
+            </select>
+
+            <div class="toolbar-right">
+              <button class="btn-export">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Export
+              </button>
+            </div>
+          </div>
+
+          <!-- Annotation for toolbar -->
+          <div class="annotation">
+            <strong>New toolbar controls (all inactive in this state):</strong><br/>
+            • <strong>Search input</strong> (leftmost) — full-text search across company name, address, and document ID<br/>
+            • <strong>State filter</strong> — filter by license state (CA, CO, NV, OR, WA…)<br/>
+            • <strong>Days in Queue</strong> — 0–30 / 31–90 / 90+ buckets<br/>
+            • <strong>Expiration Status</strong> — Expired / Expiring Soon / Valid<br/>
+            • <strong>Export button</strong> — red/coral, exports current filtered board to CSV
+          </div>
+
+          <!-- Board (unfiltered — all cards visible) -->
+          <div class="board">
+
+            <!-- REJECT column -->
+            <div class="column">
+              <div class="column-header col-reject">
+                <span>Reject</span>
+                <span class="col-count">3</span>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Desert Rose Dispensary</div>
+                    <div class="card-address">4521 N. Scottsdale Rd, Scottsdale, AZ</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date exp-expired">Exp: 2025-11-15 ⚠ EXPIRED</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip alert">⏱ 94 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Pacific Herb Supply</div>
+                    <div class="card-address">888 Harbor Blvd, Ventura, CA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-distributor">Distributor License</span>
+                  <span class="exp-date exp-expired">Exp: 2026-01-03 ⚠ EXPIRED</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip alert">⏱ 72 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Sunset Dispensary Group</div>
+                    <div class="card-address">1200 Sunset Dr, Las Vegas, NV</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-mfg">Manufacturer License</span>
+                  <span class="exp-date exp-expired">Exp: 2025-12-31 ⚠ EXPIRED</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip alert">⏱ 55 days in queue</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TO DO column -->
+            <div class="column">
+              <div class="column-header col-todo">
+                <span>To Do</span>
+                <span class="col-count">4</span>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Green Leaf Dispensary</div>
+                    <div class="card-address">2301 Mission St, San Francisco, CA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date exp-soon">Exp: 2026-04-10 ⚠ Expiring Soon</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip warn">⏱ 38 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Mountain High Collective</div>
+                    <div class="card-address">7800 Park Ave, Denver, CO</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-cultivator">Cultivator License</span>
+                  <span class="exp-date">Exp: 2026-09-15</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 12 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">NorCal Botanicals</div>
+                    <div class="card-address">540 Industrial Blvd, Sacramento, CA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-distributor">Distributor License</span>
+                  <span class="exp-date exp-soon">Exp: 2026-04-28 ⚠ Expiring Soon</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip warn">⏱ 45 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Cascade Farms LLC</div>
+                    <div class="card-address">901 River Rd, Portland, OR</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-cultivator">Cultivator License</span>
+                  <span class="exp-date">Exp: 2027-01-20</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 5 days in queue</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ACCEPT column -->
+            <div class="column">
+              <div class="column-header col-accept">
+                <span>Accept</span>
+                <span class="col-count">3</span>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Elevated Wellness Co.</div>
+                    <div class="card-address">3310 Peachtree Rd NE, Atlanta, GA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date">Exp: 2027-06-01</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 3 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Harvest Moon CBD</div>
+                    <div class="card-address">212 Elm St, Boulder, CO</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-mfg">Manufacturer License</span>
+                  <span class="exp-date">Exp: 2026-11-30</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 7 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Coastal Cannabis</div>
+                    <div class="card-address">99 Boardwalk Ave, Santa Cruz, CA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date">Exp: 2027-03-15</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 9 days in queue</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /board -->
+        </div><!-- /main-content -->
+      </div><!-- /app-body -->
+    </div><!-- /app-frame -->
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       STATE 2 — FILTERED: "california" search + Expiring Soon + 31–90 days
+  ═══════════════════════════════════════════════ -->
+  <div>
+    <p class="section-label">State 2 — Search Active: "california" + Expiring Soon + 31–90 Days</p>
+
+    <div class="app-frame">
+      <!-- Top nav -->
+      <div class="app-topnav">
+        <div class="app-brand">
+          <div class="app-brand-icon">Q</div>
+          Q-Audit
+        </div>
+        <div class="app-topnav-tabs">
+          <div class="app-tab active">Audit</div>
+          <div class="app-tab">Finances</div>
+          <div class="app-tab">Reports</div>
+          <div class="app-tab">Settings</div>
+        </div>
+        <div class="app-topnav-right">
+          <div style="color:rgba(255,255,255,.5);font-size:12px;">Qredible Admin</div>
+          <div class="avatar">JF</div>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="sidebar-icon active">🏢</div>
+          <div class="sidebar-icon">📊</div>
+          <div class="sidebar-icon">📋</div>
+          <div class="sidebar-icon">🔍</div>
+          <div class="sidebar-icon" style="margin-top:auto;">⚙️</div>
+        </div>
+
+        <div class="main-content">
+
+          <!-- Toolbar (state 2: search + filters active) -->
+          <div class="toolbar" style="background: #EFF6FF; border-color: #BFDBFE;">
+            <!-- Search input — ACTIVE -->
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input active" value="california" placeholder="Search by company name, address, or document ID…"/>
+            </div>
+
+            <div class="toolbar-divider"></div>
+
+            <!-- Existing filters -->
+            <select class="filter-select">
+              <option>All Companies</option>
+            </select>
+            <select class="filter-select">
+              <option>All Document Types</option>
+            </select>
+            <select class="filter-select">
+              <option>Sort: Newest First</option>
+            </select>
+
+            <div class="toolbar-divider"></div>
+
+            <!-- NEW filters — some active -->
+            <select class="filter-select">
+              <option>All States</option>
+            </select>
+            <select class="filter-select active">
+              <option>31–90 days</option>
+            </select>
+            <select class="filter-select active">
+              <option>Expiring Soon</option>
+            </select>
+
+            <div class="toolbar-right">
+              <span style="font-size:11px;color:#1D4ED8;font-weight:600;">3 filters active <span class="filter-count-badge">3</span></span>
+              <button style="background:none;border:1px solid #BFDBFE;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;color:#1D4ED8;cursor:pointer;font-family:var(--font-ui);">Clear All</button>
+              <button class="btn-export">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Export
+              </button>
+            </div>
+          </div>
+
+          <!-- Active filter banner -->
+          <div class="filter-banner">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3B82F6" stroke-width="1.5"/><path d="M8 7v4M8 5v.5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <strong>Filters active:</strong>
+            <span class="filter-chip">Search: "california" ✕</span>
+            <span class="filter-chip">31–90 days ✕</span>
+            <span class="filter-chip">Expiring Soon ✕</span>
+            <span style="margin-left: 4px; color: var(--text-muted);">— showing 2 of 10 cards</span>
+            <span style="margin-left:auto;color:#3B82F6;cursor:pointer;font-weight:600;">Clear All</span>
+          </div>
+
+          <!-- Annotation -->
+          <div class="annotation">
+            <strong>Filtered State:</strong> Search "california" matches on address field; "31–90 days" and "Expiring Soon" further narrow results.
+            Non-matching cards are <strong>dimmed</strong> (opacity 35%) rather than hidden — preserves board layout and column structure while clearly indicating filtered state.
+            Filter chips in the banner allow individual removal. "Clear All" resets all filters at once.
+            Export button exports only the 2 matching cards.
+          </div>
+
+          <!-- Board (filtered — dimmed non-matching cards) -->
+          <div class="board">
+
+            <!-- REJECT column -->
+            <div class="column">
+              <div class="column-header col-reject">
+                <span>Reject</span>
+                <span class="col-count" style="background:#FECACA;color:#991B1B;">0</span>
+              </div>
+              <!-- All reject cards are dimmed (expired, not expiring-soon; or not CA) -->
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Desert Rose Dispensary</div>
+                    <div class="card-address">4521 N. Scottsdale Rd, Scottsdale, AZ</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date exp-expired">Exp: 2025-11-15 ⚠ EXPIRED</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip alert">⏱ 94 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Pacific Herb Supply</div>
+                    <div class="card-address">888 Harbor Blvd, Ventura, CA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-distributor">Distributor License</span>
+                  <span class="exp-date exp-expired">Exp: 2026-01-03 ⚠ EXPIRED</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip alert">⏱ 72 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Sunset Dispensary Group</div>
+                    <div class="card-address">1200 Sunset Dr, Las Vegas, NV</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-mfg">Manufacturer License</span>
+                  <span class="exp-date exp-expired">Exp: 2025-12-31 ⚠ EXPIRED</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip alert">⏱ 55 days in queue</span>
+                </div>
+              </div>
+              <div class="col-empty">No matching cards in this column</div>
+            </div>
+
+            <!-- TO DO column -->
+            <div class="column">
+              <div class="column-header col-todo">
+                <span>To Do</span>
+                <span class="col-count" style="background:#CBD5E1;">2</span>
+              </div>
+              <!-- Green Leaf Dispensary — matches: CA address, 38 days (31-90), Expiring Soon -->
+              <div class="kanban-card highlighted">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Green Leaf Dispensary</div>
+                    <div class="card-address">2301 Mission St, <strong>San Francisco, CA</strong></div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date exp-soon">Exp: 2026-04-10 ⚠ Expiring Soon</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip warn">⏱ 38 days in queue</span>
+                </div>
+              </div>
+              <!-- NorCal Botanicals — matches: CA address, 45 days (31-90), Expiring Soon -->
+              <div class="kanban-card highlighted">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">NorCal Botanicals</div>
+                    <div class="card-address">540 Industrial Blvd, <strong>Sacramento, CA</strong></div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-distributor">Distributor License</span>
+                  <span class="exp-date exp-soon">Exp: 2026-04-28 ⚠ Expiring Soon</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip warn">⏱ 45 days in queue</span>
+                </div>
+              </div>
+              <!-- Mountain High — dimmed (CO not CA) -->
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Mountain High Collective</div>
+                    <div class="card-address">7800 Park Ave, Denver, CO</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-cultivator">Cultivator License</span>
+                  <span class="exp-date">Exp: 2026-09-15</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 12 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Cascade Farms LLC</div>
+                    <div class="card-address">901 River Rd, Portland, OR</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-cultivator">Cultivator License</span>
+                  <span class="exp-date">Exp: 2027-01-20</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 5 days in queue</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ACCEPT column -->
+            <div class="column">
+              <div class="column-header col-accept">
+                <span>Accept</span>
+                <span class="col-count" style="background:#86EFAC;">0</span>
+              </div>
+              <!-- All accept cards dimmed — none match CA + expiring soon + 31-90 days -->
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Elevated Wellness Co.</div>
+                    <div class="card-address">3310 Peachtree Rd NE, Atlanta, GA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date">Exp: 2027-06-01</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 3 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Harvest Moon CBD</div>
+                    <div class="card-address">212 Elm St, Boulder, CO</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-mfg">Manufacturer License</span>
+                  <span class="exp-date">Exp: 2026-11-30</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 7 days in queue</span>
+                </div>
+              </div>
+              <div class="kanban-card dimmed">
+                <div class="card-top">
+                  <div>
+                    <div class="card-company">Coastal Cannabis</div>
+                    <div class="card-address">99 Boardwalk Ave, Santa Cruz, CA</div>
+                  </div>
+                </div>
+                <div class="card-meta">
+                  <span class="doc-badge doc-retail">Retail License</span>
+                  <span class="exp-date">Exp: 2027-03-15</span>
+                </div>
+                <div class="card-meta">
+                  <span class="days-chip">⏱ 9 days in queue</span>
+                </div>
+              </div>
+              <div class="col-empty">No matching cards in this column</div>
+            </div>
+
+          </div><!-- /board -->
+        </div><!-- /main-content -->
+      </div><!-- /app-body -->
+    </div><!-- /app-frame -->
+
+    <div class="annotation" style="margin-top:12px;">
+      <strong>Summary of new features (QP-3548):</strong><br/>
+      1. <strong>Text search input</strong> (leftmost) — searches company name, address, document ID in real-time; highlighted blue border when active<br/>
+      2. <strong>State filter dropdown</strong> — filter by license issuing state (CA, CO, NV, OR, WA, etc.)<br/>
+      3. <strong>Days in Queue filter</strong> — bucket selector: 0–30 / 31–90 / 90+<br/>
+      4. <strong>Expiration Status filter</strong> — Expired / Expiring Soon / Valid<br/>
+      5. <strong>Filter chips in banner</strong> — each active filter shows as removable chip; individual ✕ or "Clear All"<br/>
+      6. <strong>Dimming behavior</strong> — non-matching cards dim to 35% opacity rather than disappearing; preserves column layout<br/>
+      7. <strong>Column counts update</strong> — count badge reflects only matching cards in filtered state<br/>
+      8. <strong>Export button</strong> — red/coral, right side; exports matching cards across all columns<br/>
+      9. <strong>Filter count badge</strong> — shows number of active filters (blue circle, toolbar right)
+    </div>
+  </div>
+
+</div><!-- /page-body -->
+</body>
+</html>

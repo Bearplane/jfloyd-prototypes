@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QP-3547 — Q-Audit Finances: Date Range Filter + Export</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --blue: #3B82F6;
+      --blue-dark: #1E3A5F;
+      --green: #16A34A;
+      --red: #DC2626;
+      --border: #E2E8F0;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+      --table-header-bg: #FFE4E6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-ui);
+      background: #1E293B;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 80px;
+      gap: 56px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    /* Proto nav */
+    .proto-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: #0F172A;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 10px 20px;
+      display: flex; align-items: center; gap: 14px;
+      width: 100%;
+    }
+    .proto-nav a { color: #94A3B8; text-decoration: none; font-size: 12px; font-weight: 600; }
+    .proto-nav a:hover { color: #F8FAFC; }
+    .proto-nav .nav-divider { color: #334155; }
+    .proto-nav .nav-current { color: #F8FAFC; font-size: 12px; font-weight: 600; }
+    .proto-nav .ticket-badge {
+      margin-left: auto; background: #1E3A5F; color: #93C5FD;
+      font-size: 11px; font-weight: 700; padding: 3px 10px;
+      border-radius: 4px; letter-spacing: .04em;
+    }
+
+    /* Page wrapper */
+    .page-body { width: 100%; max-width: 1400px; padding: 32px 16px 0; display: flex; flex-direction: column; gap: 56px; }
+    h1.page-title { color: #94A3B8; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-align: center; margin-bottom: 4px; }
+    p.page-subtitle { color: #64748B; font-size: 12px; text-align: center; margin-bottom: 0; }
+    .section-label { color: #94A3B8; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+    .annotation {
+      background: #FFFBEB; border: 2px dashed #FCD34D;
+      border-radius: 6px; padding: 10px 14px;
+      font-size: 12px; color: #78350F; margin-top: 10px; line-height: 1.6;
+    }
+    .annotation strong { font-weight: 700; }
+    .new-badge {
+      display: inline-block;
+      background: #1E3A5F; color: #93C5FD;
+      font-size: 9px; font-weight: 700; padding: 1px 5px;
+      border-radius: 3px; text-transform: uppercase; letter-spacing: .05em;
+      vertical-align: middle;
+    }
+
+    /* === APP CHROME === */
+    .app-frame {
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.35);
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    /* Top nav */
+    .app-topnav {
+      background: var(--blue-dark);
+      padding: 0 20px;
+      height: 52px;
+      display: flex; align-items: center; gap: 20px;
+      flex-shrink: 0;
+    }
+    .app-brand {
+      color: white; font-size: 16px; font-weight: 700;
+      letter-spacing: -.3px; display: flex; align-items: center; gap: 8px;
+    }
+    .app-brand-icon {
+      width: 26px; height: 26px; background: var(--blue);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 12px; font-weight: 800;
+    }
+    .app-topnav-tabs {
+      display: flex; gap: 0; margin-left: 24px;
+    }
+    .app-tab {
+      padding: 0 18px; height: 52px;
+      display: flex; align-items: center;
+      color: rgba(255,255,255,.6);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      transition: all .15s;
+    }
+    .app-tab.active {
+      color: white; border-bottom-color: var(--blue);
+      background: rgba(255,255,255,.05);
+    }
+    .app-tab:hover:not(.active) { color: rgba(255,255,255,.85); }
+    .app-topnav-right {
+      margin-left: auto; display: flex; align-items: center; gap: 12px;
+    }
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #3B82F6; color: white; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Layout body */
+    .app-body { display: flex; flex: 1; min-height: 580px; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 56px; background: var(--blue-dark);
+      display: flex; flex-direction: column;
+      align-items: center; padding: 16px 0; gap: 8px;
+      flex-shrink: 0;
+    }
+    .sidebar-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.5); cursor: pointer;
+      transition: all .15s; font-size: 16px;
+    }
+    .sidebar-icon.active { background: rgba(59,130,246,.25); color: #93C5FD; }
+    .sidebar-icon:hover:not(.active) { background: rgba(255,255,255,.08); color: rgba(255,255,255,.8); }
+
+    /* Main content */
+    .main-content { flex: 1; padding: 24px; overflow: auto; background: var(--bg); }
+
+    /* Page header */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 700; color: var(--text); }
+    .page-header .subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Summary cards */
+    .summary-cards { display: flex; gap: 16px; margin-bottom: 24px; }
+    .summary-card {
+      flex: 1; background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+    }
+    .summary-card .card-label {
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;
+    }
+    .summary-card .card-value {
+      font-size: 24px; font-weight: 700; color: var(--text);
+      font-family: var(--font-mono);
+    }
+    .summary-card .card-delta {
+      font-size: 11px; color: var(--green); font-weight: 600; margin-top: 4px;
+    }
+    .summary-card .card-delta.neg { color: var(--red); }
+    .filtered-tag {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;
+      border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle;
+    }
+
+    /* Filter row */
+    .filter-section {
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .filter-label { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    .filter-input {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 6px 10px; font-size: 12px; font-family: var(--font-ui);
+      color: var(--text); background: var(--bg); outline: none;
+    }
+    .filter-input:focus { border-color: var(--blue); }
+    .filter-divider { color: var(--text-muted); font-size: 12px; }
+    .quick-pills { display: flex; gap: 6px; margin-left: 4px; }
+    .pill {
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: white; color: var(--text-muted);
+      cursor: pointer; transition: all .15s; white-space: nowrap;
+    }
+    .pill:hover { border-color: var(--blue); color: var(--blue); }
+    .pill.active { background: var(--blue); color: white; border-color: var(--blue); }
+    .filter-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .btn-clear {
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      background: none; border: none; cursor: pointer; padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .btn-clear:hover { background: #F1F5F9; color: var(--text); }
+    .btn-export {
+      display: flex; align-items: center; gap: 6px;
+      background: #DC2626; color: white;
+      border: none; border-radius: var(--radius-sm);
+      padding: 7px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: var(--font-ui);
+      transition: background .15s;
+    }
+    .btn-export:hover { background: #B91C1C; }
+
+    /* Active filter banner */
+    .filter-banner {
+      background: #EFF6FF; border: 1px solid #BFDBFE;
+      border-radius: var(--radius-sm); padding: 8px 14px;
+      font-size: 12px; color: #1E40AF;
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-banner strong { font-weight: 600; }
+
+    /* Table */
+    .table-wrapper {
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius-card); overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--table-header-bg);
+      padding: 10px 14px;
+      text-align: left; font-size: 11px; font-weight: 700;
+      color: #64748B; text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid #F1F5F9; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F8FAFC; }
+    tbody td { padding: 11px 14px; font-size: 13px; color: var(--text); }
+    .company-name { font-weight: 600; }
+    .amount { font-family: var(--font-mono); font-weight: 500; }
+    .date-cell { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 4px;
+      font-size: 11px; font-weight: 600;
+    }
+    .status-active { background: #DCFCE7; color: #166534; }
+    .status-cancelled { background: #FEE2E2; color: #991B1B; }
+    .status-pending { background: #FEF9C3; color: #854D0E; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+    .dot-green { background: #16A34A; }
+    .dot-red { background: #DC2626; }
+    .dot-yellow { background: #D97706; }
+
+    /* Table footer */
+    .table-footer {
+      padding: 10px 14px; background: #F8FAFC;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; color: var(--text-muted);
+    }
+
+    /* SECTION DIVIDER */
+    .section-divider {
+      display: flex; align-items: center; gap: 16px;
+      color: #94A3B8; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .07em;
+    }
+    .section-divider::before, .section-divider::after {
+      content: ''; flex: 1; height: 1px; background: #334155;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Proto nav -->
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span class="nav-divider">›</span>
+  <a href="./">Qredible Tickets</a>
+  <span class="nav-divider">›</span>
+  <span class="nav-current">QP-3547 — Q-Audit Finances: Date Range Filter + Export</span>
+  <span class="ticket-badge">QP-3547</span>
+</nav>
+
+<div class="page-body">
+
+  <div style="text-align:center;padding-top:8px;">
+    <h1 class="page-title">Q-Audit · Finances Tab</h1>
+    <p class="page-subtitle">QP-3547 — Date range filter, quick-select pills, export button, filtered card states</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       STATE 1 — NO FILTER ACTIVE (baseline)
+  ═══════════════════════════════════════════════ -->
+  <div>
+    <p class="section-label">State 1 — No Filter Active (Baseline)</p>
+
+    <div class="app-frame">
+      <!-- Top nav -->
+      <div class="app-topnav">
+        <div class="app-brand">
+          <div class="app-brand-icon">Q</div>
+          Q-Audit
+        </div>
+        <div class="app-topnav-tabs">
+          <div class="app-tab">Audit</div>
+          <div class="app-tab active">Finances</div>
+          <div class="app-tab">Reports</div>
+          <div class="app-tab">Settings</div>
+        </div>
+        <div class="app-topnav-right">
+          <div style="color:rgba(255,255,255,.5);font-size:12px;">Qredible Admin</div>
+          <div class="avatar">JF</div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="app-body">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="sidebar-icon active">📊</div>
+          <div class="sidebar-icon">🏢</div>
+          <div class="sidebar-icon">📋</div>
+          <div class="sidebar-icon">🔍</div>
+          <div class="sidebar-icon" style="margin-top:auto;">⚙️</div>
+        </div>
+
+        <!-- Main -->
+        <div class="main-content">
+          <div class="page-header">
+            <div>
+              <h2>Finances</h2>
+              <div class="subtitle">All-time transaction history</div>
+            </div>
+          </div>
+
+          <!-- Summary cards (unfiltered) -->
+          <div class="summary-cards">
+            <div class="summary-card">
+              <div class="card-label">Monthly MRR</div>
+              <div class="card-value">$124,580</div>
+              <div class="card-delta">↑ 8.2% vs last month</div>
+            </div>
+            <div class="summary-card">
+              <div class="card-label">Yearly ARR</div>
+              <div class="card-value">$1,494,960</div>
+              <div class="card-delta">↑ 14.1% YoY</div>
+            </div>
+            <div class="summary-card">
+              <div class="card-label">Total MRR (All Time)</div>
+              <div class="card-value">$3,847,200</div>
+              <div class="card-delta neg">↓ 2 cancellations this month</div>
+            </div>
+            <div class="summary-card">
+              <div class="card-label">Active Subscribers</div>
+              <div class="card-value">312</div>
+              <div class="card-delta">↑ 7 new this month</div>
+            </div>
+          </div>
+
+          <!-- Filter section (state 1: no active filter) -->
+          <div class="filter-section" style="border: 2px dashed #FCD34D; position: relative;">
+            <div style="position:absolute;top:-10px;left:14px;background:#FFFBEB;padding:0 6px;font-size:10px;font-weight:700;color:#92400E;letter-spacing:.05em;">NEW FEATURE</div>
+            <div class="filter-row">
+              <span class="filter-label">Date Range:</span>
+              <input type="date" class="filter-input" value="" placeholder="From date" style="width:140px;"/>
+              <span class="filter-divider">→</span>
+              <input type="date" class="filter-input" value="" placeholder="To date" style="width:140px;"/>
+              <div class="quick-pills">
+                <div class="pill">This Month</div>
+                <div class="pill">Last Month</div>
+                <div class="pill">Last 3 Months</div>
+                <div class="pill">This Year</div>
+              </div>
+              <div class="filter-right">
+                <button class="btn-export">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Export CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Annotation -->
+          <div class="annotation">
+            <strong>New:</strong> Date range filter row with <strong>From / To</strong> date pickers and quick-select pills.
+            Export button (red, right side) exports the current view to CSV.
+            When no filter is active, summary cards show all-time totals (no "(filtered)" tag).
+          </div>
+
+          <!-- Table (full data) -->
+          <div class="table-wrapper" style="margin-top:14px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Company</th>
+                  <th>Description</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="company-name">Green Leaf Dispensary</span></td>
+                  <td>Q-Monitor Pro · Monthly</td>
+                  <td class="amount">$499.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-01</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Elevated Wellness Co.</span></td>
+                  <td>Q-Trust Enterprise · Monthly</td>
+                  <td class="amount">$1,299.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-03</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Pacific Herb Supply</span></td>
+                  <td>Q-Scan AI · Starter Plan</td>
+                  <td class="amount">$299.00</td>
+                  <td><span class="status-badge status-cancelled"><span class="dot dot-red"></span> Cancelled</span></td>
+                  <td class="date-cell">2026-02-28</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">NorCal Botanicals</span></td>
+                  <td>Q-Monitor Pro · Monthly</td>
+                  <td class="amount">$499.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-05</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Mountain High Collective</span></td>
+                  <td>Q-Transact · Monthly</td>
+                  <td class="amount">$799.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-02-15</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Desert Rose Dispensary</span></td>
+                  <td>Q-Trust Enterprise · Monthly</td>
+                  <td class="amount">$1,299.00</td>
+                  <td><span class="status-badge status-cancelled"><span class="dot dot-red"></span> Cancelled</span></td>
+                  <td class="date-cell">2026-01-20</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Harvest Moon CBD</span></td>
+                  <td>Q-Monitor Basic · Monthly</td>
+                  <td class="amount">$199.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-10</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Coastal Cannabis</span></td>
+                  <td>Q-Scan AI · Pro Plan</td>
+                  <td class="amount">$699.00</td>
+                  <td><span class="status-badge status-pending"><span class="dot dot-yellow"></span> Pending</span></td>
+                  <td class="date-cell">2026-03-12</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="table-footer">
+              <span>Showing <strong>8</strong> transactions</span>
+              <span>All time · No filter applied</span>
+            </div>
+          </div>
+
+        </div><!-- /main-content -->
+      </div><!-- /app-body -->
+    </div><!-- /app-frame -->
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       STATE 2 — MARCH 2026 FILTER ACTIVE
+  ═══════════════════════════════════════════════ -->
+  <div>
+    <p class="section-label">State 2 — "March 2026" Filter Active (Filtered View)</p>
+
+    <div class="app-frame">
+      <!-- Top nav -->
+      <div class="app-topnav">
+        <div class="app-brand">
+          <div class="app-brand-icon">Q</div>
+          Q-Audit
+        </div>
+        <div class="app-topnav-tabs">
+          <div class="app-tab">Audit</div>
+          <div class="app-tab active">Finances</div>
+          <div class="app-tab">Reports</div>
+          <div class="app-tab">Settings</div>
+        </div>
+        <div class="app-topnav-right">
+          <div style="color:rgba(255,255,255,.5);font-size:12px;">Qredible Admin</div>
+          <div class="avatar">JF</div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="app-body">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="sidebar-icon active">📊</div>
+          <div class="sidebar-icon">🏢</div>
+          <div class="sidebar-icon">📋</div>
+          <div class="sidebar-icon">🔍</div>
+          <div class="sidebar-icon" style="margin-top:auto;">⚙️</div>
+        </div>
+
+        <!-- Main -->
+        <div class="main-content">
+          <div class="page-header">
+            <div>
+              <h2>Finances</h2>
+              <div class="subtitle">Filtered: Mar 1, 2026 → Mar 31, 2026</div>
+            </div>
+          </div>
+
+          <!-- Summary cards (FILTERED — show filtered tag) -->
+          <div class="summary-cards">
+            <div class="summary-card" style="border-color: #FDE68A;">
+              <div class="card-label">Monthly MRR <span class="filtered-tag">filtered</span></div>
+              <div class="card-value">$68,490</div>
+              <div class="card-delta">5 transactions in range</div>
+            </div>
+            <div class="summary-card" style="border-color: #FDE68A;">
+              <div class="card-label">Yearly ARR <span class="filtered-tag">filtered</span></div>
+              <div class="card-value">$821,880</div>
+              <div class="card-delta">Projected from filtered period</div>
+            </div>
+            <div class="summary-card" style="border-color: #FDE68A;">
+              <div class="card-label">Total MRR (Filtered) <span class="filtered-tag">filtered</span></div>
+              <div class="card-value">$68,490</div>
+              <div class="card-delta">March 2026 only</div>
+            </div>
+            <div class="summary-card" style="border-color: #FDE68A;">
+              <div class="card-label">Active in Period <span class="filtered-tag">filtered</span></div>
+              <div class="card-value">5</div>
+              <div class="card-delta">0 cancellations in range</div>
+            </div>
+          </div>
+
+          <!-- Filter section (state 2: "This Month" pill active) -->
+          <div class="filter-section" style="border-color: #BFDBFE; background: #EFF6FF;">
+            <div class="filter-row">
+              <span class="filter-label">Date Range:</span>
+              <input type="date" class="filter-input" value="2026-03-01" style="width:140px; border-color:#3B82F6;"/>
+              <span class="filter-divider">→</span>
+              <input type="date" class="filter-input" value="2026-03-31" style="width:140px; border-color:#3B82F6;"/>
+              <div class="quick-pills">
+                <div class="pill active">This Month</div>
+                <div class="pill">Last Month</div>
+                <div class="pill">Last 3 Months</div>
+                <div class="pill">This Year</div>
+              </div>
+              <div class="filter-right">
+                <button class="btn-clear">✕ Clear filter</button>
+                <button class="btn-export">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Export CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active filter banner -->
+          <div class="filter-banner">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3B82F6" stroke-width="1.5"/><path d="M8 7v4M8 5v.5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <strong>Date filter active:</strong> Showing transactions from <strong>Mar 1, 2026</strong> to <strong>Mar 31, 2026</strong> — 5 of 8 transactions match.
+            <span style="margin-left:auto;color:#3B82F6;cursor:pointer;font-weight:600;">Clear</span>
+          </div>
+
+          <!-- Annotation -->
+          <div class="annotation">
+            <strong>New — Filtered State:</strong> "This Month" pill sets date range to Mar 1–31. Summary cards now show <strong>(filtered)</strong> label and reflect only the filtered period's data (card borders turn amber to signal filtered state). Filter banner confirms the active range and row count. "Clear filter" button resets everything. Export CSV exports only the filtered rows.
+          </div>
+
+          <!-- Table (filtered — March only) -->
+          <div class="table-wrapper" style="margin-top:14px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Company</th>
+                  <th>Description</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="company-name">Green Leaf Dispensary</span></td>
+                  <td>Q-Monitor Pro · Monthly</td>
+                  <td class="amount">$499.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-01</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Elevated Wellness Co.</span></td>
+                  <td>Q-Trust Enterprise · Monthly</td>
+                  <td class="amount">$1,299.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-03</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">NorCal Botanicals</span></td>
+                  <td>Q-Monitor Pro · Monthly</td>
+                  <td class="amount">$499.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-05</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Harvest Moon CBD</span></td>
+                  <td>Q-Monitor Basic · Monthly</td>
+                  <td class="amount">$199.00</td>
+                  <td><span class="status-badge status-active"><span class="dot dot-green"></span> Active</span></td>
+                  <td class="date-cell">2026-03-10</td>
+                </tr>
+                <tr>
+                  <td><span class="company-name">Coastal Cannabis</span></td>
+                  <td>Q-Scan AI · Pro Plan</td>
+                  <td class="amount">$699.00</td>
+                  <td><span class="status-badge status-pending"><span class="dot dot-yellow"></span> Pending</span></td>
+                  <td class="date-cell">2026-03-12</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="table-footer">
+              <span>Showing <strong>5</strong> of <strong>8</strong> transactions</span>
+              <span>Filtered: Mar 2026 · 3 rows hidden</span>
+            </div>
+          </div>
+
+        </div><!-- /main-content -->
+      </div><!-- /app-body -->
+    </div><!-- /app-frame -->
+
+    <div class="annotation" style="margin-top:12px;">
+      <strong>Summary of new features (QP-3547):</strong><br/>
+      1. <strong>Date range filter row</strong> — From/To date pickers populate via typing or quick-select pills.<br/>
+      2. <strong>Quick-select pills:</strong> [This Month] [Last Month] [Last 3 Months] [This Year] — clicking auto-fills date inputs and activates filter.<br/>
+      3. <strong>Export CSV button</strong> — coral/red, right side; exports current filtered (or all) rows.<br/>
+      4. <strong>Filtered summary cards</strong> — "(filtered)" amber tag appears on all cards + border turns amber when filter is active; values reflect filtered period only.<br/>
+      5. <strong>Active filter banner</strong> — blue info bar confirms range + row count; includes inline Clear link.<br/>
+      6. <strong>Clear filter button</strong> — resets date pickers, deselects pills, restores full data + card values.
+    </div>
+  </div>
+
+</div><!-- /page-body -->
+</body>
+</html>
