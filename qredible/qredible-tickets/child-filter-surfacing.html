@@ -933,5 +933,79 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════
+  SECTION 5: Export + Count Logic
+══════════════════════════════ -->
+<div class="mockup">
+  <p class="section-label">5 — Export and Count Logic: Dimmed Parents are Context Only</p>
+
+  <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);padding:24px;display:flex;gap:24px;flex-wrap:wrap;">
+
+    <!-- Rule box -->
+    <div style="flex:1;min-width:260px;">
+      <p style="font-weight:700;font-size:13px;margin-bottom:12px;color:var(--text);">Core Rule</p>
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:14px;font-size:12px;line-height:1.7;color:var(--text-muted);margin-bottom:12px;">
+        <strong style="color:var(--red-dark);">Dimmed parent rows are a UI affordance only.</strong><br>
+        They are shown solely for hierarchy/nesting context. They are <strong>not filter matches</strong> and must never appear in exports, counts, or bulk action targets.
+      </div>
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:14px;font-size:12px;line-height:1.7;color:var(--text-muted);">
+        <strong style="color:var(--green);">Export includes:</strong> Only products that directly match the active filter.<br><br>
+        <strong style="color:var(--green);">Export excludes:</strong><br>
+        • Dimmed parent rows (context only, not filter matches)<br>
+        • Hidden child rows (do not match filter, not visible)
+      </div>
+    </div>
+
+    <!-- Concrete example -->
+    <div style="flex:2;min-width:300px;">
+      <p style="font-weight:700;font-size:13px;margin-bottom:12px;color:var(--text);">Concrete Example — Filter: COA Status = Missing</p>
+
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;font-size:12px;">
+        <div style="background:var(--table-header-bg);padding:8px 12px;font-weight:700;font-size:11px;display:flex;gap:8px;">
+          <span style="flex:2">Product</span><span style="flex:1">COA Status</span><span style="flex:1">In table?</span><span style="flex:1">In export?</span><span style="flex:1">In count?</span>
+        </div>
+        <!-- Dimmed parent -->
+        <div style="padding:8px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);opacity:.5;">
+          <span style="flex:2;font-style:italic;">Parent Product (dimmed)</span>
+          <span style="flex:1;"><span class="badge b-validated" style="font-size:10px;">COA Validated</span></span>
+          <span style="flex:1;color:#94A3B8;">✓ (dimmed, context)</span>
+          <span style="flex:1;color:var(--red-dark);font-weight:700;">✗ No</span>
+          <span style="flex:1;color:var(--red-dark);font-weight:700;">✗ No</span>
+        </div>
+        <!-- Matching child -->
+        <div style="padding:8px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);background:#F1F5F9;">
+          <span style="flex:2;padding-left:20px;">↳ Child A — Missing COA</span>
+          <span style="flex:1;"><span class="badge b-missing" style="font-size:10px;">Missing</span></span>
+          <span style="flex:1;color:var(--green);font-weight:700;">✓ Full opacity</span>
+          <span style="flex:1;color:var(--green);font-weight:700;">✓ Yes</span>
+          <span style="flex:1;color:var(--green);font-weight:700;">✓ Yes</span>
+        </div>
+        <!-- Hidden child -->
+        <div style="padding:8px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);color:#94A3B8;">
+          <span style="flex:2;padding-left:20px;">↳ Child B — COA Validated (hidden)</span>
+          <span style="flex:1;"><span class="badge b-validated" style="font-size:10px;opacity:.5;">COA Validated</span></span>
+          <span style="flex:1;">✗ Hidden</span>
+          <span style="flex:1;font-weight:700;color:var(--red-dark);">✗ No</span>
+          <span style="flex:1;font-weight:700;color:var(--red-dark);">✗ No</span>
+        </div>
+        <!-- Result -->
+        <div style="padding:10px 12px;background:#F8FAFC;font-size:11px;color:var(--text-muted);line-height:1.6;">
+          <strong style="color:var(--text);">Result:</strong> Count = <strong>1</strong> (Child A only) &nbsp;·&nbsp; Export = <strong>1 row</strong> (Child A only) &nbsp;·&nbsp; Bulk actions target = <strong>Child A only</strong>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;font-size:12px;color:var(--text-muted);line-height:1.6;">
+        This rule applies to all filter types: COA Status, Listing Status, Classification, Disposition, Scan Change, etc.<br>
+        The dimmed parent is invisible to all downstream data operations.
+      </div>
+    </div>
+
+  </div>
+  <div class="annotation">
+    <strong>Why this matters:</strong> The parent row is shown dimmed purely so the user understands the hierarchy of the matching child. If a reviewer exports "all products with Missing COA" and the dimmed parent or unrelated COA-Validated siblings sneak into the export, it corrupts the export data and undermines trust in the filtering system.
+  </div>
+</div>
+
 </body>
 </html>
