@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QP-3465 / QP-3526 — Inactive COA State + Audit View</title>
+  <title>QP-3465 / QP-3526 / QP-3527 — Inactive COA State + Custom Views</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -426,6 +426,53 @@
 
     /* status indicator in coa status col */
     .status-with-badge { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+    /* ============================================================
+       CUSTOM VIEWS (QP-3527)
+    ============================================================ */
+    .views-dropdown {
+      position: relative; display: inline-block;
+    }
+    .views-dd-panel {
+      background: white; border-radius: 10px; border: 1px solid #E2E8F0;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      min-width: 280px; padding: 8px 0;
+    }
+    .views-dd-section-header {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: #94A3B8;
+      padding: 8px 14px 4px;
+    }
+    .views-dd-item {
+      padding: 8px 14px; cursor: pointer;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    }
+    .views-dd-item:hover { background: #F8FAFC; }
+    .views-dd-item.active { background: #EFF6FF; }
+    .views-dd-item-name { font-size: 12px; font-weight: 600; color: #0F172A; }
+    .views-dd-item-sub { font-size: 11px; color: #64748B; margin-top: 2px; }
+    .views-dd-item-badge { font-size: 10px; font-weight: 700; color: #64748B; white-space: nowrap; }
+    .views-dd-divider { height: 1px; background: #F1F5F9; margin: 6px 0; }
+    .views-dd-item-actions { display: flex; gap: 4px; opacity: 0; }
+    .views-dd-item:hover .views-dd-item-actions { opacity: 1; }
+    .views-dd-action-btn { color: #94A3B8; font-size: 11px; cursor: pointer; padding: 2px 4px; border-radius: 3px; }
+    .views-dd-action-btn:hover { background: #E2E8F0; color: #334155; }
+    .views-dd-save { padding: 8px 14px; font-size: 11px; font-weight: 600; color: #3B82F6; cursor: pointer; }
+    .views-dd-save:hover { background: #EFF6FF; }
+
+    /* Active view badge */
+    .view-badge-active {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #EFF6FF; border: 1.5px solid #BFDBFE;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 12px; font-weight: 600; color: #1E40AF;
+    }
+    .view-badge-active .vb-count {
+      background: #BFDBFE; color: #1E40AF; border-radius: 3px;
+      font-size: 10px; font-weight: 700; padding: 1px 5px;
+    }
+    .view-badge-active .vb-clear { color: #93C5FD; cursor: pointer; font-size: 13px; }
+    .view-badge-active .vb-clear:hover { color: #1E40AF; }
   </style>
 </head>
 <body>
@@ -434,15 +481,15 @@
 <nav class="proto-nav">
   <a href="../">← All Mockups</a>
   <span class="nav-divider">/</span>
-  <span class="nav-current">QP-3465 / QP-3526 — Inactive COA State + Audit View</span>
+  <span class="nav-current">QP-3465 / QP-3526 / QP-3527 — Inactive COA State + Custom Views</span>
 </nav>
 
 <div class="page-body">
 
   <!-- PAGE TITLE -->
   <div style="text-align:center; display:flex; flex-direction:column; gap:8px;">
-    <div class="page-title">QP-3465 / QP-3526 — Inactive COA Detection &amp; Audit View</div>
-    <div class="page-subtitle">Introduces runtime "inactive" flagging for expired COAs that have valid replacements, and an Audit View that filters them out of compliance calculations.</div>
+    <div class="page-title">QP-3465 / QP-3526 / QP-3527 — Inactive COA Detection &amp; Custom Views</div>
+    <div class="page-subtitle">Introduces runtime "inactive" flagging for expired COAs that have valid replacements, and Custom Views (QP-3527) that replace the Audit View toggle with saved filter presets.</div>
   </div>
 
   <!-- ============================================================
@@ -614,7 +661,7 @@
        SECTION 2: COA MANAGEMENT MODAL — DEFAULT VIEW
   ============================================================ -->
   <div class="section">
-    <div class="section-label">Section 2 — COA Management Modal — Default View <span class="b-new badge">existing style</span></div>
+    <div class="section-label">Section 2 — COA Management Modal — Default View <span class="b-new badge">updated QP-3527</span></div>
 
     <div class="modal-wrap">
       <div class="modal">
@@ -623,16 +670,9 @@
         <div class="modal-header">
           <div class="modal-title-group">
             <div class="modal-title">COA Management — Product A</div>
-            <div class="modal-subtitle">Manage certificates of analysis for this product · 3 COAs total</div>
+            <div class="modal-subtitle">Manage certificates of analysis for this product · 3 COAs total · 1 active · 1 inactive · 1 archived</div>
           </div>
           <div class="modal-header-actions">
-            <!-- NEW: View Selector -->
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:11px;font-weight:600;color:#64748B;">View</span>
-              <div class="view-selector">
-                Default <span class="caret">▼</span>
-              </div>
-            </div>
             <button class="btn btn-secondary btn-sm">⬆ Export</button>
             <button class="btn btn-primary btn-sm">+ Add COA</button>
             <span style="color:#94A3B8;font-size:18px;cursor:pointer;padding-left:4px;">✕</span>
@@ -642,18 +682,17 @@
         <!-- Status bar -->
         <div class="modal-status-bar">
           <span class="status-label">Product Status:</span>
-          <span class="badge b-violative">🔴 Violative (Default View — includes inactive)</span>
+          <span class="badge b-validated">✓ COA Validated</span>
           <span style="flex:1;"></span>
-          <span style="font-size:11px;color:#64748B;">Showing all COAs including inactive</span>
         </div>
 
-        <!-- Filters -->
+        <!-- Filters (QP-3526 status tabs) -->
         <div class="modal-filters">
-          <span style="font-size:11px;font-weight:600;color:#64748B;">Filter:</span>
+          <span style="font-size:11px;font-weight:600;color:#64748B;">Show:</span>
           <span class="filter-chip active">All</span>
-          <span class="filter-chip">Validated</span>
-          <span class="filter-chip">Expired</span>
-          <span class="filter-chip">Missing</span>
+          <span class="filter-chip">Active</span>
+          <span class="filter-chip">Inactive</span>
+          <span class="filter-chip">Archived</span>
         </div>
 
         <!-- Table -->
@@ -779,7 +818,7 @@
 
     <div class="two-col">
       <div class="annotation">
-        <strong>View Selector (NEW):</strong> A dropdown in the modal header lets users switch between <strong>Default</strong> (all COAs including inactive/archived) and <strong>Audit</strong> (active COAs only). Not a filter chip — it's a mode toggle.
+        <strong>View Selector removed (QP-3527):</strong> The Default/Audit dropdown has been removed from the modal header. Users now use the <strong>Show: All / Active / Inactive / Archived</strong> filter tabs (QP-3526) to narrow what they see. Custom Views (QP-3527) handle view presets at the Products table level, not inside the modal.
       </div>
       <div class="annotation">
         <strong>Activity Column (QP-3300):</strong> Each COA row can show activity indicators for active Conversations (💬), Reminders (🔔), or Elevated Reviews (🚩). A red dot appears when there is new/unread activity. Clicking the icon performs the same action as the corresponding item in the Actions dropdown — e.g., clicking the chat icon opens the COA Details modal with the Conversation tab selected.
@@ -788,122 +827,150 @@
   </div>
 
   <!-- ============================================================
-       SECTION 3: COA MANAGEMENT MODAL — AUDIT VIEW
+       SECTION 3: CUSTOM VIEWS SELECTOR (QP-3527)
   ============================================================ -->
   <div class="section">
-    <div class="section-label">Section 3 — COA Management Modal — Audit View Active</div>
+    <div class="section-label">Section 3 — Custom Views Selector (QP-3527)</div>
 
-    <div class="modal-wrap">
-      <div class="modal">
+    <!-- Products table toolbar with Custom Views dropdown OPEN -->
+    <div style="background:white;border-radius:var(--radius-card);border:1px solid var(--border);overflow:visible;position:relative;">
 
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <div class="modal-title-group">
-            <div class="modal-title">COA Management — Product A</div>
-            <div class="modal-subtitle">Manage certificates of analysis for this product · 1 active COA shown</div>
+      <!-- Toolbar -->
+      <div class="products-toolbar" style="border-radius:var(--radius-card) var(--radius-card) 0 0;">
+        <div class="toolbar-left">
+          <div class="search-box">🔍 Search products...</div>
+          <span class="filter-chip">Status ▼</span>
+          <span class="filter-chip">Compliance Domain ▼</span>
+          <span class="filter-chip">COA Status ▼</span>
+        </div>
+        <div class="toolbar-right" style="position:relative;">
+          <!-- Views button with active badge -->
+          <button class="btn btn-secondary btn-sm" style="background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF;font-weight:700;">Views ▼</button>
+          <div class="view-badge-active">
+            📋 Audit Ready <span class="vb-count">7</span> <span class="vb-clear">×</span>
           </div>
-          <div class="modal-header-actions">
-            <!-- Audit view selector -->
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:11px;font-weight:600;color:#64748B;">View</span>
-              <div class="view-selector" style="background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF;">
-                Audit <span class="caret" style="color:#1E40AF;">▼</span>
+          <button class="btn btn-secondary btn-sm">⬆ Export</button>
+
+          <!-- Custom Views Dropdown — shown open for mockup purposes -->
+          <div class="views-dd-panel" style="position:absolute;top:36px;right:80px;z-index:200;">
+            <div class="views-dd-section-header">System Views</div>
+
+            <!-- All Products -->
+            <div class="views-dd-item">
+              <div>
+                <div class="views-dd-item-name">All Products</div>
+                <div class="views-dd-item-sub">no filters</div>
+              </div>
+              <div class="views-dd-item-badge"></div>
+            </div>
+
+            <!-- Audit Ready — selected -->
+            <div class="views-dd-item active">
+              <div style="flex:1;">
+                <div class="views-dd-item-name" style="display:flex;align-items:center;gap:6px;">
+                  ✓ Audit Ready
+                </div>
+                <div class="views-dd-item-sub">State: Active · Requires COA: Yes · In Stock · Missing/Violative COA</div>
+              </div>
+              <div class="views-dd-item-badge">7 filters</div>
+            </div>
+
+            <!-- Needs Attention -->
+            <div class="views-dd-item">
+              <div>
+                <div class="views-dd-item-name">Needs Attention</div>
+                <div class="views-dd-item-sub">State: Active · COA Status: Missing or Violative</div>
+              </div>
+              <div class="views-dd-item-badge">2 filters</div>
+            </div>
+
+            <div class="views-dd-divider"></div>
+            <div class="views-dd-section-header">My Views</div>
+
+            <!-- Westtown Audit -->
+            <div class="views-dd-item">
+              <div style="flex:1;">
+                <div class="views-dd-item-name">Westtown Audit</div>
+                <div class="views-dd-item-sub">5 filters · matching 14 products</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="views-dd-item-actions" style="opacity:1;">
+                  <span class="views-dd-action-btn" title="Edit">✏️</span>
+                  <span class="views-dd-action-btn" title="Delete">🗑</span>
+                </div>
               </div>
             </div>
-            <button class="btn btn-secondary btn-sm">⬆ Export visible</button>
-            <button class="btn btn-primary btn-sm">+ Add COA</button>
-            <span style="color:#94A3B8;font-size:18px;cursor:pointer;padding-left:4px;">✕</span>
+
+            <!-- Flex CBD Review -->
+            <div class="views-dd-item">
+              <div style="flex:1;">
+                <div class="views-dd-item-name">Flex CBD Review</div>
+                <div class="views-dd-item-sub">4 filters · matching 31 products</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="views-dd-item-actions" style="opacity:1;">
+                  <span class="views-dd-action-btn" title="Edit">✏️</span>
+                  <span class="views-dd-action-btn" title="Delete">🗑</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="views-dd-divider"></div>
+            <div class="views-dd-save">＋ Save Current Filters as View</div>
           </div>
         </div>
+      </div>
 
-        <!-- Audit View Indicator — separate from filter chips -->
-        <div style="padding:8px 24px;background:#EFF6FF;border-bottom:2px solid #BFDBFE;display:flex;align-items:center;gap:10px;">
-          <div class="audit-indicator">Audit View Active</div>
-          <span style="font-size:12px;color:#1E3A5F;">Inactive COAs are hidden. Showing only active COAs used for compliance.</span>
-          <span style="flex:1;"></span>
-          <button class="btn btn-secondary btn-sm" style="border-color:#BFDBFE;color:#1E40AF;font-size:11px;">Exit Audit View</button>
-        </div>
+      <!-- Info bar showing Audit Ready view active -->
+      <div style="padding:8px 16px;background:#EFF6FF;border-bottom:2px solid #BFDBFE;font-size:12px;color:#1E3A5F;display:flex;align-items:center;gap:8px;">
+        <span style="font-weight:700;color:#1E40AF;">📋 Audit Ready view active</span>
+        <span>— showing products matching: State: Active, Requires COA: Yes, In Stock, Missing/Violative/Rejected COA</span>
+      </div>
 
-        <!-- Status bar -->
-        <div class="modal-status-bar">
-          <span class="status-label">Product Status:</span>
-          <span class="badge b-validated">✓ COA Validated</span>
-          <span style="flex:1;"></span>
-          <span style="font-size:11px;color:#64748B;">1 inactive + 1 archived hidden · <a href="#" style="color:var(--blue);text-decoration:none;font-weight:600;">Switch to Default view to see all</a></span>
-        </div>
+      <!-- Abbreviated table rows just to give context -->
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th><div class="cb"></div></th>
+            <th>Product Name</th>
+            <th>Brand</th>
+            <th>COA Status</th>
+            <th>Compliance Domain</th>
+            <th>Active COAs</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="cb"></div></td>
+            <td style="font-weight:600;">Product A — Gummy Bears 500mg</td>
+            <td>Green Leaf Co.</td>
+            <td><span class="badge b-validated">✓ COA Validated</span></td>
+            <td>CBD</td>
+            <td style="font-family:var(--font-mono);font-size:12px;color:#166534;font-weight:600;">1 active</td>
+            <td><button class="btn btn-secondary btn-sm">View</button></td>
+          </tr>
+          <tr>
+            <td><div class="cb"></div></td>
+            <td style="font-weight:600;">Product B — Tincture 1000mg</td>
+            <td>Herbal Roots</td>
+            <td><span class="badge b-violative">🔴 Violative</span></td>
+            <td>CBD</td>
+            <td style="font-family:var(--font-mono);font-size:12px;color:#DC2626;font-weight:600;">0 active</td>
+            <td><button class="btn btn-secondary btn-sm">View</button></td>
+          </tr>
+        </tbody>
+      </table>
 
-        <!-- Filters -->
-        <div class="modal-filters">
-          <span style="font-size:11px;font-weight:600;color:#64748B;">Filter:</span>
-          <span class="filter-chip active">All</span>
-          <span class="filter-chip">Validated</span>
-          <span class="filter-chip">Expired</span>
-          <span class="filter-chip">Missing</span>
-        </div>
-
-        <!-- Table — only active row shown -->
-        <div style="overflow-x:auto;">
-          <table class="modal-table">
-            <thead>
-              <tr>
-                <th><div class="cb"></div></th>
-                <th>File Name</th>
-                <th>Product Name (from COA)</th>
-                <th>Batch Number</th>
-                <th>COA Status</th>
-                <th>Disposition</th>
-                <th>Expiration</th>
-                <th>Activity</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- ONLY the active COA is shown in Audit View — inactive + archived both hidden -->
-              <tr class="row-active">
-                <td><div class="cb"></div></td>
-                <td><div class="file-name">Batch 2026-A — valid.pdf</div></td>
-                <td style="font-size:12px;">Product A — Gummy Bears 500mg</td>
-                <td style="font-family:var(--font-mono);font-size:11px;">2026-A-001</td>
-                <td><span class="badge b-validated">✓ COA Validated</span></td>
-                <td><span class="badge b-approved">Approved</span></td>
-                <td>
-                  <div style="font-size:12px;font-weight:600;color:#166534;">01/10/27</div>
-                  <div style="font-size:10px;color:#64748B;">12 mo remaining</div>
-                </td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <span style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:#EFF6FF;border:1px solid #BFDBFE;cursor:pointer;" title="Join Conversation">
-                      💬
-                      <span style="position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:#EF4444;border-radius:50%;border:1.5px solid white;"></span>
-                    </span>
-                  </div>
-                </td>
-                <td>
-                  <div style="display:flex;gap:6px;">
-                    <button class="btn btn-secondary btn-sm">View</button>
-                    <button class="btn btn-secondary btn-sm">···</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div style="padding:10px 16px;background:#EFF6FF;border-top:1px solid #BFDBFE;font-size:11px;color:#1E3A5F;display:flex;gap:12px;align-items:center;">
-          <span>1 active COA shown · 1 inactive + 1 archived hidden</span>
-          <span style="flex:1;"></span>
-          <span style="font-size:11px;font-weight:600;color:#1E40AF;">Export will include 1 row only</span>
-        </div>
+      <div style="padding:10px 16px;background:#F8FAFC;border-top:1px solid var(--border);font-size:11px;color:#64748B;display:flex;gap:12px;align-items:center;border-radius:0 0 var(--radius-card) var(--radius-card);">
+        <span>2 products · filtered by Audit Ready view</span>
+        <span style="flex:1;"></span>
+        <span>Rows per page: 25 ▼</span>
       </div>
     </div>
 
-    <div class="two-col">
-      <div class="annotation">
-        <strong>Audit View Indicator:</strong> A persistent blue bar shows "Audit View Active." Not a filter chip — a mode indicator. Shows how many inactive/archived COAs are hidden and offers a one-click return to Default view.
-      </div>
-      <div class="annotation">
-        <strong>Audit View hides Inactive + Archived (⚠️ TBD):</strong> Both inactive (logic-driven) and archived (user-action) rows are hidden in Audit View in this mockup. Implementation decision: archived rows <em>may</em> warrant always-visible treatment since they represent explicit user intent. Confirm with team — this is marked TBD.
-      </div>
+    <div class="annotation">
+      <strong>Custom Views (QP-3527) replace the Audit View toggle.</strong> Users pick from system views (<em>Audit Ready</em> ships built-in) or create their own saved filter presets. The entire combination applies as a single badge — not individual filter pills. "All Products" resets to the unfiltered state. User-created views in the "My Views" section show edit and delete controls on hover.
     </div>
   </div>
 
@@ -911,7 +978,7 @@
        SECTION 4: PRODUCTS TABLE — VIEW SELECTOR
   ============================================================ -->
   <div class="section">
-    <div class="section-label">Section 4 — Product Compliance Table — Audit View Active</div>
+    <div class="section-label">Section 4 — Product Compliance Table — Custom Views Active (QP-3527)</div>
 
     <div class="products-table-wrap">
 
@@ -924,24 +991,19 @@
           <span class="filter-chip">COA Status ▼</span>
         </div>
         <div class="toolbar-right">
-          <!-- NEW: View segmented control -->
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:11px;font-weight:600;color:#64748B;">View</span>
-            <div class="segmented">
-              <button class="seg-btn">All Data</button>
-              <button class="seg-btn active"><span class="dot"></span> Audit</button>
-            </div>
+          <!-- Custom Views button + active badge -->
+          <button class="btn btn-secondary btn-sm" style="font-weight:700;">Views ▼</button>
+          <div class="view-badge-active">
+            📋 Audit Ready <span class="vb-count">7</span> <span class="vb-clear">×</span>
           </div>
-          <!-- Audit View Badge — separate from filter chips -->
-          <div class="audit-indicator">Audit View</div>
           <button class="btn btn-secondary btn-sm">⬆ Export</button>
         </div>
       </div>
 
-      <!-- Audit mode notice -->
+      <!-- Custom view active notice -->
       <div style="padding:8px 16px;background:#EFF6FF;border-bottom:2px solid #BFDBFE;font-size:12px;color:#1E3A5F;display:flex;align-items:center;gap:8px;">
-        <span style="font-weight:700;color:#1E40AF;">ℹ Audit View active</span>
-        <span>— Products below reflect compliance status using only active (non-inactive) COAs. Expired COAs with valid replacements are excluded from status calculations.</span>
+        <span style="font-weight:700;color:#1E40AF;">📋 Audit Ready view active</span>
+        <span>— showing products matching: State: Active, Requires COA: Yes, In Stock, Missing/Violative/Rejected COA</span>
       </div>
 
       <!-- Table -->
@@ -1018,7 +1080,7 @@
       </table>
 
       <div style="padding:10px 16px;background:#F8FAFC;border-top:1px solid var(--border);font-size:11px;color:#64748B;display:flex;gap:12px;align-items:center;">
-        <span>4 products · 1 product status changed in Audit View</span>
+        <span>4 products · 1 product status changed by Audit Ready view</span>
         <span style="flex:1;"></span>
         <span>Rows per page: 25 ▼ &nbsp;|&nbsp; 1–4 of 4</span>
       </div>
@@ -1026,10 +1088,10 @@
 
     <div class="two-col">
       <div class="annotation">
-        <strong>View Segmented Control (NEW):</strong> A small [All Data] / [Audit ●] control appears in the table toolbar, separate from user filter chips. When Audit is active, the blue <code>Audit View</code> badge also appears in the toolbar as a persistent mode indicator.
+        <strong>Custom Views button (QP-3527):</strong> Replaces the [All Data] / [Audit ●] segmented control. Clicking <strong>Views ▼</strong> opens the Custom Views selector (see Section 3). When a view is active, a single badge <code>📋 Audit Ready 7 ×</code> appears inline — the count shows how many filters the view applies. Clicking ✕ on the badge clears the view back to All Products.
       </div>
       <div class="annotation">
-        <strong>Status Change in Audit View:</strong> Product A's status changes from Violative (All Data) to COA Validated (Audit). The <em>"Was Violative in All Data view"</em> annotation text helps orient reviewers. The Active COAs column also reflects only non-inactive counts.
+        <strong>Status Change with Audit Ready view:</strong> Product A's status changes from Violative (no view) to COA Validated (Audit Ready view). The <em>"Was Violative in All Data view"</em> annotation text helps orient reviewers. The Active COAs column also reflects only non-inactive counts.
       </div>
     </div>
   </div>
@@ -1061,19 +1123,13 @@
           <span class="filter-chip">Compliance Domain ▼</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-          <!-- NEW: COAs tab view toggle -->
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:11px;font-weight:600;color:#64748B;">View</span>
-            <div class="segmented">
-              <button class="seg-btn active">All</button>
-              <button class="seg-btn">Audit</button>
-            </div>
-          </div>
+          <!-- Custom Views button — no active view badge = All COAs visible (unfiltered state) -->
+          <button class="btn btn-secondary btn-sm" style="font-weight:700;">Views ▼</button>
           <button class="btn btn-secondary btn-sm">⬆ Export</button>
         </div>
       </div>
 
-      <!-- COAs table — "All" view with Activity column, inactive/archived row treatments -->
+      <!-- COAs table — unfiltered "All Products" view with Activity column, inactive/archived row treatments -->
       <div class="coas-table-wrap">
         <table class="coas-table">
           <thead>
@@ -1225,10 +1281,10 @@
 
     <div class="two-col">
       <div class="annotation">
-        <strong>Row Treatments (preserved):</strong> <strong>Inactive</strong> rows (logic-driven: expired with valid replacement) retain their grey left border + light grey background. <strong>Archived</strong> rows (user-action-driven) retain the dark slate left border + slightly darker background. <strong>Active</strong> rows have no left border and white background. No opacity dimming on any row.
+        <strong>Row Treatments (preserved):</strong> <strong>Inactive</strong> rows (logic-driven: expired with valid replacement) retain their grey left border + light grey background. <strong>Archived</strong> rows (user-action-driven) retain the dark slate left border + slightly darker background. <strong>Active</strong> rows have no left border and white background. No opacity dimming on any row. This is the unfiltered "All" state — all row types are visible.
       </div>
       <div class="annotation">
-        <strong>Activity Column (QP-3300):</strong> Each COA row can show activity indicators for active Conversations (💬), Reminders (🔔), or Elevated Reviews (🚩). A red dot appears when there is new/unread activity. Clicking the icon performs the same action as the corresponding item in the Actions dropdown. Most rows show a muted dash (—) when there is no active activity.
+        <strong>Custom Views on COAs tab (QP-3527):</strong> Users apply the "Audit Ready" system view (or a custom view) to filter the COAs tab. The [All] / [Audit] toggle has been replaced by the unified Custom Views system. Clicking <strong>Views ▼</strong> opens the selector; when no view is active (as shown here), all COAs are visible including inactive (grey border) and archived (dark border).
       </div>
     </div>
 
@@ -1243,12 +1299,12 @@
         <div style="font-size:12px;color:#64748B;line-height:1.6;">Inactive flagging is computed at query time. No changes to stored COA status fields, no archived state, no permanent records modified.</div>
       </div>
       <div style="padding:14px;background:#F8FAFC;border-radius:8px;border:1px solid var(--border);">
-        <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">🔵 View = User Preference</div>
-        <div style="font-size:12px;color:#64748B;line-height:1.6;">Default / Audit view selection is a UI preference, not a saved filter. Could be persisted per user session or per page state. Orthogonal to existing filter chips.</div>
+        <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">🔵 Custom Views = Saved Presets (QP-3527)</div>
+        <div style="font-size:12px;color:#64748B;line-height:1.6;">Custom Views replace the Audit View toggle. System views (e.g., "Audit Ready") ship built-in. Users can save their own filter combinations as named views. The active view applies as a single badge, not individual pills. Views are persisted per user account.</div>
       </div>
       <div style="padding:14px;background:#F8FAFC;border-radius:8px;border:1px solid var(--border);">
         <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">🔵 Export Behavior</div>
-        <div style="font-size:12px;color:#64748B;line-height:1.6;">In Audit View, exports reflect only visible (active) data. Supports clean compliance reporting without manual filtering before export.</div>
+        <div style="font-size:12px;color:#64748B;line-height:1.6;">When a Custom View is active, exports reflect only the filtered data matching that view's criteria. Supports clean compliance reporting without manual pre-filtering before export.</div>
       </div>
     </div>
   </div>
