@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Q-ScanAI — Findings Modal UX Improvements</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --navy: #1E3A5F;
+      --blue: #3B82F6;
+      --green: #16A34A;
+      --green-light: #22C55E;
+      --red: #DC2626;
+      --red-light: #FEE2E2;
+      --amber: #D97706;
+      --amber-light: #F59E0B;
+      --amber-bg: #FFFBEB;
+      --border: #E2E8F0;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-ui);
+      background: #1E293B;
+      min-height: 100vh;
+      color: var(--text);
+      padding-top: 48px;
+    }
+
+    /* ── STICKY NAV ── */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: #0F172A;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      gap: 12px;
+    }
+    .site-nav a {
+      color: #94A3B8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .site-nav a:hover { color: #E2E8F0; }
+    .nav-sep { color: #475569; font-size: 13px; }
+    .nav-title { color: #E2E8F0; font-size: 13px; font-weight: 600; }
+
+    /* ── PAGE WRAPPER ── */
+    .page-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 56px;
+    }
+
+    .page-heading {
+      text-align: center;
+    }
+    .page-heading h1 {
+      color: #F1F5F9;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .page-heading p {
+      color: #94A3B8;
+      font-size: 13px;
+    }
+
+    /* ── SECTION BLOCK ── */
+    .section-block {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .section-badge {
+      background: #334155;
+      color: #94A3B8;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .section-title {
+      color: #E2E8F0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .section-desc {
+      color: #94A3B8;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ── MOCKUP CARD ── */
+    .mockup-card {
+      background: var(--bg);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      border: 1px solid #475569;
+    }
+    .mockup-card-header {
+      background: var(--navy);
+      color: white;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mockup-body {
+      padding: 20px;
+    }
+
+    /* ── ANNOTATION BOX ── */
+    .annotation {
+      border: 1.5px dashed #D97706;
+      background: #FFFBEB;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #92400E;
+      line-height: 1.5;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .annotation-icon { flex-shrink: 0; font-size: 14px; }
+
+    /* ── WIREFRAME STYLES (Section 0) ── */
+    .wireframe-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      position: relative;
+    }
+    .wf-block {
+      background: #E2E8F0;
+      border: 1px solid #CBD5E1;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .wf-modal-header { height: 44px; }
+    .wf-scan-history { height: 110px; background: #DBEAFE; border-color: #93C5FD; color: #1D4ED8; font-weight: 700; }
+    .wf-summary-grid { height: 80px; background: #E8E8E8; }
+    .wf-compliance-block { height: 120px; background: #E5E7EB; }
+    .wf-toolbar { height: 40px; background: #F1F5F9; }
+    .wf-findings { height: 200px; background: #FEF9C3; border-color: #FDE047; color: #854D0E; }
+
+    .wf-annotation-wrap {
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .wf-callout {
+      position: absolute;
+      right: -8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transform: translateX(100%);
+    }
+    .wf-callout-line {
+      width: 32px;
+      height: 1px;
+      border-top: 1.5px dashed #DC2626;
+    }
+    .wf-callout-label {
+      background: #FEE2E2;
+      border: 1px dashed #DC2626;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+      color: #991B1B;
+      font-family: var(--font-ui);
+      font-weight: 500;
+      white-space: nowrap;
+      max-width: 230px;
+      white-space: normal;
+    }
+    .wf-row { display: flex; gap: 4px; }
+    .wf-row .wf-block { flex: 1; }
+
+    /* ── SCAN SELECTOR BAR ── */
+    .scan-selector-bar {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .scan-nav-btn {
+      background: #F1F5F9;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .scan-nav-btn:hover { background: #E2E8F0; }
+    .scan-label {
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 13px;
+    }
+    .scan-meta { color: var(--text-muted); font-size: 12px; }
+    .scan-dot { color: #CBD5E1; }
+    .scan-all-link {
+      color: var(--blue);
+      font-size: 12px;
+      text-decoration: none;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    .scan-all-link:hover { text-decoration: underline; }
+
+    /* ── SUMMARY PILLS ── */
+    .summary-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 6px 0;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .pill:hover { transform: translateY(-1px); }
+    .pill-high { background: #FEE2E2; color: #991B1B; border-color: #FCA5A5; }
+    .pill-medium { background: #FEF3C7; color: #92400E; border-color: #FCD34D; }
+    .pill-low { background: #DCFCE7; color: #14532D; border-color: #86EFAC; }
+    .pill-compliant { background: #F0FDF4; color: #166534; border-color: #6EE7B7; }
+    .pill-sep { color: #CBD5E1; font-size: 16px; }
+    .new-findings-notice {
+      font-size: 12px;
+      color: #92400E;
+      font-weight: 500;
+      padding: 3px 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ── COMPLIANCE DRAWER ── */
+    .compliance-drawer {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .compliance-drawer-header {
+      background: #F8FAFC;
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      border-bottom: 1px solid transparent;
+    }
+    .compliance-drawer-header.open { border-bottom-color: var(--border); }
+    .compliance-drawer-header .drawer-meta {
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    .drawer-toggle {
+      margin-left: auto;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .compliance-drawer-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      background: white;
+    }
+    .drawer-col {
+      padding: 14px;
+      border-right: 1px solid var(--border);
+    }
+    .drawer-col:last-child { border-right: none; }
+    .drawer-col-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .drawer-item {
+      font-size: 12px;
+      padding: 3px 0;
+      color: var(--text);
+      border-bottom: 1px solid #F1F5F9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .drawer-item.issue { color: var(--red); font-weight: 600; }
+    .drawer-item.compliant { color: var(--green); }
+    .drawer-item-badge {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .badge-issue { background: #FEE2E2; color: #991B1B; }
+    .badge-ok { background: #DCFCE7; color: #14532D; }
+
+    /* ── SORT/VIEW TOOLBAR ── */
+    .findings-toolbar {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .toolbar-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .toolbar-select {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+      font-family: var(--font-ui);
+      cursor: pointer;
+    }
+    .toolbar-select.active {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+    }
+    .toolbar-sep { color: #E2E8F0; }
+    .view-toggle {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .view-btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: #F8FAFC;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-ui);
+    }
+    .view-btn.active {
+      background: var(--navy);
+      color: white;
+    }
+    .view-btn + .view-btn {
+      border-left: 1px solid var(--border);
+    }
+    .toolbar-spacer { flex: 1; }
+
+    /* ── FINDINGS TABLE ── */
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .findings-table thead tr {
+      background: var(--navy);
+      color: white;
+    }
+    .findings-table thead th {
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .findings-table thead th:first-child { width: 32px; padding: 8px 10px; }
+    .findings-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    .findings-table tbody tr:hover { background: #F8FAFC; }
+    .findings-table td {
+      padding: 9px 10px;
+      vertical-align: middle;
+    }
+    .findings-table td:first-child { width: 32px; }
+
+    /* Row severity borders */
+    .row-high { border-left: 3px solid #DC2626 !important; }
+    .row-medium { border-left: 3px solid #D97706 !important; }
+    .row-pending { border-left: 3px solid #D97706 !important; background: #FFFBEB; }
+    .row-pending:hover { background: #FEF3C7 !important; }
+
+    /* Severity badge */
+    .sev-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sev-high { background: #FEE2E2; color: #991B1B; }
+    .sev-medium { background: #FEF3C7; color: #92400E; }
+    .sev-pending { background: #FEF3C7; color: #78350F; }
+    .sev-low { background: #DCFCE7; color: #14532D; }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-new { background: #DBEAFE; color: #1E40AF; }
+    .status-returning { background: #F3F4F6; color: #374151; }
+    .status-analyst { background: #FEF3C7; color: #92400E; }
+    .status-pending { background: #FEF3C7; color: #78350F; }
+
+    /* Inline selects */
+    .inline-select {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: var(--font-ui);
+      color: var(--text);
+    }
+    .reviewed-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .actions-btn {
+      background: #F1F5F9;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-family: var(--font-ui);
+    }
+    .actions-btn:hover { background: #E2E8F0; color: var(--navy); }
+
+    /* Compliant toggle row */
+    .row-compliant-toggle td {
+      background: #F8FAFC;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      padding: 8px;
+      cursor: pointer;
+      border-left: 3px solid #E2E8F0 !important;
+    }
+    .row-compliant-toggle:hover td { background: #F1F5F9; color: var(--blue); }
+
+    /* ── CARD VIEW ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .finding-card {
+      background: white;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+    .finding-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .card-severity-stripe {
+      height: 4px;
+    }
+    .stripe-high { background: #DC2626; }
+    .stripe-medium { background: #D97706; }
+    .stripe-low { background: #16A34A; }
+    .card-body {
+      padding: 12px 14px;
+    }
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .card-type {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .card-new-badge {
+      background: var(--blue);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      letter-spacing: 0.03em;
+    }
+    .card-excerpt {
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+      background: #F8FAFC;
+      border-radius: 4px;
+      padding: 6px 8px;
+      border: 1px solid #E8EAED;
+    }
+    .card-meta-row {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .card-meta-sep { color: #CBD5E1; }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+    .card-action-link {
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .card-action-link:hover { text-decoration: underline; }
+    .card-action-sep { color: #E2E8F0; }
+    .card-action-remove {
+      font-size: 11px;
+      color: #EF4444;
+      text-decoration: none;
+      font-weight: 500;
+      margin-left: auto;
+    }
+
+    /* ── MULTI-SELECT DROPDOWN ── */
+    .type-filter-wrap {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .type-filter-btn {
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-ui);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .type-filter-btn .filter-count {
+      background: var(--blue);
+      color: white;
+      border-radius: 10px;
+      padding: 0 6px;
+      font-size: 10px;
+    }
+    .type-filter-dropdown {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      width: 240px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .filter-dropdown-search {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-dropdown-search input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-family: var(--font-ui);
+      color: var(--text);
+      outline: none;
+    }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      font-size: 12.5px;
+      cursor: pointer;
+      border-bottom: 1px solid #F8FAFC;
+    }
+    .filter-option:hover { background: #F1F5F9; }
+    .filter-option input[type="checkbox"] {
+      accent-color: var(--navy);
+      width: 13px;
+      height: 13px;
+      cursor: pointer;
+    }
+    .filter-option.checked { color: var(--navy); font-weight: 600; }
+    .filter-actions {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      background: #F8FAFC;
+    }
+    .filter-clear {
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .filter-clear:hover { color: var(--red); }
+    .filter-apply {
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-ui);
+      cursor: pointer;
+    }
+    .filter-apply:hover { background: #2563EB; }
+
+    /* ── QUICK WINS TABLE ── */
+    .quick-wins-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: white;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .quick-wins-table thead tr {
+      background: var(--navy);
+    }
+    .quick-wins-table thead th {
+      color: white;
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .quick-wins-table tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+    .quick-wins-table tbody tr:last-child { border-bottom: none; }
+    .quick-wins-table tbody tr:hover { background: #F8FAFC; }
+    .quick-wins-table td {
+      padding: 10px 16px;
+      vertical-align: top;
+    }
+    .quick-wins-table td:first-child {
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .effort-low {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: #DCFCE7;
+      color: #14532D;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .effort-medium {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: #FEF3C7;
+      color: #92400E;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* ── WIREFRAME ANNO LAYOUT ── */
+    .wireframe-container {
+      display: flex;
+      gap: 20px;
+    }
+    .wireframe-stack {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .callout-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+      width: 240px;
+      padding-top: 8px;
+    }
+    .callout-item {
+      background: #FEE2E2;
+      border: 1px dashed #DC2626;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      color: #991B1B;
+      font-weight: 500;
+      line-height: 1.4;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+    .callout-dot { font-size: 14px; flex-shrink: 0; line-height: 1.2; }
+    .wf-label-inside {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: inherit;
+    }
+    .wf-pct {
+      font-size: 10px;
+      font-weight: 400;
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    /* ── UTILITIES ── */
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .mt-2 { margin-top: 8px; }
+    .mono { font-family: var(--font-mono); }
+    .text-muted { color: var(--text-muted); }
+    .gap-section { margin-top: 24px; }
+    .subsection-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94A3B8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .subsection-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #334155;
+    }
+    hr.divider {
+      border: none;
+      border-top: 1px dashed #475569;
+      margin: 24px 0;
+    }
+    .flex-row { display: flex; align-items: center; gap: 10px; }
+    .inner-spacer { margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+<!-- STICKY NAV -->
+<nav class="site-nav">
+  <a href="../">← All Mockups</a>
+  <span class="nav-sep">›</span>
+  <span class="nav-title">Q-ScanAI — Findings Modal UX Improvements</span>
+</nav>
+
+<div class="page-wrapper">
+
+  <!-- PAGE HEADING -->
+  <div class="page-heading">
+    <h1>Q-ScanAI — Findings Modal UX Improvements</h1>
+    <p>Prototype · March 2026 · Qredible Design System</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 0: CURRENT PAIN POINTS                         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-badge">Section 0</span>
+      <span class="section-title">Current Pain Points — Annotated Layout Diagram</span>
+    </div>
+    <div class="section-desc">
+      A wireframe of the <em>current</em> Findings modal state. The large scan history, expanded compliance summary,
+      and unordered findings list together push the actual findings content far below the fold.
+    </div>
+
+    <div class="mockup-card">
+      <div class="mockup-card-header">
+        <span>Current State — Modal Layout (Wireframe)</span>
+        <span style="font-weight:400;font-size:11px;opacity:0.7;">Not to pixel-scale — proportional representation</span>
+      </div>
+      <div class="mockup-body">
+        <div class="wireframe-container">
+          <!-- Left: wireframe blocks -->
+          <div class="wireframe-stack">
+
+            <!-- Modal header -->
+            <div class="wf-block wf-modal-header">
+              <span class="wf-label-inside">Modal Header / Title Bar</span>
+            </div>
+
+            <!-- Scan History - BIG block -->
+            <div class="wf-block" style="height:120px; background:#DBEAFE; border:1px solid #93C5FD; border-radius:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#1D4ED8;">
+              <span class="wf-label-inside">Scan History — 3 Cards</span>
+              <span class="wf-pct" style="color:#1D4ED8;">≈ 30% of modal height before findings</span>
+            </div>
+
+            <!-- Summary 4-card grid -->
+            <div class="wf-block" style="height:80px; background:#E8E8E8; border-radius:4px; flex-direction:column;">
+              <span class="wf-label-inside">Summary — 4 Stat Cards (High / Med / Low / Compliant)</span>
+            </div>
+
+            <!-- Compliance Summary expanded -->
+            <div class="wf-block" style="height:130px; background:#EDE9FE; border:1px solid #C4B5FD; border-radius:4px; flex-direction:column; color:#5B21B6;">
+              <span class="wf-label-inside">Compliance Scan Summary (Always Expanded)</span>
+              <span class="wf-pct" style="color:#5B21B6;">3-column keyword/term/check list — always visible</span>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="wf-block wf-toolbar" style="border-radius:4px;">
+              <span class="wf-label-inside">Filter Toolbar (single-select type)</span>
+            </div>
+
+            <!-- Findings — pushed down -->
+            <div class="wf-block" style="height:200px; background:#FEF9C3; border:1.5px solid #FDE047; border-radius:4px; color:#854D0E; flex-direction:column;">
+              <span class="wf-label-inside">Findings List (Cards, unsorted)</span>
+              <span class="wf-pct" style="color:#854D0E;">Pushed below fold · No sort order · Compliant mixed with High severity</span>
+            </div>
+          </div>
+
+          <!-- Right: callout annotations -->
+          <div class="callout-list">
+            <div class="callout-item">
+              <span class="callout-dot">🔴</span>
+              <span>Scan History takes ~30% of vertical space before you reach findings</span>
+            </div>
+            <div class="callout-item">
+              <span class="callout-dot">🔴</span>
+              <span>No sort order — compliant items appear between high-severity findings</span>
+            </div>
+            <div class="callout-item">
+              <span class="callout-dot">🔴</span>
+              <span>Analyst Review Checks pinned/mixed in regardless of status</span>
+            </div>
+            <div class="callout-item">
+              <span class="callout-dot">🔴</span>
+              <span>Type filter is single-select only — can't view multiple categories at once</span>
+            </div>
+            <div class="callout-item">
+              <span class="callout-dot">🔴</span>
+              <span>Card view: only 3–4 findings visible without scrolling</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /section 0 -->
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 1: COMPACT HEADER + SMART SUMMARY              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-badge">Section 1</span>
+      <span class="section-title">Compact Header + Smart Summary</span>
+    </div>
+    <div class="section-desc">
+      The redesigned modal header collapses scan history into a single navigation row and folds compliance details
+      into a dismissible drawer — pushing findings above the fold by default.
+    </div>
+
+    <div class="mockup-card">
+      <div class="mockup-card-header">Redesigned Modal Header — Scan Selector + Summary + Compliance Drawer</div>
+      <div class="mockup-body" style="display:flex;flex-direction:column;gap:10px;">
+
+        <!-- Compact scan selector bar -->
+        <div class="subsection-label">Compact Scan Selector Bar</div>
+        <div class="scan-selector-bar">
+          <button class="scan-nav-btn">← Previous</button>
+          <span class="scan-label">Scan #27</span>
+          <span class="scan-dot">·</span>
+          <span class="scan-meta">3/2/2026</span>
+          <span class="scan-dot">·</span>
+          <span class="scan-meta">20 findings</span>
+          <button class="scan-nav-btn" style="margin-left:4px;">Next →</button>
+          <a href="#" class="scan-all-link">▼ Show all scans</a>
+        </div>
+
+        <!-- Summary pills row -->
+        <div class="subsection-label mt-2">Severity Summary — Click to Filter</div>
+        <div style="background:white;border:1px solid var(--border);border-radius:6px;padding:10px 14px;">
+          <div class="summary-pills">
+            <span class="pill pill-high">🔴 3 High</span>
+            <span class="pill-sep">·</span>
+            <span class="pill pill-medium">🟡 5 Medium</span>
+            <span class="pill-sep">·</span>
+            <span class="pill pill-low">🟢 3 Low</span>
+            <span class="pill-sep">·</span>
+            <span class="pill pill-compliant">✓ 7 Compliant</span>
+          </div>
+          <div class="new-findings-notice">⚠ 3 New Findings since last scan</div>
+        </div>
+
+        <!-- Compliance drawer — COLLAPSED -->
+        <div class="subsection-label mt-2">Compliance Scan Summary — Collapsible Drawer</div>
+        <div class="compliance-drawer">
+          <div class="compliance-drawer-header">
+            <span>📋</span>
+            <span style="font-weight:700;">Compliance Scan Summary</span>
+            <span class="drawer-meta">— 8 violations out of 125 items checked</span>
+            <span class="drawer-toggle">▼ Show details</span>
+          </div>
+        </div>
+
+        <!-- Compliance drawer — EXPANDED (shown below for reference) -->
+        <div style="font-size:11px;color:#94A3B8;margin:4px 0 2px;font-style:italic;">↓ Expanded state (shown below for reference)</div>
+        <div class="compliance-drawer">
+          <div class="compliance-drawer-header open">
+            <span>📋</span>
+            <span style="font-weight:700;">Compliance Scan Summary</span>
+            <span class="drawer-meta">— 8 violations out of 125 items checked</span>
+            <span class="drawer-toggle">▲ Hide details</span>
+          </div>
+          <div class="compliance-drawer-body">
+            <!-- Keywords column -->
+            <div class="drawer-col">
+              <div class="drawer-col-title">Keywords (A–Z)</div>
+              <div class="drawer-item">Age gate</div>
+              <div class="drawer-item">CBD content</div>
+              <div class="drawer-item">Contact information</div>
+              <div class="drawer-item">Delta-8 THC</div>
+              <div class="drawer-item">External links</div>
+              <div class="drawer-item">FDA disclaimer</div>
+              <div class="drawer-item">Privacy policy</div>
+              <div class="drawer-item">Subscription model</div>
+              <div class="drawer-item">THC disclaimer</div>
+            </div>
+            <!-- Violative Terms column -->
+            <div class="drawer-col">
+              <div class="drawer-col-title">Violative Terms / Phrases (A–Z)</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>Cures anxiety</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>Get high legally</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>Medical-grade CBD</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>No prescription needed</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>Broad spectrum</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>Full spectrum</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>Lab tested</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>Third-party verified</div>
+            </div>
+            <!-- Compliance Checks column -->
+            <div class="drawer-col">
+              <div class="drawer-col-title">Compliance Checks — Issues First</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>Privacy policy present</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>Contact info visible</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>Age verification gate</div>
+              <div class="drawer-item issue"><span class="drawer-item-badge badge-issue">✗</span>External links reviewed</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>FDA disclaimer present</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>Lab results linked</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>No medical claims</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>Serving size disclosed</div>
+              <div class="drawer-item compliant"><span class="drawer-item-badge badge-ok">✓</span>THC level disclosed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Annotation -->
+        <div class="annotation mt-2">
+          <span class="annotation-icon">💡</span>
+          <span><strong>Space savings:</strong> Scan history and compliance summary collapse to ~80px combined, pushing the findings list above the fold. Analysts see violations immediately without any manual scrolling.</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /section 1 -->
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 2: SMART SORT — PRIORITY-FIRST FINDINGS        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-badge">Section 2</span>
+      <span class="section-title">Smart Sort Order — Priority-First Findings List</span>
+    </div>
+    <div class="section-desc">
+      The default sort order surfaces what matters most immediately: unreviewed High findings first,
+      then Medium, then Analyst Review Pending items, then Low — with Compliant items collapsed by default.
+    </div>
+
+    <div class="mockup-card">
+      <div class="mockup-card-header">Findings List — Table View (Priority Sort Default)</div>
+      <div class="mockup-body" style="padding:16px;">
+
+        <!-- Sort/View Toolbar -->
+        <div class="findings-toolbar inner-spacer">
+          <span class="toolbar-label">Sort:</span>
+          <select class="toolbar-select" style="background:#1E3A5F;color:white;border-color:#1E3A5F;">
+            <option>Priority ▼</option>
+            <option>Date Detected</option>
+            <option>Type A–Z</option>
+            <option>Severity</option>
+          </select>
+          <span style="width:8px;"></span>
+          <span class="toolbar-label">View:</span>
+          <div class="view-toggle">
+            <button class="view-btn active">⊞ Table</button>
+            <button class="view-btn">▤ Cards</button>
+          </div>
+          <span style="width:8px;"></span>
+          <span class="toolbar-label">Type:</span>
+          <select class="toolbar-select">
+            <option>Multi-select ▼</option>
+          </select>
+          <span style="width:4px;"></span>
+          <select class="toolbar-select">
+            <option>Status: All ▼</option>
+          </select>
+          <select class="toolbar-select">
+            <option>Source: All ▼</option>
+          </select>
+          <div class="toolbar-spacer"></div>
+          <span style="font-size:11px;color:var(--text-muted);">8 findings</span>
+        </div>
+
+        <!-- Sort order legend -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;color:var(--text-muted);align-items:center;">
+          <span style="font-weight:700;color:var(--navy);">Default priority order:</span>
+          <span style="color:#DC2626;font-weight:600;">🔴 HIGH New</span>
+          <span>→</span>
+          <span style="color:#DC2626;font-weight:600;">🔴 HIGH Existing</span>
+          <span>→</span>
+          <span style="color:#D97706;font-weight:600;">🟡 MED New</span>
+          <span>→</span>
+          <span style="color:#D97706;font-weight:600;">🟡 MED Existing</span>
+          <span>→</span>
+          <span style="color:#D97706;font-weight:600;">⚠ Analyst Pending</span>
+          <span>→</span>
+          <span style="color:#16A34A;font-weight:600;">🟢 LOW</span>
+          <span>→</span>
+          <span style="color:var(--text-muted);font-weight:600;">✓ Compliant (collapsed)</span>
+        </div>
+
+        <!-- Table -->
+        <div style="border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+          <table class="findings-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" style="accent-color:#94A3B8;"/></th>
+                <th>Severity</th>
+                <th>Finding Type</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th>First Detected</th>
+                <th>Last Reviewed</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Row 1: High New -->
+              <tr class="row-high">
+                <td><input type="checkbox"/></td>
+                <td><span class="sev-badge sev-high">🔴 HIGH</span></td>
+                <td style="font-weight:600;color:var(--navy);">Privacy Policy Missing</td>
+                <td><span class="mono" style="font-size:11px;color:#475569;">Q-AI Scan</span></td>
+                <td><span class="status-badge status-new">● New Finding</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">—</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">10/30/2025</span></td>
+                <td><button class="actions-btn">···</button></td>
+              </tr>
+              <!-- Row 2: High New -->
+              <tr class="row-high">
+                <td><input type="checkbox"/></td>
+                <td><span class="sev-badge sev-high">🔴 HIGH</span></td>
+                <td style="font-weight:600;color:var(--navy);">Contact Information</td>
+                <td><span class="mono" style="font-size:11px;color:#475569;">Q-AI Scan</span></td>
+                <td><span class="status-badge status-new">● New Finding</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">—</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">03/01/2026</span></td>
+                <td><button class="actions-btn">···</button></td>
+              </tr>
+              <!-- Row 3: High Analyst Review -->
+              <tr class="row-high">
+                <td><input type="checkbox"/></td>
+                <td><span class="sev-badge sev-high">🔴 HIGH</span></td>
+                <td style="font-weight:600;color:var(--navy);">External Links Review</td>
+                <td><span class="mono" style="font-size:11px;color:#475569;">User Added</span></td>
+                <td><span class="status-badge status-analyst">Analyst Review</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">02/15/2026</span></td>
+                <td>
+                  <span class="reviewed-text">Reviewed by Rtq Admin 03/16</span>
+                </td>
+                <td><button class="actions-btn">···</button></td>
+              </tr>
+              <!-- Row 4: Med New -->
+              <tr class="row-medium">
+                <td><input type="checkbox"/></td>
+                <td><span class="sev-badge sev-medium">🟡 MED</span></td>
+                <td style="font-weight:600;color:var(--navy);">Violative Term</td>
+                <td><span class="mono" style="font-size:11px;color:#475569;">Q-AI Scan</span></td>
+                <td><span class="status-badge status-new">● New Finding</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">—</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">03/02/2026</span></td>
+                <td><button class="actions-btn">···</button></td>
+              </tr>
+              <!-- Row 5: Med Returning -->
+              <tr class="row-medium">
+                <td><input type="checkbox"/></td>
+                <td><span class="sev-badge sev-medium">🟡 MED</span></td>
+                <td style="font-weight:600;color:var(--navy);">Contact Information</td>
+                <td><span class="mono" style="font-size:11px;color:#475569;">Q-AI Scan</span></td>
+                <td><span class="status-badge status-returning">Returning</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">10/30/2025</span></td>
+                <td><span class="reviewed-text">Reviewed 02/27</span></td>
+                <td><button class="actions-btn">···</button></td>
+              </tr>
+              <!-- Row 6: Analyst Pending -->
+              <tr class="row-pending">
+                <td><input type="checkbox"/></td>
+                <td><span class="sev-badge sev-pending">⚠ PENDING</span></td>
+                <td style="font-weight:600;color:var(--navy);">Product Subscription Model</td>
+                <td><span class="mono" style="font-size:11px;color:#475569;">Analyst Review</span></td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">02/23/2026</span></td>
+                <td><span class="reviewed-text">Quinn ALUM 02/23</span></td>
+                <td><button class="actions-btn">···</button></td>
+              </tr>
+              <!-- Row 7: Analyst Pending -->
+              <tr class="row-pending">
+                <td><input type="checkbox"/></td>
+                <td><span class="sev-badge sev-pending">⚠ PENDING</span></td>
+                <td style="font-weight:600;color:var(--navy);">THC Disclaimer</td>
+                <td><span class="mono" style="font-size:11px;color:#475569;">Analyst Review</span></td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">03/01/2026</span></td>
+                <td><span class="mono text-muted" style="font-size:11px;">—</span></td>
+                <td><button class="actions-btn">···</button></td>
+              </tr>
+              <!-- Row 8: Compliant collapsed toggle -->
+              <tr class="row-compliant-toggle">
+                <td colspan="8">▼ &nbsp;Show 7 Compliant findings</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Annotation -->
+        <div class="annotation mt-3">
+          <span class="annotation-icon">💡</span>
+          <span><strong>Priority sort</strong> puts unreviewed High findings first, Pending analyst checks before Low, and collapses Compliant items — reducing scroll to zero for the issues that matter. Analysts can triage the entire list in a single viewport.</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /section 2 -->
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 3: TABLE vs CARD TOGGLE + MULTI-SELECT FILTER  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-badge">Section 3</span>
+      <span class="section-title">Table View vs Card View Toggle + Multi-select Type Filter</span>
+    </div>
+    <div class="section-desc">
+      Toggleable views let analysts choose density. Table view shows 3× more findings per screen.
+      The multi-select type filter replaces the legacy single-select dropdown.
+    </div>
+
+    <!-- Sub-section A: Table View reference -->
+    <div class="mockup-card">
+      <div class="mockup-card-header">
+        <span>Sub-section A — Table View (see Section 2 for full table)</span>
+        <span style="font-size:11px;font-weight:400;opacity:0.7;">Compact · 3× findings density vs cards</span>
+      </div>
+      <div class="mockup-body">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="flex:1;background:#F1F5F9;border:1px dashed #CBD5E1;border-radius:6px;padding:14px;font-size:12px;color:#475569;text-align:center;min-height:80px;display:flex;align-items:center;justify-content:center;">
+            <span>Table view renders 8–12 compact rows per viewport<br/>with full sortable column headers and bulk-select checkboxes.<br/><em style="color:#94A3B8;">See Section 2 for the full table implementation.</em></span>
+          </div>
+          <div class="annotation" style="max-width:300px;">
+            <span class="annotation-icon">💡</span>
+            <span>Table view renders ~3× more findings per viewport compared to card view — from 3–4 cards visible to 10–12 table rows. Critical for BPO team efficiency during bulk review cycles.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-section B: Improved Card View -->
+    <div class="mockup-card">
+      <div class="mockup-card-header">
+        <span>Sub-section B — Improved Card View</span>
+        <span style="font-size:11px;font-weight:400;opacity:0.7;">More compact · Left border severity · De-emphasized secondary actions</span>
+      </div>
+      <div class="mockup-body">
+        <div style="margin-bottom:10px;" class="findings-toolbar">
+          <span class="toolbar-label">Sort:</span>
+          <select class="toolbar-select" style="background:#1E3A5F;color:white;border-color:#1E3A5F;"><option>Priority ▼</option></select>
+          <span style="width:8px;"></span>
+          <span class="toolbar-label">View:</span>
+          <div class="view-toggle">
+            <button class="view-btn">⊞ Table</button>
+            <button class="view-btn active">▤ Cards</button>
+          </div>
+          <div class="toolbar-spacer"></div>
+        </div>
+
+        <div class="card-grid">
+          <!-- Card 1: High New -->
+          <div class="finding-card">
+            <div class="card-severity-stripe stripe-high"></div>
+            <div class="card-body">
+              <div class="card-top-row">
+                <div>
+                  <span class="sev-badge sev-high" style="font-size:10px;padding:1px 6px;">🔴 HIGH</span>
+                </div>
+                <span class="card-new-badge">● New Finding</span>
+              </div>
+              <div class="card-type">Privacy Policy Missing</div>
+              <div class="card-excerpt">"No privacy policy page found on domain. Regulatory requirement under CCPA / state cannabis regs."</div>
+              <div class="card-meta-row">
+                <span>Q-AI Scan</span>
+                <span class="card-meta-sep">·</span>
+                <span>First detected 10/30/2025</span>
+                <span class="card-meta-sep">·</span>
+                <span style="color:#94A3B8;font-style:italic;">Not yet reviewed</span>
+              </div>
+              <div class="card-actions">
+                <a href="#" class="card-action-link">View Page</a>
+                <span class="card-action-sep">|</span>
+                <a href="#" class="card-action-link">Mark Reviewed</a>
+                <a href="#" class="card-action-remove">Remove</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Medium New -->
+          <div class="finding-card">
+            <div class="card-severity-stripe stripe-medium"></div>
+            <div class="card-body">
+              <div class="card-top-row">
+                <div>
+                  <span class="sev-badge sev-medium" style="font-size:10px;padding:1px 6px;">🟡 MEDIUM</span>
+                </div>
+                <span class="card-new-badge">● New Finding</span>
+              </div>
+              <div class="card-type">Violative Term</div>
+              <div class="card-excerpt">"Cures anxiety" detected on /products/cbd-tincture — prohibited medical claim language.</div>
+              <div class="card-meta-row">
+                <span>Q-AI Scan</span>
+                <span class="card-meta-sep">·</span>
+                <span>First detected 03/02/2026</span>
+                <span class="card-meta-sep">·</span>
+                <span style="color:#94A3B8;font-style:italic;">Not yet reviewed</span>
+              </div>
+              <div class="card-actions">
+                <a href="#" class="card-action-link">View Page</a>
+                <span class="card-action-sep">|</span>
+                <a href="#" class="card-action-link">Mark Reviewed</a>
+                <a href="#" class="card-action-remove">Remove</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Analyst Pending -->
+          <div class="finding-card" style="background:#FFFBEB;">
+            <div class="card-severity-stripe" style="background:#D97706;"></div>
+            <div class="card-body">
+              <div class="card-top-row">
+                <div>
+                  <span class="sev-badge sev-pending" style="font-size:10px;padding:1px 6px;">⚠ PENDING</span>
+                </div>
+                <span style="background:#FEF3C7;color:#78350F;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid #FCD34D;">Analyst Review</span>
+              </div>
+              <div class="card-type">Product Subscription Model</div>
+              <div class="card-excerpt">Subscription billing terms unclear — potential auto-renewal disclosure violation. Added by analyst for manual review.</div>
+              <div class="card-meta-row">
+                <span>User Added</span>
+                <span class="card-meta-sep">·</span>
+                <span>Added 02/23/2026</span>
+                <span class="card-meta-sep">·</span>
+                <span style="color:#92400E;font-weight:600;">Quinn ALUM 02/23</span>
+              </div>
+              <div class="card-actions">
+                <a href="#" class="card-action-link">View Page</a>
+                <span class="card-action-sep">|</span>
+                <a href="#" class="card-action-link">Resolve</a>
+                <a href="#" class="card-action-remove">Remove</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="annotation mt-3">
+          <span class="annotation-icon">💡</span>
+          <span><strong>Card improvements:</strong> Severity left border stripe replaces header badges (cleaner visual scan). "New Finding" badge is a solid blue pill for high visibility. Secondary actions (Remove, View Page) are de-emphasized with smaller font. Reviewer info and first-detected date are collapsed into one meta row instead of two separate lines.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-section C: Multi-select Type Filter -->
+    <div class="mockup-card">
+      <div class="mockup-card-header">
+        <span>Sub-section C — Multi-select Type Filter</span>
+        <span style="font-size:11px;font-weight:400;opacity:0.7;">Replaces single-select dropdown</span>
+      </div>
+      <div class="mockup-body">
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+
+          <!-- Toolbar context showing button -->
+          <div style="flex:1;min-width:280px;">
+            <div class="subsection-label">Filter bar with multi-select open</div>
+            <div class="findings-toolbar" style="margin-bottom:12px;position:relative;">
+              <span class="toolbar-label">Sort:</span>
+              <select class="toolbar-select" style="background:#1E3A5F;color:white;border-color:#1E3A5F;"><option>Priority ▼</option></select>
+              <span style="width:4px;"></span>
+              <span class="toolbar-label">View:</span>
+              <div class="view-toggle">
+                <button class="view-btn active">⊞ Table</button>
+                <button class="view-btn">▤ Cards</button>
+              </div>
+              <span style="width:4px;"></span>
+              <span class="toolbar-label">Type:</span>
+              <div class="type-filter-wrap">
+                <button class="type-filter-btn">
+                  3 selected <span class="filter-count">3</span> ▼
+                </button>
+              </div>
+              <div class="toolbar-spacer"></div>
+            </div>
+
+            <!-- Dropdown open state -->
+            <div class="type-filter-dropdown" style="position:relative;z-index:10;">
+              <div class="filter-dropdown-search">
+                <input type="text" placeholder="Search types…" value=""/>
+              </div>
+              <div class="filter-option checked">
+                <input type="checkbox" checked/> Privacy Policy
+              </div>
+              <div class="filter-option checked">
+                <input type="checkbox" checked/> Contact Information
+              </div>
+              <div class="filter-option checked">
+                <input type="checkbox" checked/> External Links Review
+              </div>
+              <div class="filter-option">
+                <input type="checkbox"/> Violative Term
+              </div>
+              <div class="filter-option">
+                <input type="checkbox"/> Age Verification
+              </div>
+              <div class="filter-option">
+                <input type="checkbox"/> Product Subscription Model
+              </div>
+              <div class="filter-option">
+                <input type="checkbox"/> FDA Disclaimer
+              </div>
+              <div class="filter-option">
+                <input type="checkbox"/> THC Disclaimer
+              </div>
+              <div class="filter-option">
+                <input type="checkbox"/> Lab Results Link
+              </div>
+              <div class="filter-actions">
+                <a href="#" class="filter-clear">Clear all</a>
+                <button class="filter-apply">Apply</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Annotation -->
+          <div style="flex:1;min-width:240px;">
+            <div class="annotation" style="margin-top:60px;">
+              <span class="annotation-icon">💡</span>
+              <span><strong>Multi-select type filter</strong> lets reviewers focus on specific violation categories across multiple types at once — e.g., selecting both "Privacy Policy" and "Contact Information" to audit all business info findings in one pass. The legacy single-select forced analysts to run separate filter sessions per type.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /section 3 -->
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 4: QUICK WINS SUMMARY                          -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-badge">Section 4</span>
+      <span class="section-title">Quick Wins Summary</span>
+    </div>
+    <div class="section-desc">
+      All proposed improvements are low-to-medium effort with immediate measurable impact on analyst workflow efficiency.
+    </div>
+
+    <div class="mockup-card">
+      <div class="mockup-card-header">Improvement Impact Matrix</div>
+      <div class="mockup-body" style="padding:0;">
+        <table class="quick-wins-table">
+          <thead>
+            <tr>
+              <th style="width:30%;">Improvement</th>
+              <th style="width:50%;">Impact</th>
+              <th style="width:20%;">Effort</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Compact scan header</td>
+              <td>High scroll saved — findings above fold without manual scrolling</td>
+              <td><span class="effort-low">● Low</span></td>
+            </tr>
+            <tr>
+              <td>Priority sort default</td>
+              <td>New High findings always appear first — zero missed critical violations</td>
+              <td><span class="effort-low">● Low</span></td>
+            </tr>
+            <tr>
+              <td>Analyst Review Pending below Low</td>
+              <td>Avoids confusion with confirmed scan violations — clear mental model separation</td>
+              <td><span class="effort-low">● Low</span></td>
+            </tr>
+            <tr>
+              <td>Compliant findings collapsed</td>
+              <td>Reduces visible list noise by ~35% — focus stays on actionable items</td>
+              <td><span class="effort-low">● Low</span></td>
+            </tr>
+            <tr>
+              <td>Table view option</td>
+              <td>3× more findings visible per viewport — dramatically faster bulk triage</td>
+              <td><span class="effort-medium">◑ Medium</span></td>
+            </tr>
+            <tr>
+              <td>Multi-select type filter</td>
+              <td>Focused category auditing — e.g., all contact/business info in one session</td>
+              <td><span class="effort-medium">◑ Medium</span></td>
+            </tr>
+            <tr>
+              <td>Alphabetized compliance summary</td>
+              <td>Faster key term lookup during review — consistent A–Z ordering</td>
+              <td><span class="effort-low">● Low</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <span class="annotation-icon">🎯</span>
+      <span><strong>Implementation note:</strong> The 5 Low-effort items can be shipped as a single sprint with no backend changes — pure frontend/UX. The 2 Medium items (table view + multi-select filter) require new UI components but no API changes. Combined, these changes reduce analyst review time per merchant by an estimated 40–60% for BPO cycle runs.</span>
+    </div>
+  </div><!-- /section 4 -->
+
+  <!-- Footer -->
+  <div style="text-align:center;color:#475569;font-size:11px;padding-bottom:24px;">
+    Q-ScanAI Findings Modal UX Improvements · Qredible Design System · March 2026
+  </div>
+
+</div><!-- /page-wrapper -->
+
+</body>
+</html>
