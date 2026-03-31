@@ -1196,6 +1196,59 @@
     .two-col-demo { grid-template-columns: 1fr; }
     .filter-dropdowns { flex-direction: column; }
   }
+
+  /* URL cell in table */
+  .table-url {
+    font-size: 11px; color: #2563eb; text-decoration: none;
+    font-family: monospace; max-width: 160px;
+    display: inline-block; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .table-url:hover { text-decoration: underline; }
+
+  /* Description cell */
+  .table-desc {
+    font-size: 11px; color: #6b7280; font-style: italic;
+    max-width: 200px; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  /* Notes badge in table */
+  .table-notes {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: #EFF6FF; border: 1px solid #BFDBFE;
+    color: #2563eb; font-size: 11px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px;
+  }
+
+  /* Field label overlay in cards */
+  .field-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: #94A3B8; display: block;
+    margin-bottom: 2px;
+  }
+
+  /* Field map legend grid */
+  .field-map-box {
+    border: 1.5px dashed #FCD34D;
+    background: #FFFBEB;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: #78350F;
+  }
+  .field-map-box strong { color: #451A03; font-size: 12px; }
+  .field-map-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 16px;
+    margin-top: 8px;
+  }
+  .field-map-card { font-family: monospace; font-size: 11px; color: #92400E; padding: 2px 0; }
+  .field-map-col { font-size: 11px; color: #374151; padding: 2px 0; display: flex; align-items: center; gap: 4px; }
+  .field-map-arrow { color: #D97706; font-weight: 700; margin-right: 2px; }
 </style>
 </head>
 <body>
@@ -1735,6 +1788,44 @@
     </div>
   </div>
 
+  <!-- Field Map Legend -->
+  <div style="padding: 12px 20px 0;">
+    <div class="field-map-box">
+      <strong>📋 Card → Table field mapping</strong>
+      <div class="field-map-grid">
+        <div class="field-map-card">severity (HIGH/MEDIUM/LOW/PENDING)</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>Risk</strong> column</div>
+
+        <div class="field-map-card">finding type + keyword chip</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>Finding</strong> column</div>
+
+        <div class="field-map-card">item.text (quoted finding / violation description)</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>Description / Text</strong> column</div>
+
+        <div class="field-map-card">item.url (page where found)</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>URL</strong> column</div>
+
+        <div class="field-map-card">tracking.status (NEW/ONGOING/ANALYST_REVIEW_CHECK)</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>Classification</strong> column</div>
+
+        <div class="field-map-card">isManuallyAdded (Q-AI Scan / User Added)</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>Source</strong> column</div>
+
+        <div class="field-map-card">review.isReviewed + reviewedUser + reviewedAt</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>Review</strong> column</div>
+
+        <div class="field-map-card">tracking.firstDetectedAt</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> <strong>First Detected</strong> column</div>
+
+        <div class="field-map-card">totalNotes</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> 💬 badge in <strong>Actions</strong> column</div>
+
+        <div class="field-map-card">imageUrl</div>
+        <div class="field-map-col"><span class="field-map-arrow">→</span> available via [···] → View Screenshot</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Findings table -->
   <div class="modal-scroll">
     <table class="findings-table">
@@ -1742,7 +1833,9 @@
         <tr>
           <th style="width:36px;"><input type="checkbox"></th>
           <th>Risk</th>
-          <th>Finding Type</th>
+          <th>Finding</th>
+          <th>Description / Text</th>
+          <th>URL</th>
           <th>Classification</th>
           <th>Source</th>
           <th>Review</th>
@@ -1751,29 +1844,33 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Row 1: HIGH New -->
+        <!-- Row 1: HIGH New — Privacy Policy Missing -->
         <tr class="row-high">
           <td><input type="checkbox" checked></td>
           <td><span class="badge badge-high">HIGH</span></td>
           <td><strong>Privacy Policy Missing</strong></td>
+          <td><span class="table-desc">Required privacy policy not found</span></td>
+          <td><a href="#" class="table-url">3tallpineswholesale.com/...</a></td>
           <td><span class="chip chip-new"><span class="chip-dot"></span>New Finding</span></td>
           <td><span class="source-badge source-ai">Q-AI Scan</span></td>
           <td><span class="unreviewed-text">—</span></td>
           <td style="white-space:nowrap; color:#6B7280; font-size:12px;">10/30/2025</td>
           <td><div class="actions-cell"><button class="btn-dots">···</button></div></td>
         </tr>
-        <!-- Row 2: HIGH New -->
+        <!-- Row 2: HIGH New — Business Email Missing -->
         <tr class="row-high">
           <td><input type="checkbox"></td>
           <td><span class="badge badge-high">HIGH</span></td>
           <td><strong>Business Email Address Missing</strong></td>
+          <td><span class="table-desc">Business email address not found on website</span></td>
+          <td><a href="#" class="table-url">aficionadoseeds.com/contact</a></td>
           <td><span class="chip chip-new"><span class="chip-dot"></span>New Finding</span></td>
           <td><span class="source-badge source-ai">Q-AI Scan</span></td>
           <td><span class="unreviewed-text">—</span></td>
           <td style="white-space:nowrap; color:#6B7280; font-size:12px;">03/01/2026</td>
           <td><div class="actions-cell"><button class="btn-dots">···</button></div></td>
         </tr>
-        <!-- Row 3: HIGH Ongoing — with notes -->
+        <!-- Row 3: HIGH Ongoing — Violative Term with notes -->
         <tr class="row-high">
           <td><input type="checkbox"></td>
           <td><span class="badge badge-high">HIGH</span></td>
@@ -1781,55 +1878,65 @@
             <span class="keyword-chip" style="margin-right:4px;">"delta-9"</span>
             <strong>Violative Term</strong>
           </td>
+          <td><span class="table-desc">"Contains delta-9-THC in trace amounts..."</span></td>
+          <td><a href="#" class="table-url">3tallpineswholesale.com/products</a></td>
           <td><span class="chip chip-ongoing"><span class="chip-dot"></span>Ongoing Issue</span></td>
           <td><span class="source-badge source-ai">Q-AI Scan</span></td>
           <td><span class="reviewed-text">✓ Reviewed</span></td>
           <td style="white-space:nowrap; color:#6B7280; font-size:12px;">09/15/2025</td>
           <td>
             <div class="actions-cell">
-              <span class="notes-indicator">💬 2</span>
+              <span class="table-notes">💬 2</span>
               <button class="btn-dots">···</button>
             </div>
           </td>
         </tr>
-        <!-- Row 4: MEDIUM New -->
+        <!-- Row 4: MEDIUM New — Age Verification -->
         <tr class="row-medium">
           <td><input type="checkbox"></td>
           <td><span class="badge badge-medium">MEDIUM</span></td>
           <td><strong>Age Verification Missing</strong></td>
+          <td><span class="table-desc">No age verification popup or entry gate detected</span></td>
+          <td><a href="#" class="table-url">aficionadoseeds.com</a></td>
           <td><span class="chip chip-new"><span class="chip-dot"></span>New Finding</span></td>
           <td><span class="source-badge source-ai">Q-AI Scan</span></td>
           <td><span class="unreviewed-text">—</span></td>
           <td style="white-space:nowrap; color:#6B7280; font-size:12px;">03/02/2026</td>
           <td><div class="actions-cell"><button class="btn-dots">···</button></div></td>
         </tr>
-        <!-- Row 5: MEDIUM Ongoing -->
+        <!-- Row 5: MEDIUM Ongoing — Business Contact Info -->
         <tr class="row-medium">
           <td><input type="checkbox"></td>
           <td><span class="badge badge-medium">MEDIUM</span></td>
           <td><strong>Business Contact Information</strong></td>
+          <td><span class="table-desc">Business address not found on website</span></td>
+          <td><a href="#" class="table-url">shop.3tallpines.com/about</a></td>
           <td><span class="chip chip-ongoing"><span class="chip-dot"></span>Ongoing Issue</span></td>
           <td><span class="source-badge source-ai">Q-AI Scan</span></td>
           <td><span class="reviewed-text" style="font-size:11px;">✓ Reviewed 02/27</span></td>
           <td style="white-space:nowrap; color:#6B7280; font-size:12px;">10/30/2025</td>
           <td><div class="actions-cell"><button class="btn-dots">···</button></div></td>
         </tr>
-        <!-- Row 6: ANALYST REVIEW -->
+        <!-- Row 6: ANALYST REVIEW — Product Subscription Model -->
         <tr class="row-analyst">
           <td><input type="checkbox"></td>
           <td><select class="pending-select"><option>Pending ▼</option><option>High</option><option>Medium</option><option>Low</option></select></td>
           <td><strong>Product Subscription Model</strong></td>
+          <td><span class="table-desc">This finding requires analyst review before severity can be assigned.</span></td>
+          <td><a href="#" class="table-url">3tallpineswholesale.com/subscribe</a></td>
           <td><span class="chip chip-analyst">Analyst Review Check</span></td>
           <td><span class="source-badge source-ai">Q-AI Scan</span></td>
           <td><span class="unreviewed-text">—</span></td>
           <td style="white-space:nowrap; color:#6B7280; font-size:12px;">02/23/2026</td>
           <td><div class="actions-cell"><button class="btn-dots">···</button></div></td>
         </tr>
-        <!-- Row 7: ANALYST REVIEW -->
+        <!-- Row 7: ANALYST REVIEW — THC Disclaimer Missing -->
         <tr class="row-analyst">
           <td><input type="checkbox"></td>
           <td><select class="pending-select"><option>Pending ▼</option><option>High</option><option>Medium</option><option>Low</option></select></td>
           <td><strong>THC Disclaimer Missing</strong></td>
+          <td><span class="table-desc">Required THC disclaimer not found on website</span></td>
+          <td><a href="#" class="table-url">aficionadoseeds.com/shop</a></td>
           <td><span class="chip chip-analyst">Analyst Review Check</span></td>
           <td><span class="source-badge source-user">User Added</span></td>
           <td><span class="unreviewed-text">—</span></td>
@@ -1838,7 +1945,7 @@
         </tr>
         <!-- Row 8: Compliant collapse row -->
         <tr class="collapse-row">
-          <td colspan="8">▼ &nbsp; Show 7 Compliant findings &nbsp; <em>(not affecting compliance status)</em></td>
+          <td colspan="10">▼ &nbsp; Show 7 Compliant findings &nbsp; <em>(not affecting compliance status)</em></td>
         </tr>
       </tbody>
     </table>
@@ -2015,24 +2122,48 @@
 
 <div class="cards-grid">
 
-  <!-- Card 1: HIGH -->
+  <!-- Card 1: HIGH — annotated with field labels -->
   <div class="finding-card-v2 high">
-    <div class="fcard-row1">
-      <input type="checkbox" checked>
-      <span style="color:#DC2626; font-size:15px;">✗</span>
-      <span class="fcard-title">Privacy Policy Missing</span>
-      <span class="badge badge-high">HIGH</span>
-      <span class="chip chip-new"><span class="chip-dot"></span>New Finding</span>
-      <span class="source-badge source-ai">Q-AI Scan</span>
+    <div class="fcard-row1" style="align-items:flex-end; flex-wrap:wrap;">
+      <input type="checkbox" checked style="margin-bottom:4px;">
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <span class="field-label">SEVERITY ↓</span>
+        <span class="badge badge-high">HIGH</span>
+      </div>
+      <div style="display:flex; flex-direction:column;">
+        <span class="field-label">FINDING TYPE ↓</span>
+        <span class="fcard-title">Privacy Policy Missing</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <span class="field-label">CLASSIFICATION ↓</span>
+        <span class="chip chip-new"><span class="chip-dot"></span>New Finding</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <span class="field-label">SOURCE ↓</span>
+        <span class="source-badge source-ai">Q-AI Scan</span>
+      </div>
       <div class="spacer"></div>
       <select class="severity-select"><option>High ▼</option></select>
       <button class="btn-three-dot">···</button>
     </div>
-    <div class="fcard-desc">No privacy policy page found or linked from the footer of the storefront.</div>
-    <div class="fcard-actions">
-      <button class="btn-mark-reviewed">Mark Reviewed</button>
-      <button class="btn-view-page">View Page</button>
-      <span class="fcard-date">First detected: 10/30/2025</span>
+    <div style="margin-left:26px; margin-bottom:4px;">
+      <span class="field-label">DESCRIPTION ↓</span>
+      <div class="fcard-desc" style="margin-left:0; margin-bottom:4px;">No privacy policy page found or linked from the footer of the storefront.</div>
+    </div>
+    <div style="margin-left:26px; margin-bottom:8px;">
+      <span class="field-label">URL ↓</span>
+      <div><a href="#" class="table-url" style="font-size:12px;">3tallpineswholesale.com/about</a></div>
+    </div>
+    <div class="fcard-actions" style="flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; flex-direction:column;">
+        <span class="field-label">REVIEW STATUS ↓</span>
+        <button class="btn-mark-reviewed">Mark Reviewed</button>
+      </div>
+      <button class="btn-view-page" style="margin-top:14px;">View Page</button>
+      <div style="margin-left:auto; display:flex; flex-direction:column; align-items:flex-end;">
+        <span class="field-label">FIRST DETECTED ↓</span>
+        <span class="fcard-date" style="margin-left:0;">10/30/2025</span>
+      </div>
     </div>
   </div>
 
