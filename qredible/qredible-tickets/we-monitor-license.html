@@ -673,7 +673,7 @@
         <div class="annotation-callout">
           <span class="callout-icon">➋</span>
           <div>
-            <strong>"License Not Required" badge (Row 3):</strong> Being renamed to <strong>"License Not Found"</strong> — semantically more accurate. "Not Required" implies a confirmed exemption; the reality is CannaSpyGlass found no license record for this company.
+            <strong>"License Not Required" badge (Row 3):</strong> Being renamed to <strong>"License Not Found"</strong> — semantically more accurate. "Not Required" implies a confirmed exemption; the reality is CannaSpyGlass found no license record for this company. Currently has no hover tooltip — new hover will show last checked timestamp.
           </div>
         </div>
         <div class="annotation-callout">
@@ -722,7 +722,7 @@
           </div>
 
           <div class="annotation-box blue" style="margin-top: 20px; max-width: 400px;">
-            <strong>Run License Check</strong> creates one Q-Audit task per license found in CannaSpyGlass. License number is the unique identifier — existing records are updated, not duplicated.
+            <strong>Run License Check</strong> always creates a new Q-Audit validation task. Deduplication happens at validation completion — if a validated record with the same license number already exists for this company, it is updated rather than duplicated.
           </div>
         </div>
 
@@ -735,33 +735,35 @@
             </div>
             <div class="flow-arrow">↓</div>
             <div class="flow-box flow-box-grey">
-              CannaSpyGlass API called for this company
+              NEW Q-Audit validation task created (always)<br>
+              CannaSpyGlass API queried for this company
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box flow-box-amber">
+              License Status badge → <strong>ⓘ Validating</strong>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box flow-box-grey">
+              Q-Audit BPO team reviews and validates
             </div>
             <div class="flow-arrow">↓</div>
             <div class="flow-box flow-box-grey" style="text-align: left; min-width: 380px;">
-              <strong>For each license found:</strong><br><br>
+              <strong>On validation completion — dedup check:</strong><br>
+              <div style="font-size: 12px; color: #6B7280; margin: 4px 0 8px;">Does a validated record with this license number already exist for this company?</div>
               <div style="display: flex; gap: 24px;">
                 <div style="flex: 1;">
-                  <div style="font-size: 12px; font-weight: 700; color: #059669; margin-bottom: 4px;">YES — License # exists in Q-Audit</div>
-                  <div style="font-size: 12px; color: #374151; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 6px; padding: 6px 10px;">Update existing record<br>Reset status → Validating</div>
+                  <div style="font-size: 12px; font-weight: 700; color: #059669; margin-bottom: 4px;">YES — record exists</div>
+                  <div style="font-size: 12px; color: #374151; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 6px; padding: 6px 10px;">Update existing record<br>(no duplicate created)</div>
                 </div>
                 <div style="flex: 1;">
-                  <div style="font-size: 12px; font-weight: 700; color: #7C3AED; margin-bottom: 4px;">NO — License # not in Q-Audit</div>
-                  <div style="font-size: 12px; color: #374151; background: #F5F3FF; border: 1px solid #DDD6FE; border-radius: 6px; padding: 6px 10px;">Create new Q-Audit<br>validation task</div>
+                  <div style="font-size: 12px; font-weight: 700; color: #7C3AED; margin-bottom: 4px;">NO — new license</div>
+                  <div style="font-size: 12px; color: #374151; background: #F5F3FF; border: 1px solid #DDD6FE; border-radius: 6px; padding: 6px 10px;">New validated license<br>record created</div>
                 </div>
               </div>
             </div>
             <div class="flow-arrow">↓</div>
-            <div class="flow-box flow-box-amber">
-              License Status badge → <strong>ⓘ Validating</strong> (all licenses reset immediately)
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="flow-box flow-box-grey">
-              Q-Audit runs validation async
-            </div>
-            <div class="flow-arrow">↓</div>
             <div class="flow-box flow-box-green">
-              Status updates to <strong>Active / Not Found / Failed / Multiple</strong>
+              License Status badge updates to <strong>Active / Not Found / Failed / Multiple</strong>
             </div>
           </div>
 
@@ -786,9 +788,42 @@
     </div>
     <div class="section-body">
 
+      <!-- Active badge simplification -->
+      <div class="subsection">
+        <div class="subsection-title">Active Badge — Simplified (Old vs New)</div>
+        <div class="side-by-side" style="align-items: flex-start; gap: 40px;">
+
+          <div>
+            <div class="state-label" style="color: #991B1B;">Old Badge — Cluttered</div>
+            <span class="ls-badge ls-active" style="max-width: 180px; overflow: hidden; text-overflow: ellipsis;">✓ Active | test lic... | Tie...</span>
+            <div style="margin-top: 10px; font-size: 12px; color: #6B7280;">
+              Inline license number + type crammed in — truncated, hard to read
+            </div>
+          </div>
+
+          <div>
+            <div class="state-label" style="color: #5F9932;">New Badge — Clean</div>
+            <span class="ls-badge ls-active">✓ Active</span>
+            <div style="margin-top: 10px; font-size: 12px; color: #6B7280;">
+              Just the status label — license details move to hover tooltip
+            </div>
+          </div>
+
+        </div>
+
+        <div class="annotation-callout" style="margin-top: 16px;">
+          <span class="callout-icon">ℹ</span>
+          <div>
+            <strong>Badge simplified — license details move to hover tooltip (already exists).</strong> The hover popover continues to show full license details (Business Name, License Number, License Type, etc.) — only the badge label is being simplified.
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-sep" />
+
       <!-- Hover states -->
       <div class="subsection">
-        <div class="subsection-title">Validating Badge — Hover States (Side-by-Side)</div>
+        <div class="subsection-title">Validating &amp; Active Badge — Hover States (Side-by-Side)</div>
         <div class="side-by-side" style="align-items: flex-start;">
 
           <!-- State A: During validation -->
@@ -808,23 +843,34 @@
             </div>
           </div>
 
-          <!-- State B: After validation completed -->
+          <!-- State B: After validation completed — Active -->
           <div>
-            <div class="state-label" style="color: #5F9932;">After Validation Completed</div>
+            <div class="state-label" style="color: #5F9932;">After Validation — Active</div>
             <span class="ls-badge ls-active" style="margin-bottom: 12px; display: inline-flex;">✓ Active</span>
             <div class="hover-tooltip" style="margin-top: 8px;">
-              <div class="hover-tooltip-title">License Verified</div>
+              <div class="hover-tooltip-title">License Information</div>
               <div class="hover-tooltip-divider"></div>
-              <div class="hover-tooltip-timestamp" style="margin-bottom: 4px;">
+              <div class="hover-tooltip-row">
+                <span class="hover-tooltip-label">Business Name</span>
+                <span class="hover-tooltip-value">1912 2</span>
+              </div>
+              <div class="hover-tooltip-row">
+                <span class="hover-tooltip-label">License Number</span>
+                <span class="hover-tooltip-value">test license 1</span>
+              </div>
+              <div class="hover-tooltip-row">
+                <span class="hover-tooltip-label">License Type</span>
+                <span class="hover-tooltip-value">Tier 1-mixed</span>
+              </div>
+              <div class="hover-tooltip-row">
+                <span class="hover-tooltip-label">License Status</span>
+                <span class="hover-tooltip-value">Active</span>
+              </div>
+              <div class="hover-tooltip-timestamp" style="margin-top: 6px;">
                 <strong>Audit task created:</strong> Mar 28, 2026 at 2:14 PM
               </div>
-              <div class="hover-tooltip-timestamp" style="margin-bottom: 8px;">
+              <div class="hover-tooltip-timestamp">
                 <strong>Validation completed:</strong> Mar 28, 2026 at 2:47 PM
-              </div>
-              <div class="hover-tooltip-divider"></div>
-              <div style="font-size: 12px; color: #374151; margin-top: 6px;">
-                <strong>License Number:</strong> test lic 1<br>
-                <strong>Type:</strong> Tier 1-mixed
               </div>
             </div>
           </div>
@@ -834,9 +880,9 @@
 
       <hr class="section-sep" />
 
-      <!-- Badge rename -->
+      <!-- Badge rename + License Not Found hover -->
       <div class="subsection">
-        <div class="subsection-title">"License Not Required" → "License Not Found" — Badge Rename</div>
+        <div class="subsection-title">"License Not Required" → "License Not Found" — Badge Rename &amp; New Hover</div>
         <div class="side-by-side" style="align-items: flex-start; gap: 40px;">
 
           <div>
@@ -844,23 +890,38 @@
             <span class="ls-badge ls-not-required">✓ License Not Required</span>
             <div style="margin-top: 10px; font-size: 12px; color: #6B7280;">
               bg: #d7e9c9 · border: #bfdea8 · color: #5F9932<br>
-              <em>Green implied a confirmed exemption</em>
+              <em>Green implied a confirmed exemption. Had NO hover tooltip.</em>
             </div>
           </div>
 
           <div>
-            <div class="state-label" style="color: #334155;">New Badge — Replacing It</div>
+            <div class="state-label" style="color: #334155;">New Badge — With Hover</div>
             <span class="ls-badge ls-not-found">? License Not Found</span>
-            <div style="margin-top: 10px; font-size: 12px; color: #6B7280;">
+            <div style="margin-top: 10px; font-size: 12px; color: #6B7280; margin-bottom: 12px;">
               bg: rgba(100,116,139,0.10) · color: #334155<br>
               <em>Muted grey — indicates absence, not exemption</em>
+            </div>
+            <div class="hover-tooltip">
+              <div class="hover-tooltip-title">License Information</div>
+              <div class="hover-tooltip-divider"></div>
+              <div class="hover-tooltip-row">
+                <span class="hover-tooltip-label">Status</span>
+                <span class="hover-tooltip-value">No license found in CannaSpyGlass</span>
+              </div>
+              <div style="font-size: 12px; color: #6B7280; padding: 8px 0 6px;">
+                CannaSpyGlass was queried for this company but returned no license records.
+              </div>
+              <div class="hover-tooltip-divider"></div>
+              <div class="hover-tooltip-timestamp" style="margin-top: 6px;">
+                <strong>Last checked:</strong> Mar 28, 2026 at 2:14 PM
+              </div>
             </div>
           </div>
 
         </div>
 
         <div class="annotation-box" style="margin-top: 20px;">
-          <strong>Semantically more accurate</strong> — "Not Required" implied CannaSpyGlass confirmed this company doesn't need a license. "Not Found" accurately reflects that no license record was returned — the company may or may not need one, we simply couldn't find it.
+          <strong>Semantically more accurate</strong> — "Not Required" implied CannaSpyGlass confirmed this company doesn't need a license. "Not Found" accurately reflects that no license record was returned — the company may or may not need one, we simply couldn't find it. The new hover tooltip surfaces the last-checked timestamp so reviewers know how fresh the data is.
         </div>
       </div>
 
@@ -1046,10 +1107,6 @@
               </div>
               <div class="filter-option">
                 <div class="filter-checkbox"></div>
-                <span class="ls-badge ls-pending" style="font-size:11px; padding: 2px 8px;">⏳ Pending</span>
-              </div>
-              <div class="filter-option">
-                <div class="filter-checkbox"></div>
                 <span class="ls-badge ls-multiple" style="font-size:11px; padding: 2px 8px;">⊕ Multiple</span>
               </div>
               <div class="dropdown-divider"></div>
@@ -1089,10 +1146,6 @@
               </div>
               <div class="filter-option">
                 <div class="filter-checkbox"></div>
-                <span class="ls-badge ls-pending" style="font-size:11px; padding: 2px 8px;">⏳ Pending</span>
-              </div>
-              <div class="filter-option">
-                <div class="filter-checkbox"></div>
                 <span class="ls-badge ls-multiple" style="font-size:11px; padding: 2px 8px;">⊕ Multiple</span>
               </div>
               <div class="dropdown-divider"></div>
@@ -1129,10 +1182,6 @@
               <div class="filter-option">
                 <div class="filter-checkbox"></div>
                 <span class="ls-badge ls-not-found" style="font-size:11px; padding: 2px 8px;">? License Not Found</span>
-              </div>
-              <div class="filter-option">
-                <div class="filter-checkbox"></div>
-                <span class="ls-badge ls-pending" style="font-size:11px; padding: 2px 8px;">⏳ Pending</span>
               </div>
               <div class="filter-option">
                 <div class="filter-checkbox"></div>
