@@ -1243,28 +1243,26 @@
   <!-- Scrollable content -->
   <div class="modal-content">
 
-    <!-- (A) Scan History -->
-    <div style="position:relative;">
-      <div class="annotated-area" style="padding:2px;">
-        <span class="annotated-label">① Space hog</span>
-        <div class="scan-history-row">
-          <button class="scan-nav-btn">← Prev</button>
-          <span class="scan-info">Scan #27</span>
-          <span style="color:#D1D5DB;">·</span>
-          <span class="scan-meta">03/02/2026</span>
-          <span style="color:#D1D5DB;">·</span>
-          <span class="scan-meta">duration: 4m 32s</span>
-          <button class="scan-nav-btn">Next →</button>
-          <select class="scan-range-select">
-            <option>Last 30 days ▼</option>
-          </select>
-        </div>
-      </div>
-      <div class="annotation"><span class="ann-marker">①</span> These sections take ~40% of vertical space before findings appear</div>
-    </div>
+    <!-- (A) Scan History + (B) Latest Scan Results + (C) Compliance Summary — all wrapped as space hog -->
+    <div style="position:relative; border:2px dashed #EF4444; border-radius:8px; padding:8px; margin-bottom:8px;">
+      <div style="position:absolute; top:-12px; right:10px; background:#EF4444; color:white; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; white-space:nowrap;">① Everything here is above-the-fold bloat</div>
 
-    <!-- (B) Latest Scan Results -->
-    <div class="card">
+      <!-- (A) Scan History -->
+      <div class="scan-history-row" style="margin-bottom:8px;">
+        <button class="scan-nav-btn">← Prev</button>
+        <span class="scan-info">Scan #27</span>
+        <span style="color:#D1D5DB;">·</span>
+        <span class="scan-meta">03/02/2026</span>
+        <span style="color:#D1D5DB;">·</span>
+        <span class="scan-meta">duration: 4m 32s</span>
+        <button class="scan-nav-btn">Next →</button>
+        <select class="scan-range-select">
+          <option>Last 30 days ▼</option>
+        </select>
+      </div>
+
+      <!-- (B) Latest Scan Results -->
+      <div class="card" style="margin-bottom:8px;">
       <div class="scan-results-header">
         <div>
           <div class="card-title">Latest Scan Results</div>
@@ -1333,6 +1331,11 @@
           <div class="comp-check ok"><span class="comp-check-icon">✓</span> SSL/TLS Secure</div>
         </div>
       </div>
+    </div>
+
+    </div><!-- end space-hog wrapper -->
+    <div style="background:#FEE2E2; border:1px solid #FECACA; border-radius:6px; padding:8px 14px; margin-bottom:12px; font-size:12px; color:#991B1B;">
+      <strong>① All of the above</strong> — Scan selector, 4 severity cards, and the full Compliance Scan Summary — takes up ~60% of the modal height before the first finding is visible. Reviewers must scroll past all of this on every page load.
     </div>
 
     <!-- (D) Filter & Actions -->
