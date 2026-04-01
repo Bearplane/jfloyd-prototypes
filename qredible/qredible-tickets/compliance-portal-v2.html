@@ -171,10 +171,10 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 /* ─── SIDE PANEL (Screen 4) ─── */
 .panel-host { position: relative; }
 .side-panel {
-  position: absolute;
-  top: 0; right: 0;
+  position: fixed;
+  top: 40px; right: 0;
   width: 42%;
-  min-height: 100%;
+  height: calc(100vh - 40px);
   background: white;
   box-shadow: -4px 0 24px rgba(0,0,0,0.12);
   z-index: 100;
@@ -512,7 +512,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 .comply-page-title { font-size: 22px; font-weight: 700; color: #1a202e; }
 .comply-page-sub { font-size: 13px; color: #6B7280; margin-top: 4px; }
 .table-container { overflow-x: auto; width: 100%; }
-.panel-host { position: relative; overflow: hidden; }
+.panel-host { position: relative; }
 .data-table { min-width: 800px; width: 100%; }
 .page-content.has-panel { padding-right: 24px; }
 </style>
