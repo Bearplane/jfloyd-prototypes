@@ -1967,5 +1967,61 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
     </div>
   </div>
 
+
+<script>
+var TOTAL_SCREENS = 9;
+
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var el = document.getElementById('screen-' + n);
+  if (el) {
+    el.classList.add('active');
+    var lbl = document.getElementById('screen-label');
+    if (lbl) lbl.textContent = 'Screen ' + n + ' / ' + TOTAL_SCREENS;
+    window.scrollTo(0, 0);
+  }
+  closeAllDropdowns();
+}
+
+function toggleDropdown(id) {
+  var menu = document.getElementById(id);
+  if (!menu) return;
+  var isOpen = menu.classList.contains('open');
+  closeAllDropdowns();
+  if (!isOpen) menu.classList.add('open');
+}
+
+function closeAllDropdowns() {
+  document.querySelectorAll('.dropdown-menu').forEach(function(m) { m.classList.remove('open'); });
+}
+
+function openPanel(screenNum) {
+  var screen = document.getElementById('screen-' + screenNum);
+  if (!screen) return;
+  var panel = screen.querySelector('.side-panel');
+  if (panel) panel.classList.add('open');
+}
+
+function closePanel(screenNum) {
+  var screen = document.getElementById('screen-' + screenNum);
+  if (!screen) return;
+  var panel = screen.querySelector('.side-panel');
+  if (panel) panel.classList.remove('open');
+}
+
+function showToast(msg, duration) {
+  duration = duration || 4000;
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;top:20px;right:20px;background:#16a34a;color:white;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+  document.body.appendChild(t);
+  setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, duration);
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.dropdown-container')) closeAllDropdowns();
+});
+</script>
+
 </body>
 </html>
