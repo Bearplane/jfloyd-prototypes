@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Management & Compliance Portal — QP-3579 through QP-3586</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Uber Move", -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #1E293B;
+    color: #1A202E;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Proto Nav ── */
+  .proto-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #0F172A;
+    padding: 0 24px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #94A3B8;
+    border-bottom: 1px solid #1E293B;
+  }
+  .proto-nav a { color: #60A5FA; text-decoration: none; }
+  .proto-nav a:hover { color: #93C5FD; }
+  .proto-nav .sep { color: #475569; }
+  .proto-nav .crumb { color: #CBD5E1; font-weight: 500; }
+
+  /* ── Page layout ── */
+  .page-content { padding: 48px 24px 80px; max-width: 1440px; margin: 0 auto; }
+
+  /* ── Section headers ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #94A3B8;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    margin-top: 56px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #334155;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+
+  .section-desc {
+    color: #94A3B8;
+    font-size: 13px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  /* ── App frame ── */
+  .app-frame {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.4);
+    overflow: hidden;
+  }
+
+  /* ── Annotation box ── */
+  .annotation {
+    border: 1.5px dashed #FCD34D;
+    background: #FFFBEB;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #92400E;
+    line-height: 1.6;
+    margin-top: 16px;
+  }
+  .annotation strong { color: #78350F; }
+  .annotation code {
+    background: #FEF3C7;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+  }
+
+  /* ── Status pills ── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pill-draft    { background: #F3F4F6; color: #374151; }
+  .pill-open     { background: #DBEAFE; color: #1E40AF; }
+  .pill-awaiting { background: #FEF3C7; color: #92400E; }
+  .pill-review   { background: #EDE9FE; color: #5B21B6; }
+  .pill-disputed { background: #FEE2E2; color: #991B1B; }
+  .pill-resolved { background: #DCFCE7; color: #166534; }
+  .pill-closed   { background: #F3F4F6; color: #9CA3AF; }
+
+  .pill-high   { background: #FEE2E2; color: #991B1B; }
+  .pill-medium { background: #FEF9C3; color: #854D0E; }
+  .pill-low    { background: #DCFCE7; color: #166534; }
+
+  /* ── Q-Monitor Tab Nav ── */
+  .qmon-nav {
+    background: #fff;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .qmon-nav-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2563eb;
+    margin-right: 20px;
+    flex-shrink: 0;
+    padding: 14px 0;
+  }
+  .qmon-tab {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #6B7280;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .15s;
+  }
+  .qmon-tab:hover { color: #1A202E; }
+  .qmon-tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+    font-weight: 600;
+  }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: #f1f5f9;
+    color: #1a202e;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #E5E7EB;
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid #E5E7EB;
+  }
+  tbody tr:hover { background: #FAFAFA; }
+  tbody td {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #1A202E;
+    vertical-align: middle;
+  }
+  .td-muted { color: #6B7280; font-size: 12px; }
+  .td-code { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: #6B7280; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+  }
+  .btn-primary { background: #2563eb; color: white; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-green   { background: #16a34a; color: white; }
+  .btn-outline { background: white; color: #374151; border: 1px solid #D1D5DB; }
+  .btn-outline:hover { background: #F9FAFB; }
+  .btn-ghost   { background: transparent; color: #6B7280; border: 1px solid #E5E7EB; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-danger { background: white; color: #991B1B; border: 1px solid #FCA5A5; }
+  .btn-danger:hover { background: #FEE2E2; }
+
+  /* ── Checkbox ── */
+  .cb {
+    width: 15px; height: 15px;
+    border: 1.5px solid #D1D5DB;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cb.checked { background: #2563eb; border-color: #2563eb; color: white; font-size: 9px; }
+
+  /* ── Input ── */
+  .input {
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #1A202E;
+    font-family: inherit;
+    width: 100%;
+    outline: none;
+  }
+  .input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.1); }
+
+  /* ── Select ── */
+  .select {
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    padding: 7px 28px 7px 10px;
+    font-size: 13px;
+    color: #1A202E;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
+    appearance: none;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .toolbar-search {
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+    position: relative;
+  }
+  .toolbar-search input {
+    width: 100%;
+    padding: 7px 12px 7px 32px;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #1A202E;
+    outline: none;
+  }
+  .toolbar-search::before {
+    content: '🔍';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    pointer-events: none;
+  }
+
+  /* ── Bulk action bar ── */
+  .bulk-bar {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 8px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #1E40AF;
+    font-weight: 500;
+  }
+  .bulk-bar .divider { width: 1px; height: 18px; background: #BFDBFE; margin: 0 2px; }
+
+  /* ── Active filter chip ── */
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #1E40AF;
+  }
+  .filter-chip .x { color: #93C3FD; cursor: pointer; font-size: 11px; }
+
+  /* ── Progress bar ── */
+  .progress-wrap { background: #E5E7EB; border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; }
+  .progress-green  { background: #16a34a; }
+  .progress-amber  { background: #D97706; }
+  .progress-red    { background: #DC2626; }
+
+  /* ── Entity / ERD ── */
+  .erd-wrap {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .erd-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #94A3B8;
+    font-size: 11px;
+    padding-top: 60px;
+  }
+  .erd-arrow { font-size: 20px; color: #475569; }
+  .entity-card {
+    background: white;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+    flex: 1;
+    min-width: 260px;
+    max-width: 340px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .entity-header {
+    background: #F7F5FF;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1A202E;
+    border-bottom: 1.5px solid #E5E7EB;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .entity-header .entity-icon { font-size: 16px; }
+  .entity-field {
+    padding: 5px 14px;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: 12px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: #374151;
+  }
+  .entity-field:last-child { border-bottom: none; }
+  .field-name { font-weight: 500; color: #1A202E; min-width: 140px; flex-shrink: 0; }
+  .field-type { color: #6B7280; font-size: 11px; font-family: 'SF Mono','Fira Code',monospace; }
+  .field-enum { color: #5B21B6; font-size: 11px; font-family: 'SF Mono','Fira Code',monospace; }
+  .field-fk { color: #2563eb; font-size: 11px; }
+
+  /* ── Status machine ── */
+  .state-machine {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 20px 0 8px;
+  }
+  .state-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .state-box {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .state-label { font-size: 10px; color: #9CA3AF; text-align: center; max-width: 80px; }
+  .state-arrow {
+    color: #6B7280;
+    font-size: 18px;
+    padding: 0 4px;
+    margin-top: -14px;
+  }
+  .state-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 12px;
+    margin-top: 8px;
+    gap: 4px;
+    border-left: 2px dashed #E5E7EB;
+    margin-left: 8px;
+  }
+
+  /* ── Two column layout ── */
+  .two-col { display: flex; gap: 20px; align-items: flex-start; }
+  .two-col > * { flex: 1; min-width: 0; }
+
+  /* ── Panel ── */
+  .panel {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .panel-header {
+    background: #F7F5FF;
+    padding: 12px 16px;
+    border-bottom: 1px solid #E5E7EB;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1A202E;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-body { padding: 16px; }
+
+  /* ── Drawer ── */
+  .drawer-wrap {
+    display: flex;
+    gap: 0;
+    position: relative;
+  }
+  .drawer-main { flex: 1; min-width: 0; }
+  .drawer-panel {
+    width: 300px;
+    flex-shrink: 0;
+    background: white;
+    border-left: 1px solid #E5E7EB;
+    display: flex;
+    flex-direction: column;
+  }
+  .drawer-header {
+    background: #F7F5FF;
+    padding: 14px 16px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .drawer-title { font-size: 14px; font-weight: 700; color: #1A202E; }
+  .drawer-sub { font-size: 12px; color: #6B7280; margin-top: 2px; }
+  .drawer-body { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+  .drawer-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #E5E7EB;
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ── Form fields ── */
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 12px; font-weight: 600; color: #374151; }
+
+  /* ── Priority radio ── */
+  .priority-group { display: flex; gap: 6px; }
+  .priority-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #6B7280;
+  }
+  .priority-btn.selected-high { border-color: #EF4444; background: #FEE2E2; color: #991B1B; }
+  .priority-btn.selected-medium { border-color: #F59E0B; background: #FEF9C3; color: #854D0E; }
+  .priority-btn.selected-low { border-color: #22C55E; background: #DCFCE7; color: #166534; }
+
+  /* ── Case item row ── */
+  .case-item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+  .case-item-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .case-item-body { flex: 1; min-width: 0; }
+  .case-item-type { font-weight: 600; color: #1A202E; font-size: 11px; font-family: 'SF Mono','Fira Code',monospace; }
+  .case-item-name { color: #374151; margin-top: 1px; }
+  .case-item-res { color: #6B7280; font-size: 11px; margin-top: 2px; }
+  .case-item-x { color: #9CA3AF; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+  .case-item-x:hover { color: #EF4444; }
+
+  /* ── SLA badge ── */
+  .sla-ok    { color: #166534; font-size: 12px; font-weight: 500; }
+  .sla-warn  { color: #D97706; font-size: 12px; font-weight: 600; }
+  .sla-over  { color: #DC2626; font-size: 12px; font-weight: 600; }
+
+  /* ── Items count ── */
+  .items-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6B7280;
+  }
+  .items-bar .resolved { color: #166534; font-weight: 600; }
+
+  /* ── Detail panel ── */
+  .detail-panel {
+    width: 42%;
+    flex-shrink: 0;
+    background: white;
+    border-left: 1px solid #E5E7EB;
+    display: flex;
+    flex-direction: column;
+    max-height: 700px;
+    overflow-y: auto;
+  }
+  .detail-header {
+    background: #F7F5FF;
+    padding: 16px 18px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .detail-title { font-size: 15px; font-weight: 700; color: #1A202E; margin-bottom: 8px; }
+  .detail-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .detail-sla-row { margin-bottom: 8px; }
+  .detail-sla-label { font-size: 12px; color: #6B7280; margin-bottom: 4px; }
+  .detail-assigned { font-size: 12px; color: #6B7280; display: flex; align-items: center; gap: 6px; }
+
+  /* ── Detail tabs ── */
+  .detail-tabs {
+    display: flex;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .detail-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #6B7280;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .detail-tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+
+  .detail-items { padding: 14px 16px; flex: 1; overflow-y: auto; }
+  .di-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .di-row:last-child { border-bottom: none; }
+  .di-status { font-size: 16px; flex-shrink: 0; }
+  .di-body { flex: 1; min-width: 0; }
+  .di-type { font-size: 11px; font-family: 'SF Mono','Fira Code',monospace; color: #5B21B6; font-weight: 600; }
+  .di-name { font-size: 13px; font-weight: 500; color: #1A202E; margin: 2px 0; }
+  .di-sub { font-size: 12px; color: #6B7280; }
+
+  .detail-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #E5E7EB;
+    display: flex;
+    gap: 8px;
+    background: white;
+    flex-shrink: 0;
+  }
+
+  /* ── Active cases badge ── */
+  .ac-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .ac-none { color: #9CA3AF; }
+  .ac-amber { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+  .ac-red   { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+
+  /* ── Tooltip ── */
+  .tooltip-wrap { position: relative; display: inline-flex; }
+  .tooltip-tip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1A202E;
+    color: white;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .tooltip-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #1A202E;
+  }
+
+  /* ── Compliance portal (merchant) ── */
+  .comply-nav {
+    background: #1E3A8A;
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .comply-nav-left { display: flex; align-items: center; gap: 12px; }
+  .comply-logo {
+    background: white;
+    color: #1E3A8A;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    letter-spacing: -.3px;
+  }
+  .comply-nav-title { color: #BFDBFE; font-size: 14px; font-weight: 600; }
+  .comply-nav-right { display: flex; align-items: center; gap: 16px; }
+  .comply-company { color: white; font-size: 13px; font-weight: 500; }
+  .comply-bell { color: #BFDBFE; font-size: 18px; cursor: pointer; }
+  .comply-avatar {
+    width: 30px; height: 30px;
+    background: #3B82F6;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 12px; font-weight: 700;
+  }
+
+  .comply-hero {
+    background: linear-gradient(135deg, #1E3A8A 0%, #2563eb 100%);
+    padding: 24px 28px;
+    color: white;
+  }
+  .comply-hero h1 { font-size: 20px; font-weight: 700; }
+  .comply-hero p { font-size: 13px; color: #BFDBFE; margin-top: 3px; }
+
+  .comply-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding: 20px 24px;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .comply-card {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .comply-card-label { font-size: 11px; color: #6B7280; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; }
+  .comply-card-value { font-size: 26px; font-weight: 700; color: #1A202E; margin: 4px 0; }
+  .comply-card-badge { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; }
+  .badge-red-dot::before { content: '●'; color: #DC2626; margin-right: 3px; font-size: 8px; }
+  .badge-urgent { background: #FEF3C7; color: #92400E; }
+  .badge-good   { background: #DCFCE7; color: #166534; }
+  .badge-complete { background: #DCFCE7; color: #166534; }
+
+  /* ── Case detail (merchant) ── */
+  .merchant-detail {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .merchant-detail-header {
+    background: #F7F5FF;
+    padding: 18px 20px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .merchant-detail-title { font-size: 17px; font-weight: 700; color: #1A202E; }
+  .merchant-detail-meta { font-size: 12px; color: #6B7280; margin-top: 4px; }
+  .merchant-detail-sla {
+    margin-top: 10px;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .merchant-detail-sla-info { flex: 1; }
+  .merchant-detail-sla-label { font-size: 11px; color: #6B7280; }
+  .merchant-detail-sla-value { font-size: 13px; font-weight: 600; color: #1A202E; }
+
+  .merchant-summary-box {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 16px 20px 0;
+    font-size: 13px;
+    color: #1E40AF;
+    line-height: 1.6;
+  }
+
+  /* ── Response item (merchant) ── */
+  .res-item {
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 16px 20px 0;
+  }
+  .res-item:last-child { margin-bottom: 20px; }
+  .res-item-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .res-item-body { padding: 14px 16px; }
+  .res-item-desc { font-size: 13px; color: #374151; line-height: 1.6; margin-bottom: 14px; }
+  .res-required { font-size: 12px; font-weight: 600; color: #1A202E; margin-bottom: 10px; }
+  .upload-zone {
+    border: 2px dashed #CBD5E1;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    background: #F8FAFC;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .upload-zone:hover { border-color: #2563eb; background: #EFF6FF; }
+  .upload-icon { font-size: 28px; margin-bottom: 6px; }
+  .upload-text { font-size: 13px; color: #6B7280; }
+  .upload-text strong { color: #2563eb; }
+
+  /* ── Email mockup ── */
+  .email-card {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  .email-header {
+    background: #F8FAFC;
+    padding: 12px 16px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .email-field { display: flex; gap: 10px; padding: 3px 0; }
+  .email-field-label { color: #9CA3AF; font-size: 12px; min-width: 50px; }
+  .email-field-value { color: #1A202E; font-size: 12px; }
+  .email-body { padding: 20px 24px; }
+  .email-greeting { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1A202E; }
+  .email-p { color: #374151; line-height: 1.7; margin-bottom: 14px; }
+  .email-cta {
+    display: inline-block;
+    background: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  .email-meta { font-size: 12px; color: #6B7280; line-height: 1.8; }
+
+  /* ── Routing diagram ── */
+  .route-diagram {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 13px;
+  }
+  .route-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+  .route-row:last-child { margin-bottom: 0; }
+  .route-row.existing { background: #F3F4F6; }
+  .route-row.new-route { background: #EFF6FF; border: 1px dashed #BFDBFE; }
+  .route-role { font-weight: 600; color: #1A202E; min-width: 220px; }
+  .route-arrow { color: #6B7280; font-size: 16px; }
+  .route-dest { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; }
+  .route-dest.new { color: #2563eb; font-weight: 600; }
+  .route-dest.existing { color: #6B7280; }
+  .route-new-chip {
+    background: #DCFCE7;
+    color: #166534;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: .04em;
+  }
+
+  /* ── Roadmap ── */
+  .roadmap-wrap { display: flex; gap: 16px; flex-wrap: wrap; }
+  .roadmap-phase {
+    flex: 1;
+    min-width: 260px;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .roadmap-phase-header {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .phase1-h { background: #EFF6FF; color: #1E40AF; }
+  .phase2-h { background: #F5F3FF; color: #5B21B6; }
+  .phase3-h { background: #F0FDF4; color: #166534; }
+  .roadmap-phase-target { font-size: 11px; font-weight: 400; margin-top: 2px; opacity: .75; }
+  .roadmap-items { padding: 12px 0; }
+  .roadmap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 16px;
+    font-size: 13px;
+    color: #374151;
+  }
+  .roadmap-item.done { color: #1A202E; }
+  .roadmap-item.done .ri-icon { color: #16a34a; }
+  .roadmap-item .ri-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; color: #9CA3AF; }
+
+  /* ── We Monitor table ── */
+  .wm-th { color: #2563eb !important; }
+  .wm-th-new { color: #2563eb !important; background: #EFF6FF !important; }
+
+  /* ── Actions dropdown ── */
+  .action-dropdown {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    overflow: hidden;
+    min-width: 220px;
+  }
+  .action-item {
+    padding: 9px 14px;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .action-item:hover { background: #F9FAFB; }
+  .action-item.new { color: #2563eb; font-weight: 500; }
+  .action-divider { height: 1px; background: #E5E7EB; margin: 2px 0; }
+
+  /* ── Chip ── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  .chip-new      { background: #DBEAFE; color: #1E40AF; }
+  .chip-ongoing  { background: #FEF3C7; color: #92400E; }
+
+  /* ── NEW badge ── */
+  .new-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #DBEAFE;
+    color: #1E40AF;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .7; }
+  }
+
+  /* ── Respond button urgency ── */
+  .btn-respond-urgent {
+    background: white;
+    color: #DC2626;
+    border: 1.5px solid #FCA5A5;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-respond-urgent:hover { background: #FEF2F2; }
+
+  /* row highlight */
+  .row-urgent { background: #FFFBEB !important; }
+  .row-selected { background: #EFF6FF !important; }
+
+  /* Badge new label */
+  .label-new {
+    background: #DCFCE7;
+    color: #166534;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: .04em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ PROTO NAV ══════════════════════ -->
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span class="sep">/</span>
+  <span class="crumb">Case Management &amp; Compliance Portal — QP-3579 through QP-3586</span>
+</nav>
+
+<div class="page-content">
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 1: Data Model Overview — QP-3579
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">QP-3579 — Data Model Overview</div>
+  <p class="section-desc">Three net-new PostgreSQL tables forming the compliance case infrastructure. Zero existing infrastructure — PlLitigationCase (court cases) and PlAuditTask (license review) are separate domains.</p>
+
+  <!-- ERD -->
+  <div class="app-frame" style="padding: 24px;">
+    <div class="erd-wrap">
+
+      <!-- PlComplianceCase -->
+      <div class="entity-card">
+        <div class="entity-header">
+          <span class="entity-icon">📋</span>
+          PlComplianceCase
+        </div>
+        <div class="entity-field"><span class="field-name">id</span><span class="field-type">uuid PK</span></div>
+        <div class="entity-field"><span class="field-name">plMerchantProcessorClientId</span><span class="field-fk">FK → MPC</span></div>
+        <div class="entity-field"><span class="field-name">plClientCompanyId</span><span class="field-fk">FK → Company</span></div>
+        <div class="entity-field"><span class="field-name">plMerchantProcessorCompanyId</span><span class="field-fk">FK → Processor</span></div>
+        <div class="entity-field"><span class="field-name">createdByUserId</span><span class="field-fk">FK → User</span></div>
+        <div class="entity-field"><span class="field-name">assignedToUserId</span><span class="field-fk">FK → User</span></div>
+        <div class="entity-field"><span class="field-name">title</span><span class="field-type">varchar</span></div>
+        <div class="entity-field"><span class="field-name">status</span><span class="field-enum">DRAFT|OPEN|AWAITING_RESPONSE|IN_REVIEW|DISPUTED|RESOLVED|CLOSED</span></div>
+        <div class="entity-field"><span class="field-name">priority</span><span class="field-enum">HIGH|MEDIUM|LOW</span></div>
+        <div class="entity-field"><span class="field-name">slaDeadlineAt</span><span class="field-type">timestamptz</span></div>
+        <div class="entity-field"><span class="field-name">resolvedAt</span><span class="field-type">timestamptz?</span></div>
+        <div class="entity-field"><span class="field-name">closedAt</span><span class="field-type">timestamptz?</span></div>
+        <div class="entity-field"><span class="field-name">metadata</span><span class="field-type">jsonb</span></div>
+      </div>
+
+      <!-- connector 1 -->
+      <div class="erd-connector">
+        <span style="font-size:11px;color:#6B7280;">has many</span>
+        <span class="erd-arrow">→</span>
+      </div>
+
+      <!-- PlComplianceCaseItem -->
+      <div class="entity-card">
+        <div class="entity-header">
+          <span class="entity-icon">🔎</span>
+          PlComplianceCaseItem
+        </div>
+        <div class="entity-field"><span class="field-name">id</span><span class="field-type">uuid PK</span></div>
+        <div class="entity-field"><span class="field-name">plComplianceCaseId</span><span class="field-fk">FK → Case</span></div>
+        <div class="entity-field"><span class="field-name">itemType</span><span class="field-enum">COMPLIANCE_FINDING|PRODUCT_MISSING_COA|COA_EXPIRED|COA_VIOLATIVE|LICENSE_ISSUE|MANUAL</span></div>
+        <div class="entity-field"><span class="field-name">plComplianceFindingId</span><span class="field-fk">FK? → Finding</span></div>
+        <div class="entity-field"><span class="field-name">plProductId</span><span class="field-fk">FK? → Product</span></div>
+        <div class="entity-field"><span class="field-name">vaultCoaId</span><span class="field-fk">FK? → COA</span></div>
+        <div class="entity-field"><span class="field-name">plCompanyLicenseId</span><span class="field-fk">FK? → License</span></div>
+        <div class="entity-field"><span class="field-name">description</span><span class="field-type">text</span></div>
+        <div class="entity-field"><span class="field-name">severity</span><span class="field-enum">HIGH|MEDIUM|LOW</span></div>
+        <div class="entity-field"><span class="field-name">resolutionType</span><span class="field-enum">UPLOAD_COA|CORRECT_COA|REMOVE_PRODUCT|CORRECT_WEBSITE|ATTEST_CORRECTED|OTHER</span></div>
+        <div class="entity-field"><span class="field-name">resolvedAt</span><span class="field-type">timestamptz?</span></div>
+      </div>
+
+      <!-- connector 2 -->
+      <div class="erd-connector">
+        <span style="font-size:11px;color:#6B7280;">has many</span>
+        <span class="erd-arrow">→</span>
+      </div>
+
+      <!-- PlComplianceCaseResponse -->
+      <div class="entity-card">
+        <div class="entity-header">
+          <span class="entity-icon">💬</span>
+          PlComplianceCaseResponse
+        </div>
+        <div class="entity-field"><span class="field-name">id</span><span class="field-type">uuid PK</span></div>
+        <div class="entity-field"><span class="field-name">plComplianceCaseId</span><span class="field-fk">FK → Case</span></div>
+        <div class="entity-field"><span class="field-name">submittedByUserId</span><span class="field-fk">FK → User</span></div>
+        <div class="entity-field"><span class="field-name">responseType</span><span class="field-enum">CORRECTIVE_ACTION|ATTESTATION|DISPUTE|REQUEST_EXTENSION|CLARIFICATION</span></div>
+        <div class="entity-field"><span class="field-name">message</span><span class="field-type">text</span></div>
+        <div class="entity-field"><span class="field-name">evidenceS3ResourceIds</span><span class="field-type">uuid[]</span></div>
+        <div class="entity-field"><span class="field-name">status</span><span class="field-enum">PENDING|ACCEPTED|REJECTED</span></div>
+        <div class="entity-field"><span class="field-name">reviewedByUserId</span><span class="field-fk">FK? → User</span></div>
+        <div class="entity-field"><span class="field-name">reviewNote</span><span class="field-type">text?</span></div>
+      </div>
+    </div>
+
+    <!-- Status Machine -->
+    <div style="margin-top:32px;">
+      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em;">Status Machine</div>
+      <div class="state-machine">
+        <div class="state-node">
+          <div class="state-box pill-draft">DRAFT</div>
+          <div class="state-label">created</div>
+        </div>
+        <span class="state-arrow">→</span>
+        <div class="state-node">
+          <div class="state-box pill-open">OPEN</div>
+          <div class="state-label">send to merchant</div>
+        </div>
+        <span class="state-arrow">→</span>
+        <div class="state-node">
+          <div class="state-box pill-awaiting">AWAITING_RESPONSE</div>
+          <div class="state-label">merchant notified</div>
+        </div>
+        <span class="state-arrow">→</span>
+        <div class="state-node">
+          <div class="state-box pill-review">IN_REVIEW</div>
+          <div class="state-label">merchant responds</div>
+        </div>
+        <span class="state-arrow">→</span>
+        <div class="state-node">
+          <div class="state-box pill-resolved">RESOLVED</div>
+          <div class="state-label">all items resolved</div>
+        </div>
+        <span class="state-arrow">→</span>
+        <div class="state-node">
+          <div class="state-box pill-closed">CLOSED</div>
+          <div class="state-label">archived</div>
+        </div>
+      </div>
+      <!-- Dispute branch -->
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0 0 160px;font-size:12px;color:#6B7280;">
+        <span style="color:#EF4444;font-size:16px;">↕</span>
+        <span>AWAITING_RESPONSE or IN_REVIEW can branch to</span>
+        <span class="state-box pill-disputed" style="font-size:12px;padding:3px 10px;">DISPUTED</span>
+        <span style="color:#9CA3AF;">→ requires escalation</span>
+      </div>
+    </div>
+
+    <div class="annotation" style="margin-top:20px;">
+      <strong>Architecture note:</strong> Zero existing case infrastructure — all 3 tables are net-new.
+      <code>PlLitigationCase</code> (court cases) and <code>PlAuditTask</code> (license review) are separate domains and remain untouched.
+      These tables live in the <code>pl_</code> schema alongside existing entities.
+    </div>
+  </div><!-- /app-frame -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 2: Case Creation Entry Points — QP-3581, QP-3582
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">QP-3581 / QP-3582 — Case Creation Entry Points</div>
+  <p class="section-desc">The "Create Case" action surfaces in two existing screens: Q-ScanAI Findings and Product Compliance Table. Both use the same <code>CaseDraftDrawer</code> component; itemType is auto-detected from context.</p>
+
+  <div class="app-frame">
+    <div class="drawer-wrap" style="min-height:480px;">
+      <!-- Main area: two panels side by side -->
+      <div class="drawer-main" style="display:flex;gap:0;border-right:1px solid #E5E7EB;">
+
+        <!-- Left: Q-ScanAI Findings -->
+        <div style="flex:1;min-width:0;border-right:1px solid #E5E7EB;">
+          <div class="panel-header" style="border-radius:0;background:#F7F5FF;border-bottom:1px solid #E5E7EB;">
+            <span>🔍</span>
+            <span>Q-ScanAI Findings — QP-3581</span>
+          </div>
+          <div style="padding:14px;">
+            <!-- Findings table -->
+            <table style="margin-bottom:12px;">
+              <thead>
+                <tr>
+                  <th style="width:28px;"></th>
+                  <th>Severity</th>
+                  <th>Finding</th>
+                  <th>Status</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row-selected">
+                  <td><div class="cb checked">✓</div></td>
+                  <td><span class="pill pill-high">HIGH</span></td>
+                  <td style="font-size:13px;font-weight:500;">Privacy Policy Missing</td>
+                  <td><span class="chip chip-new">NEW</span></td>
+                  <td class="td-muted">Q-AI Scan</td>
+                </tr>
+                <tr class="row-selected">
+                  <td><div class="cb checked">✓</div></td>
+                  <td><span class="pill pill-high">HIGH</span></td>
+                  <td style="font-size:13px;font-weight:500;">Violative Term "delta-9"</td>
+                  <td><span class="chip chip-ongoing">ONGOING</span></td>
+                  <td class="td-muted">Q-AI Scan</td>
+                </tr>
+                <tr>
+                  <td><div class="cb"></div></td>
+                  <td><span class="pill pill-medium">MEDIUM</span></td>
+                  <td style="font-size:13px;">Age Verification Missing</td>
+                  <td><span class="chip chip-new">NEW</span></td>
+                  <td class="td-muted">Q-AI Scan</td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Bulk action bar -->
+            <div class="bulk-bar">
+              <span>2 selected</span>
+              <div class="divider"></div>
+              <button class="btn btn-primary btn-sm">📋 Create Case</button>
+              <button class="btn btn-outline btn-sm">⬆ Export Findings</button>
+              <button class="btn btn-outline btn-sm">✏ Bulk Edit</button>
+              <button class="btn btn-outline btn-sm">✓ Mark Reviewed</button>
+              <button class="btn btn-ghost btn-sm">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Product Compliance Table -->
+        <div style="flex:1;min-width:0;">
+          <div class="panel-header" style="border-radius:0;background:#F7F5FF;border-bottom:1px solid #E5E7EB;">
+            <span>🧪</span>
+            <span>Product Compliance — QP-3582</span>
+          </div>
+          <div style="padding:14px;">
+            <!-- Product table -->
+            <table style="margin-bottom:12px;">
+              <thead>
+                <tr>
+                  <th style="width:28px;"></th>
+                  <th>Product</th>
+                  <th>COA Status</th>
+                  <th>Item Type (auto)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row-selected">
+                  <td><div class="cb checked">✓</div></td>
+                  <td style="font-size:13px;font-weight:500;">Gummy Bears 500mg</td>
+                  <td><span style="color:#991B1B;font-size:12px;font-weight:600;">⊗ Missing COA</span></td>
+                  <td><span class="td-code">PRODUCT_MISSING_COA</span></td>
+                </tr>
+                <tr class="row-selected">
+                  <td><div class="cb checked">✓</div></td>
+                  <td style="font-size:13px;font-weight:500;">Tincture 1000mg</td>
+                  <td><span style="color:#854D0E;font-size:12px;font-weight:600;">⚠ COA Expired</span></td>
+                  <td><span class="td-code">COA_EXPIRED</span></td>
+                </tr>
+                <tr>
+                  <td><div class="cb"></div></td>
+                  <td style="font-size:13px;">Capsules 25mg</td>
+                  <td><span style="color:#166534;font-size:12px;font-weight:600;">✓ COA Validated</span></td>
+                  <td><span style="color:#9CA3AF;font-size:11px;">—</span></td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Toolbar -->
+            <div class="bulk-bar">
+              <span>2 selected</span>
+              <div class="divider"></div>
+              <button class="btn btn-primary btn-sm">📋 Create Case (2)</button>
+              <button class="btn btn-outline btn-sm">⬆ Export</button>
+              <button class="btn btn-ghost btn-sm">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CaseDraftDrawer -->
+      <div class="drawer-panel">
+        <div class="drawer-header">
+          <div class="drawer-title">Create Compliance Case</div>
+          <div class="drawer-sub">2 items selected</div>
+        </div>
+        <div class="drawer-body">
+          <div class="form-group">
+            <label class="form-label">Case Title</label>
+            <input class="input" type="text" value="Product Compliance — Westtown Payments — Apr 1, 2026" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <div class="priority-group">
+              <div class="priority-btn selected-high">● High</div>
+              <div class="priority-btn">○ Medium</div>
+              <div class="priority-btn">○ Low</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">SLA Deadline</label>
+            <div style="position:relative;">
+              <input class="input" type="text" value="Apr 8, 2026 (7 days)" readonly style="padding-right:32px;background:#F9FAFB;" />
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#9CA3AF;font-size:14px;">📅</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Case Items</label>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div class="case-item-row">
+                <span class="case-item-icon">🔴</span>
+                <div class="case-item-body">
+                  <div class="case-item-type">PRODUCT_MISSING_COA</div>
+                  <div class="case-item-name">Gummy Bears 500mg</div>
+                  <div class="case-item-res">Resolution: Upload COA</div>
+                </div>
+                <span class="case-item-x">×</span>
+              </div>
+              <div class="case-item-row">
+                <span class="case-item-icon">🟡</span>
+                <div class="case-item-body">
+                  <div class="case-item-type">COA_EXPIRED</div>
+                  <div class="case-item-name">Tincture 1000mg</div>
+                  <div class="case-item-res">Resolution: Upload COA</div>
+                </div>
+                <span class="case-item-x">×</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assign To</label>
+            <select class="select" style="width:100%;">
+              <option>S. Johnson</option>
+              <option>M. Davis</option>
+              <option>R. Wilson</option>
+            </select>
+          </div>
+        </div>
+        <div class="drawer-footer">
+          <button class="btn btn-outline" style="flex:1;">Save as Draft</button>
+          <button class="btn btn-primary" style="flex:1;">Send to Merchant →</button>
+        </div>
+      </div>
+    </div><!-- /drawer-wrap -->
+
+    <div style="padding:0 16px 16px;">
+      <div class="annotation">
+        <strong>CaseDraftDrawer:</strong> Same component reused across Q-ScanAI and Product Compliance entry points.
+        <code>itemType</code> auto-detected from data: <code>COMPLIANCE_FINDING</code> for scan findings,
+        <code>PRODUCT_MISSING_COA</code> / <code>COA_EXPIRED</code> / <code>COA_VIOLATIVE</code> for products.
+        "Send to Merchant" transitions status <code>DRAFT → OPEN → AWAITING_RESPONSE</code> and triggers invite email.
+      </div>
+    </div>
+  </div><!-- /app-frame -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 3: We Monitor — Active Cases Column — QP-3583
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">QP-3583 — We Monitor: Active Cases Column</div>
+  <p class="section-desc">New "Active Cases" column added to the We Monitor monitored companies table. LEFT JOIN on <code>pl_compliance_case</code>. Feature-gated by <code>QMonitorWeMonitorActiveCasesColumn</code>.</p>
+
+  <div class="app-frame">
+    <div style="padding:0;">
+      <!-- We Monitor tab header (simulated) -->
+      <div style="background:#F7F5FF;padding:10px 20px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:13px;font-weight:700;color:#1A202E;">We Monitor</span>
+        <span style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm">⬆ Export</button>
+          <button class="btn btn-outline btn-sm">Columns ▼</button>
+          <button class="btn btn-outline btn-sm">Filter ▼</button>
+        </span>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th class="wm-th">Legal Name</th>
+              <th class="wm-th">DBA Names</th>
+              <th class="wm-th-new" style="background:#EFF6FF !important;">
+                Active Cases
+                <span class="label-new" style="margin-left:5px;">NEW</span>
+              </th>
+              <th class="wm-th">License Status</th>
+              <th class="wm-th">Website Compliance</th>
+              <th class="wm-th">Product Compliance</th>
+              <th class="wm-th">Website</th>
+              <th class="wm-th">Scans</th>
+              <th class="wm-th">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1: 3 cases (red) -->
+            <tr>
+              <td style="font-weight:600;color:#1A202E;">3 Tall Pines LLC</td>
+              <td class="td-muted">—</td>
+              <td style="background:#FFF5F5;">
+                <div class="tooltip-wrap">
+                  <span class="ac-badge ac-red">3</span>
+                  <div class="tooltip-tip">3 active cases · Click to view →</div>
+                </div>
+              </td>
+              <td><span style="color:#6B7280;font-size:13px;">ⓘ Validating</span></td>
+              <td><span style="color:#991B1B;font-size:12px;font-weight:600;">⚠ 5 High</span></td>
+              <td><span style="color:#374151;font-size:12px;">99+ Products</span></td>
+              <td><a href="#" style="color:#2563eb;font-size:12px;">↗ site</a></td>
+              <td><a href="#" style="color:#2563eb;font-size:12px;">View →</a></td>
+              <td><button class="btn btn-outline btn-sm">Actions ▼</button></td>
+            </tr>
+            <!-- Row 2: 1 case (amber) -->
+            <tr>
+              <td style="font-weight:600;color:#1A202E;">Sunshine Wellness Products</td>
+              <td class="td-muted">Sunshine Supplements</td>
+              <td>
+                <span class="ac-badge ac-amber">1</span>
+              </td>
+              <td><span style="color:#166534;font-size:13px;font-weight:600;">✓ Active</span></td>
+              <td><span style="color:#991B1B;font-size:12px;font-weight:600;">⚠ 2 High</span></td>
+              <td><span style="color:#374151;font-size:12px;">45 Products</span></td>
+              <td><a href="#" style="color:#2563eb;font-size:12px;">↗ site</a></td>
+              <td><a href="#" style="color:#2563eb;font-size:12px;">View →</a></td>
+              <td><button class="btn btn-outline btn-sm">Actions ▼</button></td>
+            </tr>
+            <!-- Row 3: 0 cases (grey dash) -->
+            <tr>
+              <td style="font-weight:600;color:#1A202E;">Aficionado Designs LLC</td>
+              <td class="td-muted">—</td>
+              <td><span class="ac-none">—</span></td>
+              <td><span style="color:#6B7280;font-size:13px;">ⓘ Validating</span></td>
+              <td><span style="color:#166534;font-size:12px;font-weight:600;">✓ Compliant</span></td>
+              <td><span style="color:#374151;font-size:12px;">12 Products</span></td>
+              <td><a href="#" style="color:#2563eb;font-size:12px;">↗ site</a></td>
+              <td><a href="#" style="color:#2563eb;font-size:12px;">View →</a></td>
+              <td><button class="btn btn-outline btn-sm">Actions ▼</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="padding:12px 16px;">
+        <div class="annotation">
+          <strong>Active Cases column</strong> added to <code>MonitoredColumnEnum</code>.
+          Query: <code>LEFT JOIN pl_compliance_case ON … WHERE status NOT IN ('CLOSED','RESOLVED')</code>.
+          Color thresholds: 0 = grey "—", 1–2 = amber pill, 3+ = red pill.
+          Click navigates to <code>/qmonitor/cases?merchantId=…</code>.
+          Feature flag: <code>QMonitorWeMonitorActiveCasesColumn</code>.
+        </div>
+      </div>
+    </div>
+  </div><!-- /app-frame -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 4: Internal Case Management — QP-3584
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">QP-3584 — Internal Case Management Screen (/qmonitor/cases)</div>
+  <p class="section-desc">New route added to QMonitorLayout. Full case list with filtering, sorting, bulk actions, and a slide-out detail panel for the processor-side team.</p>
+
+  <div class="app-frame">
+    <!-- Q-Monitor tab nav -->
+    <div class="qmon-nav">
+      <div class="qmon-nav-logo">Q-Monitor</div>
+      <div class="qmon-tab">Dashboard</div>
+      <div class="qmon-tab">Pipeline</div>
+      <div class="qmon-tab">Findings</div>
+      <div class="qmon-tab">Product Compliance</div>
+      <div class="qmon-tab active">Cases</div>
+      <div class="qmon-tab">Monitored Companies</div>
+      <div class="qmon-tab">Reports</div>
+    </div>
+
+    <!-- Page header -->
+    <div style="padding:16px 20px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h2 style="font-size:18px;font-weight:700;color:#1A202E;">Compliance Cases</h2>
+        <p style="font-size:12px;color:#6B7280;margin-top:2px;">Manage open, disputed, and resolved compliance cases across all monitored merchants.</p>
+      </div>
+      <button class="btn btn-primary">+ New Case</button>
+    </div>
+
+    <!-- Toolbar -->
+    <div style="padding:12px 20px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#FAFAFA;">
+      <div class="toolbar-search">
+        <input type="text" placeholder="Search by merchant or case title..." />
+      </div>
+      <select class="select"><option>Status ▼</option></select>
+      <select class="select"><option>Priority ▼</option></select>
+      <select class="select"><option>Merchant ▼</option></select>
+      <select class="select"><option>Assigned To ▼</option></select>
+      <select class="select"><option>Date Range ▼</option></select>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:12px;color:#6B7280;">Active filters:</span>
+        <span class="filter-chip">Status: Open <span class="x">×</span></span>
+      </div>
+    </div>
+
+    <!-- Bulk action bar -->
+    <div style="padding:8px 20px;background:#EFF6FF;border-bottom:1px solid #BFDBFE;">
+      <div class="bulk-bar" style="background:transparent;border:none;padding:0;">
+        <span>2 cases selected</span>
+        <div class="divider"></div>
+        <button class="btn btn-outline btn-sm">Reassign ▼</button>
+        <button class="btn btn-outline btn-sm">Close Cases</button>
+        <button class="btn btn-outline btn-sm">Update SLA</button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto;">Clear Selection</button>
+      </div>
+    </div>
+
+    <!-- Case table + detail panel -->
+    <div style="display:flex;">
+      <!-- Table -->
+      <div style="flex:1;min-width:0;overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px;"><div class="cb" style="border-color:#94A3B8;"></div></th>
+              <th>Case</th>
+              <th>Merchant</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Items</th>
+              <th>SLA Deadline</th>
+              <th>Assigned To</th>
+              <th>Last Activity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1: selected, OPEN -->
+            <tr class="row-selected" style="cursor:pointer;">
+              <td><div class="cb checked">✓</div></td>
+              <td>
+                <div style="font-size:12px;font-weight:700;color:#2563eb;">CR-2026-0001</div>
+                <div style="font-size:13px;font-weight:500;color:#1A202E;margin-top:1px;">Product Compliance — Westtown Payments</div>
+              </td>
+              <td><span style="font-size:13px;">Westtown Payments LLC</span></td>
+              <td><span class="pill pill-open">OPEN</span></td>
+              <td><span class="pill pill-high">HIGH</span></td>
+              <td>
+                <div class="items-bar">
+                  <span class="resolved">3</span><span>/5 resolved</span>
+                </div>
+              </td>
+              <td><span class="sla-ok">Apr 8 (7d)</span></td>
+              <td><span style="font-size:13px;">S. Johnson</span></td>
+              <td class="td-muted">2 hours ago</td>
+              <td style="white-space:nowrap;">
+                <button class="btn btn-primary btn-sm">View</button>
+                <button class="btn btn-ghost btn-sm">···</button>
+              </td>
+            </tr>
+            <!-- Row 2: selected, AWAITING -->
+            <tr class="row-selected" style="cursor:pointer;">
+              <td><div class="cb checked">✓</div></td>
+              <td>
+                <div style="font-size:12px;font-weight:700;color:#2563eb;">CR-2026-0002</div>
+                <div style="font-size:13px;font-weight:500;color:#1A202E;margin-top:1px;">KYC Documentation — Sunshine Wellness</div>
+              </td>
+              <td><span style="font-size:13px;">Sunshine Wellness Products</span></td>
+              <td><span class="pill pill-awaiting">AWAITING</span></td>
+              <td><span class="pill pill-high">HIGH</span></td>
+              <td><div class="items-bar"><span>0</span><span>/4 resolved</span></div></td>
+              <td><span class="sla-over">Apr 5 (2d) ⚠</span></td>
+              <td><span style="font-size:13px;">M. Davis</span></td>
+              <td class="td-muted">1 day ago</td>
+              <td style="white-space:nowrap;">
+                <button class="btn btn-primary btn-sm">View</button>
+                <button class="btn btn-outline btn-sm" style="color:#1E40AF;border-color:#BFDBFE;">Review (4)</button>
+              </td>
+            </tr>
+            <!-- Row 3: IN_REVIEW -->
+            <tr style="cursor:pointer;">
+              <td><div class="cb"></div></td>
+              <td>
+                <div style="font-size:12px;font-weight:700;color:#2563eb;">CR-2026-0003</div>
+                <div style="font-size:13px;font-weight:500;color:#1A202E;margin-top:1px;">Website Compliance Review</div>
+              </td>
+              <td><span style="font-size:13px;">Aficionado Seeds</span></td>
+              <td><span class="pill pill-review">IN_REVIEW</span></td>
+              <td><span class="pill pill-medium">MEDIUM</span></td>
+              <td><div class="items-bar"><span class="resolved">2</span><span>/3 resolved</span></div></td>
+              <td><span class="sla-ok">Apr 12 (11d)</span></td>
+              <td><span style="font-size:13px;">R. Wilson</span></td>
+              <td class="td-muted">3 hours ago</td>
+              <td style="white-space:nowrap;">
+                <button class="btn btn-primary btn-sm">View</button>
+                <button class="btn btn-outline btn-sm">Accept/Reject</button>
+              </td>
+            </tr>
+            <!-- Row 4: DISPUTED -->
+            <tr style="cursor:pointer;">
+              <td><div class="cb"></div></td>
+              <td>
+                <div style="font-size:12px;font-weight:700;color:#2563eb;">CR-2026-0004</div>
+                <div style="font-size:13px;font-weight:500;color:#1A202E;margin-top:1px;">License Verification</div>
+              </td>
+              <td><span style="font-size:13px;">3 Tall Pines LLC</span></td>
+              <td><span class="pill pill-disputed">DISPUTED</span></td>
+              <td><span class="pill pill-high">HIGH</span></td>
+              <td><div class="items-bar"><span class="resolved">1</span><span>/2 resolved</span></div></td>
+              <td><span class="sla-over">⚠ OVERDUE (−2d)</span></td>
+              <td><span style="font-size:13px;">S. Johnson</span></td>
+              <td class="td-muted">5 days ago</td>
+              <td style="white-space:nowrap;">
+                <button class="btn btn-primary btn-sm">View</button>
+                <button class="btn btn-danger btn-sm">Escalate</button>
+              </td>
+            </tr>
+            <!-- Row 5: CLOSED -->
+            <tr style="cursor:pointer;">
+              <td><div class="cb"></div></td>
+              <td>
+                <div style="font-size:12px;font-weight:700;color:#2563eb;">CR-2026-0005</div>
+                <div style="font-size:13px;font-weight:500;color:#1A202E;margin-top:1px;">Quarterly Compliance Review</div>
+              </td>
+              <td><span style="font-size:13px;">Metro Financial</span></td>
+              <td><span class="pill pill-closed">CLOSED</span></td>
+              <td><span class="pill pill-low">LOW</span></td>
+              <td><div class="items-bar"><span class="resolved">3</span><span>/3 resolved</span></div></td>
+              <td><span style="font-size:12px;color:#9CA3AF;">Completed</span></td>
+              <td><span style="font-size:13px;">L. Chen</span></td>
+              <td class="td-muted">2 weeks ago</td>
+              <td style="white-space:nowrap;">
+                <button class="btn btn-outline btn-sm">View</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Detail panel (for Row 1) -->
+      <div class="detail-panel">
+        <div class="detail-header">
+          <div class="detail-title">Product Compliance — Westtown Payments</div>
+          <div class="detail-meta">
+            <span class="pill pill-open">OPEN</span>
+            <span class="pill pill-high">HIGH</span>
+            <span class="td-code">CR-2026-0001</span>
+          </div>
+          <div class="detail-sla-row">
+            <div class="detail-sla-label">SLA Deadline — 7 days remaining</div>
+            <div class="progress-wrap" style="margin-top:4px;">
+              <div class="progress-fill progress-green" style="width:75%;"></div>
+            </div>
+          </div>
+          <div class="detail-assigned">
+            <span>👤 S. Johnson</span>
+            <button class="btn btn-ghost btn-sm">Reassign</button>
+          </div>
+        </div>
+
+        <div class="detail-tabs">
+          <div class="detail-tab active">Items</div>
+          <div class="detail-tab">Responses</div>
+          <div class="detail-tab">Activity</div>
+        </div>
+
+        <div class="detail-items" style="flex:1;overflow-y:auto;">
+          <!-- Item 1: RESOLVED -->
+          <div class="di-row">
+            <div class="di-status">✅</div>
+            <div class="di-body">
+              <div class="di-type">PRODUCT_MISSING_COA</div>
+              <div class="di-name">Gummy Bears 500mg</div>
+              <div class="di-sub">Upload COA · <span style="color:#16a34a;">Resolved Apr 1</span></div>
+            </div>
+            <span class="pill pill-resolved" style="flex-shrink:0;">Resolved</span>
+          </div>
+          <!-- Item 2: PENDING -->
+          <div class="di-row">
+            <div class="di-status">⏳</div>
+            <div class="di-body">
+              <div class="di-type">COA_EXPIRED</div>
+              <div class="di-name">Tincture 1000mg</div>
+              <div class="di-sub">Upload COA · <span style="color:#D97706;">Awaiting merchant</span></div>
+            </div>
+            <span class="pill pill-awaiting" style="flex-shrink:0;font-size:10px;">Pending</span>
+          </div>
+          <!-- Item 3: PENDING -->
+          <div class="di-row">
+            <div class="di-status">⏳</div>
+            <div class="di-body">
+              <div class="di-type">COMPLIANCE_FINDING</div>
+              <div class="di-name">Privacy Policy Missing</div>
+              <div class="di-sub">Correct Website · <span style="color:#D97706;">Awaiting merchant</span></div>
+            </div>
+            <span class="pill pill-awaiting" style="flex-shrink:0;font-size:10px;">Pending</span>
+          </div>
+        </div>
+
+        <div class="detail-footer">
+          <button class="btn btn-outline btn-sm">Send Reminder</button>
+          <button class="btn btn-outline btn-sm">Close Case</button>
+          <button class="btn btn-ghost btn-sm">Export Report</button>
+        </div>
+      </div>
+    </div><!-- /flex -->
+
+    <div style="padding:12px 16px;">
+      <div class="annotation">
+        <strong>New route:</strong> <code>/qmonitor/cases</code> — added to <code>QMonitorLayout</code> nav.
+        SLA countdown goes <strong style="color:#DC2626;">red</strong> at &lt;3 days or overdue.
+        <strong>Bulk actions:</strong> reassign <code>assignedToUserId</code>, bulk close (requires RESOLVED status first), bulk SLA update.
+        Detail panel loads inline (no route change) — clicking "View" opens full-page detail route.
+      </div>
+    </div>
+  </div><!-- /app-frame -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 5: Merchant Portal Auth & Invite Flow — QP-3585
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">QP-3585 — Merchant Portal Auth &amp; Invite Flow</div>
+  <p class="section-desc">New "Invite to Compliance Portal" action added to the We Monitor Actions dropdown. Triggers invite email and sets up merchant access to <code>/comply</code>.</p>
+
+  <div class="app-frame">
+    <div style="padding:20px;">
+      <div class="two-col" style="gap:24px;align-items:flex-start;">
+
+        <!-- Left: Actions dropdown -->
+        <div style="flex:0 0 auto;width:280px;">
+          <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">We Monitor — Actions Dropdown</div>
+          <!-- Trigger button -->
+          <button class="btn btn-outline" style="margin-bottom:8px;width:180px;justify-content:space-between;">Actions <span>▼</span></button>
+          <!-- Dropdown -->
+          <div class="action-dropdown">
+            <div class="action-item">🔍 Scan</div>
+            <div class="action-item">🪪 Run License Check</div>
+            <div class="action-divider"></div>
+            <div class="action-item new">✉️ Invite to Compliance Portal
+              <span class="label-new" style="margin-left:auto;">NEW</span>
+            </div>
+            <div class="action-divider"></div>
+            <div class="action-item" style="color:#9CA3AF;">🗄️ Archive Company</div>
+          </div>
+        </div>
+
+        <!-- Right: Email preview + routing -->
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Invite Email Preview</div>
+            <div class="email-card">
+              <div class="email-header">
+                <div class="email-field">
+                  <span class="email-field-label">From:</span>
+                  <span class="email-field-value">compliance@qredible.com</span>
+                </div>
+                <div class="email-field">
+                  <span class="email-field-label">To:</span>
+                  <span class="email-field-value">compliance@westtownpayments.com</span>
+                </div>
+                <div class="email-field">
+                  <span class="email-field-label">Subject:</span>
+                  <span class="email-field-value" style="font-weight:600;color:#1A202E;">Westtown Payments has shared compliance items requiring your attention</span>
+                </div>
+              </div>
+              <div class="email-body">
+                <div class="email-greeting">Hello,</div>
+                <p class="email-p">You have <strong>3 open compliance cases</strong> that require your attention from <strong>Westtown Payments, LLC</strong>.</p>
+                <a href="#" class="email-cta">View Your Compliance Portal →</a>
+                <div class="email-meta">
+                  <div>Cases include items related to: <strong>Product Compliance, KYC Documentation</strong></div>
+                  <div>SLA Deadline: <strong>April 8, 2026</strong></div>
+                  <div style="margin-top:8px;color:#9CA3AF;font-size:11px;">If you have questions, reply to this email or contact your payment processor directly.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Routing diagram -->
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Post-Login Routing</div>
+            <div class="route-diagram">
+              <div class="route-row new-route">
+                <span class="route-role">MERCHANT_PROCESSOR_CLIENT login</span>
+                <span class="route-arrow">→</span>
+                <span class="route-dest new">/comply</span>
+                <span class="route-new-chip">NEW</span>
+              </div>
+              <div class="route-row existing">
+                <span class="route-role">MERCHANT_PROCESSOR login</span>
+                <span class="route-arrow">→</span>
+                <span class="route-dest existing">/qmonitor</span>
+                <span style="font-size:11px;color:#9CA3AF;">(unchanged)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="annotation" style="margin-top:16px;">
+        <strong>New MailType:</strong> <code>QP_INVITE_COMPLIANCE_PORTAL</code>.
+        <strong>New Handlebars template:</strong> <code>compliancePortalInvite.hbs</code>.
+        <strong>Post-login routing change:</strong> <code>MERCHANT_PROCESSOR_CLIENT</code> plan type routes to <code>/comply</code> instead of <code>/qmonitor/findings</code>.
+        Invite action creates/updates <code>PlMerchantProcessorClient</code> record and sends token-based magic link for passwordless first login.
+      </div>
+    </div>
+  </div><!-- /app-frame -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 6: Merchant Compliance Portal — /comply — QP-3586
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">QP-3586 — Merchant Compliance Portal (/comply)</div>
+  <p class="section-desc">The merchant-facing compliance portal. Clean, mobile-first view. No processor admin features visible. The merchant sees only their cases and can respond inline.</p>
+
+  <div class="app-frame">
+    <!-- Merchant nav -->
+    <div class="comply-nav">
+      <div class="comply-nav-left">
+        <div class="comply-logo">Q</div>
+        <span class="comply-nav-title">Compliance Portal</span>
+      </div>
+      <div class="comply-nav-right">
+        <span class="comply-company">Sunshine Wellness Products LLC</span>
+        <span class="comply-bell">🔔</span>
+        <div class="comply-avatar">SW</div>
+      </div>
+    </div>
+
+    <!-- Hero / portal header -->
+    <div class="comply-hero">
+      <h1>Sunshine Wellness Products LLC</h1>
+      <p>Managed by Westtown Payments, LLC · Compliance Portal</p>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="comply-summary">
+      <div class="comply-card">
+        <div class="comply-card-label">Open Cases</div>
+        <div class="comply-card-value" style="color:#DC2626;">1</div>
+        <span class="comply-card-badge badge-urgent">
+          <span class="badge-red-dot"></span>HIGH
+        </span>
+      </div>
+      <div class="comply-card">
+        <div class="comply-card-label">Action Required</div>
+        <div class="comply-card-value" style="color:#D97706;">2</div>
+        <span class="comply-card-badge badge-urgent">⚠ URGENT</span>
+      </div>
+      <div class="comply-card">
+        <div class="comply-card-label">Days to SLA</div>
+        <div class="comply-card-value" style="color:#16a34a;">5</div>
+        <span class="comply-card-badge badge-good">✓ GOOD</span>
+      </div>
+      <div class="comply-card">
+        <div class="comply-card-label">Completed</div>
+        <div class="comply-card-value" style="color:#166534;">12</div>
+        <span class="comply-card-badge badge-complete">✓ All time</span>
+      </div>
+    </div>
+
+    <!-- Case list -->
+    <div style="padding:20px 24px 0;">
+      <h3 style="font-size:15px;font-weight:700;color:#1A202E;margin-bottom:12px;">Your Compliance Cases</h3>
+      <table style="margin-bottom:16px;">
+        <thead>
+          <tr>
+            <th>Case</th>
+            <th>Status</th>
+            <th>Items</th>
+            <th>SLA</th>
+            <th>From</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1: active / urgent -->
+          <tr class="row-urgent" style="cursor:pointer;">
+            <td>
+              <div style="font-size:13px;font-weight:600;color:#1A202E;">Product Compliance Review</div>
+              <div class="td-code">CR-2026-0001</div>
+            </td>
+            <td>
+              <span class="pill pill-open">OPEN</span>
+              <span class="new-badge" style="margin-left:4px;">🔔 NEW</span>
+            </td>
+            <td><span style="font-size:13px;font-weight:600;color:#DC2626;">2 pending</span></td>
+            <td><span class="sla-warn">Apr 8 (5d)</span></td>
+            <td><span style="font-size:13px;color:#6B7280;">Westtown Payments</span></td>
+            <td class="td-muted">2 hours ago</td>
+            <td><button class="btn btn-primary btn-sm">Respond Now →</button></td>
+          </tr>
+          <!-- Row 2: overdue -->
+          <tr style="cursor:pointer;">
+            <td>
+              <div style="font-size:13px;font-weight:600;color:#1A202E;">KYC Documentation Update</div>
+              <div class="td-code">CR-2026-0002</div>
+            </td>
+            <td><span class="pill pill-awaiting">AWAITING</span></td>
+            <td><span style="font-size:13px;font-weight:600;color:#DC2626;">4 pending</span></td>
+            <td><span class="sla-over">Apr 5 (2d) ⚠</span></td>
+            <td><span style="font-size:13px;color:#6B7280;">Westtown Payments</span></td>
+            <td class="td-muted">1 day ago</td>
+            <td><button class="btn-respond-urgent">Respond Now →</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Case detail view (merchant) -->
+    <div style="padding:0 24px 24px;">
+      <div style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Case Detail — CR-2026-0001 (active)</div>
+      <div class="merchant-detail">
+        <!-- Case header -->
+        <div class="merchant-detail-header">
+          <div class="merchant-detail-title">Product Compliance Review</div>
+          <div class="merchant-detail-meta">
+            From: <strong>Westtown Payments, LLC</strong> · Analyst: S. Johnson ·
+            <span class="pill pill-open" style="margin-left:4px;">OPEN</span>
+          </div>
+          <div class="merchant-detail-sla">
+            <div class="merchant-detail-sla-info">
+              <div class="merchant-detail-sla-label">SLA Deadline</div>
+              <div class="merchant-detail-sla-value">Due April 8, 2026 — 5 days remaining</div>
+            </div>
+            <div style="width:120px;">
+              <div class="progress-wrap">
+                <div class="progress-fill progress-amber" style="width:55%;"></div>
+              </div>
+              <div style="font-size:10px;color:#9CA3AF;margin-top:3px;">5 of 9 days elapsed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="merchant-summary-box">
+          Your payment processor has identified <strong>2 compliance items</strong> that require your response.
+          Please review each item below and provide the requested documentation or corrective action.
+        </div>
+
+        <!-- Item 1: Product COA Missing -->
+        <div class="res-item">
+          <div class="res-item-header" style="background:#FEF2F2;">
+            <span class="pill pill-high">🔴 HIGH</span>
+            <span style="font-size:13px;font-weight:600;color:#1A202E;">Product COA Missing</span>
+            <span class="td-code" style="margin-left:auto;">PRODUCT_MISSING_COA</span>
+          </div>
+          <div class="res-item-body">
+            <div style="font-size:12px;color:#6B7280;margin-bottom:6px;">
+              <strong style="color:#1A202E;">Product:</strong> Gummy Bears 500mg
+              <span style="margin-left:8px;font-family:monospace;font-size:11px;background:#F3F4F6;padding:1px 5px;border-radius:3px;">SKU: GB-500</span>
+            </div>
+            <div class="res-item-desc">
+              A Certificate of Analysis (COA) is required for this product. Please upload a valid, unexpired COA
+              from a licensed testing laboratory.
+            </div>
+            <div class="res-required">Resolution Required: Upload COA</div>
+            <!-- Upload form -->
+            <div class="upload-zone">
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">Drop COA PDF here or <strong>click to browse</strong></div>
+              <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">PDF, max 20MB · Must be from accredited testing lab</div>
+            </div>
+            <textarea class="input" rows="2" placeholder="Describe what you're uploading..." style="resize:vertical;margin-bottom:10px;"></textarea>
+            <button class="btn btn-primary">Submit Response</button>
+          </div>
+        </div>
+
+        <!-- Item 2: COA Expired -->
+        <div class="res-item">
+          <div class="res-item-header" style="background:#FFFBEB;">
+            <span class="pill pill-medium">🟡 MEDIUM</span>
+            <span style="font-size:13px;font-weight:600;color:#1A202E;">COA Expired</span>
+            <span class="td-code" style="margin-left:auto;">COA_EXPIRED</span>
+          </div>
+          <div class="res-item-body">
+            <div style="font-size:12px;color:#6B7280;margin-bottom:6px;">
+              <strong style="color:#1A202E;">Product:</strong> Tincture 1000mg
+              <span style="margin-left:8px;font-family:monospace;font-size:11px;background:#F3F4F6;padding:1px 5px;border-radius:3px;">SKU: TIN-1000</span>
+            </div>
+            <div class="res-item-desc">
+              The COA for this product expired on <strong>January 15, 2026</strong>. Please upload a replacement COA dated within the past 2 years from a licensed testing laboratory.
+            </div>
+            <div class="res-required">Resolution Required: Upload COA</div>
+            <div class="upload-zone">
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">Drop COA PDF here or <strong>click to browse</strong></div>
+              <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">PDF, max 20MB · COA must be dated after January 15, 2024</div>
+            </div>
+            <textarea class="input" rows="2" placeholder="Describe what you're uploading..." style="resize:vertical;margin-bottom:10px;"></textarea>
+            <button class="btn btn-primary">Submit Response</button>
+          </div>
+        </div>
+
+        <!-- Mobile note -->
+        <div style="padding:0 20px 20px;margin-top:4px;">
+          <div class="annotation">
+            <strong>📱 Mobile-first:</strong> The <code>/comply</code> portal is built mobile-first.
+            On phone/tablet: cards stack vertically, response forms open as full-screen modals,
+            file upload uses camera/gallery picker on iOS/Android.
+            MUI v5 responsive breakpoints ensure proper layout across all screen sizes.
+            Touch-optimized upload zone uses <code>accept="application/pdf"</code> + <code>capture</code> attribute for native file pickers.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /app-frame -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 7: Evolution Roadmap
+  ══════════════════════════════════════════════════════ -->
+  <div class="section-label">Evolution Roadmap</div>
+  <p class="section-desc">Three phases from MVP to full enterprise compliance platform.</p>
+
+  <div class="app-frame" style="padding:24px;">
+    <div class="roadmap-wrap">
+
+      <!-- Phase 1 -->
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-header phase1-h">
+          Phase 1 — MVP
+          <div class="roadmap-phase-target">QP-3579 to QP-3586 · Target: April 2026</div>
+        </div>
+        <div class="roadmap-items">
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Data model (PlComplianceCase, CaseItem, CaseResponse)</div>
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Case CRUD API (10 endpoints)</div>
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Create Case from Q-ScanAI findings</div>
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Create Case from Product Compliance table</div>
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Active Cases column in We Monitor</div>
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Internal case management screen (/qmonitor/cases)</div>
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Merchant invite flow</div>
+          <div class="roadmap-item done"><span class="ri-icon">✅</span> Merchant compliance portal (/comply)</div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-header phase2-h">
+          Phase 2 — Enhanced
+          <div class="roadmap-phase-target">Post-MVP · Q3 2026</div>
+        </div>
+        <div class="roadmap-items">
+          <div class="roadmap-item"><span class="ri-icon">○</span> SLA notifications (email + in-app approaching/breached)</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Case audit trail (full activity log)</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Dispute resolution workflow (state machine)</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Case templates per violation type</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Bulk processor actions (reassign, close, SLA)</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Reporting dashboard (cases by merchant, SLA breach trends)</div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-header phase3-h">
+          Phase 3 — Advanced
+          <div class="roadmap-phase-target">Future · Roadmap TBD</div>
+        </div>
+        <div class="roadmap-items">
+          <div class="roadmap-item"><span class="ri-icon">○</span> Sanctions screening → case items (QP-3469 Vital 4)</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Reputation events → case items (BBB, CourtListener)</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Merchant-assisted COA matching via portal</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Custom case templates per processor</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> Mobile app support (PWA or native)</div>
+          <div class="roadmap-item"><span class="ri-icon">○</span> API access for enterprise processors</div>
+        </div>
+      </div>
+
+    </div><!-- /roadmap-wrap -->
+  </div><!-- /app-frame -->
+
+</div><!-- /page-content -->
+
+</body>
+</html>
