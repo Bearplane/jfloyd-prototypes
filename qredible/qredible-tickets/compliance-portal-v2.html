@@ -601,10 +601,20 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
         💡 <strong>Try clicking:</strong> The red <strong>"3"</strong> badge on Black Bear Wellness → or <strong>Actions → Create Compliance Case</strong>
       </div>
 
+      <!-- Bulk action bar — shown when rows selected -->
+      <div class="bulk-bar" style="margin-bottom:12px;">
+        <span class="bulk-label">2 merchants selected</span>
+        <button class="btn-green btn-sm">📋 Create Case (2 merchants)</button>
+        <button class="btn-secondary btn-sm">Send All Drafts</button>
+        <button class="btn-secondary btn-sm" onclick="showScreen(4)">View All Cases</button>
+        <button class="btn-secondary btn-sm" style="color:#6B7280;">✕ Clear</button>
+      </div>
+
       <div class="table-wrapper">
         <table class="data-table">
           <thead>
             <tr>
+              <th style="width:32px;"><input type="checkbox"></th>
               <th class="sortable">Legal Name</th>
               <th class="sortable">DBA Names</th>
               <th>License Status</th>
@@ -613,13 +623,14 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
               <th>Website</th>
               <th>Team Members</th>
               <th>Scans</th>
-              <th class="col-new">Active Cases <span class="new-badge">NEW</span></th>
+              <th class="col-new">Cases <span class="new-badge">NEW</span></th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <!-- Row 1 -->
             <tr>
+              <td><input type="checkbox"></td>
               <td>
                 <div class="font-semibold text-navy" style="font-size:13px;">AG Living Solutions LLC</div>
                 <div class="text-xs text-muted">6783000000007ll</div>
@@ -639,6 +650,9 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
               <td><a href="#" style="color:#2563eb;font-size:12px;">https://bgcannarn.com</a></td>
               <td><span style="font-size:12px;">Caroline Bertani <span class="text-muted">+4</span></span></td>
               <td><div class="text-xs text-muted">Completed Last:</div><div class="text-xs">02/26/2026 ×2</div></td>
+              <td style="white-space:nowrap;">
+                <span class="text-muted" style="font-size:12px;">—</span>
+              </td>
               <td>
                 <div class="dropdown-container">
                   <button class="btn-secondary btn-sm btn-with-chevron" onclick="toggleDropdown('dd-row1');event.stopPropagation()">Actions <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></button>
@@ -656,6 +670,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
             </tr>
             <!-- Row 2 -->
             <tr>
+              <td><input type="checkbox" checked></td>
               <td>
                 <div class="font-semibold text-navy" style="font-size:13px;">ATX Auctions Corpus Christi LLC</div>
                 <div class="text-xs text-muted">TX Hemp/CBD Retailer</div>
@@ -675,7 +690,10 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
               <td><a href="#" style="color:#2563eb;font-size:12px;">https://pricecatchcbd.com</a></td>
               <td><span style="font-size:12px;">Caroline Bertani <span class="text-muted">+4</span></span></td>
               <td><div class="text-xs text-muted">Completed Last:</div><div class="text-xs">02/26/2026</div></td>
-              <td><span class="case-badge-amber">2</span></td>
+              <td style="white-space:nowrap;">
+                <span class="case-badge-amber" style="cursor:pointer;" onclick="showScreen(4)" title="2 active cases">2</span>
+                <span style="display:inline-block;background:#F3F4F6;color:#6B7280;border-radius:12px;padding:2px 7px;font-size:11px;font-weight:600;margin-left:4px;cursor:pointer;" onclick="showScreen(4)" title="1 draft case">✏ 1</span>
+              </td>
               <td>
                 <div class="dropdown-container">
                   <button class="btn-secondary btn-sm btn-with-chevron" onclick="toggleDropdown('dd-row2');event.stopPropagation()">Actions <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></button>
@@ -693,6 +711,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
             </tr>
             <!-- Row 3 — Black Bear Wellness (INTERACTIVE) -->
             <tr>
+              <td><input type="checkbox" checked></td>
               <td>
                 <div class="font-semibold text-navy" style="font-size:13px;">Black Bear Wellness LLC</div>
                 <div class="text-xs text-muted">PA Hemp/CBD Retailer</div>
@@ -712,8 +731,9 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
               <td><a href="#" style="color:#2563eb;font-size:12px;">https://www.blackbeardispens...</a></td>
               <td><span style="font-size:12px;">Caroline Bertani <span class="text-muted">+4</span></span></td>
               <td><div class="text-xs text-muted">Completed Last:</div><div class="text-xs">03/11/2026 ×3</div></td>
-              <td>
-                <button class="case-badge-red" data-tooltip="3 active cases · Click to view →" onclick="showScreen(4)">3</button>
+              <td style="white-space:nowrap;">
+                <button class="case-badge-red" data-tooltip="3 active · 2 drafts · Click to view all →" onclick="openCasesPanel('blackbear')">3</button>
+                <span style="display:inline-block;background:#F3F4F6;color:#6B7280;border-radius:12px;padding:2px 7px;font-size:11px;font-weight:600;margin-left:4px;cursor:pointer;" onclick="openCasesPanel('blackbear')" title="2 draft cases">✏ 2</span>
               </td>
               <td>
                 <!-- Black Bear Actions Dropdown — INTERACTIVE -->
@@ -733,6 +753,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
             </tr>
             <!-- Row 4 -->
             <tr>
+              <td><input type="checkbox"></td>
               <td>
                 <div class="font-semibold text-navy" style="font-size:13px;">BTB Brands LLC DBA Beach Break</div>
                 <div class="text-xs text-muted">TX Hemp/CBD Retailer</div>
@@ -750,6 +771,9 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
               <td><a href="#" style="color:#2563eb;font-size:12px;">https://sjbbeachbreak.com/col...</a></td>
               <td><span style="font-size:12px;">Caroline Bertani <span class="text-muted">+4</span></span></td>
               <td><div class="text-xs text-muted">Completed Last:</div><div class="text-xs">03/11/2026</div></td>
+              <td style="white-space:nowrap;">
+                <span class="text-muted" style="font-size:12px;">—</span>
+              </td>
               <td>
                 <div class="dropdown-container">
                   <button class="btn-secondary btn-sm btn-with-chevron" onclick="toggleDropdown('dd-row4');event.stopPropagation()">Actions <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></button>
@@ -768,6 +792,102 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
           </tbody>
         </table>
       </div>
+    <!-- Inline Cases Mini Panel for We Monitor -->
+    <div id="cases-panel-blackbear" class="side-panel" style="width:460px;">
+      <div class="panel-header" style="background:#F7F5FF;padding:14px 18px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#1a202e;">Black Bear Wellness LLC</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Cases — quick view</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button onclick="showScreen(4)" style="background:#2563eb;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">View All Cases →</button>
+          <button onclick="closeCasesPanel('blackbear')" style="background:none;border:none;cursor:pointer;font-size:18px;color:#6B7280;">×</button>
+        </div>
+      </div>
+
+      <!-- Subtabs -->
+      <div style="display:flex;border-bottom:1px solid #E5E7EB;background:white;">
+        <div style="padding:10px 16px;font-size:13px;color:#2563eb;border-bottom:2px solid #2563eb;font-weight:500;cursor:pointer;">Active (3)</div>
+        <div style="padding:10px 16px;font-size:13px;color:#6B7280;cursor:pointer;">Drafts (2)</div>
+      </div>
+
+      <!-- Active cases list -->
+      <div style="flex:1;overflow-y:auto;padding:12px 16px;">
+
+        <!-- Case 1 -->
+        <div style="border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;margin-bottom:10px;background:white;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1a202e;">Product &amp; Website Compliance</div>
+              <div style="font-size:11px;color:#6B7280;">CR-2026-0001 · S. Johnson</div>
+            </div>
+            <span class="pill pill-open" style="flex-shrink:0;">OPEN</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="pill pill-high">HIGH</span>
+            <span style="font-size:12px;color:#374151;">3 items pending</span>
+            <span style="font-size:12px;color:#F59E0B;font-weight:500;">Apr 8 (5 days)</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:10px;">
+            <button class="btn-primary btn-sm" onclick="showScreen(4)">View Case</button>
+            <button class="btn-secondary btn-sm">Send Reminder</button>
+          </div>
+        </div>
+
+        <!-- Case 2 -->
+        <div style="border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;margin-bottom:10px;background:white;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1a202e;">KYC Documentation Update</div>
+              <div style="font-size:11px;color:#6B7280;">CR-2026-0004 · M. Davis</div>
+            </div>
+            <span class="pill pill-awaiting" style="flex-shrink:0;">AWAITING</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="pill pill-high">HIGH</span>
+            <span style="font-size:12px;color:#374151;">4 items pending</span>
+            <span style="font-size:12px;color:#DC2626;font-weight:600;">⚠ Apr 5 (2 days)</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:10px;">
+            <button class="btn-primary btn-sm" onclick="showScreen(4)">View Case</button>
+            <button class="btn-secondary btn-sm">Send Reminder</button>
+          </div>
+        </div>
+
+        <!-- Case 3 -->
+        <div style="border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;margin-bottom:10px;background:white;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1a202e;">License Verification</div>
+              <div style="font-size:11px;color:#6B7280;">CR-2026-0005 · S. Johnson</div>
+            </div>
+            <span class="pill pill-disputed" style="flex-shrink:0;">DISPUTED</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="pill pill-high">HIGH</span>
+            <span style="font-size:12px;color:#374151;">1/2 resolved</span>
+            <span style="font-size:12px;color:#DC2626;font-weight:500;">⚠ OVERDUE</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:10px;">
+            <button class="btn-primary btn-sm" onclick="showScreen(4)">View Case</button>
+            <button class="btn-secondary btn-sm" style="color:#DC2626;">Escalate</button>
+          </div>
+        </div>
+
+        <!-- Drafts divider hint -->
+        <div style="text-align:center;padding:10px;font-size:12px;color:#9CA3AF;">
+          + 2 draft cases not yet sent to merchant · <button onclick="void(0)" style="background:none;border:none;color:#2563eb;font-size:12px;cursor:pointer;">View Drafts</button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:12px 16px;border-top:1px solid #E5E7EB;background:white;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-primary btn-sm" onclick="showScreen(3)">+ Create New Case</button>
+        <button class="btn-secondary btn-sm">Send All Reminders</button>
+        <button class="btn-secondary btn-sm" onclick="showScreen(4)">View All Cases →</button>
+      </div>
+    </div>
+
     </div><!-- /page-content -->
 
     <div class="screen-nav">
@@ -2130,6 +2250,22 @@ function copyScreenLink() {
     navigator.clipboard.writeText(url).then(function() { showToast('Link copied: ' + url, 3000); });
   } else {
     showToast('Link: ' + url, 5000);
+  }
+}
+
+function openCasesPanel(merchantId) {
+  var panelId = 'cases-panel-' + merchantId;
+  var panel = document.getElementById(panelId);
+  if (panel) {
+    panel.classList.add('open');
+  }
+}
+
+function closeCasesPanel(merchantId) {
+  var panelId = 'cases-panel-' + merchantId;
+  var panel = document.getElementById(panelId);
+  if (panel) {
+    panel.classList.remove('open');
   }
 }
 </script>
