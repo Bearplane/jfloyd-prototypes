@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regulatory Attributes & Rules Engine — QP-3539–3542</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3B82F6;
+      --blue-light: #EFF6FF;
+      --blue-mid: #BFDBFE;
+      --navy: #1E3A5F;
+      --green: #16A34A;
+      --green-light: #F0FDF4;
+      --green-mid: #BBF7D0;
+      --red: #DC2626;
+      --red-light: #FEF2F2;
+      --red-mid: #FECACA;
+      --orange: #D97706;
+      --orange-light: #FFFBEB;
+      --orange-mid: #FDE68A;
+      --purple: #7C3AED;
+      --purple-light: #F5F3FF;
+      --purple-mid: #DDD6FE;
+      --border: #E2E8F0;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --muted: #64748B;
+      --white: #FFFFFF;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: "IBM Plex Mono", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Proto Nav ── */
+    .proto-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .proto-nav a { color: var(--blue); text-decoration: none; }
+    .proto-nav a:hover { text-decoration: underline; }
+    .proto-nav span:nth-child(3) { color: var(--text); font-weight: 600; }
+    .ticket-badge {
+      background: var(--navy);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Page Layout ── */
+    .page { max-width: 1400px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* ── Section Wrappers ── */
+    .section {
+      margin-bottom: 64px;
+    }
+    .section-header {
+      margin-bottom: 24px;
+    }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--navy);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* ── Annotation Box ── */
+    .annotation {
+      background: #FFFBEB;
+      border: 1px solid #FCD34D;
+      border-left: 4px solid #F59E0B;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #92400E;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+    .annotation strong { color: #78350F; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 24px;
+    }
+
+    /* ── Pills / Tags ── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pill-blue   { background: var(--blue-light);   color: #1D4ED8; border: 1px solid var(--blue-mid); }
+    .pill-green  { background: var(--green-light);  color: var(--green); border: 1px solid var(--green-mid); }
+    .pill-red    { background: var(--red-light);    color: var(--red); border: 1px solid var(--red-mid); }
+    .pill-orange { background: var(--orange-light); color: var(--orange); border: 1px solid var(--orange-mid); }
+    .pill-purple { background: var(--purple-light); color: var(--purple); border: 1px solid var(--purple-mid); }
+    .pill-gray   { background: #F1F5F9; color: var(--muted); border: 1px solid #CBD5E1; }
+    .pill-amber  { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+    .pill-navy   { background: var(--navy); color: white; border: 1px solid var(--navy); }
+
+    .mono-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-primary:hover { background: #2563EB; }
+    .btn-secondary { background: var(--white); color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover { background: var(--bg); }
+    .btn-ghost { background: transparent; color: var(--blue); padding: 4px 8px; font-size: 12px; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-danger { background: var(--red-light); color: var(--red); border-color: var(--red-mid); }
+
+    /* ── NEW Badge ── */
+    .new-badge {
+      display: inline-block;
+      background: var(--green);
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 2px 5px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    /* ═══════════════════════════════════════
+       SECTION 1 — Architecture Diagram
+    ═══════════════════════════════════════ */
+    .arch-diagram {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 32px;
+    }
+    .arch-layers {
+      display: grid;
+      grid-template-columns: 1fr 48px 1fr 48px 1fr 48px 120px;
+      gap: 0;
+      align-items: start;
+      min-height: 320px;
+    }
+    .arch-layer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .arch-layer-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--muted);
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .arch-layer-header.layer1 { color: #1D4ED8; border-color: var(--blue-mid); }
+    .arch-layer-header.layer2 { color: #5B21B6; border-color: var(--purple-mid); }
+    .arch-layer-header.layer3 { color: #065F46; border-color: var(--green-mid); }
+    .arch-layer-header.layer4 { color: var(--navy); border-color: #93C5FD; }
+
+    .arch-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 48px;
+      color: var(--muted);
+      font-size: 20px;
+    }
+    .arch-connector svg { width: 32px; height: 32px; }
+
+    /* Layer 1 tags */
+    .attr-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      border: 1px solid;
+      width: fit-content;
+    }
+    .attr-tag-blue   { background: var(--blue-light);   color: #1E40AF; border-color: var(--blue-mid); }
+    .attr-tag-orange { background: var(--orange-light); color: #92400E; border-color: var(--orange-mid); }
+    .attr-tag-green  { background: var(--green-light);  color: #14532D; border-color: var(--green-mid); }
+    .attr-tag-purple { background: var(--purple-light); color: #4C1D95; border-color: var(--purple-mid); }
+    .attr-tag-amber  { background: #FFFBEB; color: #78350F; border-color: #FCD34D; }
+    .attr-tag .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Layer 2 binding targets */
+    .binding-target {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+    }
+    .binding-target .icon { font-size: 14px; }
+    .binding-target .label { font-weight: 600; color: var(--text); }
+    .binding-target .desc { font-size: 11px; color: var(--muted); }
+
+    /* Layer 3 rule mini-cards */
+    .rule-mini {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .rule-mini-name { font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .rule-mini-logic {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .rule-mini-result {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 11px;
+    }
+
+    /* Layer 4 result */
+    .compliance-result-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 44px;
+    }
+    .cr-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .cr-item.compliant   { background: var(--green-light);  color: var(--green); border: 1px solid var(--green-mid); }
+    .cr-item.prohibited  { background: var(--red-light);    color: var(--red);   border: 1px solid var(--red-mid); }
+    .cr-item.unknown     { background: #F1F5F9;              color: var(--muted); border: 1px solid var(--border); }
+
+    .arch-sub { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+    /* ═══════════════════════════════════════
+       SECTION 2 — Global Settings Tiles
+    ═══════════════════════════════════════ */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .settings-tile {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .settings-tile:hover {
+      border-color: var(--blue);
+      box-shadow: 0 2px 8px rgba(59,130,246,0.12);
+    }
+    .settings-tile.highlight {
+      border: 2px solid var(--green);
+      box-shadow: 0 0 0 3px rgba(22,163,74,0.08);
+    }
+    .settings-tile .tile-icon { font-size: 24px; margin-bottom: 10px; }
+    .settings-tile .tile-name { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+    .settings-tile .tile-count { font-size: 12px; color: var(--muted); }
+
+    /* ═══════════════════════════════════════
+       SECTION 3 — Attributes Table
+    ═══════════════════════════════════════ */
+    .screen-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .screen-title { font-size: 20px; font-weight: 700; color: var(--text); }
+    .screen-subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .search-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--muted);
+      min-width: 260px;
+    }
+
+    .data-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--border); }
+    .data-table thead tr { background: var(--navy); }
+    .data-table thead th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .data-table tbody tr { border-bottom: 1px solid var(--border); }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: #F8FAFC; }
+    .data-table td { padding: 12px 14px; vertical-align: top; }
+
+    .bound-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .bound-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .bound-pill-blue   { background: var(--blue-light);   color: #1D4ED8; border: 1px solid var(--blue-mid); }
+    .bound-pill-green  { background: var(--green-light);  color: var(--green); border: 1px solid var(--green-mid); }
+    .bound-pill-purple { background: var(--purple-light); color: var(--purple); border: 1px solid var(--purple-mid); }
+    .bound-pill-amber  { background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; }
+
+    .action-btns { display: flex; gap: 6px; align-items: center; }
+    .btn-link { background: none; border: none; color: var(--blue); font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; padding: 3px 0; }
+    .btn-link-muted { color: var(--muted); }
+    .sep { color: var(--border); }
+
+    /* ═══════════════════════════════════════
+       SECTION 4 — Modal
+    ═══════════════════════════════════════ */
+    .modal-backdrop {
+      background: rgba(15,23,42,0.35);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .modal {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      width: 700px;
+      max-width: 100%;
+      box-shadow: 0 20px 60px rgba(15,23,42,0.18);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .modal-attr-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--blue);
+      background: var(--blue-light);
+      border: 1px solid var(--blue-mid);
+      border-radius: 4px;
+      padding: 3px 8px;
+      margin-top: 4px;
+      display: inline-block;
+    }
+    .modal-close {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .modal-body {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .modal-body .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 12px; font-weight: 700; color: var(--text); }
+    .form-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .form-input.mono { font-family: var(--mono); color: var(--navy); background: #F1F5F9; }
+    .form-input.readonly { opacity: 0.7; cursor: not-allowed; }
+    .form-textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
+      resize: none;
+      height: 72px;
+    }
+    .form-select {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* Toggle */
+    .toggle-group { display: flex; align-items: center; gap: 10px; }
+    .toggle {
+      position: relative;
+      width: 40px; height: 22px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: var(--green);
+      border-radius: 11px;
+      cursor: pointer;
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      background: white;
+      border-radius: 50%;
+      top: 3px; left: 21px;
+      transition: 0.2s;
+    }
+    .toggle-label { font-size: 13px; font-weight: 600; color: var(--green); }
+
+    /* Jurisdictions pills */
+    .pill-group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .pill-remove {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.1);
+      font-size: 10px;
+      cursor: pointer;
+      margin-left: 2px;
+    }
+
+    /* Bindings list */
+    .bindings-section {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .bindings-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .binding-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+    }
+    .binding-row-left { display: flex; align-items: center; gap: 10px; }
+    .binding-type-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--blue-light);
+      color: #1D4ED8;
+      border: 1px solid var(--blue-mid);
+      font-weight: 500;
+    }
+    .binding-value { font-size: 13px; font-weight: 600; color: var(--text); }
+    .remove-btn {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--red-light);
+      border: 1px solid var(--red-mid);
+      color: var(--red);
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Add binding dropdown */
+    .add-binding-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1.5px dashed #93C5FD;
+      border-radius: var(--radius-sm);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--blue-light);
+      font-family: var(--font);
+      margin-top: 4px;
+    }
+
+    /* Rules reference */
+    .rules-ref-section {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .rule-ref-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      background: var(--green-light);
+      border: 1px solid var(--green-mid);
+      border-radius: var(--radius-sm);
+    }
+    .rule-ref-name { font-weight: 700; font-size: 13px; color: var(--text); }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+    }
+
+    /* ═══════════════════════════════════════
+       SECTION 5 — Rules Builder
+    ═══════════════════════════════════════ */
+    .rules-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .rule-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+    .rule-card.expanded { border-left: 4px solid var(--green); }
+    .rule-card.collapsed { border-left: 4px solid var(--border); }
+
+    .rule-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+    }
+    .rule-card-header:hover { background: var(--bg); }
+    .rule-header-left { display: flex; align-items: center; gap: 12px; }
+    .rule-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .rule-summary { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .rule-header-right { display: flex; align-items: center; gap: 10px; }
+    .chevron { color: var(--muted); font-size: 16px; }
+
+    .rule-body { padding: 0 20px 20px; }
+
+    /* Visual rule builder */
+    .rule-builder {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin: 12px 0;
+    }
+    .rule-builder-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .rule-flow { display: flex; flex-direction: column; gap: 8px; }
+    .rule-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid;
+      font-size: 13px;
+    }
+    .rule-block.condition-if {
+      background: var(--blue-light);
+      border-color: var(--blue);
+      color: #1E3A5F;
+    }
+    .rule-block.condition-and-not {
+      background: var(--red-light);
+      border-color: var(--red);
+      color: #7F1D1D;
+    }
+    .rule-block.rule-then {
+      background: var(--green-light);
+      border-color: var(--green);
+      color: #14532D;
+    }
+    .rule-block-keyword {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      min-width: 56px;
+      opacity: 0.7;
+    }
+    .rule-block-content { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rule-block-val {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-weight: 600;
+    }
+    .rule-block-link {
+      font-size: 12px;
+      color: var(--blue);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .then-result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+    .result-prohibited { background: var(--red); color: white; }
+    .result-noncompliant { background: var(--orange); color: white; }
+    .result-severity { font-size: 11px; color: var(--muted); }
+
+    /* Rule meta grid */
+    .rule-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .rule-meta-item { }
+    .rule-meta-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .rule-meta-value { font-size: 13px; color: var(--text); }
+    .rule-meta-value.mono { font-family: var(--mono); font-size: 12px; }
+
+    .run-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .run-stat { text-align: center; }
+    .run-stat-val { font-size: 22px; font-weight: 800; color: var(--text); }
+    .run-stat-val.auth { color: var(--green); }
+    .run-stat-val.prohib { color: var(--red); }
+    .run-stat-val.unk { color: var(--muted); }
+    .run-stat-lbl { font-size: 11px; color: var(--muted); }
+    .run-stat-divider { width: 1px; background: var(--border); }
+
+    /* ═══════════════════════════════════════
+       SECTION 6 — Product Table
+    ═══════════════════════════════════════ */
+    .product-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border);
+      background: var(--white);
+    }
+    .product-table {
+      width: 100%;
+      border-collapse: collapse;
+      white-space: nowrap;
+    }
+    .product-table thead tr { background: var(--navy); }
+    .product-table thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .product-table thead th.new-col {
+      background: #163450;
+      position: relative;
+    }
+    .product-table thead th.new-col::after {
+      content: "NEW";
+      display: inline-block;
+      background: var(--green);
+      color: white;
+      font-size: 8px;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 2px;
+      margin-left: 5px;
+      letter-spacing: 0.3px;
+      vertical-align: middle;
+    }
+    .product-table tbody tr { border-bottom: 1px solid var(--border); }
+    .product-table tbody tr:last-child { border-bottom: none; }
+    .product-table tbody tr:hover { background: #F8FAFC; }
+    .product-table td { padding: 11px 14px; vertical-align: middle; font-size: 13px; }
+
+    /* Product thumbnail placeholder */
+    .thumb {
+      width: 36px; height: 36px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .product-info { display: flex; align-items: center; gap: 10px; }
+    .product-name { font-weight: 600; color: var(--text); }
+    .product-sku { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+    /* Compliance status cell */
+    .compliance-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .cs-compliant    { background: var(--green-light); color: var(--green); border: 1px solid var(--green-mid); }
+    .cs-authorized   { background: var(--green-light); color: #065F46; border: 1px solid var(--green-mid); }
+    .cs-prohibited   { background: var(--red-light); color: var(--red); border: 1px solid var(--red-mid); }
+    .cs-unknown      { background: #F1F5F9; color: var(--muted); border: 1px solid var(--border); }
+
+    /* COA/Disposition status */
+    .coa-status { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+    .coa-status.attached { color: var(--green); font-weight: 600; }
+    .coa-status.na { color: var(--muted); }
+    .disp { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+    .disp.approved { color: var(--green); font-weight: 600; }
+    .disp.na { color: var(--muted); }
+
+    /* Callout tooltips */
+    .tooltip-callout {
+      background: var(--navy);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-top: 8px;
+      position: relative;
+    }
+    .tooltip-callout::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 24px;
+      width: 12px; height: 12px;
+      background: var(--navy);
+      transform: rotate(45deg);
+    }
+    .tooltip-rule-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .tooltip-icon { font-size: 14px; flex-shrink: 0; }
+    .tooltip-rule-name { font-size: 12px; font-weight: 700; color: #93C5FD; }
+    .tooltip-verdict { font-size: 13px; font-weight: 800; color: white; }
+    .tooltip-desc { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+    .tooltip-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .tooltip-meta-item { font-size: 11px; color: #94A3B8; }
+    .tooltip-meta-item strong { color: #E2E8F0; }
+    .tooltip-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .tooltip-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      border: none;
+    }
+    .tooltip-btn-primary { background: var(--blue); color: white; }
+    .tooltip-btn-secondary { background: rgba(255,255,255,0.1); color: white; }
+    .tooltip-note {
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: rgba(220,38,38,0.2);
+      border-radius: 4px;
+      font-size: 11px;
+      color: #FCA5A5;
+    }
+
+    /* Row highlight for callout */
+    .row-with-callout td { background: #FFF8F8 !important; }
+    .row-with-callout-kratom td { background: #FFF8F8 !important; }
+    .callout-row td { padding: 0; }
+    .callout-row .callout-cell { padding: 0 14px 12px; }
+
+    /* Classification tag */
+    .class-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 11px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Checkbox */
+    .cb { width: 14px; height: 14px; accent-color: var(--blue); }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    /* ── Breadcrumb within section ── */
+    .screen-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .screen-breadcrumb a { color: var(--blue); text-decoration: none; }
+    .screen-breadcrumb span { color: var(--text); font-weight: 600; }
+
+    /* ── Screen container ── */
+    .screen {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Proto Nav -->
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span>/</span>
+  <span>Regulatory Attributes & Rules Engine</span>
+  <span class="ticket-badge">QP-3539 · QP-3540 · QP-3541 · QP-3542</span>
+</nav>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 1 — Architecture Overview
+  ══════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">Section 1 · QP-3539</div>
+      <div class="section-title">Compliance Ontology — Architecture Overview</div>
+      <div class="section-subtitle">How regulatory attributes flow from configuration to product compliance status</div>
+    </div>
+
+    <div class="arch-diagram">
+      <div class="arch-layers">
+
+        <!-- Layer 1: Regulatory Attributes -->
+        <div class="arch-layer">
+          <div class="arch-layer-header layer1">🏷️ Layer 1 — Regulatory Attributes</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div class="attr-tag attr-tag-blue"><span class="dot" style="background:#3B82F6;"></span>FDA_ENDS_AUTHORIZATION_REQUIRED</div>
+            <div class="attr-tag attr-tag-orange"><span class="dot" style="background:#D97706;"></span>KRATOM_BANNED</div>
+            <div class="attr-tag attr-tag-green"><span class="dot" style="background:#16A34A;"></span>THC_LIMIT_0.3PCT</div>
+            <div class="attr-tag attr-tag-purple"><span class="dot" style="background:#7C3AED;"></span>PSILOCYBIN_RESTRICTED</div>
+            <div class="attr-tag attr-tag-amber"><span class="dot" style="background:#D97706;"></span>MCC_7995_GAMBLING</div>
+          </div>
+          <div class="arch-sub">Controlled vocabulary — managed in Q-Audit Global Settings</div>
+        </div>
+
+        <!-- Connector 1→2 -->
+        <div class="arch-connector">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 24 H40 M32 16 L40 24 L32 32" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Layer 2: Attribute Bindings -->
+        <div class="arch-layer">
+          <div class="arch-layer-header layer2">🔗 Layer 2 — Attribute Bindings</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="binding-target">
+              <span class="icon">📦</span>
+              <div>
+                <div class="label">Product Classification</div>
+                <div class="desc">Auto-inherits to all products in class</div>
+              </div>
+            </div>
+            <div class="binding-target">
+              <span class="icon">🔖</span>
+              <div>
+                <div class="label">Product (direct)</div>
+                <div class="desc">Manual override on specific product</div>
+              </div>
+            </div>
+            <div class="binding-target">
+              <span class="icon">🧪</span>
+              <div>
+                <div class="label">COA Field</div>
+                <div class="desc">Triggered when analyte detected (e.g., Psilocybin &gt; 0)</div>
+              </div>
+            </div>
+            <div class="binding-target">
+              <span class="icon">🌐</span>
+              <div>
+                <div class="label">Website Finding</div>
+                <div class="desc">Triggered by scan finding type (e.g., "vape")</div>
+              </div>
+            </div>
+            <div class="binding-target">
+              <span class="icon">💳</span>
+              <div>
+                <div class="label">MCC Code</div>
+                <div class="desc">Tied to merchant category code</div>
+              </div>
+            </div>
+            <div class="binding-target">
+              <span class="icon">📋</span>
+              <div>
+                <div class="label">License Type</div>
+                <div class="desc">Tied to license classification</div>
+              </div>
+            </div>
+            <div class="binding-target">
+              <span class="icon">🏢</span>
+              <div>
+                <div class="label">Company (direct)</div>
+                <div class="desc">Company-level attribute</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connector 2→3 -->
+        <div class="arch-connector">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 24 H40 M32 16 L40 24 L32 32" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Layer 3: Compliance Rules -->
+        <div class="arch-layer">
+          <div class="arch-layer-header layer3">⚖️ Layer 3 — Compliance Rules</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="rule-mini">
+              <div class="rule-mini-name">FDA ENDS Authorization Check</div>
+              <div class="rule-mini-logic">IF has FDA_ENDS_AUTHORIZATION_REQUIRED<br>AND NOT IN fdaEndsList</div>
+              <div class="rule-mini-result">
+                <span class="result-status result-prohibited">PROHIBITED</span>
+                <span style="font-size:11px;color:var(--muted);">Severity: HIGH</span>
+              </div>
+            </div>
+            <div class="rule-mini">
+              <div class="rule-mini-name">Kratom State Ban</div>
+              <div class="rule-mini-logic">IF has KRATOM_BANNED<br>AND jurisdiction IN [IN,AL,AR,WI,VT,RI]</div>
+              <div class="rule-mini-result">
+                <span class="result-status result-prohibited">PROHIBITED</span>
+                <span style="font-size:11px;color:var(--muted);">Severity: HIGH</span>
+              </div>
+            </div>
+            <div class="rule-mini">
+              <div class="rule-mini-name">THC Content Limit</div>
+              <div class="rule-mini-logic">IF COA Delta-9 THC &gt; 0.3%<br>AND has THC_LIMIT_0.3PCT</div>
+              <div class="rule-mini-result">
+                <span class="result-status result-noncompliant">NON-COMPLIANT</span>
+                <span style="font-size:11px;color:var(--muted);">Severity: HIGH</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connector 3→4 -->
+        <div class="arch-connector">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 24 H40 M32 16 L40 24 L32 32" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Layer 4: Product Compliance Status -->
+        <div class="arch-layer">
+          <div class="arch-layer-header layer4">📊 Compliance Status Column</div>
+          <div class="compliance-result-box">
+            <div class="cr-item compliant">✓ Compliant</div>
+            <div class="cr-item compliant">✓ FDA Authorized</div>
+            <div class="cr-item prohibited">🔴 PROHIBITED</div>
+            <div class="cr-item prohibited">🔴 PROHIBITED</div>
+            <div class="cr-item compliant">✓ Compliant</div>
+            <div class="cr-item unknown">⚠ Unknown</div>
+          </div>
+          <div class="arch-sub">Aggregated per-product across all applicable rules</div>
+        </div>
+
+      </div><!-- /arch-layers -->
+    </div><!-- /arch-diagram -->
+
+    <div class="annotation">
+      <strong>Unified Compliance Ontology:</strong> Regulatory attributes are the controlled vocabulary. One attribute can bind to multiple data elements (a classification, a COA analyte, a website finding type). One rule can reference multiple attributes. When a product matches <em>any</em> binding for an attribute, it inherits that attribute — and every rule referencing that attribute will evaluate it. The <strong>Product Compliance Status</strong> column aggregates all applicable rule results and shows the most severe outcome. A product needs to pass every applicable rule to show ✓ Compliant.
+    </div>
+  </div><!-- /section 1 -->
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 2 — Global Settings Tiles
+  ══════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">Section 2 · QP-3539</div>
+      <div class="section-title">Q-Audit Global Settings — Two New Tiles</div>
+      <div class="section-subtitle">These tiles are added to the existing Global Settings grid</div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="screen-breadcrumb">
+      <a href="#">Q-Monitor</a> / <a href="#">Q-Audit</a> / <span>Global Settings</span>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-card);padding:24px;">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:20px;font-weight:700;color:var(--text);">Global Settings</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:3px;">Configure system-wide audit parameters, document requirements, and compliance rules</div>
+      </div>
+
+      <div class="settings-grid">
+        <!-- NEW: Regulatory Attributes -->
+        <div class="settings-tile highlight">
+          <div class="tile-icon">🏷️</div>
+          <div class="tile-name">Regulatory Attributes <span class="new-badge">NEW</span></div>
+          <div class="tile-count">12 attributes · 5 active rules</div>
+        </div>
+        <!-- NEW: Compliance Rules -->
+        <div class="settings-tile highlight">
+          <div class="tile-icon">⚖️</div>
+          <div class="tile-name">Compliance Rules <span class="new-badge">NEW</span></div>
+          <div class="tile-count">5 rules · 3 active</div>
+        </div>
+        <!-- Existing tiles -->
+        <div class="settings-tile">
+          <div class="tile-icon">📄</div>
+          <div class="tile-name">Document Types</div>
+          <div class="tile-count">24 types configured</div>
+        </div>
+        <div class="settings-tile">
+          <div class="tile-icon">❌</div>
+          <div class="tile-name">Rejection Reasons</div>
+          <div class="tile-count">18 reasons active</div>
+        </div>
+        <div class="settings-tile">
+          <div class="tile-icon">🏭</div>
+          <div class="tile-name">Industry Types</div>
+          <div class="tile-count">7 industries</div>
+        </div>
+        <div class="settings-tile">
+          <div class="tile-icon">🕷️</div>
+          <div class="tile-name">Spider Assignment</div>
+          <div class="tile-count">12 spiders configured</div>
+        </div>
+        <div class="settings-tile">
+          <div class="tile-icon">🔍</div>
+          <div class="tile-name">Violative Terms</div>
+          <div class="tile-count">847 terms · 9 domains</div>
+        </div>
+        <div class="settings-tile">
+          <div class="tile-icon">📊</div>
+          <div class="tile-name">COA Analyte Library</div>
+          <div class="tile-count">62 analytes configured</div>
+        </div>
+        <div class="settings-tile">
+          <div class="tile-icon">⚡</div>
+          <div class="tile-name">Scan Triggers</div>
+          <div class="tile-count">4 trigger types</div>
+        </div>
+        <div class="settings-tile">
+          <div class="tile-icon">🔔</div>
+          <div class="tile-name">Alert Rules</div>
+          <div class="tile-count">11 rules enabled</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where these live:</strong> The <strong>Regulatory Attributes</strong> and <strong>Compliance Rules</strong> tiles are added to the existing Q-Audit Global Settings page alongside Document Types, Rejection Reasons, and other configuration tiles. They are the management interface for the entire regulatory compliance framework. Access is restricted to Admin and Compliance Officer roles.
+    </div>
+  </div><!-- /section 2 -->
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 3 — Regulatory Attributes Management
+  ══════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">Section 3 · QP-3540</div>
+      <div class="section-title">Regulatory Attributes — Management Screen</div>
+      <div class="section-subtitle">Click the Regulatory Attributes tile to open this screen</div>
+    </div>
+
+    <div class="screen">
+      <div class="screen-breadcrumb">
+        <a href="#">Q-Audit</a> / <a href="#">Global Settings</a> / <span>Regulatory Attributes</span>
+      </div>
+
+      <div class="screen-header">
+        <div>
+          <div class="screen-title">Regulatory Attributes</div>
+          <div class="screen-subtitle">Define compliance tags that bind to products, classifications, COA fields, and website findings</div>
+        </div>
+        <button class="btn btn-primary">+ Create Attribute</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-input">
+          <span>🔍</span>
+          <span>Search attributes…</span>
+        </div>
+        <select class="form-select btn-sm" style="min-width:130px;">
+          <option>All Scopes</option>
+          <option>Federal</option>
+          <option>State</option>
+          <option>Local</option>
+        </select>
+        <select class="form-select btn-sm" style="min-width:130px;">
+          <option>All Statuses</option>
+          <option>Active</option>
+          <option>Draft</option>
+          <option>Archived</option>
+        </select>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Attribute Name</th>
+            <th>Scope</th>
+            <th>Jurisdiction</th>
+            <th>Bound To</th>
+            <th>Active Rules</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Row 1 -->
+          <tr>
+            <td><span class="mono-tag">FDA_ENDS_AUTHORIZATION_REQUIRED</span></td>
+            <td><span class="pill pill-navy">Federal</span></td>
+            <td style="font-size:12px;color:var(--muted);">US (all states)</td>
+            <td>
+              <div class="bound-pills">
+                <span class="bound-pill bound-pill-blue">📦 Disposable Vape</span>
+                <span class="bound-pill bound-pill-blue">📦 Vape Cartridge</span>
+                <span class="bound-pill bound-pill-blue">📦 E-Liquid</span>
+                <span class="bound-pill bound-pill-blue">📦 Cigalike</span>
+                <span class="bound-pill bound-pill-blue">📦 Traditional Tobacco</span>
+              </div>
+            </td>
+            <td style="text-align:center;"><span class="pill pill-blue">1 rule</span></td>
+            <td><span class="pill pill-green">Active</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-link">Edit</button>
+                <span class="sep">|</span>
+                <button class="btn-link btn-link-muted">Archive</button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 2 -->
+          <tr>
+            <td><span class="mono-tag">KRATOM_BANNED</span></td>
+            <td><span class="pill pill-orange">State</span></td>
+            <td style="font-size:12px;color:var(--muted);">IN, AL, AR, WI, VT, RI</td>
+            <td>
+              <div class="bound-pills">
+                <span class="bound-pill bound-pill-blue">📦 Kratom</span>
+                <span class="bound-pill bound-pill-green">🧪 Mitragynine &gt; 0</span>
+                <span class="bound-pill bound-pill-purple">🌐 "kratom" violative</span>
+              </div>
+            </td>
+            <td style="text-align:center;"><span class="pill pill-blue">1 rule</span></td>
+            <td><span class="pill pill-green">Active</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-link">Edit</button>
+                <span class="sep">|</span>
+                <button class="btn-link btn-link-muted">Archive</button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 3 -->
+          <tr>
+            <td><span class="mono-tag">THC_LIMIT_0.3PCT</span></td>
+            <td><span class="pill pill-navy">Federal</span></td>
+            <td style="font-size:12px;color:var(--muted);">US (all states)</td>
+            <td>
+              <div class="bound-pills">
+                <span class="bound-pill bound-pill-green">🧪 Delta-9 THC &gt; 0.3%</span>
+              </div>
+            </td>
+            <td style="text-align:center;"><span class="pill pill-blue">1 rule</span></td>
+            <td><span class="pill pill-green">Active</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-link">Edit</button>
+                <span class="sep">|</span>
+                <button class="btn-link btn-link-muted">Archive</button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 4 -->
+          <tr>
+            <td><span class="mono-tag">PSILOCYBIN_RESTRICTED</span></td>
+            <td><span class="pill pill-orange">State</span></td>
+            <td style="font-size:12px;color:var(--muted);">All states except OR, CO</td>
+            <td>
+              <div class="bound-pills">
+                <span class="bound-pill bound-pill-blue">📦 Functional Mushrooms</span>
+                <span class="bound-pill bound-pill-green">🧪 Psilocybin &gt; 0</span>
+              </div>
+            </td>
+            <td style="text-align:center;"><span class="pill pill-gray">0 rules</span></td>
+            <td><span class="pill pill-gray">Draft</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-link">Edit</button>
+                <span class="sep">|</span>
+                <button class="btn-link btn-link-muted">Archive</button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 5 -->
+          <tr>
+            <td><span class="mono-tag">MCC_7995_GAMBLING</span></td>
+            <td><span class="pill pill-navy">Federal</span></td>
+            <td style="font-size:12px;color:var(--muted);">US (all states)</td>
+            <td>
+              <div class="bound-pills">
+                <span class="bound-pill bound-pill-amber">💳 MCC Code: 7995</span>
+              </div>
+            </td>
+            <td style="text-align:center;"><span class="pill pill-gray">0 rules</span></td>
+            <td><span class="pill pill-gray">Draft</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-link">Edit</button>
+                <span class="sep">|</span>
+                <button class="btn-link btn-link-muted">Archive</button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 6 -->
+          <tr>
+            <td><span class="mono-tag">CBD_FOOD_ADDITIVE_BANNED</span></td>
+            <td><span class="pill pill-navy">Federal</span></td>
+            <td style="font-size:12px;color:var(--muted);">US (all states)</td>
+            <td>
+              <div class="bound-pills">
+                <span class="bound-pill bound-pill-blue">📦 CBD Edibles</span>
+                <span class="bound-pill bound-pill-purple">🌐 "CBD food"</span>
+              </div>
+            </td>
+            <td style="text-align:center;"><span class="pill pill-blue">1 rule</span></td>
+            <td><span class="pill pill-green">Active</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-link">Edit</button>
+                <span class="sep">|</span>
+                <button class="btn-link btn-link-muted">Archive</button>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--muted);padding:0 4px;">
+        <span>Showing 6 of 12 attributes</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm">← Prev</button>
+          <button class="btn btn-secondary btn-sm">Next →</button>
+        </div>
+      </div>
+    </div><!-- /screen -->
+
+    <div class="annotation">
+      <strong>Attributes are the building blocks — they don't DO anything by themselves.</strong> They're tags. The rules engine evaluates them. The <strong>Bound To</strong> column shows every data element that carries this attribute. When a product matches <em>any</em> binding condition (e.g., is classified as "Disposable Vape", or a COA shows Mitragynine detected), it inherits the attribute. The rules engine then evaluates all rules referencing that attribute and aggregates the results into the Product Compliance Status column.
+    </div>
+  </div><!-- /section 3 -->
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 4 — Attribute Edit Modal
+  ══════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">Section 4 · QP-3540</div>
+      <div class="section-title">Attribute Detail / Edit Modal — FDA ENDS Example</div>
+      <div class="section-subtitle">Clicking "Edit" on FDA_ENDS_AUTHORIZATION_REQUIRED opens this modal</div>
+    </div>
+
+    <div class="modal-backdrop">
+      <div class="modal">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Edit Regulatory Attribute</div>
+            <div class="modal-attr-name">FDA_ENDS_AUTHORIZATION_REQUIRED</div>
+          </div>
+          <div class="modal-close">✕</div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+
+          <!-- Attribute Name (read-only) -->
+          <div class="form-group full">
+            <label class="form-label">Attribute Name <span style="color:var(--muted);font-weight:400;">(read-only for existing attributes)</span></label>
+            <input class="form-input mono readonly" readonly value="FDA_ENDS_AUTHORIZATION_REQUIRED">
+          </div>
+
+          <!-- Display Label -->
+          <div class="form-group">
+            <label class="form-label">Display Label</label>
+            <input class="form-input" value="FDA ENDS Authorization Required">
+          </div>
+
+          <!-- Scope -->
+          <div class="form-group">
+            <label class="form-label">Scope</label>
+            <select class="form-select">
+              <option selected>Federal</option>
+              <option>State</option>
+              <option>Local</option>
+            </select>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group full">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea">Requires products to appear on the FDA's authorized ENDS product list per PMTA pathway. Products not found on the authorization list are considered PROHIBITED.</textarea>
+          </div>
+
+          <!-- Jurisdictions -->
+          <div class="form-group full">
+            <label class="form-label">Jurisdictions</label>
+            <div class="pill-group" style="padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);">
+              <span class="pill pill-navy">🇺🇸 US (all states) <span class="pill-remove">×</span></span>
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;">+ Add state</button>
+            </div>
+          </div>
+
+          <!-- Source/Citation -->
+          <div class="form-group">
+            <label class="form-label">Source / Citation</label>
+            <input class="form-input" value="21 CFR Part 1140; FDA PMTA Authorization Orders">
+          </div>
+
+          <!-- Effective Date -->
+          <div class="form-group">
+            <label class="form-label">Effective Date</label>
+            <input class="form-input" type="date" value="2023-04-14">
+          </div>
+
+          <!-- Status Toggle -->
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <div class="toggle-group">
+              <label class="toggle">
+                <input type="checkbox" checked>
+                <span class="toggle-track"></span>
+              </label>
+              <span class="toggle-label">Active</span>
+            </div>
+          </div>
+
+          <!-- Spacer -->
+          <div></div>
+
+          <!-- Bindings Section -->
+          <div class="bindings-section">
+            <div class="bindings-title">🔗 Attribute Bindings — Where this attribute applies</div>
+            <div class="binding-row">
+              <div class="binding-row-left">
+                <span class="binding-type-badge">Product Classification</span>
+                <span class="binding-value">Disposable Vape / ENDS Device</span>
+              </div>
+              <div class="remove-btn">×</div>
+            </div>
+            <div class="binding-row">
+              <div class="binding-row-left">
+                <span class="binding-type-badge">Product Classification</span>
+                <span class="binding-value">Vape Cartridge</span>
+              </div>
+              <div class="remove-btn">×</div>
+            </div>
+            <div class="binding-row">
+              <div class="binding-row-left">
+                <span class="binding-type-badge">Product Classification</span>
+                <span class="binding-value">E-Liquid / Vape Juice</span>
+              </div>
+              <div class="remove-btn">×</div>
+            </div>
+            <div class="binding-row">
+              <div class="binding-row-left">
+                <span class="binding-type-badge">Product Classification</span>
+                <span class="binding-value">Cigalike / Pod Mod</span>
+              </div>
+              <div class="remove-btn">×</div>
+            </div>
+            <div class="binding-row">
+              <div class="binding-row-left">
+                <span class="binding-type-badge">Product Classification</span>
+                <span class="binding-value">Traditional Tobacco</span>
+              </div>
+              <div class="remove-btn">×</div>
+            </div>
+
+            <div style="position:relative;margin-top:8px;">
+              <button class="add-binding-btn">+ Add Binding</button>
+              <div style="margin-top:6px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;display:flex;flex-wrap:wrap;gap:4px;">
+                <span style="font-size:11px;color:var(--muted);width:100%;padding:2px 6px;font-weight:700;">Binding Type:</span>
+                <button class="btn btn-secondary btn-sm" style="font-size:11px;">📦 Product Classification</button>
+                <button class="btn btn-secondary btn-sm" style="font-size:11px;">🔖 Product (direct)</button>
+                <button class="btn btn-secondary btn-sm" style="font-size:11px;">🧪 COA Field</button>
+                <button class="btn btn-secondary btn-sm" style="font-size:11px;">🌐 Website Finding Type</button>
+                <button class="btn btn-secondary btn-sm" style="font-size:11px;">💳 MCC Code</button>
+                <button class="btn btn-secondary btn-sm" style="font-size:11px;">📋 License Type</button>
+                <button class="btn btn-secondary btn-sm" style="font-size:11px;">🏢 Company</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Rules Section -->
+          <div class="rules-ref-section">
+            <div class="bindings-title">⚖️ Active Rules Referencing This Attribute</div>
+            <div class="rule-ref-row">
+              <div>
+                <div class="rule-ref-name">FDA ENDS Authorization Check</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">Evaluates products against the FDA ENDS authorization list</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="pill pill-green">Active</span>
+                <button class="btn btn-ghost btn-sm">View Rule →</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /modal-body -->
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Save Changes</button>
+        </div>
+      </div><!-- /modal -->
+    </div><!-- /modal-backdrop -->
+
+    <div class="annotation">
+      <strong>Bindings are the key mechanism.</strong> Attaching <code style="font-family:var(--mono);font-size:12px;">FDA_ENDS_AUTHORIZATION_REQUIRED</code> to all 5 tobacco/vape product classifications means every product in those classes automatically carries this attribute — no manual tagging per product required. When a new product is classified as "Disposable Vape", it immediately gets this attribute and is evaluated by the FDA ENDS Authorization Check rule. The Source/Citation field provides the regulatory basis for audit trail purposes.
+    </div>
+  </div><!-- /section 4 -->
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 5 — Compliance Rules Builder
+  ══════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">Section 5 · QP-3541</div>
+      <div class="section-title">Compliance Rules Builder</div>
+      <div class="section-subtitle">Click the Compliance Rules tile in Global Settings to open this screen</div>
+    </div>
+
+    <div class="screen">
+      <div class="screen-breadcrumb">
+        <a href="#">Q-Audit</a> / <a href="#">Global Settings</a> / <span>Compliance Rules</span>
+      </div>
+
+      <div class="screen-header">
+        <div>
+          <div class="screen-title">Compliance Rules</div>
+          <div class="screen-subtitle">Define automated checks that evaluate regulatory attributes against data sources</div>
+        </div>
+        <button class="btn btn-primary">+ Create Rule</button>
+      </div>
+
+      <div class="rules-list">
+
+        <!-- ── Rule 1: EXPANDED ── -->
+        <div class="rule-card expanded">
+          <div class="rule-card-header">
+            <div class="rule-header-left">
+              <div>
+                <div class="rule-name">FDA ENDS Authorization Check</div>
+                <div class="rule-summary">Evaluates tobacco/vape products against the FDA PMTA authorization list</div>
+              </div>
+            </div>
+            <div class="rule-header-right">
+              <span class="pill pill-green">Active</span>
+              <span class="chevron">▲</span>
+            </div>
+          </div>
+
+          <div class="rule-body">
+
+            <!-- Trigger -->
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:5px;">Trigger</div>
+              <div style="font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;">
+                When a product is classified into a category that carries
+                <span class="mono-tag" style="margin:0 3px;">FDA_ENDS_AUTHORIZATION_REQUIRED</span>
+                — or when the product catalog is manually triggered
+              </div>
+            </div>
+
+            <!-- Visual Rule Builder -->
+            <div class="rule-builder">
+              <div class="rule-builder-title">🔧 Rule Logic — IF / AND / THEN</div>
+              <div class="rule-flow">
+
+                <div class="rule-block condition-if">
+                  <span class="rule-block-keyword">IF</span>
+                  <div class="rule-block-content">
+                    <span>Product has attribute</span>
+                    <span class="rule-block-val">FDA_ENDS_AUTHORIZATION_REQUIRED</span>
+                  </div>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:8px;padding:0 20px;">
+                  <span style="color:var(--muted);font-size:12px;">└─</span>
+                  <span style="font-size:12px;color:var(--muted);font-weight:600;">also evaluates:</span>
+                </div>
+
+                <div class="rule-block condition-and-not">
+                  <span class="rule-block-keyword">AND NOT</span>
+                  <div class="rule-block-content">
+                    <span>Product found in</span>
+                    <span class="rule-block-val">fdaEndsAuthorizationList</span>
+                    <a class="rule-block-link">[Manage List →]</a>
+                  </div>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:6px;padding:2px 20px;color:var(--muted);font-size:12px;">
+                  <span>▼</span>
+                </div>
+
+                <div class="rule-block rule-then">
+                  <span class="rule-block-keyword">THEN</span>
+                  <div class="rule-block-content">
+                    <div class="then-result">
+                      <span>Set compliance status =</span>
+                      <span class="result-status result-prohibited">PROHIBITED</span>
+                      <span class="result-severity">Severity: <strong>HIGH</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Rule Meta Grid -->
+            <div class="rule-meta">
+              <div class="rule-meta-item">
+                <div class="rule-meta-label">Data Source</div>
+                <div class="rule-meta-value">
+                  FDA ENDS Authorization List
+                  <span class="pill pill-blue" style="margin-left:6px;">247 products</span>
+                  <a class="btn-link" style="margin-left:6px;font-size:12px;">Manage List →</a>
+                </div>
+              </div>
+              <div class="rule-meta-item">
+                <div class="rule-meta-label">Match Settings</div>
+                <div class="rule-meta-value">Fuzzy threshold: <strong>85%</strong> · Case-insensitive · Ignore punctuation</div>
+              </div>
+              <div class="rule-meta-item">
+                <div class="rule-meta-label">Applies To</div>
+                <div class="rule-meta-value">
+                  All products with <span class="mono-tag">FDA_ENDS_AUTHORIZATION_REQUIRED</span>
+                  <div style="margin-top:4px;font-size:12px;color:var(--muted);">
+                    Currently: <strong>5 classifications</strong> · <strong>~340 products</strong> across <strong>12 merchants</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="rule-meta-item">
+                <div class="rule-meta-label">Created / Modified</div>
+                <div class="rule-meta-value" style="font-size:12px;color:var(--muted);">Created Mar 15, 2026 · Modified Apr 1, 2026</div>
+              </div>
+            </div>
+
+            <!-- Run Stats -->
+            <div class="run-stats">
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">Last Run: Apr 1, 2026</div>
+                <div style="display:flex;gap:24px;align-items:center;">
+                  <div class="run-stat">
+                    <div class="run-stat-val">340</div>
+                    <div class="run-stat-lbl">Evaluated</div>
+                  </div>
+                  <div class="run-stat-divider"></div>
+                  <div class="run-stat">
+                    <div class="run-stat-val auth">312</div>
+                    <div class="run-stat-lbl">✓ Authorized</div>
+                  </div>
+                  <div class="run-stat-divider"></div>
+                  <div class="run-stat">
+                    <div class="run-stat-val prohib">18</div>
+                    <div class="run-stat-lbl">🔴 Prohibited</div>
+                  </div>
+                  <div class="run-stat-divider"></div>
+                  <div class="run-stat">
+                    <div class="run-stat-val unk">10</div>
+                    <div class="run-stat-lbl">⚠ Unknown</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:flex-end;">
+                <button class="btn btn-secondary btn-sm">View Results</button>
+                <button class="btn btn-primary btn-sm">▶ Run Now</button>
+              </div>
+            </div>
+
+          </div><!-- /rule-body -->
+        </div><!-- /rule 1 -->
+
+        <!-- ── Rule 2: COLLAPSED ── -->
+        <div class="rule-card collapsed">
+          <div class="rule-card-header">
+            <div class="rule-header-left">
+              <div>
+                <div class="rule-name">Kratom State Ban</div>
+                <div class="rule-summary">
+                  <span class="pill pill-orange" style="font-size:10px;margin-right:6px;">State</span>
+                  Products with <span class="mono-tag">KRATOM_BANNED</span> attribute in restricted jurisdictions → PROHIBITED (HIGH)
+                </div>
+              </div>
+            </div>
+            <div class="rule-header-right">
+              <span class="pill pill-green">Active</span>
+              <span style="font-size:11px;color:var(--muted);">Last run: Mar 28, 2026</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+        </div><!-- /rule 2 -->
+
+        <!-- ── Rule 3: COLLAPSED ── -->
+        <div class="rule-card collapsed">
+          <div class="rule-card-header">
+            <div class="rule-header-left">
+              <div>
+                <div class="rule-name">THC Content Limit</div>
+                <div class="rule-summary">
+                  <span class="pill pill-navy" style="font-size:10px;margin-right:6px;">Federal</span>
+                  COA Delta-9 THC &gt; 0.3% on product with <span class="mono-tag">THC_LIMIT_0.3PCT</span> → NON-COMPLIANT (HIGH)
+                </div>
+              </div>
+            </div>
+            <div class="rule-header-right">
+              <span class="pill pill-green">Active</span>
+              <span style="font-size:11px;color:var(--muted);">Last run: Apr 1, 2026</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+        </div><!-- /rule 3 -->
+
+      </div><!-- /rules-list -->
+    </div><!-- /screen -->
+
+    <div class="annotation">
+      <strong>Rules are the evaluation logic.</strong> They reference regulatory attributes and external data sources (like the FDA ENDS list). The visual rule builder uses IF / AND / THEN blocks. Rules run automatically when: a product is classified, a COA is uploaded, a website scan completes, or manually triggered.<br><br>
+      The <strong>"Applies to" count</strong> shows real-time scope — how many products across how many merchants are currently affected by this rule. When a new merchant onboards and has vape products classified as "Disposable Vape", they are immediately included in the next rule evaluation run. The regulatory team has full visibility into who is affected before changing any rule.
+    </div>
+  </div><!-- /section 5 -->
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION 6 — Product Compliance Status Column
+  ══════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-label">Section 6 · QP-3542</div>
+      <div class="section-title">Product Compliance Status Column — End Result</div>
+      <div class="section-subtitle">The new column in the Product Catalog table — aggregated rule evaluation output</div>
+    </div>
+
+    <!-- Screen header -->
+    <div class="screen-breadcrumb">
+      <a href="#">Q-Monitor</a> / <a href="#">Products</a> / <span>Product Catalog</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);">Product Catalog</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px;">Acme Smoke Shop · 6 products · Last compliance check: Apr 1, 2026</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary btn-sm">Filter</button>
+        <button class="btn btn-secondary btn-sm">Export</button>
+        <button class="btn btn-primary btn-sm">▶ Run Compliance Check</button>
+      </div>
+    </div>
+
+    <div class="product-table-wrap">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" class="cb"></th>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Classification</th>
+            <th class="new-col">Product Compliance Status</th>
+            <th>COA Status</th>
+            <th>Disposition</th>
+            <th>Date Added</th>
+            <th>Activity</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Row 1: Compliant -->
+          <tr>
+            <td><input type="checkbox" class="cb"></td>
+            <td>
+              <div class="product-info">
+                <div class="thumb">🍬</div>
+                <div>
+                  <div class="product-name">Delta-8 Gummy 25mg</div>
+                  <div class="product-sku">Hemp/CBD Edible</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:12px;color:var(--muted);">D8-GUM-25</td>
+            <td><span class="class-tag">Hemp / CBD</span></td>
+            <td><span class="compliance-status cs-compliant">✓ Compliant</span></td>
+            <td><span class="coa-status attached">✓ Attached</span></td>
+            <td><span class="disp approved">✓ Approved</span></td>
+            <td style="font-size:12px;color:var(--muted);">Jan 12, 2026</td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+
+          <!-- Row 2: FDA Authorized -->
+          <tr>
+            <td><input type="checkbox" class="cb"></td>
+            <td>
+              <div class="product-info">
+                <div class="thumb">🚬</div>
+                <div>
+                  <div class="product-name">JUUL Virginia Tobacco Pod</div>
+                  <div class="product-sku">Vape Pod / Cartridge</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:12px;color:var(--muted);">JUUL-VT-2PK</td>
+            <td><span class="class-tag">Vape Cartridge</span></td>
+            <td><span class="compliance-status cs-authorized">🏛️ FDA Authorized</span></td>
+            <td><span class="coa-status na" style="color:var(--muted);">— N/A</span></td>
+            <td><span class="disp na" style="color:var(--muted);">— N/A</span></td>
+            <td style="font-size:12px;color:var(--muted);">Feb 3, 2026</td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+
+          <!-- Row 3: PROHIBITED (Vape) — with callout -->
+          <tr class="row-with-callout" style="background:#FFF5F5;">
+            <td><input type="checkbox" class="cb"></td>
+            <td>
+              <div class="product-info">
+                <div class="thumb" style="border-color:var(--red-mid);background:var(--red-light);">💨</div>
+                <div>
+                  <div class="product-name" style="color:var(--red);">Generic Disposable Vape</div>
+                  <div class="product-sku">No-name ENDS device</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:12px;color:var(--muted);">GEN-DISP-01</td>
+            <td><span class="class-tag">Disposable Vape</span></td>
+            <td>
+              <span class="compliance-status cs-prohibited">🔴 PROHIBITED</span>
+            </td>
+            <td><span class="coa-status na">— N/A</span></td>
+            <td><span class="disp na">— N/A</span></td>
+            <td style="font-size:12px;color:var(--muted);">Mar 8, 2026</td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+
+          <!-- Callout row for Vape PROHIBITED -->
+          <tr class="callout-row" style="background:#FFF5F5;">
+            <td colspan="9">
+              <div class="callout-cell">
+                <div class="tooltip-callout">
+                  <div class="tooltip-rule-line">
+                    <span class="tooltip-icon">🏛️</span>
+                    <div>
+                      <div class="tooltip-rule-name">FDA ENDS Authorization Check</div>
+                      <div class="tooltip-verdict">NOT ON LIST</div>
+                      <div class="tooltip-desc">Product not found on FDA authorized ENDS products list. Match attempted against 247 authorized products at 85% fuzzy threshold. No match found.</div>
+                    </div>
+                  </div>
+                  <div class="tooltip-meta">
+                    <span class="tooltip-meta-item">Severity: <strong>HIGH</strong></span>
+                    <span style="color:rgba(255,255,255,0.2);">·</span>
+                    <span class="tooltip-meta-item">Rule: <strong>FDA ENDS Authorization Check</strong></span>
+                    <span style="color:rgba(255,255,255,0.2);">·</span>
+                    <span class="tooltip-meta-item">Checked: <strong>Apr 1, 2026</strong></span>
+                  </div>
+                  <div class="tooltip-actions">
+                    <button class="tooltip-btn tooltip-btn-primary">View Rule</button>
+                    <button class="tooltip-btn tooltip-btn-secondary">Override ▾</button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 4: PROHIBITED (Kratom) — COA fine but banned -->
+          <tr class="row-with-callout-kratom" style="background:#FFF5F5;">
+            <td><input type="checkbox" class="cb"></td>
+            <td>
+              <div class="product-info">
+                <div class="thumb" style="border-color:var(--red-mid);background:var(--red-light);">🌿</div>
+                <div>
+                  <div class="product-name" style="color:var(--red);">Kratom Extract 50x</div>
+                  <div class="product-sku">Botanical supplement</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:12px;color:var(--muted);">KRT-EXT-50X</td>
+            <td><span class="class-tag">Kratom</span></td>
+            <td>
+              <span class="compliance-status cs-prohibited">🔴 PROHIBITED</span>
+            </td>
+            <td><span class="coa-status attached" style="color:var(--green);">✓ Attached</span></td>
+            <td><span class="disp approved" style="color:var(--green);">✓ Approved</span></td>
+            <td style="font-size:12px;color:var(--muted);">Feb 19, 2026</td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+
+          <!-- Callout row for Kratom PROHIBITED -->
+          <tr class="callout-row" style="background:#FFF5F5;">
+            <td colspan="9">
+              <div class="callout-cell">
+                <div class="tooltip-callout">
+                  <div class="tooltip-rule-line">
+                    <span class="tooltip-icon">⚖️</span>
+                    <div>
+                      <div class="tooltip-rule-name">Kratom State Ban</div>
+                      <div class="tooltip-verdict">PROHIBITED IN IN</div>
+                      <div class="tooltip-desc">Kratom products are banned in Indiana (IN). Merchant jurisdiction: Indiana. Product classification: Kratom.</div>
+                    </div>
+                  </div>
+                  <div class="tooltip-meta">
+                    <span class="tooltip-meta-item">Severity: <strong>HIGH</strong></span>
+                    <span style="color:rgba(255,255,255,0.2);">·</span>
+                    <span class="tooltip-meta-item">Rule: <strong>Kratom State Ban</strong></span>
+                    <span style="color:rgba(255,255,255,0.2);">·</span>
+                    <span class="tooltip-meta-item">Checked: <strong>Mar 28, 2026</strong></span>
+                  </div>
+                  <div class="tooltip-note">
+                    ⚠️ Note: COA status (Approved) does NOT override product-level compliance. This product has a valid lab analysis but is still prohibited by state law.
+                  </div>
+                  <div class="tooltip-actions">
+                    <button class="tooltip-btn tooltip-btn-primary">View Rule</button>
+                    <button class="tooltip-btn tooltip-btn-secondary">Override ▾</button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 5: Compliant -->
+          <tr>
+            <td><input type="checkbox" class="cb"></td>
+            <td>
+              <div class="product-info">
+                <div class="thumb">💧</div>
+                <div>
+                  <div class="product-name">CBD Tincture 1000mg</div>
+                  <div class="product-sku">Full-spectrum tincture</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:12px;color:var(--muted);">CBD-TINC-1K</td>
+            <td><span class="class-tag">Tincture</span></td>
+            <td><span class="compliance-status cs-compliant">✓ Compliant</span></td>
+            <td><span class="coa-status attached">✓ Attached</span></td>
+            <td><span class="disp approved">✓ Approved</span></td>
+            <td style="font-size:12px;color:var(--muted);">Jan 28, 2026</td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+
+          <!-- Row 6: Unknown -->
+          <tr>
+            <td><input type="checkbox" class="cb"></td>
+            <td>
+              <div class="product-info">
+                <div class="thumb" style="background:#F1F5F9;border-color:#CBD5E1;">❓</div>
+                <div>
+                  <div class="product-name" style="color:var(--muted);">Mystery Vape Cart</div>
+                  <div class="product-sku">Unknown manufacturer</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:12px;color:var(--muted);">UNK-VAPE-X</td>
+            <td><span class="class-tag">Vape Cartridge</span></td>
+            <td>
+              <span class="compliance-status cs-unknown">⚠ Unknown</span>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px;">Awaiting list match</div>
+            </td>
+            <td><span class="coa-status na">— N/A</span></td>
+            <td><span class="disp na">— N/A</span></td>
+            <td style="font-size:12px;color:var(--muted);">Apr 1, 2026</td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div><!-- /product-table-wrap -->
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:0 4px;font-size:12px;color:var(--muted);">
+      <span>Showing 6 products · <span style="color:var(--red);font-weight:600;">2 prohibited</span> · <span style="color:var(--green);font-weight:600;">3 compliant</span> · <span style="font-weight:600;">1 unknown</span></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm">← Prev</button>
+        <button class="btn btn-secondary btn-sm">Next →</button>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>This is the end result.</strong> The <strong>Product Compliance Status</strong> column aggregates all applicable rule evaluations into a single, scannable signal per product. Key takeaways from this table:<br><br>
+      <strong>🏛️ FDA Authorization rows:</strong> JUUL Virginia Tobacco Pod shows <em>FDA Authorized</em> (it's on the list). Generic Disposable Vape shows <em>PROHIBITED</em> (not on the list) with a tooltip showing the specific rule and failure reason.<br><br>
+      <strong>⚖️ Kratom row demonstrates the critical insight:</strong> Kratom Extract 50x has a valid COA (Attached) and an Approved lab disposition — the lab analysis is clean. But it is still PROHIBITED at the product level because state law bans it. <strong>COA compliance and legal compliance are orthogonal concerns.</strong> The tooltip explicitly surfaces this distinction so compliance reviewers understand why a "Approved" product is flagged.<br><br>
+      Hovering the compliance status cell (shown as visible callouts here) displays which specific rules contributed to the status, with categorical icons: 🏛️ for government authorization checks, ⚖️ for legal/ban checks, 🧪 for lab-based checks. The <strong>Override</strong> action allows authorized users to manually exempt a product with a documented reason.
+    </div>
+
+  </div><!-- /section 6 -->
+
+</div><!-- /page -->
+
+</body>
+</html>
