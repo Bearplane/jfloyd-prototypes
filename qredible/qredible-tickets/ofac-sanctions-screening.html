@@ -1054,7 +1054,7 @@
       <div class="mri-arch-card active">
         <span class="mri-arch-badge badge-active">✓ Built</span>
         <div class="mri-arch-icon">🛡️</div>
-        <div class="mri-arch-label">Sanctions Screening</div>
+        <div class="mri-arch-label">Merchant Risk Intelligence</div>
         <div class="mri-arch-status">Built — QP-3602</div>
         <div class="mri-arch-text">OFAC SDN list, sanctions databases, regulatory blocked persons. Contacts screened against federal sanctions lists.</div>
       </div>
@@ -1090,7 +1090,63 @@
   </div>
 
 
+  
   <!-- ═══════════════════════════════════════════════════════
+       SECTION 0: Merchant Risk Intelligence — Architecture
+  ══════════════════════════════════════════════════════════ -->
+  <div>
+    <div class="section-label" style="margin-bottom:16px;">Section 0 — Merchant Risk Intelligence (MRI) Architecture</div>
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px 18px;font-size:13px;color:#1E40AF;margin-bottom:16px;">
+      <strong>Brian Fitzpatrick, Apr 3 2026:</strong> "Just as we have product compliance rolled up into its own separate modal and website compliance rolled up in its separate modal, OFAC is just one factor... we need to be able to move the other areas of screening — legal, reputation, reviews. OFAC is a subset." Final name: <strong>Merchant Risk Intelligence (MRI)</strong>.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;">
+      <div style="background:white;border:2px solid #16A34A;border-radius:10px;padding:16px 14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:20px;">🛡️</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#0F172A;">Sanctions Screening</div>
+            <span style="background:#DCFCE7;color:#166534;font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;">✓ Built — QP-3602</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#64748B;line-height:1.6;">OFAC SDN list, sanctions databases, regulatory blocked persons. Contacts screened against federal sanctions lists.</div>
+      </div>
+      <div style="background:white;border:2px solid #3B82F6;border-radius:10px;padding:16px 14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:20px;">⭐</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#0F172A;">Reputation Intelligence</div>
+            <span style="background:#DBEAFE;color:#1E40AF;font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;">↻ Activating</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#64748B;line-height:1.6;">BBB ratings, Google Reviews, Trustpilot, Yelp. Already collected — being activated via Findings tab.</div>
+      </div>
+      <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px 14px;opacity:.8;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:20px;">⚖️</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#0F172A;">Legal &amp; Regulatory</div>
+            <span style="background:#F1F5F9;color:#64748B;font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;">Planned</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#64748B;line-height:1.6;">FDA warning letters, FTC enforcement actions, state regulatory violations, court judgments.</div>
+      </div>
+      <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px 14px;opacity:.8;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:20px;">📊</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#0F172A;">Business Risk</div>
+            <span style="background:#F1F5F9;color:#64748B;font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;">Planned</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#64748B;line-height:1.6;">MCC code risk signals, domain/tech analysis, business registration verification, chargeback history.</div>
+      </div>
+    </div>
+    <div class="annotation">
+      <strong>MRI = Merchant Risk Intelligence.</strong> The We Monitor column shows the aggregate worst-case status across all active MRI factors — same pattern as Website Compliance and Product Compliance columns. Clicking opens the MRI modal. The modal has tabs: Sanctions (Phase 1, built), Reputation (Phase 2, activating), Legal, Business Risk. This mockup covers the Sanctions tab in detail.
+    </div>
+  </div>
+
+<!-- ═══════════════════════════════════════════════════════
        SECTION 1: WE MONITOR TABLE WITH MRI COLUMN
   ══════════════════════════════════════════════════════════ -->
   <div>
