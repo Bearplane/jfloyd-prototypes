@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyCOA SEO + Consumer Experience — Qredible Mockup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #3B82F6;
+      --blue-light: #EFF6FF;
+      --blue-mid: #BFDBFE;
+      --navy: #1E3A5F;
+      --navy-light: #EEF2F7;
+      --green: #16A34A;
+      --green-light: #F0FDF4;
+      --green-mid: #BBF7D0;
+      --red: #DC2626;
+      --red-light: #FEF2F2;
+      --orange: #D97706;
+      --orange-light: #FFFBEB;
+      --purple: #7C3AED;
+      --purple-light: #F5F3FF;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --gray-800: #1F2937;
+      --gray-900: #111827;
+      --radius-card: 10px;
+      --radius-sm: 6px;
+      --font-ui: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background: #F0F2F5;
+      color: var(--gray-800);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ─── ANNOTATION BAR ─────────────────────────────────── */
+    .annotation-bar {
+      background: #FEF3C7;
+      border-bottom: 2px solid #F59E0B;
+      padding: 10px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #92400E;
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .annotation-bar::before { content: '🔖'; font-size: 14px; }
+    .annotation-phase {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .phase-chip {
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .phase-chip.mvp { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+    .phase-chip.p2  { background: #EDE9FE; color: #6D28D9; border: 1px solid #C4B5FD; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .page-wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ─── CARD ───────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .card-header {
+      background: var(--navy);
+      color: #fff;
+      padding: 13px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-new {
+      background: #3B82F6;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .badge-current { background: #16A34A; }
+    .badge-phase1  { background: #D97706; }
+    .badge-phase2  { background: #7C3AED; }
+
+    .card-body { padding: 24px; }
+
+    /* ─── FORM ELEMENTS ──────────────────────────────────── */
+    .subsection {
+      margin-bottom: 28px;
+    }
+    .subsection:last-child { margin-bottom: 0; }
+
+    .subsection-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--navy);
+      padding: 6px 12px;
+      background: var(--navy-light);
+      border-left: 3px solid var(--navy);
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      outline: none;
+      resize: vertical;
+    }
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--blue);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+    .form-textarea { min-height: 72px; }
+
+    .variable-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      align-items: center;
+    }
+    .variable-chips-label {
+      font-size: 11px;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+    .chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--blue-light);
+      color: var(--blue);
+      border: 1px solid var(--blue-mid);
+      border-radius: 4px;
+      padding: 2px 7px;
+      cursor: default;
+    }
+    .chip:hover { background: var(--blue-mid); }
+
+    .preview-box {
+      margin-top: 8px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+    .preview-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-bottom: 4px;
+    }
+    .preview-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 4px;
+    }
+
+    /* ─── RADIO CARDS ────────────────────────────────────── */
+    .radio-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .radio-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transition: border-color 0.15s;
+    }
+    .radio-card.selected {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+    .radio-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radio-card.selected .radio-dot {
+      border-color: var(--blue);
+    }
+    .radio-dot::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: transparent;
+    }
+    .radio-card.selected .radio-dot::after { background: var(--blue); }
+    .radio-card-title { font-size: 13px; font-weight: 700; color: var(--gray-800); }
+    .radio-card-desc  { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
+    /* ─── CUSTOM DOMAIN ──────────────────────────────────── */
+    .domain-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .domain-input-row .form-input { flex: 1; }
+    .btn {
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-outline  { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
+    .btn-ghost    { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .btn-green    { background: var(--green); color: #fff; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--green-light);
+      border: 1px solid var(--green-mid);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .dns-box {
+      margin-top: 12px;
+      background: var(--gray-900);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #86EFAC;
+      line-height: 1.8;
+    }
+    .dns-box span { color: #93C5FD; }
+
+    /* ─── OPTIONS GRID ───────────────────────────────────── */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 700px) {
+      .options-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .option-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      background: var(--gray-50);
+    }
+    .option-card-label { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .option-card select, .option-card input[type="number"] {
+      width: 100%;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: var(--font-ui);
+      font-size: 12px;
+      color: var(--gray-700);
+      background: #fff;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .toggle-label { font-size: 12px; font-weight: 500; color: var(--gray-700); }
+    .toggle {
+      width: 36px;
+      height: 20px;
+      background: var(--green);
+      border-radius: 10px;
+      position: relative;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .toggle.off { background: var(--gray-300); }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      right: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle.off::after { right: auto; left: 3px; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--gray-200);
+      margin: 24px 0;
+    }
+
+    /* ─── SECTION 2: LINK STRATEGY ───────────────────────── */
+    .link-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 700px) { .link-cards-grid { grid-template-columns: 1fr; } }
+
+    .link-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      background: var(--gray-50);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .link-card-icon { font-size: 28px; }
+    .link-card-title { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+    .link-card-desc  { font-size: 12.5px; color: var(--gray-600); line-height: 1.5; }
+    .link-card-url {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--blue);
+      background: var(--blue-light);
+      border: 1px solid var(--blue-mid);
+      border-radius: 4px;
+      padding: 6px 10px;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+    .link-card-usecase {
+      font-size: 11.5px;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border-radius: 4px;
+      padding: 8px 10px;
+      line-height: 1.5;
+    }
+    .link-card-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      align-self: flex-start;
+    }
+    .badge-green-pill  { background: var(--green-light); color: var(--green); border: 1px solid var(--green-mid); }
+    .badge-orange-pill { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+    .badge-blue-pill   { background: var(--blue-light); color: #1D4ED8; border: 1px solid var(--blue-mid); }
+
+    .qr-placeholder {
+      width: 80px;
+      height: 80px;
+      background: var(--gray-200);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--gray-500);
+      font-weight: 600;
+      text-align: center;
+      border: 2px dashed var(--gray-300);
+      line-height: 1.3;
+    }
+
+    .info-box {
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #92400E;
+      font-weight: 500;
+    }
+
+    /* ─── SECTION 3: BROWSER MOCKUP ─────────────────────── */
+    .browser-shell {
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .browser-chrome {
+      background: #F1F3F4;
+      border-bottom: 1px solid var(--gray-300);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red    { background: #FF5F57; }
+    .dot-yellow { background: #FEBC2E; }
+    .dot-green  { background: #28C840; }
+    .browser-url-bar {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--gray-300);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .browser-url-bar::before { content: '🔒'; font-size: 11px; }
+    .browser-url-text { color: var(--gray-500); }
+    .browser-url-text strong { color: var(--gray-800); }
+
+    .browser-body { padding: 24px; background: #fff; }
+
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+    }
+    .breadcrumb a { color: var(--blue); font-weight: 500; }
+    .breadcrumb span { margin: 0 6px; color: var(--gray-400); }
+
+    .product-info-bar {
+      background: var(--navy-light);
+      border: 1px solid #C7D2E4;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .pib-item { font-size: 12px; color: var(--gray-600); }
+    .pib-item strong { display: block; font-size: 13px; font-weight: 700; color: var(--gray-800); }
+    .pib-divider { width: 1px; height: 32px; background: #C7D2E4; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-validated { background: var(--green-light); color: var(--green); border: 1px solid var(--green-mid); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-dot-green { background: var(--green); }
+
+    .pdf-viewer-area {
+      background: var(--gray-100);
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--radius-sm);
+      height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .pdf-icon { font-size: 48px; }
+    .pdf-label { font-size: 14px; font-weight: 600; color: var(--gray-600); }
+    .pdf-sublabel { font-size: 12px; color: var(--gray-400); }
+    .pdf-toolbar {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .jsonld-section { margin-top: 16px; }
+    .jsonld-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      padding: 8px 12px;
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-200);
+      user-select: none;
+    }
+    .jsonld-toggle::before { content: '▶'; font-size: 9px; }
+    .jsonld-code {
+      background: var(--gray-900);
+      color: #86EFAC;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 14px 16px;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .jsonld-code .k { color: #93C5FD; }
+    .jsonld-code .v { color: #FDE68A; }
+    .jsonld-code .s { color: #86EFAC; }
+    .jsonld-code .p { color: #F9A8D4; }
+
+    /* ─── SECTION 4: PHONE MOCKUP ────────────────────────── */
+    .phone-container-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .phone-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .phone-shell {
+      width: 390px;
+      max-width: 100%;
+      border: 2px solid var(--gray-300);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 6px var(--gray-100);
+      background: #fff;
+    }
+    .phone-notch {
+      background: var(--gray-900);
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .phone-notch::after {
+      content: '';
+      width: 80px;
+      height: 8px;
+      background: #374151;
+      border-radius: 4px;
+    }
+    .phone-body { overflow: hidden; }
+
+    .coa-app-header {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .coa-logo-placeholder {
+      width: 100px;
+      height: 28px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--gray-500);
+      font-weight: 600;
+    }
+    .coa-powered {
+      font-size: 9.5px;
+      color: var(--gray-400);
+      font-weight: 500;
+    }
+    .coa-powered strong { color: var(--blue); }
+
+    .coa-product-hero {
+      padding: 16px;
+      background: var(--gray-50);
+    }
+    .product-img-placeholder {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--gray-500);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .coa-product-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .coa-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+    }
+    .coa-meta-item { font-size: 11.5px; }
+    .coa-meta-item .meta-key { color: var(--gray-400); font-weight: 500; }
+    .coa-meta-item .meta-val { color: var(--gray-700); font-weight: 600; }
+
+    .coa-cards { padding: 0 12px; display: flex; flex-direction: column; gap: 10px; }
+
+    .coa-card {
+      border-radius: 10px;
+      padding: 14px;
+      border: 1px solid var(--gray-200);
+    }
+    .coa-card.potency { background: var(--green-light); border-color: var(--green-mid); }
+    .coa-card.safety  { background: #fff; }
+    .coa-card.terpene { background: var(--purple-light); border-color: #DDD6FE; }
+
+    .coa-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gray-600);
+      margin-bottom: 10px;
+    }
+    .potency-main { font-size: 26px; font-weight: 700; color: var(--green); line-height: 1.1; }
+    .potency-sub  { font-size: 13px; color: var(--gray-500); margin-bottom: 12px; }
+
+    .cannabinoid-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .cb-name { font-size: 11px; font-weight: 600; color: var(--gray-700); width: 50px; flex-shrink: 0; }
+    .cb-track { flex: 1; height: 8px; background: var(--green-mid); border-radius: 4px; overflow: hidden; }
+    .cb-fill  { height: 100%; background: var(--green); border-radius: 4px; }
+    .cb-val   { font-size: 10.5px; font-family: var(--font-mono); color: var(--gray-600); width: 46px; text-align: right; flex-shrink: 0; }
+
+    .safety-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .safety-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 8px;
+      background: var(--gray-50);
+      border-radius: 6px;
+      border: 1px solid var(--gray-200);
+    }
+    .safety-item .si-icon { font-size: 14px; flex-shrink: 0; }
+    .safety-item .si-name { font-size: 11px; font-weight: 700; color: var(--gray-700); }
+    .safety-item .si-result { font-size: 10px; color: var(--green); font-weight: 600; }
+
+    .terpene-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .terp-name { font-size: 11px; font-weight: 600; color: var(--purple); width: 90px; flex-shrink: 0; }
+    .terp-track { flex: 1; height: 6px; background: #DDD6FE; border-radius: 3px; overflow: hidden; }
+    .terp-fill  { height: 100%; background: var(--purple); border-radius: 3px; }
+    .terp-val   { font-size: 10.5px; font-family: var(--font-mono); color: var(--gray-600); width: 40px; text-align: right; flex-shrink: 0; }
+
+    .coa-footer-area { padding: 12px; }
+    .btn-view-pdf {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--blue);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--blue);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+    .coa-app-footer {
+      background: var(--gray-50);
+      border-top: 1px solid var(--gray-200);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 10.5px;
+      color: var(--gray-400);
+      font-weight: 500;
+    }
+    .coa-app-footer strong { color: var(--blue); }
+
+    .phone-validated-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 16px;
+      background: var(--green-light);
+      border-bottom: 1px solid var(--green-mid);
+    }
+
+    /* ─── SECTION 5: LIFECYCLE ───────────────────────────── */
+    .flow-diagram {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+    .flow-step {
+      flex: 1;
+      min-width: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .flow-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+      color: var(--gray-400);
+      font-weight: 300;
+      z-index: 1;
+    }
+    .flow-step-inner {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-card);
+      padding: 20px 16px;
+      background: var(--gray-50);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 0 12px;
+    }
+    .flow-icon { font-size: 28px; }
+    .flow-step-num {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gray-400);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .flow-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .flow-desc  { font-size: 11.5px; color: var(--gray-500); line-height: 1.4; }
+    .flow-sub   {
+      font-size: 11px;
+      font-style: italic;
+      color: var(--blue);
+      background: var(--blue-light);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* ─── DATA TABLE ─────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .data-table th {
+      background: var(--navy);
+      color: #fff;
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .data-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--gray-700);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--gray-50); }
+    .data-table td:first-child { font-weight: 600; color: var(--gray-800); font-family: var(--font-mono); font-size: 12px; }
+    .data-table td:last-child { color: var(--gray-500); }
+
+    /* ─── PHASE COMPARISON ───────────────────────────────── */
+    .phase-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .phase-col {
+      border-radius: var(--radius-card);
+      padding: 20px;
+      border: 2px solid;
+    }
+    .phase-col.mvp    { border-color: var(--green-mid); background: var(--green-light); }
+    .phase-col.phase2 { border-color: #C4B5FD; background: var(--purple-light); }
+    .phase-col-header {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .phase-col.mvp    .phase-col-header { color: var(--green); }
+    .phase-col.phase2 .phase-col-header { color: var(--purple); }
+    .phase-col-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--gray-500);
+      margin-bottom: 14px;
+    }
+    .phase-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .phase-list li {
+      font-size: 12.5px;
+      color: var(--gray-700);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      line-height: 1.4;
+    }
+    .phase-list li::before { font-size: 13px; flex-shrink: 0; }
+    .phase-col.mvp    .phase-list li::before { content: '✅'; }
+    .phase-col.phase2 .phase-list li::before { content: '🔮'; }
+
+    /* ─── SECTION SPACER ─────────────────────────────────── */
+    .section-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+    .section-row-title { font-size: 11px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; }
+    .section-row-line { flex: 1; height: 1px; background: var(--gray-200); }
+
+    /* ─── HEADER ─────────────────────────────────────────── */
+    .page-header {
+      padding: 24px 0 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .page-header p { font-size: 13px; color: var(--gray-500); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ANNOTATION BAR                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="annotation-bar">
+  Mockup — MyCOA SEO Settings + Consumer COA Experience&nbsp;&nbsp;|&nbsp;&nbsp;Phase 1 MVP → Phase 2 Friendly Template
+  <div class="annotation-phase">
+    <span class="phase-chip mvp">Phase 1 MVP</span>
+    <span class="phase-chip p2">Phase 2</span>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <div class="page-header">
+    <h1>MyCOA — SEO + Consumer Experience</h1>
+    <p>Q-Monitor › MyCOA Settings &nbsp;|&nbsp; Ticket reference mockup — all fields are illustrative. Design uses Qredible system tokens.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 1: SEO SETTINGS                                     -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-header">
+      SEO Settings
+      <span class="badge-new">New / Updated</span>
+    </div>
+    <div class="card-body">
+
+      <!-- 1a. Listing Page SEO -->
+      <div class="subsection">
+        <div class="subsection-label">1a — Listing Page SEO</div>
+
+        <div class="form-group">
+          <label class="form-label">Listing Page Title</label>
+          <input class="form-input" type="text" value="Lab Results &amp; COA Reports | {company}" readonly />
+          <div class="variable-chips">
+            <span class="variable-chips-label">Variables:</span>
+            <span class="chip">{company}</span>
+            <span class="chip">{product_count}</span>
+          </div>
+          <div class="preview-box">
+            <div class="preview-label">Preview</div>
+            <div class="preview-value">Lab Results &amp; COA Reports | Black Bear Dispensary</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Listing Page Description</label>
+          <textarea class="form-textarea" readonly>Browse {product_count} verified COA lab reports from {company}. Search by batch number or product name.</textarea>
+          <div class="char-count">91 / 160</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- 1b. Individual COA Page SEO -->
+      <div class="subsection">
+        <div class="subsection-label">1b — Individual COA Page SEO</div>
+
+        <div class="form-group">
+          <label class="form-label">COA Detail Page Title</label>
+          <input class="form-input" type="text" value="{product} COA - {batch} | {company}" readonly />
+          <div class="variable-chips">
+            <span class="variable-chips-label">Variables:</span>
+            <span class="chip">{product}</span>
+            <span class="chip">{batch}</span>
+            <span class="chip">{company}</span>
+            <span class="chip">{lab}</span>
+            <span class="chip">{date}</span>
+          </div>
+          <div class="preview-box">
+            <div class="preview-label">Preview</div>
+            <div class="preview-value">THCa Live Rosin Sex Panther COA - 02-18-2025-5853 | Black Bear Dispensary</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">COA Detail Description</label>
+          <textarea class="form-textarea" readonly>View certified lab results for {product} (Batch: {batch}). Full cannabinoid profile and safety testing from {lab}.</textarea>
+          <div class="char-count">118 / 160</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- 1c. Search Engine Indexing -->
+      <div class="subsection">
+        <div class="subsection-label">1c — Search Engine Indexing</div>
+        <div class="radio-card-grid">
+          <div class="radio-card selected">
+            <div class="radio-dot"></div>
+            <div>
+              <div class="radio-card-title">🔍 Index My COA Pages</div>
+              <div class="radio-card-desc">Allow search engines to index your COA listing and detail pages. Recommended for maximum SEO visibility.</div>
+            </div>
+          </div>
+          <div class="radio-card">
+            <div class="radio-dot"></div>
+            <div>
+              <div class="radio-card-title">🚫 Don't Index</div>
+              <div class="radio-card-desc">Adds noindex meta tags to all COA pages. Use if you want to keep lab results private or share by direct link only.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- 1d. Custom Domain -->
+      <div class="subsection">
+        <div class="subsection-label">1d — Custom Domain</div>
+        <div class="form-group">
+          <label class="form-label">Custom Domain</label>
+          <div class="domain-input-row">
+            <input class="form-input" type="text" value="coa.blackbeardispensary.com" readonly style="flex:1" />
+            <span class="verified-badge">✓ Verified</span>
+            <button class="btn btn-ghost btn-sm">Disconnect</button>
+          </div>
+        </div>
+        <div class="dns-box">
+          <span># DNS Configuration (CNAME)</span><br/>
+          <span>Type:</span> CNAME<br/>
+          <span>Name:</span> coa<br/>
+          <span>Value:</span> members.qredible.com<br/>
+          <span>TTL:</span> Auto
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- 1e. COA Listing Options -->
+      <div class="subsection">
+        <div class="subsection-label">1e — COA Listing Options</div>
+        <div class="options-grid">
+
+          <div class="option-card">
+            <div class="option-card-label">Sort Order</div>
+            <select>
+              <option selected>Newest First</option>
+              <option>Oldest First</option>
+              <option>Product A–Z</option>
+              <option>Batch #</option>
+            </select>
+          </div>
+
+          <div class="option-card">
+            <div class="option-card-label">Items Per Page</div>
+            <input type="number" value="24" min="12" max="100" step="12" />
+          </div>
+
+          <div class="option-card">
+            <div class="option-card-label">HTML Summary</div>
+            <div class="toggle-row" style="margin-top:8px;">
+              <span class="toggle-label">Render HTML summary below PDF</span>
+              <div class="toggle"></div>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="option-card-label">Auto-Generate Sitemap</div>
+            <div class="toggle-row" style="margin-top:8px;">
+              <span class="toggle-label">Include COA pages in sitemap.xml</span>
+              <div class="toggle"></div>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="option-card-label">Show Recent COAs Listing</div>
+            <div class="toggle-row" style="margin-top:8px;">
+              <span class="toggle-label">Widget on homepage / recent COAs</span>
+              <div class="toggle off"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 2: COA LINK STRATEGY                                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-header">
+      COA Link Strategy
+      <span class="badge-new">New</span>
+    </div>
+    <div class="card-body">
+
+      <div class="link-cards-grid">
+
+        <!-- Card 1: Dynamic Listing URL -->
+        <div class="link-card">
+          <div class="link-card-icon">🔗</div>
+          <div>
+            <div class="link-card-title">Dynamic Listing URL</div>
+            <span class="link-card-badge badge-green-pill">Current Feature</span>
+          </div>
+          <div class="link-card-desc">A single URL for your full COA library. Customers browse and search all published COAs.</div>
+          <div class="link-card-url">members.qredible.com/my-coa/<strong>black-bear-hemp-dispensary-164911</strong></div>
+          <div class="link-card-usecase">
+            <strong>Best for:</strong> Site header/footer link, "Lab Results" nav menu item
+          </div>
+        </div>
+
+        <!-- Card 2: Direct COA URL -->
+        <div class="link-card">
+          <div class="link-card-icon">📄</div>
+          <div>
+            <div class="link-card-title">Direct COA URL</div>
+            <span class="link-card-badge badge-orange-pill">Phase 1A — SSR</span>
+          </div>
+          <div class="link-card-desc">Each COA gets a unique, shareable URL. Link directly from product pages.</div>
+          <div class="link-card-url">coa.blackbeardispensary.com/<strong>thca-live-rosin-sex-panther</strong>/<strong>02-18-2025-5853</strong></div>
+          <div class="link-card-usecase">
+            <strong>Best for:</strong> Product page links, QR codes on packaging
+          </div>
+        </div>
+
+        <!-- Card 3: QR Code -->
+        <div class="link-card">
+          <div class="link-card-icon">📱</div>
+          <div>
+            <div class="link-card-title">QR Code</div>
+            <span class="link-card-badge badge-green-pill">Current Feature</span>
+          </div>
+          <div class="link-card-desc">Scannable QR code printed on product labels. Links to the Direct COA URL.</div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="qr-placeholder">
+              <!-- SVG QR placeholder -->
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="4" width="22" height="22" rx="2" fill="#D1D5DB"/>
+                <rect x="8" y="8" width="14" height="14" rx="1" fill="#6B7280"/>
+                <rect x="38" y="4" width="22" height="22" rx="2" fill="#D1D5DB"/>
+                <rect x="42" y="8" width="14" height="14" rx="1" fill="#6B7280"/>
+                <rect x="4" y="38" width="22" height="22" rx="2" fill="#D1D5DB"/>
+                <rect x="8" y="42" width="14" height="14" rx="1" fill="#6B7280"/>
+                <rect x="38" y="38" width="6" height="6" fill="#9CA3AF"/>
+                <rect x="46" y="38" width="6" height="6" fill="#9CA3AF"/>
+                <rect x="54" y="38" width="6" height="6" fill="#9CA3AF"/>
+                <rect x="38" y="46" width="6" height="6" fill="#9CA3AF"/>
+                <rect x="50" y="46" width="10" height="6" fill="#9CA3AF"/>
+                <rect x="38" y="54" width="6" height="6" fill="#9CA3AF"/>
+                <rect x="46" y="54" width="14" height="6" fill="#9CA3AF"/>
+              </svg>
+            </div>
+            <div>
+              <button class="btn btn-ghost btn-sm" style="display:block; margin-bottom:6px;">Download QR</button>
+              <div style="font-size:10px; color:var(--gray-400);">PNG / SVG / PDF</div>
+            </div>
+          </div>
+          <div class="link-card-usecase">
+            <strong>Best for:</strong> Physical product labels, in-store displays
+          </div>
+        </div>
+
+      </div>
+
+      <div class="info-box">
+        💡 <strong>For maximum SEO impact, use all three:</strong> listing URL in your navigation, direct URLs on product pages, and QR codes on packaging.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 3: PHASE 1 — COA DETAIL VIEW                        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-header">
+      Phase 1 — COA Detail View (PDF Viewer)
+      <span class="link-card-badge badge-orange-pill" style="margin-left:4px; font-size:10px; padding: 2px 8px; border-radius:4px; background:#FFFBEB; color:#92400E; border: 1px solid #FDE68A; font-weight:700; letter-spacing:0.05em;">Phase 1A — SSR</span>
+    </div>
+    <div class="card-body">
+
+      <p style="font-size:12.5px; color:var(--gray-500); margin-bottom:16px;">
+        Current-state COA detail page with new SSR slug URLs. Consumer-facing — rendered server-side for SEO indexability.
+      </p>
+
+      <div class="browser-shell">
+
+        <!-- Browser Chrome -->
+        <div class="browser-chrome">
+          <div class="browser-dots">
+            <div class="browser-dot dot-red"></div>
+            <div class="browser-dot dot-yellow"></div>
+            <div class="browser-dot dot-green"></div>
+          </div>
+          <div class="browser-url-bar">
+            <span>coa.blackbeardispensary.com/<span style="color:var(--blue); font-weight:600;">thca-live-rosin-headband-haze</span>/<span style="color:var(--blue); font-weight:600;">02-18-2025-5858</span></span>
+          </div>
+          <div style="font-size:11px; color:var(--gray-400); display:flex; gap:8px; align-items:center;">
+            <span>↩</span><span>⤤</span><span>⋮</span>
+          </div>
+        </div>
+
+        <!-- Browser Body -->
+        <div class="browser-body">
+
+          <!-- Site header stub -->
+          <div style="background:var(--navy); padding:10px 24px; display:flex; align-items:center; gap:16px; border-bottom:1px solid #2D4A6A;">
+            <div style="width:120px; height:24px; background:rgba(255,255,255,0.15); border-radius:4px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:9px; color:rgba(255,255,255,0.5); font-weight:600;">BLACK BEAR DISPENSARY</span>
+            </div>
+            <div style="margin-left:auto; display:flex; gap:20px;">
+              <span style="font-size:11px; color:rgba(255,255,255,0.6);">Shop</span>
+              <span style="font-size:11px; color:#93C5FD; font-weight:600;">Lab Results</span>
+              <span style="font-size:11px; color:rgba(255,255,255,0.6);">About</span>
+            </div>
+          </div>
+
+          <div style="padding:20px 24px;">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+              <a href="#">Black Bear Dispensary</a>
+              <span>›</span>
+              <a href="#">Lab Results</a>
+              <span>›</span>
+              THCa Live Rosin Headband Haze
+            </div>
+
+            <!-- Product Info Bar -->
+            <div class="product-info-bar">
+              <div class="pib-item">
+                <strong>THCa Live Rosin Headband Haze 0.5g</strong>
+                Product Name
+              </div>
+              <div class="pib-divider"></div>
+              <div class="pib-item">
+                <strong>02-18-2025-5858</strong>
+                Batch #
+              </div>
+              <div class="pib-divider"></div>
+              <div class="pib-item">
+                <strong>Cannabis ChemLab</strong>
+                Testing Lab
+              </div>
+              <div class="pib-divider"></div>
+              <div class="pib-item">
+                <strong>Feb 25, 2025</strong>
+                Test Date
+              </div>
+              <div class="pib-divider"></div>
+              <div>
+                <span class="status-badge status-validated">
+                  <span class="status-dot status-dot-green"></span>
+                  COA Validated
+                </span>
+              </div>
+            </div>
+
+            <!-- PDF Viewer -->
+            <div class="pdf-viewer-area">
+              <div class="pdf-toolbar">
+                <button class="btn btn-ghost btn-sm">− Zoom</button>
+                <button class="btn btn-ghost btn-sm">100%</button>
+                <button class="btn btn-ghost btn-sm">+ Zoom</button>
+              </div>
+              <div class="pdf-icon">📄</div>
+              <div class="pdf-label">Headband Haze Rosin — Cannabis ChemLab</div>
+              <div class="pdf-sublabel">COA-02-18-2025-5858.pdf &nbsp;|&nbsp; 3 pages</div>
+              <div style="margin-top:8px; padding:6px 16px; background:rgba(255,255,255,0.8); border-radius:6px; border:1px solid var(--gray-300); font-size:11px; color:var(--gray-500);">
+                Server-side rendered — indexable by search engines
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-row" style="margin-bottom:20px;">
+              <button class="btn btn-primary">⬇ Download PDF</button>
+              <button class="btn btn-ghost">⛶ Full Screen</button>
+              <button class="btn btn-outline">← Back to All COAs</button>
+            </div>
+
+            <!-- JSON-LD Structured Data -->
+            <div class="jsonld-section">
+              <div class="jsonld-toggle">
+                &nbsp;&nbsp;Structured Data Preview — JSON-LD (injected into &lt;head&gt; server-side)
+              </div>
+              <div class="jsonld-code"><pre>{
+  <span class="k">"@context"</span>: <span class="v">"https://schema.org"</span>,
+  <span class="k">"@type"</span>: <span class="v">"Product"</span>,
+  <span class="k">"name"</span>: <span class="s">"THCa Live Rosin Headband Haze 0.5g"</span>,
+  <span class="k">"manufacturer"</span>: {
+    <span class="k">"@type"</span>: <span class="v">"Organization"</span>,
+    <span class="k">"name"</span>: <span class="s">"Black Bear Dispensary"</span>
+  },
+  <span class="k">"additionalProperty"</span>: [
+    { <span class="k">"@type"</span>: <span class="v">"PropertyValue"</span>, <span class="k">"name"</span>: <span class="s">"BatchNumber"</span>, <span class="k">"value"</span>: <span class="s">"02-18-2025-5858"</span> },
+    { <span class="k">"@type"</span>: <span class="v">"PropertyValue"</span>, <span class="k">"name"</span>: <span class="s">"TestingLab"</span>, <span class="k">"value"</span>: <span class="s">"Cannabis ChemLab"</span> },
+    { <span class="k">"@type"</span>: <span class="v">"PropertyValue"</span>, <span class="k">"name"</span>: <span class="s">"TestDate"</span>, <span class="k">"value"</span>: <span class="s">"2025-02-25"</span> },
+    { <span class="k">"@type"</span>: <span class="v">"PropertyValue"</span>, <span class="k">"name"</span>: <span class="s">"TotalTHC"</span>, <span class="k">"value"</span>: <span class="s">"75.14%"</span> }
+  ],
+  <span class="k">"url"</span>: <span class="s">"https://coa.blackbeardispensary.com/thca-live-rosin-headband-haze/02-18-2025-5858"</span>
+}</pre></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 4: PHASE 2 — FRIENDLY COA TEMPLATE                  -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-header">
+      Phase 2 — Friendly COA Template (Consumer View)
+      <span class="badge-new badge-phase2">Phase 2</span>
+    </div>
+    <div class="card-body">
+
+      <p style="font-size:12.5px; color:var(--gray-500); margin-bottom:20px;">
+        Consumer-facing mobile view rendered from extracted COA fields (Aluma). Replaces raw PDF viewer with structured, branded cards. Original PDF remains accessible via download.
+      </p>
+
+      <div class="phone-container-wrap">
+        <div class="phone-label">📱 Mobile Consumer View — max-width 390px</div>
+
+        <div class="phone-shell">
+
+          <!-- Notch -->
+          <div class="phone-notch"></div>
+
+          <!-- App -->
+          <div class="phone-body">
+
+            <!-- Header -->
+            <div class="coa-app-header">
+              <div class="coa-logo-placeholder">BLACK BEAR DISP.</div>
+              <div class="coa-powered">Powered by <strong>MyCOA®</strong></div>
+            </div>
+
+            <!-- Validated bar -->
+            <div class="phone-validated-bar">
+              <span style="font-size:13px;">✅</span>
+              <span style="font-size:11.5px; font-weight:700; color:var(--green);">COA Validated</span>
+              <span style="font-size:10.5px; color:var(--gray-400); margin-left:4px;">Verified by Qredible</span>
+            </div>
+
+            <!-- Product Hero -->
+            <div class="coa-product-hero">
+              <div class="product-img-placeholder">📸 Product Image</div>
+              <div class="coa-product-name">THCa Live Rosin Headband Haze 0.5g</div>
+              <div class="coa-meta-grid">
+                <div class="coa-meta-item">
+                  <span class="meta-key">Supplier &nbsp;</span>
+                  <span class="meta-val">WNC</span>
+                </div>
+                <div class="coa-meta-item">
+                  <span class="meta-key">Batch &nbsp;</span>
+                  <span class="meta-val">02-18-2025-5858</span>
+                </div>
+                <div class="coa-meta-item">
+                  <span class="meta-key">Tested &nbsp;</span>
+                  <span class="meta-val">Feb 25, 2025</span>
+                </div>
+                <div class="coa-meta-item">
+                  <span class="meta-key">Lab &nbsp;</span>
+                  <span class="meta-val">Cannabis ChemLab</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cards -->
+            <div class="coa-cards">
+
+              <!-- Potency Card -->
+              <div class="coa-card potency">
+                <div class="coa-card-title">🌿 Cannabinoid Potency</div>
+                <div class="potency-main">75.14%</div>
+                <div class="potency-sub">Total THC &nbsp;·&nbsp; 0.13% Total CBD</div>
+
+                <div class="cannabinoid-bar-row">
+                  <div class="cb-name">THCa</div>
+                  <div class="cb-track"><div class="cb-fill" style="width:90%;"></div></div>
+                  <div class="cb-val">83.21%</div>
+                </div>
+                <div class="cannabinoid-bar-row">
+                  <div class="cb-name">Δ9-THC</div>
+                  <div class="cb-track"><div class="cb-fill" style="width:8%;"></div></div>
+                  <div class="cb-val">0.27%</div>
+                </div>
+                <div class="cannabinoid-bar-row">
+                  <div class="cb-name">CBD</div>
+                  <div class="cb-track"><div class="cb-fill" style="width:2%;"></div></div>
+                  <div class="cb-val">0.13%</div>
+                </div>
+                <div class="cannabinoid-bar-row">
+                  <div class="cb-name">CBG</div>
+                  <div class="cb-track"><div class="cb-fill" style="width:3%;"></div></div>
+                  <div class="cb-val">0.22%</div>
+                </div>
+                <div class="cannabinoid-bar-row">
+                  <div class="cb-name">CBN</div>
+                  <div class="cb-track"><div class="cb-fill" style="width:1%;"></div></div>
+                  <div class="cb-val">0.05%</div>
+                </div>
+              </div>
+
+              <!-- Safety Card -->
+              <div class="coa-card safety">
+                <div class="coa-card-title">🛡️ Safety Testing</div>
+                <div class="safety-grid">
+                  <div class="safety-item">
+                    <div class="si-icon">✅</div>
+                    <div>
+                      <div class="si-name">Pesticides</div>
+                      <div class="si-result">Not Detected</div>
+                    </div>
+                  </div>
+                  <div class="safety-item">
+                    <div class="si-icon">✅</div>
+                    <div>
+                      <div class="si-name">Heavy Metals</div>
+                      <div class="si-result">Pass</div>
+                    </div>
+                  </div>
+                  <div class="safety-item">
+                    <div class="si-icon">✅</div>
+                    <div>
+                      <div class="si-name">Residual Solvents</div>
+                      <div class="si-result">Pass</div>
+                    </div>
+                  </div>
+                  <div class="safety-item">
+                    <div class="si-icon">✅</div>
+                    <div>
+                      <div class="si-name">Microbials</div>
+                      <div class="si-result">Pass</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Terpene Card -->
+              <div class="coa-card terpene">
+                <div class="coa-card-title" style="color:var(--purple);">🌺 Terpene Profile</div>
+                <div class="terpene-row">
+                  <div class="terp-name">Myrcene</div>
+                  <div class="terp-track"><div class="terp-fill" style="width:100%;"></div></div>
+                  <div class="terp-val">1.20%</div>
+                </div>
+                <div class="terpene-row">
+                  <div class="terp-name">Limonene</div>
+                  <div class="terp-track"><div class="terp-fill" style="width:67%;"></div></div>
+                  <div class="terp-val">0.80%</div>
+                </div>
+                <div class="terpene-row">
+                  <div class="terp-name">Caryophyllene</div>
+                  <div class="terp-track"><div class="terp-fill" style="width:42%;"></div></div>
+                  <div class="terp-val">0.50%</div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- View PDF Button -->
+            <div class="coa-footer-area">
+              <div class="btn-view-pdf">📄 View Original PDF</div>
+            </div>
+
+            <!-- Footer -->
+            <div class="coa-app-footer">
+              Verified by <strong>Qredible</strong> &nbsp;•&nbsp; <strong>MyCOA®</strong>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="font-size:11px; color:var(--gray-400); text-align:center; max-width:390px; line-height:1.5;">
+          ↑ Rendered from Aluma-extracted fields. Falls back to PDF viewer if extraction incomplete.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION 5: COA LIFECYCLE FLOW                               -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-header">
+      COA Lifecycle
+    </div>
+    <div class="card-body">
+
+      <p style="font-size:12.5px; color:var(--gray-500); margin-bottom:20px;">
+        End-to-end flow from upload to consumer view. Each step is automatic — no additional config required after initial setup.
+      </p>
+
+      <!-- Flow Diagram -->
+      <div class="flow-diagram">
+
+        <div class="flow-step">
+          <div class="flow-step-inner">
+            <div class="flow-icon">☁️</div>
+            <div class="flow-step-num">Step 1</div>
+            <div class="flow-title">Upload</div>
+            <div class="flow-desc">Upload COA PDF via Q-Monitor or bulk import</div>
+            <div class="flow-sub">Aluma extracts fields</div>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-step-inner">
+            <div class="flow-icon">🔗</div>
+            <div class="flow-step-num">Step 2</div>
+            <div class="flow-title">Assign</div>
+            <div class="flow-desc">Assign COA to product in catalog</div>
+            <div class="flow-sub">Slug URL auto-generated</div>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-step-inner">
+            <div class="flow-icon">🌐</div>
+            <div class="flow-step-num">Step 3</div>
+            <div class="flow-title">Publish</div>
+            <div class="flow-desc">Mark COA as published</div>
+            <div class="flow-sub">URL live + QR ready</div>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-step-inner">
+            <div class="flow-icon">👤</div>
+            <div class="flow-step-num">Step 4</div>
+            <div class="flow-title">Consumer</div>
+            <div class="flow-desc">Customer scans QR or follows link</div>
+            <div class="flow-sub">Friendly template shown</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Table -->
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Upload COA</td>
+            <td>Slug URL auto-created, fields extracted by Aluma</td>
+          </tr>
+          <tr>
+            <td>Assign to Product</td>
+            <td>COA URL column populated, product linked in catalog</td>
+          </tr>
+          <tr>
+            <td>Publish</td>
+            <td>Appears on listing page + direct URL goes live</td>
+          </tr>
+          <tr>
+            <td>Update / Replace COA</td>
+            <td>Same URL, updated content — no broken links</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- PHASE COMPARISON TABLE                                      -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-header">
+      Phase Comparison
+    </div>
+    <div class="card-body">
+
+      <div class="phase-grid">
+
+        <div class="phase-col mvp">
+          <div class="phase-col-header">✅ Phase 1 — MVP</div>
+          <div class="phase-col-sub">Current development target · SSR foundation</div>
+          <ul class="phase-list">
+            <li>SSR slug URLs for individual COAs</li>
+            <li>SSR listing page</li>
+            <li>SEO meta tags + JSON-LD structured data</li>
+            <li>Sitemap auto-generation</li>
+            <li>PDF viewer as COA detail view</li>
+            <li>Custom domain support (CNAME)</li>
+          </ul>
+        </div>
+
+        <div class="phase-col phase2">
+          <div class="phase-col-header">🔮 Phase 2 — Enhanced</div>
+          <div class="phase-col-sub">Consumer-first template · Extracted fields</div>
+          <ul class="phase-list">
+            <li>Friendly COA template (extracted fields)</li>
+            <li>Mobile-optimized card layout</li>
+            <li>Terpene profile visualization</li>
+            <li>Safety testing summary cards</li>
+            <li>"View Original PDF" fallback</li>
+            <li>Cannabinoid bar charts</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- footer spacer -->
+  <div style="text-align:center; padding:16px 0; font-size:11px; color:var(--gray-400);">
+    Qredible — MyCOA SEO + Consumer Experience · Mockup · Not production UI
+  </div>
+
+</div><!-- /page-wrap -->
+
+</body>
+</html>
