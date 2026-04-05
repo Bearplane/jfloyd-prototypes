@@ -982,7 +982,7 @@
           <div class="variable-chips">
             <span class="variable-chips-label">Variables:</span>
             <span class="chip">{company}</span>
-            <span class="chip">{product_count}</span>
+            <span class="chip"></span>
           </div>
           <div class="preview-box">
             <div class="preview-label">Preview</div>
@@ -992,7 +992,7 @@
 
         <div class="form-group">
           <label class="form-label">Listing Page Description</label>
-          <textarea class="form-textarea" readonly>Browse {product_count} verified COA lab reports from {company}. Search by batch number or product name.</textarea>
+          <textarea class="form-textarea" readonly>Browse verified COA lab reports from {company}. Search by batch number or product name.</textarea>
           <div class="char-count">91 / 160</div>
         </div>
       </div>
@@ -1052,31 +1052,9 @@
 
       <hr class="divider" />
 
-      <!-- 1d. Custom Domain -->
-      <div class="subsection">
-        <div class="subsection-label">1d — Custom Domain</div>
-        <div class="form-group">
-          <label class="form-label">Custom Domain</label>
-          <div class="domain-input-row">
-            <input class="form-input" type="text" value="coa.blackbeardispensary.com" readonly style="flex:1" />
-            <span class="verified-badge">✓ Verified</span>
-            <button class="btn btn-ghost btn-sm">Disconnect</button>
-          </div>
-        </div>
-        <div class="dns-box">
-          <span># DNS Configuration (CNAME)</span><br/>
-          <span>Type:</span> CNAME<br/>
-          <span>Name:</span> coa<br/>
-          <span>Value:</span> members.qredible.com<br/>
-          <span>TTL:</span> Auto
-        </div>
-      </div>
-
-      <hr class="divider" />
-
       <!-- 1e. COA Listing Options -->
       <div class="subsection">
-        <div class="subsection-label">1e — COA Listing Options</div>
+        <div class="subsection-label">1d — COA Listing Options</div>
         <div class="options-grid">
 
           <div class="option-card">
@@ -1090,9 +1068,9 @@
           </div>
 
           <div class="option-card">
-            <div class="option-card-label">HTML Summary</div>
+            <div class="option-card-label">Friendly COA Template</div>
             <div class="toggle-row" style="margin-top:8px;">
-              <span class="toggle-label">Render HTML summary below PDF</span>
+              <span class="toggle-label">Show extracted fields in card layout (Phase 2)</span>
               <div class="toggle"></div>
             </div>
           </div>
@@ -1106,9 +1084,9 @@
           </div>
 
           <div class="option-card">
-            <div class="option-card-label">Show Recent COAs Listing</div>
+            <div class="option-card-label">Recent COAs Section</div>
             <div class="toggle-row" style="margin-top:8px;">
-              <span class="toggle-label">Widget on homepage / recent COAs</span>
+              <span class="toggle-label">Show crawlable list of recently added COAs on listing page</span>
               <div class="toggle off"></div>
             </div>
           </div>
@@ -1567,9 +1545,9 @@
           <div class="flow-step-inner">
             <div class="flow-icon">🌐</div>
             <div class="flow-step-num">Step 3</div>
-            <div class="flow-title">Publish</div>
-            <div class="flow-desc">Mark COA as published</div>
-            <div class="flow-sub">URL live + QR ready</div>
+            <div class="flow-title">Published</div>
+            <div class="flow-desc">COA status set to active</div>
+            <div class="flow-sub">Appears on listing page, direct URL live</div>
           </div>
         </div>
 
@@ -1600,11 +1578,11 @@
           </tr>
           <tr>
             <td>Assign to Product</td>
-            <td>COA URL column populated, product linked in catalog</td>
+            <td>COA URL column auto-populated with slug URL, product linked in catalog</td>
           </tr>
           <tr>
-            <td>Publish</td>
-            <td>Appears on listing page + direct URL goes live</td>
+            <td>Set Status Active</td>
+            <td>COA appears on listing page, direct URL goes live, QR code resolves</td>
           </tr>
           <tr>
             <td>Update / Replace COA</td>
