@@ -1027,10 +1027,25 @@
               <!-- Preset Bar -->
               <div class="preset-bar">
                 <span class="preset-bar-label">Preset:</span>
-                <button class="preset-chip">All Columns (Default)</button>
-                <button class="preset-chip active">Flex Bank Format</button>
-                <button class="preset-chip">Internal Audit</button>
-                <button class="preset-chip-add">+ Save as Preset</button>
+                <button class="preset-chip">All Columns (Default) <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#F1F5F9;color:#64748B;font-weight:700;">⚙</span></button>
+                <button class="preset-chip active">Flex Bank Format <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;font-weight:700;">🏢</span></button>
+                <button class="preset-chip">Internal Audit <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:var(--gray-100);color:var(--gray-600);font-weight:700;">👤</span></button>
+                <div style="margin-left:auto;display:flex;flex-direction:column;gap:6px;padding:8px 12px;background:#fff;border:1px solid var(--gray-200);border-radius:6px;">
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    <input type="text" style="padding:4px 8px;border:1px solid var(--gray-200);border-radius:4px;font-size:11px;width:160px;font-family:var(--font-sans);" value="Flex Bank Format" />
+                    <button class="btn btn-sm btn-primary" style="font-size:11px;padding:4px 10px;">Save</button>
+                  </div>
+                  <div style="display:flex;gap:12px;">
+                    <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--gray-600);">
+                      <input type="radio" name="ps1" style="accent-color:var(--blue);width:12px;height:12px;" />
+                      👤 Personal
+                    </label>
+                    <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--gray-600);">
+                      <input type="radio" name="ps1" checked style="accent-color:var(--blue);width:12px;height:12px;" />
+                      🏢 Company-wide
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <!-- Column Configuration -->
@@ -1043,22 +1058,61 @@
 
               <!-- Column List — Flex Bank Format preset active -->
               <div class="col-list">
-                <!-- CHECKED rows -->
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Is Parent product</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">SKU</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
                   <input type="checkbox" class="col-checkbox" checked />
                   <span class="col-name">Product Definition</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="Product Name" />
+                  <input type="text" class="export-as-input" value="Product Name"   />
                 </div>
-                <div class="col-row checked">
+                <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" checked />
-                  <span class="col-name">Product URL</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Price</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="URL/Link to Product" />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Classification</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Company</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Scan Change</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1066,7 +1120,7 @@
                   <span class="col-name">COA Status</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="COA Status" />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original"  />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1074,113 +1128,127 @@
                   <span class="col-name">Disposition</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="Compliance Status" />
-                </div>
-                <!-- UNCHECKED rows -->
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">SKU</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="SKU" disabled />
+                  <input type="text" class="export-as-input" value="Compliance Status"   />
                 </div>
                 <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Price</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Price" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Classification</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Classification" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Company</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Company" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
+                  <input type="checkbox" class="col-checkbox"  />
                   <span class="col-name">Listing Status</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Listing Status" disabled />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
                 <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Expired COA</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Cannabinoid Non-Compliant</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
                   <span class="col-name">Date Added</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Date Added" disabled />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Product URL</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="URL/Link to Product"   />
                 </div>
                 <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Company URL</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">COA Filename</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Company URL" disabled />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
                 <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">License Number</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Archived</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="License Number" disabled />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
-                <div class="col-row unchecked">
+                <div class="col-row checked" style="background:#EFF6FF;">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">License State</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">D9/THC-A Combined %</span>
+                  <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#DBEAFE;color:#1D4ED8;margin-left:4px;">⚙ Computed</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="License State" disabled />
+                  <input type="text" class="export-as-input" value="D9/THC-A Combined Percentage" />
                 </div>
-                <div class="col-row unchecked">
+                <div class="col-row checked" style="background:#FEF3C7;">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Compliance Domain</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Initials</span>
+                  <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#FEF3C7;color:#D97706;margin-left:4px;border:1px solid #FDE68A;">✏️ Manual</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Compliance Domain" disabled />
+                  <input type="text" class="export-as-input" value="Initials" />
                 </div>
-                <div class="col-row unchecked">
+                <div class="col-row checked" style="background:#FEF3C7;">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Last Scanned</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Date</span>
+                  <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#FEF3C7;color:#D97706;margin-left:4px;border:1px solid #FDE68A;">✏️ Manual</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Last Scanned" disabled />
+                  <input type="text" class="export-as-input" value="Date" />
                 </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Scan Score</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Scan Score" disabled />
+
+                <!-- Add buttons -->
+                <div style="display:flex;gap:8px;padding:8px 8px 4px;">
+                  <button class="btn btn-sm" style="background:#EFF6FF;color:#1D4ED8;border:1px dashed #93C5FD;font-size:11px;">⚙ + Add Computed Column</button>
+                  <button class="btn btn-sm" style="background:#FEF3C7;color:#D97706;border:1px dashed #FDE68A;font-size:11px;">✏️ + Add Blank Column</button>
                 </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Updated At</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Updated At" disabled />
+              <!-- Inline Add Computed Column Form (expanded state) -->
+              <div style="margin:0 16px 12px;padding:12px;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:6px;">
+                <div style="font-size:11px;font-weight:700;color:#1E40AF;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">New Computed Column</div>
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                  <input type="text" style="padding:5px 8px;border:1px solid #BAE6FD;border-radius:4px;font-size:12px;width:140px;font-family:var(--font-sans);" placeholder="Column name..." value="D9/THC-A Combined %" />
+                  <span style="font-size:12px;color:#64748B;font-weight:600;">=</span>
+                  <select style="padding:5px 8px;border:1px solid #E2E8F0;border-radius:4px;font-size:11px;font-family:var(--font-sans);">
+                    <option selected>Delta-9 THC %</option>
+                  </select>
+                  <select style="padding:4px 6px;border:1px solid #E2E8F0;border-radius:4px;font-size:11px;font-family:var(--font-mono);width:40px;">
+                    <option selected>+</option><option>-</option><option>×</option><option>÷</option>
+                  </select>
+                  <select style="padding:5px 8px;border:1px solid #E2E8F0;border-radius:4px;font-size:11px;font-family:var(--font-sans);">
+                    <option selected>THC-A %</option>
+                  </select>
+                  <button class="btn btn-sm btn-primary" style="font-size:11px;">✓ Add</button>
+                  <button class="btn btn-sm btn-ghost" style="font-size:11px;">✕</button>
                 </div>
+                <div style="font-size:10px;color:#64748B;margin-top:6px;">Pulls data from the current row's linked COA records</div>
+              </div>
+              <!-- Inline Add Blank Column Form -->
+              <div style="margin:0 16px 12px;padding:12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;">
+                <div style="font-size:11px;font-weight:700;color:#D97706;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">New Blank Column</div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input type="text" style="padding:5px 8px;border:1px solid #FDE68A;border-radius:4px;font-size:12px;width:200px;font-family:var(--font-sans);" placeholder="Column header name..." value="Reviewer Notes" />
+                  <button class="btn btn-sm" style="background:#D97706;color:#fff;font-size:11px;">✓ Add</button>
+                  <button class="btn btn-sm btn-ghost" style="font-size:11px;">✕</button>
+                </div>
+                <div style="font-size:10px;color:#64748B;margin-top:6px;">Exports as an empty column — for manual entry after download</div>
+              </div>
               </div>
 
               <hr class="modal-section-divider" />
@@ -1343,29 +1411,91 @@
               <!-- Preset Bar -->
               <div class="preset-bar">
                 <span class="preset-bar-label">Preset:</span>
-                <button class="preset-chip">All Columns (Default)</button>
-                <button class="preset-chip active">Flex Bank Format</button>
-                <button class="preset-chip">Internal Audit</button>
-                <button class="preset-chip-add">+ Save as Preset</button>
+                <button class="preset-chip">All Columns (Default) <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#F1F5F9;color:#64748B;font-weight:700;">⚙</span></button>
+                <button class="preset-chip active">Flex Bank Format <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;font-weight:700;">🏢</span></button>
+                <button class="preset-chip">Internal Audit <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:var(--gray-100);color:var(--gray-600);font-weight:700;">👤</span></button>
+                <div style="margin-left:auto;display:flex;flex-direction:column;gap:6px;padding:8px 12px;background:#fff;border:1px solid var(--gray-200);border-radius:6px;">
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    <input type="text" style="padding:4px 8px;border:1px solid var(--gray-200);border-radius:4px;font-size:11px;width:160px;font-family:var(--font-sans);" value="Flex Bank Format" />
+                    <button class="btn btn-sm btn-primary" style="font-size:11px;padding:4px 10px;">Save</button>
+                  </div>
+                  <div style="display:flex;gap:12px;">
+                    <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--gray-600);">
+                      <input type="radio" name="ps2" style="accent-color:var(--blue);width:12px;height:12px;" />
+                      👤 Personal
+                    </label>
+                    <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:var(--gray-600);">
+                      <input type="radio" name="ps1" checked style="accent-color:var(--blue);width:12px;height:12px;" />
+                      🏢 Company-wide
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div class="modal-section">
                 <div class="modal-section-header">
                   <span class="modal-section-title">COA Column Configuration — 28 Columns</span>
-                  <span class="text-xs color-gray">7 selected · Flex Bank Format</span>
+                  <span class="text-xs color-gray">7 selected · Flex Bank Format <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;font-weight:700;">🏢</span></span>
                 </div>
               </div>
 
               <!-- COA Column List -->
               <div class="col-list">
-                <!-- CHECKED rows -->
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Company Name</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Address</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">City</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">State</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Zip</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">SKU</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
                   <input type="checkbox" class="col-checkbox" checked />
                   <span class="col-name">Product Assignment</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="Product Name" />
+                  <input type="text" class="export-as-input" value="Product Name"   />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1373,7 +1503,55 @@
                   <span class="col-name">Product URL</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="URL/Link to Product" />
+                  <input type="text" class="export-as-input" value="URL/Link to Product"   />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Sample ID</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Batch Number</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Lot Number</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Number Of Units</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Collected Date</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Received Date</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1381,7 +1559,7 @@
                   <span class="col-name">Completed Date</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="COA Batch Date" />
+                  <input type="text" class="export-as-input" value="COA Batch Date"   />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1389,7 +1567,55 @@
                   <span class="col-name">Expiration Date</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="COA Expiration Date" />
+                  <input type="text" class="export-as-input" value="COA Expiration Date"   />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Expired COA</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Cannabinoid Non-Compliant</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Violative Reason</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Laboratory Name</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">COA URL</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">COA Filename</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1397,7 +1623,7 @@
                   <span class="col-name">Delta-9 THC %</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="Delta-9 Percentage" />
+                  <input type="text" class="export-as-input" value="Delta-9 Percentage"   />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1405,7 +1631,7 @@
                   <span class="col-name">THC-A %</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="THC-A Percentage" />
+                  <input type="text" class="export-as-input" value="THC-A Percentage"   />
                 </div>
                 <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
@@ -1413,192 +1639,64 @@
                   <span class="col-name">Total THC</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input renamed" value="Total THC Percentage" />
-                </div>
-                <!-- UNCHECKED — remaining 21 COA columns -->
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">COA ID</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="COA ID" disabled />
+                  <input type="text" class="export-as-input" value="Total THC Percentage"   />
                 </div>
                 <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Lab Name</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Lab Name" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Batch Number</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Batch Number" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Sample ID</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Sample ID" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">CBD %</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="CBD %" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">CBD-A %</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="CBD-A %" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Total CBD</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Total CBD" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">CBG %</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="CBG %" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">CBN %</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="CBN %" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">CBC %</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="CBC %" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
+                  <input type="checkbox" class="col-checkbox"  />
                   <span class="col-name">Delta-8 THC %</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Delta-8 THC %" disabled />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
                 <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Moisture Content</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">Delta-10 THC %</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Moisture Content" disabled />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
                 <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Pesticides Passed</span>
+                  <input type="checkbox" class="col-checkbox"  />
+                  <span class="col-name">THC-O %</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Pesticides Passed" disabled />
+                  <input type="text" class="export-as-input empty" value="" placeholder="Keep original" disabled />
                 </div>
-                <div class="col-row unchecked">
+                <div class="col-row checked" style="background:#EFF6FF;">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Heavy Metals Passed</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">D9/THC-A Combined %</span>
+                  <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#DBEAFE;color:#1D4ED8;margin-left:4px;">⚙ Computed</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Heavy Metals Passed" disabled />
+                  <input type="text" class="export-as-input" value="D9/THC-A Combined Percentage" />
                 </div>
-                <div class="col-row unchecked">
+                <div class="col-row checked" style="background:#FEF3C7;">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Microbials Passed</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Initials</span>
+                  <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#FEF3C7;color:#D97706;margin-left:4px;border:1px solid #FDE68A;">✏️ Manual</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Microbials Passed" disabled />
+                  <input type="text" class="export-as-input" value="Initials" />
                 </div>
-                <div class="col-row unchecked">
+                <div class="col-row checked" style="background:#FEF3C7;">
                   <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Solvents Passed</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Date</span>
+                  <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#FEF3C7;color:#D97706;margin-left:4px;border:1px solid #FDE68A;">✏️ Manual</span>
                   <span class="col-arrow">→</span>
                   <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Solvents Passed" disabled />
+                  <input type="text" class="export-as-input" value="Date" />
                 </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Overall Result</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Overall Result" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Disposition</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Disposition" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Created At</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Created At" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Reviewed By</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Reviewed By" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Review Notes</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Review Notes" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Source URL</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Source URL" disabled />
-                </div>
-                <div class="col-row unchecked">
-                  <span class="drag-handle">⠿</span>
-                  <input type="checkbox" class="col-checkbox" />
-                  <span class="col-name">Aluma Extraction ID</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">as:</span>
-                  <input type="text" class="export-as-input" value="Aluma Extraction ID" disabled />
+
+                <!-- Add buttons -->
+                <div style="display:flex;gap:8px;padding:8px 8px 4px;">
+                  <button class="btn btn-sm" style="background:#EFF6FF;color:#1D4ED8;border:1px dashed #93C5FD;font-size:11px;">⚙ + Add Computed Column</button>
+                  <button class="btn btn-sm" style="background:#FEF3C7;color:#D97706;border:1px dashed #FDE68A;font-size:11px;">✏️ + Add Blank Column</button>
                 </div>
               </div>
 
@@ -1725,16 +1823,16 @@
               <div class="dropdown-demo">
                 <div class="btn-split">
                   <button class="btn-split-main">
-                    <span class="preset-label">· Flex Bank Format</span>
+                    <span class="preset-label">· Flex Bank Format <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;font-weight:700;">🏢</span></span>
                     ↓ Export
                   </button>
                   <button class="btn-split-gear">⚙</button>
                 </div>
                 <!-- Dropdown shown open -->
                 <div class="dropdown-menu">
-                  <div class="dropdown-item">All Columns (Default)</div>
-                  <div class="dropdown-item active"><span class="check-icon">✓</span> Flex Bank Format</div>
-                  <div class="dropdown-item">Internal Audit</div>
+                  <div class="dropdown-item">All Columns (Default) <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#F1F5F9;color:#64748B;font-weight:700;">⚙</span></div>
+                  <div class="dropdown-item active"><span class="check-icon">✓</span> Flex Bank Format <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;font-weight:700;">🏢</span></div>
+                  <div class="dropdown-item">Internal Audit <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:var(--gray-100);color:var(--gray-600);font-weight:700;">👤</span></div>
                   <div class="dropdown-divider"></div>
                   <div class="dropdown-manage">⚙ Manage Presets…</div>
                 </div>
@@ -1767,11 +1865,11 @@
             <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
               <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600);">
                 <span style="font-size:16px;">📋</span>
-                <span><strong>Products tab</strong> — last used: <span class="font-mono text-xs" style="color:var(--navy)">All Columns (Default)</span></span>
+                <span><strong>Products tab</strong> — last used: <span class="font-mono text-xs" style="color:var(--navy)">All Columns (Default) <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#F1F5F9;color:#64748B;font-weight:700;">⚙</span></span></span>
               </div>
               <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600);">
                 <span style="font-size:16px;">🧪</span>
-                <span><strong>COAs tab</strong> — last used: <span class="font-mono text-xs" style="color:var(--navy); font-weight:600;">Flex Bank Format</span></span>
+                <span><strong>COAs tab</strong> — last used: <span class="font-mono text-xs" style="color:var(--navy); font-weight:600;">Flex Bank Format <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;font-weight:700;">🏢</span></span></span>
               </div>
               <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600);">
                 <span style="font-size:16px;">📡</span>
