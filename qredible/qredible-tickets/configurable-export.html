@@ -1,1388 +1,1894 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Configurable Export — Product Compliance · QP-3616</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurable Export — QP-3616</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
-      --blue-dark: #1E3A5F;
       --blue: #3B82F6;
-      --blue-light: #DBEAFE;
-      --blue-text: #1E40AF;
+      --blue-light: #EFF6FF;
+      --blue-mid: #DBEAFE;
+      --navy: #1E3A5F;
+      --navy-light: #2A4D7F;
       --green: #16A34A;
       --green-light: #DCFCE7;
       --red: #DC2626;
-      --red-light: #FEE2E2;
-      --border: #E2E8F0;
-      --bg: #F8FAFC;
-      --surface: #FFFFFF;
-      --text: #0F172A;
-      --muted: #64748B;
-      --radius: 10px;
-      --radius-sm: 6px;
+      --orange: #D97706;
+      --orange-light: #FEF3C7;
+      --purple: #7C3AED;
+      --purple-light: #F3E8FF;
+      --gray-50: #F8FAFC;
+      --gray-100: #F1F5F9;
+      --gray-200: #E2E8F0;
+      --gray-300: #CBD5E1;
+      --gray-400: #94A3B8;
+      --gray-500: #64748B;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1E293B;
+      --gray-900: #0F172A;
+      --radius-card: 10px;
+      --radius-input: 6px;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: var(--font-ui);
-      font-size: 13px;
-      background: var(--bg);
-      color: var(--text);
+      font-family: var(--font-sans);
+      background: var(--gray-100);
+      color: var(--gray-800);
+      font-size: 14px;
       line-height: 1.5;
     }
 
-    /* ── Proto Nav ── */
-    .proto-nav {
-      background: var(--blue-dark);
-      padding: 10px 20px;
+    /* ─── NAV ─── */
+    .nav {
+      background: var(--navy);
+      padding: 0 24px;
+      height: 52px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 12px;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .nav-back {
       color: #93C5FD;
-      flex-wrap: wrap;
-    }
-    .proto-nav a { color: #93C5FD; text-decoration: none; }
-    .proto-nav a:hover { text-decoration: underline; }
-    .proto-nav span { color: #64748B; }
-    .proto-nav span:last-of-type:not(.ticket-badge) { color: #CBD5E1; }
-    .ticket-badge {
-      background: rgba(59,130,246,0.25);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 10px;
+      text-decoration: none;
+      font-size: 13px;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
     }
+    .nav-back:hover { color: #fff; }
+    .nav-sep { color: #4B6FA8; font-size: 13px; }
+    .nav-title { color: #fff; font-size: 13px; font-weight: 600; }
+    .nav-spacer { flex: 1; }
+    .nav-badge {
+      background: rgba(59,130,246,0.25);
+      border: 1px solid rgba(59,130,246,0.5);
+      color: #93C5FD;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      padding: 3px 8px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .nav-badge:hover { background: rgba(59,130,246,0.4); }
 
-    /* ── Page ── */
+    /* ─── PAGE LAYOUT ─── */
     .page {
-      max-width: 1160px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 36px 24px 80px;
+      padding: 32px 24px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
     }
 
-    /* ── Section wrapper ── */
-    .section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 40px;
-      overflow: hidden;
+    /* ─── PAGE HEADER ─── */
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 6px;
     }
-    .section-label {
-      padding: 14px 20px 12px;
-      border-bottom: 1px solid var(--border);
+    .page-header p {
+      color: var(--gray-500);
+      font-size: 13px;
+      max-width: 680px;
+    }
+
+    /* ─── SECTION ─── */
+    .section {
+      background: #fff;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .section-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-200);
       display: flex;
       align-items: center;
       gap: 10px;
-      background: #F8FAFC;
+      background: var(--gray-50);
     }
-    .section-label h2 {
-      font-size: 13px;
+    .section-header h2 {
+      font-size: 14px;
       font-weight: 700;
-      color: var(--text);
+      color: var(--gray-900);
     }
-    .section-label .badge {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-    .badge-before { background: #FEF9C3; color: #854D0E; }
-    .badge-after  { background: #DCFCE7; color: #166534; }
-    .badge-persist { background: #EDE9FE; color: #5B21B6; }
-    .section-inner {
-      padding: 24px 20px;
-    }
+    .section-body { padding: 20px; }
 
-    /* ── Toolbar ── */
+    /* ─── STATE BADGES ─── */
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .badge-yellow { background: var(--orange-light); color: #92400E; border: 1px solid #FDE68A; }
+    .badge-green  { background: var(--green-light); color: #14532D; border: 1px solid #BBF7D0; }
+    .badge-purple { background: var(--purple-light); color: #4C1D95; border: 1px solid #DDD6FE; }
+    .badge-blue   { background: var(--blue-light); color: #1E40AF; border: 1px solid #BFDBFE; }
+
+    /* ─── TOOLBAR ─── */
     .toolbar {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
+      padding: 10px 12px;
+      background: var(--gray-50);
+      border-radius: var(--radius-input);
+      border: 1px solid var(--gray-200);
+      margin-bottom: 16px;
     }
-    .search-input {
+    .toolbar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-700);
       flex: 1;
-      min-width: 260px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 7px 10px 7px 30px;
-      font-family: var(--font-ui);
-      font-size: 12px;
-      color: var(--muted);
-      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 9px center;
     }
-
-    /* ── Buttons ── */
+    .toolbar-subtitle {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-left: 8px;
+    }
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 7px 13px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-ui);
-      font-size: 12px;
-      font-weight: 600;
-      border: 1px solid transparent;
-      cursor: pointer;
-      white-space: nowrap;
-      line-height: 1;
-    }
-    .btn-white {
-      background: white;
-      border-color: var(--border);
-      color: var(--text);
-    }
-    .btn-navy {
-      background: var(--blue-dark);
-      color: white;
-    }
-    .btn-red {
-      background: var(--red);
-      color: white;
-    }
-    .btn-blue {
-      background: var(--blue);
-      color: white;
-    }
-    .btn-export-settings {
-      background: var(--blue);
-      color: white;
-      padding: 7px 0;
-      overflow: hidden;
-      border-radius: var(--radius-sm);
-    }
-    .btn-export-settings .export-main {
-      padding: 0 11px 0 13px;
-    }
-    .btn-export-settings .export-gear {
-      padding: 0 10px 0 9px;
-      border-left: 1px solid rgba(255,255,255,0.25);
+      padding: 7px 14px;
+      border-radius: var(--radius-input);
       font-size: 13px;
-      opacity: 0.9;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
     }
-    .filters-badge {
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: #2563EB; }
+    .btn-ghost { background: transparent; color: var(--gray-600); border: 1px solid var(--gray-300); }
+    .btn-ghost:hover { background: var(--gray-100); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-split {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 16px;
-      height: 16px;
-      background: var(--green);
-      color: white;
-      border-radius: 50%;
-      font-size: 9px;
-      font-weight: 700;
-      line-height: 1;
+      align-items: stretch;
+      border-radius: var(--radius-input);
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     }
-
-    /* ── Filter chips ── */
-    .filter-chips {
+    .btn-split-main {
+      background: var(--blue);
+      color: #fff;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      border: none;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
+      gap: 5px;
     }
-    .filter-chip {
-      display: inline-flex;
+    .btn-split-gear {
+      background: #2563EB;
+      border: none;
+      border-left: 1px solid rgba(255,255,255,0.25);
+      padding: 7px 9px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
       align-items: center;
-      gap: 4px;
-      background: #EFF6FF;
-      border: 1px solid #BFDBFE;
-      color: #1E40AF;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 20px;
     }
-    .chip-x {
-      cursor: pointer;
-      opacity: 0.6;
-      font-size: 12px;
-    }
-    .clear-all {
+    .btn-split-gear:hover { background: #1D4ED8; }
+
+    /* preset label on button */
+    .preset-label {
       font-size: 11px;
-      color: var(--muted);
-      text-decoration: underline;
-      cursor: pointer;
+      color: #93C5FD;
+      font-weight: 500;
+      margin-right: 2px;
     }
 
-    /* ── Table ── */
+    /* ─── DATA TABLE ─── */
+    .data-table-wrap {
+      border-radius: var(--radius-input);
+      border: 1px solid var(--gray-200);
+      overflow: auto;
+    }
     .data-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11.5px;
+      font-size: 12.5px;
     }
     .data-table th {
-      background: var(--blue-dark);
-      color: white;
-      font-size: 11px;
+      background: var(--navy);
+      color: #fff;
       font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 9px 12px;
       text-align: left;
-      padding: 8px 10px;
       white-space: nowrap;
     }
-    .data-table th:first-child { border-radius: 6px 0 0 0; }
-    .data-table th:last-child  { border-radius: 0 6px 0 0; }
     .data-table td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      vertical-align: middle;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--gray-100);
+      color: var(--gray-700);
       white-space: nowrap;
     }
     .data-table tr:last-child td { border-bottom: none; }
-    .data-table tr:hover td { background: #F8FAFC; }
-    .sku-code {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      color: var(--muted);
-    }
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+    .data-table tr:hover td { background: var(--gray-50); }
+
+    /* status pills */
+    .pill {
+      display: inline-block;
       padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
     }
-    .pill-green  { background: var(--green-light); color: #166534; }
-    .pill-blue   { background: var(--blue-light); color: var(--blue-text); }
-    .pill-yellow { background: #FEF9C3; color: #854D0E; }
-    .pill-gray   { background: #F1F5F9; color: var(--muted); }
-    .pill-red    { background: var(--red-light); color: #991B1B; }
-    .pill-purple { background: #EDE9FE; color: #5B21B6; }
+    .pill-green  { background: #DCFCE7; color: #15803D; }
+    .pill-red    { background: #FEE2E2; color: #DC2626; }
+    .pill-orange { background: #FEF3C7; color: #D97706; }
+    .pill-blue   { background: #DBEAFE; color: #1D4ED8; }
+    .pill-gray   { background: var(--gray-100); color: var(--gray-600); }
 
-    .scan-changed { color: var(--green); font-weight: 700; font-size: 11px; }
-    .scan-new     { color: var(--blue); font-weight: 700; font-size: 11px; }
-
-    .activity-dots { display: flex; gap: 2px; align-items: center; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); opacity: 0.15; }
-    .dot.active { opacity: 1; }
-
-    /* ── Annotation ── */
+    /* ─── ANNOTATION ─── */
     .annotation {
       margin-top: 14px;
       padding: 10px 14px;
-      background: #FFFBEB;
+      background: var(--orange-light);
       border: 1px solid #FDE68A;
-      border-left: 3px solid #F59E0B;
-      border-radius: var(--radius-sm);
-      font-size: 11.5px;
+      border-radius: var(--radius-input);
+      font-size: 12.5px;
       color: #78350F;
-      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
     }
-    .annotation strong { font-weight: 700; }
+    .annotation-green {
+      background: var(--green-light);
+      border-color: #BBF7D0;
+      color: #14532D;
+    }
+    .annotation-blue {
+      background: var(--blue-light);
+      border-color: #BFDBFE;
+      color: #1E40AF;
+    }
+    .annotation-icon { flex-shrink: 0; font-size: 14px; margin-top: 1px; }
 
-    /* ── MODAL OVERLAY ── */
+    /* ─── MODAL OVERLAY ─── */
     .modal-scene {
       position: relative;
-      margin-top: 20px;
+      min-height: 700px;
+      border-radius: var(--radius-input);
+      overflow: hidden;
     }
-    .table-dimmed {
-      opacity: 0.25;
-      pointer-events: none;
-      user-select: none;
-    }
-    .modal-overlay {
+    .modal-backdrop {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15,23,42,0.4);
-      border-radius: var(--radius-sm);
+      inset: 0;
+      background: rgba(15,23,42,0.45);
+      backdrop-filter: blur(1px);
+      border-radius: var(--radius-input);
+      z-index: 10;
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 20px 12px;
-      z-index: 10;
+      padding-top: 20px;
     }
+    .modal-dimmed-content {
+      filter: brightness(0.75) blur(0.5px);
+      pointer-events: none;
+    }
+
+    /* ─── MODAL CARD ─── */
     .modal {
-      background: white;
-      border-radius: var(--radius);
-      width: 100%;
-      max-width: 680px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.12);
+      background: #fff;
+      border-radius: var(--radius-card);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.15);
+      width: 680px;
+      max-width: calc(100% - 32px);
       overflow: hidden;
+      border: 1px solid var(--gray-200);
     }
     .modal-header {
-      padding: 18px 20px 14px;
-      border-bottom: 1px solid var(--border);
+      background: var(--navy);
+      padding: 14px 20px;
       display: flex;
-      align-items: flex-start;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
     }
-    .modal-header-icon {
-      width: 38px; height: 38px; flex-shrink: 0;
-      background: #EFF6FF;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
+    .modal-header h3 {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      flex: 1;
+    }
+    .modal-header .modal-close {
+      color: #93C5FD;
+      background: none;
+      border: none;
       font-size: 20px;
-      color: var(--blue);
-    }
-    .modal-header-text { flex: 1; }
-    .modal-header-text h3 { font-size: 15px; font-weight: 700; color: var(--text); }
-    .modal-header-text p  { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
-    .modal-close {
-      width: 28px; height: 28px; border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--muted); font-size: 16px;
-      border: 1px solid var(--border);
-      background: white;
-      flex-shrink: 0;
-    }
-    .modal-close:hover { background: var(--bg); }
-
-    /* Preset bar */
-    .preset-bar {
-      padding: 10px 20px;
-      background: #F8FAFC;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .preset-label {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--muted);
-    }
-    .preset-select-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-    .preset-select {
-      appearance: none;
-      -webkit-appearance: none;
-      border: 1px solid var(--border);
-      background: white;
-      padding: 5px 24px 5px 10px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-ui);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
       cursor: pointer;
-      min-width: 200px;
+      line-height: 1;
+      padding: 0 2px;
     }
-    .preset-select-caret {
-      position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
-      pointer-events: none; font-size: 10px; color: var(--muted);
-    }
-    .btn-save-preset {
-      margin-left: auto;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 5px 11px;
-      border: 1px dashed #94A3B8;
-      border-radius: var(--radius-sm);
-      background: white;
-      font-family: var(--font-ui);
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-    }
-    .btn-save-preset:hover { border-color: var(--blue); color: var(--blue); }
-
-    /* Column config */
     .modal-body {
-      padding: 16px 20px;
-      max-height: 480px;
+      padding: 0;
+      max-height: 580px;
       overflow-y: auto;
     }
-    .col-config-header {
+
+    /* ─── PRESET BAR ─── */
+    .preset-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 16px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      flex-wrap: wrap;
+    }
+    .preset-bar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
+      margin-right: 2px;
+    }
+    .preset-chip {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--gray-300);
+      background: #fff;
+      color: var(--gray-600);
+      transition: all 0.15s;
+    }
+    .preset-chip.active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+    .preset-chip:hover:not(.active) { border-color: var(--blue); color: var(--blue); }
+    .preset-chip-add {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px dashed var(--gray-300);
+      background: transparent;
+      color: var(--gray-500);
+    }
+    .preset-chip-add:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* ─── MODAL SECTION LABEL ─── */
+    .modal-section {
+      padding: 12px 16px 0;
+    }
+    .modal-section-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    .col-config-header h4 {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .col-count {
+    .modal-section-title {
       font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      background: #F1F5F9;
-      padding: 2px 8px;
-      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-500);
+    }
+    .modal-section-divider {
+      border: none;
+      border-top: 1px solid var(--gray-100);
+      margin: 0 16px;
     }
 
-    /* Column rows */
+    /* ─── COLUMN LIST ─── */
     .col-list {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      margin-bottom: 16px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 4px 16px 8px;
     }
     .col-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 7px 10px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      background: white;
-      transition: box-shadow .12s;
+      padding: 6px 8px;
+      border-radius: var(--radius-input);
+      margin-bottom: 2px;
+      transition: background 0.12s;
     }
-    .col-row:hover { box-shadow: 0 1px 6px rgba(0,0,0,.07); }
-    .col-row.excluded { opacity: 0.55; background: #FAFAFA; }
+    .col-row:hover { background: var(--gray-50); }
+    .col-row.checked { background: #F0FDF4; }
+    .col-row.unchecked { opacity: 0.5; }
     .drag-handle {
-      font-size: 15px;
-      color: #CBD5E1;
+      color: var(--gray-400);
+      font-size: 13px;
       cursor: grab;
-      user-select: none;
-      line-height: 1;
       flex-shrink: 0;
     }
     .col-checkbox {
-      width: 15px; height: 15px;
+      width: 15px;
+      height: 15px;
       accent-color: var(--blue);
-      cursor: pointer;
       flex-shrink: 0;
+      cursor: pointer;
     }
     .col-name {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      min-width: 110px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--gray-700);
+      width: 170px;
       flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .col-arrow {
+      color: var(--gray-400);
       font-size: 12px;
-      color: #CBD5E1;
       flex-shrink: 0;
     }
     .export-as-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--muted);
+      font-size: 11px;
+      color: var(--gray-500);
       flex-shrink: 0;
-      white-space: nowrap;
     }
     .export-as-input {
       flex: 1;
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 4px 8px;
-      font-family: var(--font-ui);
       font-size: 12px;
-      font-weight: 500;
-      color: var(--blue);
-      background: #F8FAFF;
-      outline: none;
+      font-family: var(--font-mono);
+      padding: 4px 8px;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      color: var(--gray-700);
+      background: #fff;
       min-width: 0;
     }
-    .export-as-input::placeholder { color: #CBD5E1; font-weight: 400; }
-    .export-as-input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(59,130,246,.1); }
-    .export-as-input.empty {
-      color: var(--muted);
-      background: white;
+    .export-as-input:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+    }
+    .export-as-input.renamed {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--navy);
+      font-weight: 500;
+    }
+    .export-as-input:disabled {
+      background: var(--gray-100);
+      color: var(--gray-400);
+      border-color: var(--gray-200);
+    }
+    .col-source-tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--blue-mid);
+      color: #1E40AF;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    /* Options row */
-    .options-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 14px;
-      padding: 12px 14px;
-      background: #F8FAFC;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-    .option-group { display: flex; flex-direction: column; gap: 4px; }
-    .option-label {
-      font-size: 10.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-    }
-    .option-input {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 6px 10px;
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      color: var(--text);
-      background: white;
-      outline: none;
-    }
-    .option-select {
-      appearance: none;
-      -webkit-appearance: none;
-      border: 1px solid var(--border);
-      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
-      padding: 6px 28px 6px 10px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-ui);
-      font-size: 12px;
-      color: var(--text);
-      cursor: pointer;
-    }
-    .scope-row {
-      grid-column: 1 / -1;
+    /* computed & blank rows */
+    .special-row {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: var(--radius-input);
+      margin-bottom: 4px;
+      border: 1px dashed var(--gray-300);
+      background: var(--gray-50);
     }
-    .scope-option {
+    .special-row.computed { border-color: #93C5FD; background: #EFF6FF; }
+    .special-row.blank { border-color: var(--gray-300); background: var(--gray-50); }
+    .special-icon { font-size: 14px; flex-shrink: 0; }
+    .special-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--gray-700);
+      flex: 1;
+    }
+    .special-formula {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--gray-500);
+    }
+    .manual-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      background: var(--orange-light);
+      color: #92400E;
+      border: 1px solid #FDE68A;
+    }
+
+    /* ─── OPTIONS ROW ─── */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      padding: 12px 16px;
+    }
+    .opt-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-500);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .opt-input {
+      width: 100%;
+      font-size: 12.5px;
+      font-family: var(--font-sans);
+      padding: 6px 9px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-input);
+      color: var(--gray-700);
+      background: #fff;
+    }
+    .opt-input:focus { outline: none; border-color: var(--blue); }
+    .scope-options { display: flex; flex-direction: column; gap: 5px; }
+    .scope-radio {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 12px;
+      font-size: 12.5px;
+      color: var(--gray-700);
+      cursor: pointer;
     }
-    .scope-option input[type=radio] { accent-color: var(--blue); }
-    .scope-count { color: var(--muted); font-size: 11px; }
+    .scope-radio input { accent-color: var(--blue); }
 
-    /* Preview */
-    .preview-section {
-      margin-bottom: 14px;
+    /* ─── CSV PREVIEW ─── */
+    .csv-preview-wrap {
+      padding: 12px 16px;
     }
-    .preview-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-    .preview-header h4 {
+    .csv-preview-label {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-    }
-    .preview-badge {
-      font-size: 9.5px;
-      font-weight: 700;
-      background: #F1F5F9;
-      color: var(--muted);
-      padding: 2px 6px;
-      border-radius: 3px;
+      letter-spacing: 0.08em;
+      color: var(--gray-500);
+      margin-bottom: 7px;
     }
     .csv-preview {
       background: #0F172A;
-      border-radius: 7px;
-      padding: 11px 14px;
+      border-radius: var(--radius-input);
+      padding: 12px 14px;
       font-family: var(--font-mono);
-      font-size: 10.5px;
-      line-height: 1.7;
-      overflow-x: auto;
-      white-space: pre;
-    }
-    .csv-header-row { color: #93C5FD; }
-    .csv-data-row   { color: #86EFAC; }
-
-    /* Modal footer */
-    .modal-footer {
-      padding: 12px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #F8FAFC;
-    }
-    .modal-footer .btn-cancel {
-      background: white;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-    .modal-footer .btn-quick {
-      background: white;
-      border: 1px solid var(--blue);
-      color: var(--blue);
-      font-weight: 600;
-    }
-    .modal-footer .btn-export-now {
-      margin-left: auto;
-      background: var(--blue-dark);
-      color: white;
-      font-weight: 700;
-    }
-
-    /* ── Section 3: Post-export ── */
-    .toast {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #DCFCE7;
-      border: 1px solid #86EFAC;
-      color: #166534;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      margin: 12px 0;
-    }
-    .toast-icon { font-size: 14px; }
-
-    .export-dropdown-wrap {
-      position: relative;
-      display: inline-block;
-      margin-top: 16px;
-    }
-    .export-active-btn {
-      background: var(--blue);
-      color: white;
-      padding: 7px 0;
-      border-radius: var(--radius-sm);
-      display: inline-flex;
-      align-items: center;
-      overflow: hidden;
-      font-family: var(--font-ui);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .export-active-btn .ea-main {
-      padding: 0 11px;
-    }
-    .export-active-btn .ea-preset {
-      padding: 0 10px;
-      border-left: 1px solid rgba(255,255,255,0.2);
-      font-size: 11px;
-      font-weight: 700;
-      color: #BAE6FD;
-    }
-    .export-active-btn .ea-gear {
-      padding: 0 10px;
-      border-left: 1px solid rgba(255,255,255,0.2);
-      font-size: 13px;
-      opacity: 0.9;
-    }
-
-    .export-dropdown {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.14);
-      min-width: 280px;
-      z-index: 20;
-      overflow: hidden;
-    }
-    .dd-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 14px;
-      font-size: 12.5px;
-      cursor: pointer;
-      transition: background .1s;
-    }
-    .dd-item:hover { background: #F8FAFC; }
-    .dd-item.primary { font-weight: 700; color: var(--text); }
-    .dd-item.secondary { color: var(--muted); }
-    .dd-item .dd-icon { font-size: 14px; flex-shrink: 0; }
-    .dd-item .dd-badge {
-      margin-left: auto;
-      font-size: 9.5px;
-      font-weight: 700;
-      color: var(--blue);
-      background: var(--blue-light);
-      padding: 1px 6px;
-      border-radius: 3px;
-    }
-    .dd-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 2px 0;
-    }
-    .dd-item.preset-item {
-      font-size: 12px;
-      color: var(--text);
-    }
-    .dd-item.add-preset {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .persistence-note {
-      margin-top: 18px;
-      padding: 12px 16px;
-      background: #F0F9FF;
-      border: 1px solid #BAE6FD;
-      border-left: 3px solid var(--blue);
-      border-radius: var(--radius-sm);
       font-size: 11.5px;
-      color: #0369A1;
-      line-height: 1.6;
+      line-height: 1.7;
+      color: #E2E8F0;
+      overflow-x: auto;
     }
+    .csv-header { color: #93C5FD; }
+    .csv-data { color: #86EFAC; }
+    .csv-comment { color: #64748B; }
 
-    /* ── Section 3b: COAs tab ── */
-    .tab-row {
+    /* ─── MODAL FOOTER ─── */
+    .modal-footer {
       display: flex;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 16px;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+    .modal-footer-spacer { flex: 1; }
+
+    /* ─── TABS ─── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      padding: 0 16px;
     }
     .tab {
-      padding: 8px 16px;
-      font-size: 12.5px;
+      padding: 10px 16px;
+      font-size: 13px;
       font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
+      color: var(--gray-500);
       border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: -1px;
     }
     .tab.active {
       color: var(--blue);
       border-bottom-color: var(--blue);
     }
+    .tab:hover:not(.active) { color: var(--gray-700); }
 
-    .coa-context-note {
+    /* ─── PERSISTENCE SECTION ─── */
+    .persistence-demo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .persist-panel {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+    .persist-panel-header {
+      background: var(--gray-50);
       padding: 10px 14px;
-      background: #FFFBEB;
-      border: 1px solid #FDE68A;
-      border-left: 3px solid #F59E0B;
-      border-radius: var(--radius-sm);
-      font-size: 11.5px;
-      color: #78350F;
-      margin-top: 14px;
-      line-height: 1.6;
-    }
-
-    /* ── Section headers ── */
-    .section-title-block {
-      padding: 32px 0 8px;
-    }
-    .section-title-block h2 {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text);
-    }
-    .section-title-block p {
-      font-size: 12.5px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-    .section-divider {
-      border: none;
-      border-top: 2px solid var(--border);
-      margin: 8px 0 24px;
-    }
-
-    /* Before/after label */
-    .state-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 9px;
-      border-radius: 20px;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
-    .state-before { background: #FEF9C3; color: #92400E; }
-    .state-after  { background: #DCFCE7; color: #166534; }
-    .state-persist { background: #EDE9FE; color: #4C1D95; }
+    .persist-panel-body { padding: 14px; }
+
+    /* dropdown */
+    .dropdown-demo {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-card);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      min-width: 220px;
+      overflow: hidden;
+      z-index: 50;
+    }
+    .dropdown-item {
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .dropdown-item:hover { background: var(--gray-50); }
+    .dropdown-item.active { background: var(--blue-light); color: var(--navy); font-weight: 600; }
+    .dropdown-divider { border: none; border-top: 1px solid var(--gray-100); margin: 4px 0; }
+    .dropdown-manage {
+      padding: 8px 14px;
+      font-size: 12px;
+      color: var(--blue);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dropdown-manage:hover { background: var(--blue-light); }
+    .check-icon { color: var(--blue); font-size: 13px; }
+
+    /* toast */
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid #BBF7D0;
+      border-left: 4px solid var(--green);
+      border-radius: var(--radius-input);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-size: 13px;
+      color: var(--gray-700);
+    }
+    .toast-icon { color: var(--green); font-size: 16px; }
+
+    /* info box */
+    .info-box {
+      background: var(--blue-light);
+      border: 1px solid #BFDBFE;
+      border-radius: var(--radius-input);
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      color: #1E40AF;
+    }
+    .info-box-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+
+    /* ─── MAPPING TABLE ─── */
+    .mapping-table-wrap {
+      border-radius: var(--radius-card);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+    }
+    .mapping-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .mapping-table th {
+      background: var(--navy);
+      color: #fff;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 10px 16px;
+      text-align: left;
+    }
+    .mapping-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .mapping-table tr:last-child td { border-bottom: none; }
+    .mapping-table tr:hover td { background: var(--gray-50); }
+    .bank-col { font-weight: 600; color: var(--gray-800); }
+    .source-col { font-family: var(--font-mono); font-size: 12px; color: var(--gray-600); }
+    .status-auto { color: var(--green); font-weight: 600; font-size: 12px; }
+    .status-computed { color: var(--blue); font-weight: 600; font-size: 12px; }
+    .status-manual { color: var(--orange); font-weight: 600; font-size: 12px; }
+
+    .coverage-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-light);
+      border: 1px solid #BBF7D0;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #14532D;
+      margin-top: 14px;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    .col-list::-webkit-scrollbar { width: 5px; }
+    .col-list::-webkit-scrollbar-track { background: transparent; }
+    .col-list::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
+
+    /* ─── MISC ─── */
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .flex-1 { flex: 1; }
+    .text-xs { font-size: 11px; }
+    .text-sm { font-size: 12.5px; }
+    .font-mono { font-family: var(--font-mono); }
+    .color-gray { color: var(--gray-500); }
+
+    .section-step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-yellow { background: var(--orange-light); color: #92400E; border: 1.5px solid #FDE68A; }
+    .step-green  { background: var(--green-light); color: #14532D; border: 1.5px solid #BBF7D0; }
+    .step-purple { background: var(--purple-light); color: #4C1D95; border: 1.5px solid #DDD6FE; }
+    .step-blue   { background: var(--blue-light); color: #1E40AF; border: 1.5px solid #BFDBFE; }
+
+    @media (max-width: 680px) {
+      .persistence-demo { grid-template-columns: 1fr; }
+      .options-grid { grid-template-columns: 1fr 1fr; }
+      .modal { width: calc(100% - 16px); }
+    }
   </style>
 </head>
 <body>
 
-<nav class="proto-nav">
-  <a href="../">← All Mockups</a>
-  <span>/</span>
-  <span style="color:#CBD5E1;">Configurable Export — Product Compliance</span>
-  <span class="ticket-badge"><a href="https://qredible.atlassian.net/browse/QP-3616" target="_blank" style="color:#93C5FD;text-decoration:none;">QP-3616</a></span>
+<!-- ═══════════════════════════ NAV ═══════════════════════════ -->
+<nav class="nav">
+  <a href="../index.html" class="nav-back">
+    <span>←</span> All Mockups
+  </a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">Configurable Export — Product Compliance</span>
+  <div class="nav-spacer"></div>
+  <a href="https://qredible.atlassian.net/browse/QP-3616" target="_blank" class="nav-badge">QP-3616</a>
 </nav>
 
 <div class="page">
 
-  <!-- ═══════════════════════════════════
-       SECTION 1 — CURRENT STATE
-  ═══════════════════════════════════ -->
-  <div class="section-title-block">
-    <h2>Configurable Export — Product Compliance</h2>
-    <p>QP-3616 · Replace the fixed-format Export button with a configurable export flow: column selection, drag-to-reorder, rename-on-export, and persistent presets.</p>
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Configurable Export</h1>
+    <p>Allows users to select, reorder, rename, and save custom export column configurations — with support for computed columns, blank columns, and named presets. Per-user, per-tab persistence via localStorage.</p>
   </div>
-  <hr class="section-divider"/>
 
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 1 — BEFORE / CURRENT STATE
+  ════════════════════════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label">
-      <span class="state-chip state-before">① Before</span>
-      <h2>Current State — Fixed Export</h2>
+    <div class="section-header">
+      <div class="section-step step-yellow">①</div>
+      <h2>Before — Current State</h2>
+      <span class="badge badge-yellow">Current Behavior</span>
     </div>
-    <div class="section-inner">
+    <div class="section-body">
 
       <!-- Toolbar -->
       <div class="toolbar">
-        <input class="search-input" type="text" value="" placeholder="Search products by definition, classification, SKU or COA file name..." readonly/>
-        <button class="btn btn-white">
-          Filters
-          <span class="filters-badge">3</span>
-        </button>
-        <button class="btn btn-navy">Add Product</button>
-        <button class="btn btn-navy">Import Products</button>
-        <button class="btn btn-navy">Scan for Products</button>
-        <button class="btn btn-red">Report an Issue</button>
-        <button class="btn btn-blue">Export</button>
-      </div>
-
-      <!-- Filter chips -->
-      <div class="filter-chips">
-        <span class="filter-chip">State: Active <span class="chip-x">×</span></span>
-        <span class="filter-chip">From Date: 04/03/2025 <span class="chip-x">×</span></span>
-        <span class="filter-chip">To Date: 04/03/2026 <span class="chip-x">×</span></span>
-        <span class="clear-all">Clear all</span>
+        <span class="toolbar-title">Products</span>
+        <span class="toolbar-subtitle">124 results</span>
+        <button class="btn btn-ghost btn-sm">Filters</button>
+        <button class="btn btn-ghost btn-sm">Columns</button>
+        <button class="btn btn-primary btn-sm">↓ Export</button>
       </div>
 
       <!-- Table -->
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>SKU</th>
-            <th>Product Definition</th>
-            <th>Price</th>
-            <th>Classification</th>
-            <th>Company</th>
-            <th>Scan Change</th>
-            <th>Listing Status</th>
-            <th>COA Status</th>
-            <th>Disposition</th>
-            <th>Date Added</th>
-            <th>Activity</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="sku-code">164826-PET-1</span></td>
-            <td>CBD Living Pet Calming Soft Chews 300 MG / 30 Ct</td>
-            <td>$25.00/unit</td>
-            <td><span class="status-pill pill-purple">Edibles</span></td>
-            <td>AG Living Solutions LLC</td>
-            <td><span class="scan-new">● New</span></td>
-            <td><span class="status-pill pill-green">In Stock</span></td>
-            <td><span class="status-pill pill-green">COA Validated</span></td>
-            <td><span class="status-pill pill-green">Approved</span></td>
-            <td>12/30/2025</td>
-            <td>
-              <div class="activity-dots">
-                <div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td><span class="sku-code">219034-TINK-5</span></td>
-            <td>Charlotte's Web Daily Wellness Hemp Extract Oil 50mg</td>
-            <td>$89.99/unit</td>
-            <td><span class="status-pill pill-blue">Tinctures</span></td>
-            <td>CW Hemp Co.</td>
-            <td><span class="scan-changed">↑ Modified</span></td>
-            <td><span class="status-pill pill-green">In Stock</span></td>
-            <td><span class="status-pill pill-yellow">COA Pending</span></td>
-            <td><span class="status-pill pill-yellow">Under Review</span></td>
-            <td>01/15/2026</td>
-            <td>
-              <div class="activity-dots">
-                <div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td><span class="sku-code">301892-CAPS-2</span></td>
-            <td>Green Roads Pharmacy Grade CBD Capsules 25mg × 30ct</td>
-            <td>$49.00/unit</td>
-            <td><span class="status-pill pill-gray">Capsules</span></td>
-            <td>Green Roads World</td>
-            <td>—</td>
-            <td><span class="status-pill pill-red">Out of Stock</span></td>
-            <td><span class="status-pill pill-green">COA Validated</span></td>
-            <td><span class="status-pill pill-green">Approved</span></td>
-            <td>03/08/2026</td>
-            <td>
-              <div class="activity-dots">
-                <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Product Definition</th>
+              <th>Price</th>
+              <th>Classification</th>
+              <th>Company</th>
+              <th>COA Status</th>
+              <th>Disposition</th>
+              <th>Listing Status</th>
+              <th>Date Added</th>
+              <th>Product URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-mono text-xs">CBD-OIL-1000</td>
+              <td>Full Spectrum CBD Oil 1000mg</td>
+              <td>$49.99</td>
+              <td><span class="pill pill-blue">CBD</span></td>
+              <td>Green Leaf Co.</td>
+              <td><span class="pill pill-green">Compliant</span></td>
+              <td><span class="pill pill-green">Approved</span></td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td class="font-mono text-xs">2025-11-04</td>
+              <td class="font-mono text-xs color-gray">greenleaf.com/…</td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">D9-GUMMY-25</td>
+              <td>Delta-9 THC Gummies 25mg</td>
+              <td>$34.99</td>
+              <td><span class="pill pill-orange">D9-THC</span></td>
+              <td>Harvest Moon LLC</td>
+              <td><span class="pill pill-orange">Pending</span></td>
+              <td><span class="pill pill-orange">Under Review</span></td>
+              <td><span class="pill pill-blue">Listed</span></td>
+              <td class="font-mono text-xs">2025-12-17</td>
+              <td class="font-mono text-xs color-gray">harvestmoon.io/…</td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">KRAT-CAPS-60</td>
+              <td>Kratom Capsules — Maeng Da 60ct</td>
+              <td>$29.99</td>
+              <td><span class="pill pill-gray">Kratom</span></td>
+              <td>Botanica Supply</td>
+              <td><span class="pill pill-red">Non-Compliant</span></td>
+              <td><span class="pill pill-red">Rejected</span></td>
+              <td><span class="pill pill-gray">Inactive</span></td>
+              <td class="font-mono text-xs">2026-01-09</td>
+              <td class="font-mono text-xs color-gray">botanica.shop/…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="annotation">
-        <strong>Current behavior:</strong> Clicking <em>Export</em> immediately downloads all columns in fixed order. No column selection, no renaming, no persistence. Every exported file requires manual column cleanup in Excel before sending to Flex Bank or internal audit.
+        <span class="annotation-icon">⚠️</span>
+        <span><strong>Current behavior:</strong> Export downloads ALL columns in fixed order. No column selection, renaming, or saved presets. Users must manually reformat CSV in Excel before submitting to banks or auditors.</span>
       </div>
 
     </div>
   </div>
 
-
-  <!-- ═══════════════════════════════════
-       SECTION 2 — EXPORT SETTINGS MODAL
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 2 — AFTER: PRODUCTS TAB MODAL
+  ════════════════════════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label">
-      <span class="state-chip state-after">② After</span>
-      <h2>New Export Button + Settings Modal</h2>
+    <div class="section-header">
+      <div class="section-step step-green">②</div>
+      <h2>After — Products Tab Export Settings Modal</h2>
+      <span class="badge badge-green">New Behavior</span>
     </div>
-    <div class="section-inner">
+    <div class="section-body">
 
-      <!-- Toolbar with gear icon -->
+      <!-- Toolbar -->
       <div class="toolbar">
-        <input class="search-input" type="text" value="" placeholder="Search products by definition, classification, SKU or COA file name..." readonly/>
-        <button class="btn btn-white">Filters <span class="filters-badge">3</span></button>
-        <button class="btn btn-navy">Add Product</button>
-        <button class="btn btn-navy">Import Products</button>
-        <button class="btn btn-navy">Scan for Products</button>
-        <button class="btn btn-red">Report an Issue</button>
-        <button class="btn btn-export-settings">
-          <span class="export-main">Export</span>
-          <span class="export-gear">⚙</span>
-        </button>
+        <span class="toolbar-title">Products</span>
+        <span class="toolbar-subtitle">124 results</span>
+        <button class="btn btn-ghost btn-sm">Filters</button>
+        <button class="btn btn-ghost btn-sm">Columns</button>
+        <div class="btn-split">
+          <button class="btn-split-main">↓ Export</button>
+          <button class="btn-split-gear">⚙</button>
+        </div>
       </div>
 
-      <div class="filter-chips">
-        <span class="filter-chip">State: Active <span class="chip-x">×</span></span>
-        <span class="filter-chip">From Date: 04/03/2025 <span class="chip-x">×</span></span>
-        <span class="filter-chip">To Date: 04/03/2026 <span class="chip-x">×</span></span>
-        <span class="clear-all">Clear all</span>
-      </div>
-
-      <!-- Table + Modal overlay -->
+      <!-- MODAL SCENE -->
       <div class="modal-scene">
-
-        <!-- Table (dimmed) -->
-        <div class="table-dimmed">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>SKU</th><th>Product Definition</th><th>Price</th><th>Classification</th>
-                <th>Company</th><th>Scan Change</th><th>Listing Status</th><th>COA Status</th>
-                <th>Disposition</th><th>Date Added</th><th>Activity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><span class="sku-code">164826-PET-1</span></td>
-                <td>CBD Living Pet Calming Soft Chews 300 MG / 30 Ct</td>
-                <td>$25.00/unit</td>
-                <td><span class="status-pill pill-purple">Edibles</span></td>
-                <td>AG Living Solutions LLC</td>
-                <td><span class="scan-new">● New</span></td>
-                <td><span class="status-pill pill-green">In Stock</span></td>
-                <td><span class="status-pill pill-green">COA Validated</span></td>
-                <td><span class="status-pill pill-green">Approved</span></td>
-                <td>12/30/2025</td>
-                <td><div class="activity-dots"><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div></td>
-              </tr>
-              <tr>
-                <td><span class="sku-code">219034-TINK-5</span></td>
-                <td>Charlotte's Web Daily Wellness Hemp Extract Oil 50mg</td>
-                <td>$89.99/unit</td>
-                <td><span class="status-pill pill-blue">Tinctures</span></td>
-                <td>CW Hemp Co.</td>
-                <td><span class="scan-changed">↑ Modified</span></td>
-                <td><span class="status-pill pill-green">In Stock</span></td>
-                <td><span class="status-pill pill-yellow">COA Pending</span></td>
-                <td><span class="status-pill pill-yellow">Under Review</span></td>
-                <td>01/15/2026</td>
-                <td><div class="activity-dots"><div class="dot active"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td>
-              </tr>
-              <tr>
-                <td><span class="sku-code">301892-CAPS-2</span></td>
-                <td>Green Roads Pharmacy Grade CBD Capsules 25mg × 30ct</td>
-                <td>$49.00/unit</td>
-                <td><span class="status-pill pill-gray">Capsules</span></td>
-                <td>Green Roads World</td>
-                <td>—</td>
-                <td><span class="status-pill pill-red">Out of Stock</span></td>
-                <td><span class="status-pill pill-green">COA Validated</span></td>
-                <td><span class="status-pill pill-green">Approved</span></td>
-                <td>03/08/2026</td>
-                <td><div class="activity-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Dimmed table behind modal -->
+        <div class="modal-dimmed-content">
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Product Definition</th>
+                  <th>Price</th>
+                  <th>Classification</th>
+                  <th>Company</th>
+                  <th>COA Status</th>
+                  <th>Disposition</th>
+                  <th>Listing Status</th>
+                  <th>Date Added</th>
+                  <th>Product URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-mono text-xs">CBD-OIL-1000</td>
+                  <td>Full Spectrum CBD Oil 1000mg</td>
+                  <td>$49.99</td>
+                  <td><span class="pill pill-blue">CBD</span></td>
+                  <td>Green Leaf Co.</td>
+                  <td><span class="pill pill-green">Compliant</span></td>
+                  <td><span class="pill pill-green">Approved</span></td>
+                  <td><span class="pill pill-green">Active</span></td>
+                  <td class="font-mono text-xs">2025-11-04</td>
+                  <td class="font-mono text-xs color-gray">greenleaf.com/…</td>
+                </tr>
+                <tr>
+                  <td class="font-mono text-xs">D9-GUMMY-25</td>
+                  <td>Delta-9 THC Gummies 25mg</td>
+                  <td>$34.99</td>
+                  <td><span class="pill pill-orange">D9-THC</span></td>
+                  <td>Harvest Moon LLC</td>
+                  <td><span class="pill pill-orange">Pending</span></td>
+                  <td><span class="pill pill-orange">Under Review</span></td>
+                  <td><span class="pill pill-blue">Listed</span></td>
+                  <td class="font-mono text-xs">2025-12-17</td>
+                  <td class="font-mono text-xs color-gray">harvestmoon.io/…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <!-- Modal overlay -->
-        <div class="modal-overlay">
+        <!-- Modal Backdrop + Modal -->
+        <div class="modal-backdrop">
           <div class="modal">
-
-            <!-- Header -->
+            <!-- Modal Header -->
             <div class="modal-header">
-              <div class="modal-header-icon">↓</div>
-              <div class="modal-header-text">
-                <h3>Export Settings — Products</h3>
-                <p>Configure your export format. Settings are saved automatically.</p>
-              </div>
-              <div class="modal-close">×</div>
+              <span style="font-size:16px;">📤</span>
+              <h3>Export Settings — Products</h3>
+              <button class="modal-close">✕</button>
             </div>
 
-            <!-- Preset bar -->
-            <div class="preset-bar">
-              <span class="preset-label">Preset:</span>
-              <div class="preset-select-wrapper">
-                <select class="preset-select">
-                  <option selected>All Columns (Default) ✓</option>
-                  <option>Flex Bank Format</option>
-                  <option>Internal Audit</option>
-                </select>
-                <span class="preset-select-caret">▾</span>
-              </div>
-              <button class="btn-save-preset">＋ Save Current as Preset</button>
-            </div>
-
-            <!-- Column list -->
             <div class="modal-body">
-              <div class="col-config-header">
-                <h4>Select &amp; Configure Columns</h4>
-                <span class="col-count">9 of 11 selected</span>
+              <!-- Preset Bar -->
+              <div class="preset-bar">
+                <span class="preset-bar-label">Preset:</span>
+                <button class="preset-chip">All Columns (Default)</button>
+                <button class="preset-chip active">Flex Bank Format</button>
+                <button class="preset-chip">Internal Audit</button>
+                <button class="preset-chip-add">+ Save as Preset</button>
               </div>
 
-              <div class="col-list">
-
-                <!-- 1 SKU -->
-                <div class="col-row">
-                  <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
-                  <span class="col-name">SKU</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input empty" type="text" placeholder="Keep original name" value=""/>
+              <!-- Column Configuration -->
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">Column Configuration</span>
+                  <span class="text-xs color-gray">Drag to reorder · Check to include</span>
                 </div>
+              </div>
 
-                <!-- 2 Product Definition — RENAMED -->
-                <div class="col-row">
+              <!-- Column List — Flex Bank Format preset active -->
+              <div class="col-list">
+                <!-- CHECKED rows -->
+                <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
+                  <input type="checkbox" class="col-checkbox" checked />
                   <span class="col-name">Product Definition</span>
                   <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input" type="text" value="Product Name"/>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="Product Name" />
                 </div>
-
-                <!-- 3 Price — RENAMED -->
-                <div class="col-row">
+                <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
-                  <span class="col-name">Price</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Product URL</span>
                   <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input" type="text" value="Unit Price"/>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="URL/Link to Product" />
                 </div>
-
-                <!-- 4 Classification -->
-                <div class="col-row">
+                <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
-                  <span class="col-name">Classification</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input empty" type="text" placeholder="Keep original name"/>
-                </div>
-
-                <!-- 5 Company — RENAMED -->
-                <div class="col-row">
-                  <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
-                  <span class="col-name">Company</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input" type="text" value="Merchant Name"/>
-                </div>
-
-                <!-- 6 Scan Change — EXCLUDED -->
-                <div class="col-row excluded">
-                  <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox"/>
-                  <span class="col-name">Scan Change</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input empty" type="text" placeholder="Keep original name" disabled/>
-                </div>
-
-                <!-- 7 Listing Status — RENAMED -->
-                <div class="col-row">
-                  <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
-                  <span class="col-name">Listing Status</span>
-                  <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input" type="text" value="Stock Status"/>
-                </div>
-
-                <!-- 8 COA Status -->
-                <div class="col-row">
-                  <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
+                  <input type="checkbox" class="col-checkbox" checked />
                   <span class="col-name">COA Status</span>
                   <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input empty" type="text" placeholder="Keep original name"/>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="COA Status" />
                 </div>
-
-                <!-- 9 Disposition — RENAMED -->
-                <div class="col-row">
+                <div class="col-row checked">
                   <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
+                  <input type="checkbox" class="col-checkbox" checked />
                   <span class="col-name">Disposition</span>
                   <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input" type="text" value="Compliance Status"/>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="Compliance Status" />
                 </div>
-
-                <!-- 10 Date Added -->
-                <div class="col-row">
+                <!-- UNCHECKED rows -->
+                <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox" checked/>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">SKU</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="SKU" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Price</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Price" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Classification</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Classification" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Company</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Company" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Listing Status</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Listing Status" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
                   <span class="col-name">Date Added</span>
                   <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input empty" type="text" placeholder="Keep original name"/>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Date Added" disabled />
                 </div>
-
-                <!-- 11 Activity — EXCLUDED -->
-                <div class="col-row excluded">
+                <div class="col-row unchecked">
                   <span class="drag-handle">⠿</span>
-                  <input class="col-checkbox" type="checkbox"/>
-                  <span class="col-name">Activity</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Company URL</span>
                   <span class="col-arrow">→</span>
-                  <span class="export-as-label">Export as:</span>
-                  <input class="export-as-input empty" type="text" placeholder="Keep original name" disabled/>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Company URL" disabled />
                 </div>
-
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">License Number</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="License Number" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">License State</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="License State" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Compliance Domain</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Compliance Domain" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Last Scanned</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Last Scanned" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Scan Score</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Scan Score" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Updated At</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Updated At" disabled />
+                </div>
               </div>
 
-              <!-- Options row -->
-              <div class="options-row">
-                <div class="option-group">
-                  <span class="option-label">File Name</span>
-                  <input class="option-input" type="text" value="product-compliance-2026-04-03"/>
+              <hr class="modal-section-divider" />
+
+              <!-- Computed Columns -->
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">Computed Columns</span>
+                  <button class="btn btn-primary btn-sm">+ Add Computed Column</button>
                 </div>
-                <div class="option-group">
-                  <span class="option-label">Format</span>
-                  <select class="option-select">
-                    <option selected>CSV</option>
-                    <option>Excel (.xlsx)</option>
+                <div class="special-row computed">
+                  <span class="special-icon">⚙️</span>
+                  <div style="flex:1">
+                    <div class="special-name">D9/THC-A Combined %</div>
+                    <div class="special-formula">= Delta-9 THC % + THC-A %</div>
+                    <div class="text-xs color-gray" style="margin-top:2px">Pulls from linked COA record</div>
+                  </div>
+                  <span class="col-source-tag">From COA</span>
+                </div>
+              </div>
+
+              <hr class="modal-section-divider" style="margin-top:10px;" />
+
+              <!-- Blank Columns -->
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">Blank Columns</span>
+                  <button class="btn btn-ghost btn-sm">+ Add Blank Column</button>
+                </div>
+                <div class="special-row blank">
+                  <span class="special-icon">📝</span>
+                  <span class="special-name">Initials</span>
+                  <span class="manual-badge">Manual Entry</span>
+                </div>
+                <div class="special-row blank" style="margin-top:4px;">
+                  <span class="special-icon">📅</span>
+                  <span class="special-name">Date</span>
+                  <span class="manual-badge">Manual Entry</span>
+                </div>
+              </div>
+
+              <hr class="modal-section-divider" style="margin-top:10px;" />
+
+              <!-- Options -->
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">Export Options</span>
+                </div>
+              </div>
+              <div class="options-grid">
+                <div>
+                  <div class="opt-label">File Name</div>
+                  <input class="opt-input" type="text" value="products-export-2026-04-06" />
+                </div>
+                <div>
+                  <div class="opt-label">Format</div>
+                  <select class="opt-input">
+                    <option>CSV</option>
+                    <option>XLSX</option>
                     <option>TSV</option>
                   </select>
                 </div>
-                <div class="scope-row">
-                  <span class="option-label" style="margin-right:4px;">Scope:</span>
-                  <label class="scope-option">
-                    <input type="radio" name="scope" checked/>
-                    All filtered products
-                    <span class="scope-count">(3,414)</span>
-                  </label>
-                  <label class="scope-option">
-                    <input type="radio" name="scope"/>
-                    Selected only
-                    <span class="scope-count">(25)</span>
-                  </label>
+                <div>
+                  <div class="opt-label">Date Format</div>
+                  <select class="opt-input">
+                    <option>YYYY-MM-DD</option>
+                    <option>MM/DD/YYYY</option>
+                    <option>DD/MM/YYYY</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="opt-label">Scope</div>
+                  <div class="scope-options">
+                    <label class="scope-radio">
+                      <input type="radio" name="scope2" checked /> All filtered (124)
+                    </label>
+                    <label class="scope-radio">
+                      <input type="radio" name="scope2" /> Selected only (3)
+                    </label>
+                  </div>
                 </div>
               </div>
+
+              <hr class="modal-section-divider" />
 
               <!-- CSV Preview -->
-              <div class="preview-section">
-                <div class="preview-header">
-                  <h4>Preview</h4>
-                  <span class="preview-badge">First 2 rows · with renames applied</span>
+              <div class="csv-preview-wrap">
+                <div class="csv-preview-label">CSV Preview</div>
+                <div class="csv-preview">
+                  <div class="csv-comment"># Flex Bank Format — 4 columns + 1 computed + 2 blank</div>
+                  <div class="csv-header">Product Name,URL/Link to Product,COA Status,Compliance Status,D9/THC-A Combined %,Initials,Date</div>
+                  <div class="csv-data">Full Spectrum CBD Oil 1000mg,https://greenleaf.com/cbd-oil-1000,Compliant,Approved,0.28,,</div>
                 </div>
-                <div class="csv-preview"><span class="csv-header-row">SKU,Product Name,Unit Price,Classification,Merchant Name,Stock Status,COA Status,Compliance Status,Date Added</span>
-<span class="csv-data-row">164826-PET-1,"CBD Living Pet Calming Soft Chews 300 MG / 30 Ct",$25.00/unit,Edibles,AG Living Solutions LLC,In Stock,COA Validated,Approved,12/30/2025</span></div>
               </div>
-
             </div><!-- /modal-body -->
 
             <!-- Footer -->
             <div class="modal-footer">
-              <button class="btn btn-cancel">Cancel</button>
-              <button class="btn btn-quick">Quick Export (last settings)</button>
-              <button class="btn btn-export-now modal-footer">Export Now →</button>
+              <button class="btn btn-ghost btn-sm">Cancel</button>
+              <div class="modal-footer-spacer"></div>
+              <button class="btn btn-ghost btn-sm">Quick Export (no settings)</button>
+              <button class="btn btn-primary btn-sm">Export Now →</button>
             </div>
-
           </div><!-- /modal -->
-        </div><!-- /modal-overlay -->
-
+        </div><!-- /backdrop -->
       </div><!-- /modal-scene -->
 
-    </div><!-- /section-inner -->
-  </div><!-- /section -->
-
-
-  <!-- ═══════════════════════════════════
-       SECTION 3 — PERSISTENCE + QUICK ACCESS
-  ═══════════════════════════════════ -->
-  <div class="section">
-    <div class="section-label">
-      <span class="state-chip state-persist">③ Persistence</span>
-      <h2>Post-Export State + Quick Access Dropdown</h2>
-    </div>
-    <div class="section-inner">
-
-      <!-- Toolbar with active preset badge -->
-      <div class="toolbar">
-        <input class="search-input" type="text" value="" placeholder="Search products by definition, classification, SKU or COA file name..." readonly/>
-        <button class="btn btn-white">Filters <span class="filters-badge">3</span></button>
-        <button class="btn btn-navy">Add Product</button>
-        <button class="btn btn-navy">Import Products</button>
-        <button class="btn btn-navy">Scan for Products</button>
-        <button class="btn btn-red">Report an Issue</button>
-        <!-- Active preset shown on button -->
-        <div class="export-active-btn">
-          <span class="ea-main">Export</span>
-          <span class="ea-preset">· Flex Bank Format</span>
-          <span class="ea-gear">⚙</span>
-        </div>
-      </div>
-
-      <div class="filter-chips">
-        <span class="filter-chip">State: Active <span class="chip-x">×</span></span>
-        <span class="filter-chip">From Date: 04/03/2025 <span class="chip-x">×</span></span>
-        <span class="filter-chip">To Date: 04/03/2026 <span class="chip-x">×</span></span>
-        <span class="clear-all">Clear all</span>
-      </div>
-
-      <!-- Success toast -->
-      <div class="toast">
-        <span class="toast-icon">✓</span>
-        Export complete — <strong>product-compliance-2026-04-03.csv</strong> (3,414 rows)
-      </div>
-
-      <!-- Quick-access dropdown demo -->
-      <div class="export-dropdown-wrap">
-        <div class="export-active-btn">
-          <span class="ea-main">Export</span>
-          <span class="ea-preset">· Flex Bank Format</span>
-          <span class="ea-gear">⚙</span>
-        </div>
-        <div class="export-dropdown">
-          <div class="dd-item primary">
-            <span class="dd-icon">↓</span>
-            Export (Flex Bank Format)
-            <span class="dd-badge">⌘E</span>
-          </div>
-          <div class="dd-item secondary">
-            <span class="dd-icon">⚙</span>
-            Change Export Settings…
-          </div>
-          <div class="dd-divider"></div>
-          <div class="dd-item preset-item">
-            <span class="dd-icon">📋</span>
-            Flex Bank Format
-          </div>
-          <div class="dd-item preset-item">
-            <span class="dd-icon">📋</span>
-            Internal Audit
-          </div>
-          <div class="dd-item preset-item">
-            <span class="dd-icon">📋</span>
-            All Columns (Default)
-          </div>
-          <div class="dd-divider"></div>
-          <div class="dd-item add-preset">
-            <span class="dd-icon">＋</span>
-            Save New Preset
-          </div>
-        </div>
-      </div>
-
-      <div class="persistence-note">
-        <strong>Persistence:</strong> Export settings are stored per user. The last-used preset is remembered across sessions. <strong>Quick Export (⌘E)</strong> uses the active preset without opening the modal — useful for recurring exports like weekly Flex Bank submissions. Preset names are shown on the button so users always know what they'll get before clicking.
+      <div class="annotation annotation-green mt-12">
+        <span class="annotation-icon">✅</span>
+        <span><strong>After:</strong> Clicking the ⚙ gear opens Export Settings. Preset is remembered per-user. Renamed headers, computed columns, and blank columns all appear in the downloaded file.</span>
       </div>
 
     </div>
   </div>
 
-
-  <!-- ═══════════════════════════════════
-       SECTION 3b — COAs TAB
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 3 — COAs TAB MODAL
+  ════════════════════════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label">
-      <span class="state-chip state-persist">③b COAs Tab</span>
-      <h2>COAs Tab — Same Export Pattern, Tab-Specific Presets</h2>
+    <div class="section-header">
+      <div class="section-step step-green">②</div>
+      <h2>COAs Tab — Export Settings Modal</h2>
+      <span class="badge badge-green">New Behavior</span>
     </div>
-    <div class="section-inner">
+    <div class="section-body">
 
-      <!-- Tabs -->
-      <div class="tab-row">
-        <div class="tab">Products</div>
-        <div class="tab active">COAs</div>
-        <div class="tab">WeMonitor</div>
-      </div>
-
-      <!-- COAs toolbar -->
-      <div class="toolbar">
-        <input class="search-input" type="text" value="" placeholder="Search COAs by company, file name, batch number…" readonly/>
-        <button class="btn btn-white">Filters <span class="filters-badge">2</span></button>
-        <button class="btn btn-navy">Upload COA</button>
-        <button class="btn btn-red">Report an Issue</button>
-        <!-- Same Export ⚙ pattern on COAs tab -->
-        <div class="export-active-btn">
-          <span class="ea-main">Export</span>
-          <span class="ea-gear" style="border-left: 1px solid rgba(255,255,255,0.2); padding: 0 10px;">⚙</span>
+      <!-- Tab Bar -->
+      <div style="border:1px solid var(--gray-200); border-radius:var(--radius-input); overflow:hidden; margin-bottom:16px;">
+        <div class="tab-bar">
+          <div class="tab">Products</div>
+          <div class="tab active">COAs</div>
+          <div class="tab">WeMonitor</div>
+        </div>
+        <!-- Toolbar inside tab context -->
+        <div class="toolbar" style="margin:12px; border-radius:var(--radius-input);">
+          <span class="toolbar-title">COA Records</span>
+          <span class="toolbar-subtitle">386 results</span>
+          <button class="btn btn-ghost btn-sm">Filters</button>
+          <div class="btn-split">
+            <button class="btn-split-main">↓ Export</button>
+            <button class="btn-split-gear">⚙</button>
+          </div>
         </div>
       </div>
 
-      <div class="filter-chips">
-        <span class="filter-chip">Status: COA Validated <span class="chip-x">×</span></span>
-        <span class="filter-chip">Disposition: Approved <span class="chip-x">×</span></span>
-        <span class="clear-all">Clear all</span>
+      <!-- MODAL SCENE -->
+      <div class="modal-scene">
+        <div class="modal-dimmed-content" style="min-height:80px; background:var(--gray-100); border-radius:var(--radius-input); height:80px;"></div>
+
+        <div class="modal-backdrop" style="position:relative; background:transparent; backdrop-filter:none; padding-top:0; display:block;">
+          <div class="modal" style="margin:0 auto; box-shadow: 0 8px 32px rgba(0,0,0,0.18);">
+
+            <div class="modal-header">
+              <span style="font-size:16px;">📤</span>
+              <h3>Export Settings — COAs</h3>
+              <button class="modal-close">✕</button>
+            </div>
+
+            <div class="modal-body">
+              <!-- Preset Bar -->
+              <div class="preset-bar">
+                <span class="preset-bar-label">Preset:</span>
+                <button class="preset-chip">All Columns (Default)</button>
+                <button class="preset-chip active">Flex Bank Format</button>
+                <button class="preset-chip">Internal Audit</button>
+                <button class="preset-chip-add">+ Save as Preset</button>
+              </div>
+
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">COA Column Configuration — 28 Columns</span>
+                  <span class="text-xs color-gray">7 selected · Flex Bank Format</span>
+                </div>
+              </div>
+
+              <!-- COA Column List -->
+              <div class="col-list">
+                <!-- CHECKED rows -->
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Product Assignment</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="Product Name" />
+                </div>
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Product URL</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="URL/Link to Product" />
+                </div>
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Completed Date</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="COA Batch Date" />
+                </div>
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Expiration Date</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="COA Expiration Date" />
+                </div>
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Delta-9 THC %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="Delta-9 Percentage" />
+                </div>
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">THC-A %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="THC-A Percentage" />
+                </div>
+                <div class="col-row checked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" checked />
+                  <span class="col-name">Total THC</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input renamed" value="Total THC Percentage" />
+                </div>
+                <!-- UNCHECKED — remaining 21 COA columns -->
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">COA ID</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="COA ID" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Lab Name</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Lab Name" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Batch Number</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Batch Number" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Sample ID</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Sample ID" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">CBD %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="CBD %" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">CBD-A %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="CBD-A %" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Total CBD</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Total CBD" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">CBG %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="CBG %" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">CBN %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="CBN %" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">CBC %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="CBC %" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Delta-8 THC %</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Delta-8 THC %" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Moisture Content</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Moisture Content" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Pesticides Passed</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Pesticides Passed" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Heavy Metals Passed</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Heavy Metals Passed" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Microbials Passed</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Microbials Passed" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Solvents Passed</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Solvents Passed" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Overall Result</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Overall Result" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Disposition</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Disposition" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Created At</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Created At" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Reviewed By</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Reviewed By" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Review Notes</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Review Notes" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Source URL</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Source URL" disabled />
+                </div>
+                <div class="col-row unchecked">
+                  <span class="drag-handle">⠿</span>
+                  <input type="checkbox" class="col-checkbox" />
+                  <span class="col-name">Aluma Extraction ID</span>
+                  <span class="col-arrow">→</span>
+                  <span class="export-as-label">as:</span>
+                  <input type="text" class="export-as-input" value="Aluma Extraction ID" disabled />
+                </div>
+              </div>
+
+              <hr class="modal-section-divider" />
+
+              <!-- Computed Columns -->
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">Computed Columns</span>
+                  <button class="btn btn-primary btn-sm">+ Add Computed Column</button>
+                </div>
+                <div class="special-row computed">
+                  <span class="special-icon">⚙️</span>
+                  <div style="flex:1">
+                    <div class="special-name">D9/THC-A Combined</div>
+                    <div class="special-formula">= Delta-9 THC % + THC-A %</div>
+                  </div>
+                  <span class="export-as-label" style="margin-right:4px">as:</span>
+                  <input type="text" class="export-as-input renamed" value="D9/THC-A Combined Percentage" style="max-width:200px" />
+                </div>
+              </div>
+
+              <hr class="modal-section-divider" style="margin-top:10px;" />
+
+              <!-- Blank Columns -->
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">Blank Columns</span>
+                  <button class="btn btn-ghost btn-sm">+ Add Blank Column</button>
+                </div>
+                <div class="special-row blank">
+                  <span class="special-icon">📝</span>
+                  <span class="special-name">Initials</span>
+                  <span class="manual-badge">Manual Entry</span>
+                </div>
+                <div class="special-row blank" style="margin-top:4px;">
+                  <span class="special-icon">📅</span>
+                  <span class="special-name">Date</span>
+                  <span class="manual-badge">Manual Entry</span>
+                </div>
+              </div>
+
+              <hr class="modal-section-divider" style="margin-top:10px;" />
+
+              <!-- Options -->
+              <div class="modal-section">
+                <div class="modal-section-header">
+                  <span class="modal-section-title">Export Options</span>
+                </div>
+              </div>
+              <div class="options-grid">
+                <div>
+                  <div class="opt-label">File Name</div>
+                  <input class="opt-input" type="text" value="coas-flex-bank-2026-04-06" />
+                </div>
+                <div>
+                  <div class="opt-label">Format</div>
+                  <select class="opt-input"><option>CSV</option><option>XLSX</option><option>TSV</option></select>
+                </div>
+                <div>
+                  <div class="opt-label">Date Format</div>
+                  <select class="opt-input"><option>YYYY-MM-DD</option><option>MM/DD/YYYY</option><option>DD/MM/YYYY</option></select>
+                </div>
+                <div>
+                  <div class="opt-label">Scope</div>
+                  <div class="scope-options">
+                    <label class="scope-radio"><input type="radio" name="scope3" checked /> All filtered (386)</label>
+                    <label class="scope-radio"><input type="radio" name="scope3" /> Selected only (0)</label>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="modal-section-divider" />
+
+              <!-- CSV Preview -->
+              <div class="csv-preview-wrap">
+                <div class="csv-preview-label">CSV Preview</div>
+                <div class="csv-preview">
+                  <div class="csv-comment"># Flex Bank Format — COAs — 7 columns + 1 computed + 2 blank</div>
+                  <div class="csv-header">Product Name,URL/Link to Product,COA Batch Date,COA Expiration Date,Delta-9 Percentage,THC-A Percentage,Total THC Percentage,D9/THC-A Combined Percentage,Initials,Date</div>
+                  <div class="csv-data">Full Spectrum CBD Oil 1000mg,https://greenleaf.com/cbd-oil-1000,2025-09-15,2026-09-15,0.12,0.16,0.28,0.28,,</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn btn-ghost btn-sm">Cancel</button>
+              <div class="modal-footer-spacer"></div>
+              <button class="btn btn-ghost btn-sm">Quick Export (no settings)</button>
+              <button class="btn btn-primary btn-sm">Export Now →</button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- COAs table -->
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Company</th>
-            <th>Product Assignment</th>
-            <th>File Name</th>
-            <th>Batch Date</th>
-            <th>Batch Number</th>
-            <th>Date Added</th>
-            <th>Status</th>
-            <th>Disposition</th>
-            <th>Valid for Months</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>AG Living Solutions LLC</td>
-            <td>CBD Living Pet Calming Soft Chews 300mg</td>
-            <td><span class="sku-code">coa-164826-2025-12.pdf</span></td>
-            <td>12/01/2025</td>
-            <td><span class="sku-code">BATCH-2025-12A</span></td>
-            <td>12/30/2025</td>
-            <td><span class="status-pill pill-green">COA Validated</span></td>
-            <td><span class="status-pill pill-green">Approved</span></td>
-            <td>12</td>
-          </tr>
-          <tr>
-            <td>CW Hemp Co.</td>
-            <td>Charlotte's Web Daily Wellness Hemp Extract 50mg</td>
-            <td><span class="sku-code">cw-extract-50mg-batch47.pdf</span></td>
-            <td>11/15/2025</td>
-            <td><span class="sku-code">BATCH-47-2025</span></td>
-            <td>01/15/2026</td>
-            <td><span class="status-pill pill-green">COA Validated</span></td>
-            <td><span class="status-pill pill-green">Approved</span></td>
-            <td>12</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="annotation annotation-green mt-12">
+        <span class="annotation-icon">💡</span>
+        <span><strong>COA export already contains cannabinoid data.</strong> Flex Bank preset maps to the bank's required column names automatically. Reviewers only add Initials and Date manually after downloading.</span>
+      </div>
 
-      <div class="coa-context-note">
-        <strong>Tab-specific presets:</strong> The same configurable export system applies to the COAs tab. The Export Settings modal adapts to COA table columns (Company, Product Assignment, File Name, Batch Date, Batch Number, Date Added, Status, Disposition, Valid for Months). <strong>Presets are tab-specific</strong> — Products presets don't appear in the COAs export and vice versa.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 4 — PERSISTENCE
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-step step-purple">③</div>
+      <h2>Persistence — Presets Remembered Per User Per Tab</h2>
+      <span class="badge badge-purple">UX Detail</span>
+    </div>
+    <div class="section-body">
+
+      <div class="persistence-demo">
+        <!-- Panel 1: Active preset on button -->
+        <div class="persist-panel">
+          <div class="persist-panel-header">Export Button — Active Preset Shown</div>
+          <div class="persist-panel-body">
+            <div class="toolbar" style="margin-bottom:12px;">
+              <span class="toolbar-title">COAs</span>
+              <span class="toolbar-subtitle">386 results</span>
+              <div style="flex:1"></div>
+              <div class="dropdown-demo">
+                <div class="btn-split">
+                  <button class="btn-split-main">
+                    <span class="preset-label">· Flex Bank Format</span>
+                    ↓ Export
+                  </button>
+                  <button class="btn-split-gear">⚙</button>
+                </div>
+                <!-- Dropdown shown open -->
+                <div class="dropdown-menu">
+                  <div class="dropdown-item">All Columns (Default)</div>
+                  <div class="dropdown-item active"><span class="check-icon">✓</span> Flex Bank Format</div>
+                  <div class="dropdown-item">Internal Audit</div>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-manage">⚙ Manage Presets…</div>
+                </div>
+              </div>
+            </div>
+            <!-- Success toast below -->
+            <div class="toast">
+              <span class="toast-icon">✅</span>
+              <div>
+                <strong>Export started</strong><br>
+                <span style="font-size:12px;color:var(--gray-500)">coas-flex-bank-2026-04-06.csv — 386 rows</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Info about persistence -->
+        <div class="persist-panel">
+          <div class="persist-panel-header">Persistence Behavior</div>
+          <div class="persist-panel-body">
+            <div class="info-box">
+              <span class="info-box-icon">ℹ️</span>
+              <div>
+                <strong>Per-user, per-tab persistence</strong><br><br>
+                Last-used preset is saved in localStorage keyed by <span class="font-mono text-xs" style="background:#DBEAFE; padding:1px 5px; border-radius:3px;">userId + tabName</span>.<br><br>
+                Presets themselves are stored server-side (user account). Switching users or tabs resets to that context's last-used preset.<br><br>
+                <strong>Products tab</strong> remembers its own preset independently of the <strong>COAs tab</strong>.
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600);">
+                <span style="font-size:16px;">📋</span>
+                <span><strong>Products tab</strong> — last used: <span class="font-mono text-xs" style="color:var(--navy)">All Columns (Default)</span></span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600);">
+                <span style="font-size:16px;">🧪</span>
+                <span><strong>COAs tab</strong> — last used: <span class="font-mono text-xs" style="color:var(--navy); font-weight:600;">Flex Bank Format</span></span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600);">
+                <span style="font-size:16px;">📡</span>
+                <span><strong>WeMonitor tab</strong> — last used: <span class="font-mono text-xs" style="color:var(--gray-400)">No preset yet</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 5 — BANK TEMPLATE MAPPING
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-step step-blue">④</div>
+      <h2>Bank Template Mapping</h2>
+      <span class="badge badge-blue">Reference</span>
+    </div>
+    <div class="section-body">
+
+      <p style="font-size:13px; color:var(--gray-500); margin-bottom:16px;">
+        Shows how the Flex Bank Format preset maps Qredible COA columns to the bank's required template columns. Computed and blank columns fill the gaps that don't exist as native fields.
+      </p>
+
+      <div class="mapping-table-wrap">
+        <table class="mapping-table">
+          <thead>
+            <tr>
+              <th>Bank Required Column</th>
+              <th>Qredible Source</th>
+              <th>Export As (Renamed)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="bank-col">Product Name</td>
+              <td class="source-col">Product Assignment</td>
+              <td class="source-col" style="color:var(--navy); font-weight:600;">Product Name</td>
+              <td class="status-auto">✅ Auto</td>
+            </tr>
+            <tr>
+              <td class="bank-col">URL/Link to Product</td>
+              <td class="source-col">Product URL</td>
+              <td class="source-col" style="color:var(--navy); font-weight:600;">URL/Link to Product</td>
+              <td class="status-auto">✅ Auto</td>
+            </tr>
+            <tr>
+              <td class="bank-col">COA Batch Date</td>
+              <td class="source-col">Completed Date</td>
+              <td class="source-col" style="color:var(--navy); font-weight:600;">COA Batch Date</td>
+              <td class="status-auto">✅ Auto</td>
+            </tr>
+            <tr>
+              <td class="bank-col">COA Expiration Date</td>
+              <td class="source-col">Expiration Date</td>
+              <td class="source-col" style="color:var(--navy); font-weight:600;">COA Expiration Date</td>
+              <td class="status-auto">✅ Auto</td>
+            </tr>
+            <tr>
+              <td class="bank-col">Delta-9 %</td>
+              <td class="source-col">Delta-9 THC %</td>
+              <td class="source-col" style="color:var(--navy); font-weight:600;">Delta-9 Percentage</td>
+              <td class="status-auto">✅ Auto</td>
+            </tr>
+            <tr>
+              <td class="bank-col">THC-A %</td>
+              <td class="source-col">THC-A %</td>
+              <td class="source-col" style="color:var(--navy); font-weight:600;">THC-A Percentage</td>
+              <td class="status-auto">✅ Auto</td>
+            </tr>
+            <tr>
+              <td class="bank-col">D9/THC-A Combined</td>
+              <td class="source-col">— (computed field)</td>
+              <td class="source-col" style="color:var(--blue); font-weight:600;">D9/THC-A Combined Percentage</td>
+              <td class="status-computed">⚙ Computed</td>
+            </tr>
+            <tr>
+              <td class="bank-col">Total THC %</td>
+              <td class="source-col">Total THC</td>
+              <td class="source-col" style="color:var(--navy); font-weight:600;">Total THC Percentage</td>
+              <td class="status-auto">✅ Auto</td>
+            </tr>
+            <tr>
+              <td class="bank-col">Initials</td>
+              <td class="source-col">— (blank column)</td>
+              <td class="source-col" style="color:var(--orange); font-weight:600;">Initials</td>
+              <td class="status-manual">✏️ Manual</td>
+            </tr>
+            <tr>
+              <td class="bank-col">Date</td>
+              <td class="source-col">— (blank column)</td>
+              <td class="source-col" style="color:var(--orange); font-weight:600;">Date</td>
+              <td class="status-manual">✏️ Manual</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:16px; margin-top:16px; flex-wrap:wrap;">
+        <div class="coverage-badge">
+          ✅ 8 of 10 bank columns auto-populated (80%)
+        </div>
+        <div style="display:flex; gap:12px; font-size:12px; color:var(--gray-500);">
+          <span style="display:flex;align-items:center;gap:4px;"><span class="status-auto" style="font-size:11px;">✅</span> Auto-mapped (8)</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span class="status-computed" style="font-size:11px;">⚙</span> Computed (1)</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span class="status-manual" style="font-size:11px;">✏️</span> Manual (2)</span>
+        </div>
+      </div>
+
+      <div class="annotation annotation-blue mt-12">
+        <span class="annotation-icon">🏦</span>
+        <span><strong>Bank workflow:</strong> User selects "Flex Bank Format" preset on the COAs tab → clicks Export Now → downloads CSV with correctly named headers → opens in Excel → fills in Initials and Date columns → submits to bank. No reformatting required.</span>
       </div>
 
     </div>
