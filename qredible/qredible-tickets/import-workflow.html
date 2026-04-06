@@ -515,8 +515,176 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B
 
   <!-- SECTION 4: STEP 3 VALIDATION -->
   
-  <!-- Classification Auto-Classify Section -->
+  <!-- Classification & Controlled Values Section -->
   <div class="section">
+    <div class="section-header">
+      <span class="badge badge-green">② Step 2b</span>
+      <h2>Controlled Value Handling — Classification & Industry Type</h2>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:#64748B;margin-bottom:16px;">Fields like <strong>Classification</strong>, <strong>Industry Type</strong>, and <strong>Type of Company</strong> are Qredible-controlled values. During import, users choose how to handle them.</p>
+
+      <!-- Two-track toggle -->
+      <div style="display:flex;gap:12px;margin-bottom:20px;">
+        <!-- Option A -->
+        <div style="flex:1;padding:16px;border:2px solid #3B82F6;border-radius:10px;background:#EFF6FF;cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:#3B82F6;display:flex;align-items:center;justify-content:center;">
+              <span style="color:#fff;font-size:12px;font-weight:700;">✓</span>
+            </div>
+            <span style="font-size:14px;font-weight:700;color:#1E3A5F;">🤖 Auto-classify for me</span>
+          </div>
+          <p style="font-size:12px;color:#475569;line-height:1.5;margin-bottom:8px;">Skip the classification column — our system will auto-classify products after upload using Q-Audit's keyword engine. Review and override anytime in the platform.</p>
+          <div style="padding:8px 10px;background:#fff;border:1px solid #BFDBFE;border-radius:6px;font-size:11px;color:#1E40AF;">
+            <strong>How it works:</strong> Product Definition text is matched against keyword rules (primary keywords, exclusion keywords, priority sort). Classification assigned automatically post-import.
+          </div>
+        </div>
+
+        <!-- Option B -->
+        <div style="flex:1;padding:16px;border:2px solid #E2E8F0;border-radius:10px;background:#F8FAFC;cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:20px;height:20px;border-radius:50%;border:2px solid #CBD5E1;"></div>
+            <span style="font-size:14px;font-weight:700;color:#1E3A5F;">✏️ I'll provide classification</span>
+          </div>
+          <p style="font-size:12px;color:#475569;line-height:1.5;margin-bottom:8px;">Map a column from your file to Classification. Any value NOT in our accepted list will be flagged for you to correct before import.</p>
+          <div style="padding:8px 10px;background:#fff;border:1px solid #E2E8F0;border-radius:6px;font-size:11px;color:#64748B;">
+            <strong>Accepted values:</strong> Tinctures, Edibles, Flower, Topicals, Vape, Bath Bombs, Pets, Distillate, Dried Flower, Isolate
+          </div>
+        </div>
+      </div>
+
+      <!-- Option B: Invalid value review table -->
+      <div style="padding:16px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="font-size:16px;">⚠️</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#92400E;">Value Review — "I'll provide classification" mode</div>
+            <div style="font-size:12px;color:#A16207;">3 values from your file don't match accepted classifications. Select the correct value:</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #FDE68A;border-radius:6px;overflow:hidden;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="background:#78350F;color:#fff;">
+                <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;">Row</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;">Product Definition</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;">Your Value</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:600;">→ Select Accepted Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #FEF3C7;">
+                <td style="padding:8px 12px;color:#64748B;">Row 4</td>
+                <td style="padding:8px 12px;color:#334155;">THC Seltzer 4-pack Swell Berry</td>
+                <td style="padding:8px 12px;"><span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-decoration:line-through;">Beverages</span></td>
+                <td style="padding:8px 12px;"><select style="padding:5px 8px;border:1px solid #FDE68A;border-radius:4px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;color:#334155;background:#FFFBEB;font-weight:600;"><option>— Select —</option><option>Tinctures</option><option selected>Edibles</option><option>Flower</option><option>Topicals</option><option>Vape</option><option>Bath Bombs</option><option>Pets</option><option>Distillate</option><option>Dried Flower</option><option>Isolate</option></select></td>
+              </tr>
+              <tr style="border-bottom:1px solid #FEF3C7;">
+                <td style="padding:8px 12px;color:#64748B;">Row 9</td>
+                <td style="padding:8px 12px;color:#334155;">Premium Hemp Capsules 50mg</td>
+                <td style="padding:8px 12px;"><span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-decoration:line-through;">Supplements</span></td>
+                <td style="padding:8px 12px;"><select style="padding:5px 8px;border:1px solid #FDE68A;border-radius:4px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;color:#334155;background:#FFFBEB;font-weight:600;"><option>— Select —</option><option selected>Tinctures</option><option>Edibles</option><option>Flower</option><option>Topicals</option><option>Vape</option><option>Bath Bombs</option><option>Pets</option><option>Distillate</option><option>Dried Flower</option><option>Isolate</option></select></td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px;color:#64748B;">Row 15</td>
+                <td style="padding:8px 12px;color:#334155;">CBG Muscle Relief Cream</td>
+                <td style="padding:8px 12px;"><span style="background:#FEE2E2;color:#DC2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-decoration:line-through;">Creams</span></td>
+                <td style="padding:8px 12px;"><select style="padding:5px 8px;border:1px solid #FDE68A;border-radius:4px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;color:#334155;background:#FFFBEB;font-weight:600;"><option>— Select —</option><option>Tinctures</option><option>Edibles</option><option>Flower</option><option selected>Topicals</option><option>Vape</option><option>Bath Bombs</option><option>Pets</option><option>Distillate</option><option>Dried Flower</option><option>Isolate</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#92400E;">All values must be resolved before import can proceed.</div>
+      </div>
+
+      <!-- Company Progressive Enrichment -->
+      <div style="padding:16px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="font-size:18px;">🏢</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#14532D;">Company Import — Progressive Enrichment</div>
+            <div style="font-size:12px;color:#166534;">Industry Type and Type of Company are <strong>optional on import</strong>. Classification builds over time from real evidence.</div>
+          </div>
+        </div>
+
+        <!-- Progressive enrichment flow -->
+        <div style="display:flex;align-items:center;gap:0;margin-bottom:16px;flex-wrap:wrap;">
+          <div style="padding:10px 14px;background:#fff;border:1px solid #BBF7D0;border-radius:8px;text-align:center;min-width:130px;">
+            <div style="font-size:20px;margin-bottom:4px;">📥</div>
+            <div style="font-size:11px;font-weight:700;color:#334155;">Import</div>
+            <div style="font-size:10px;color:#64748B;">Industry: <em>Blank OK</em></div>
+            <div style="padding:2px 6px;background:#FEF3C7;color:#D97706;border-radius:10px;font-size:9px;font-weight:700;margin-top:4px;display:inline-block;">Unclassified</div>
+          </div>
+          <div style="padding:0 8px;color:#16A34A;font-size:18px;">→</div>
+          <div style="padding:10px 14px;background:#fff;border:1px solid #BBF7D0;border-radius:8px;text-align:center;min-width:130px;">
+            <div style="font-size:20px;margin-bottom:4px;">🌐</div>
+            <div style="font-size:11px;font-weight:700;color:#334155;">Website Scan</div>
+            <div style="font-size:10px;color:#64748B;">Products found → suggest industry</div>
+            <div style="padding:2px 6px;background:#DBEAFE;color:#1D4ED8;border-radius:10px;font-size:9px;font-weight:700;margin-top:4px;display:inline-block;">Suggested</div>
+          </div>
+          <div style="padding:0 8px;color:#16A34A;font-size:18px;">→</div>
+          <div style="padding:10px 14px;background:#fff;border:1px solid #BBF7D0;border-radius:8px;text-align:center;min-width:130px;">
+            <div style="font-size:20px;margin-bottom:4px;">📋</div>
+            <div style="font-size:11px;font-weight:700;color:#334155;">License Check</div>
+            <div style="font-size:10px;color:#64748B;">License type confirms industry</div>
+            <div style="padding:2px 6px;background:#DCFCE7;color:#166534;border-radius:10px;font-size:9px;font-weight:700;margin-top:4px;display:inline-block;">Confirmed</div>
+          </div>
+          <div style="padding:0 8px;color:#16A34A;font-size:18px;">→</div>
+          <div style="padding:10px 14px;background:#fff;border:1px solid #BBF7D0;border-radius:8px;text-align:center;min-width:130px;">
+            <div style="font-size:20px;margin-bottom:4px;">📦</div>
+            <div style="font-size:11px;font-weight:700;color:#334155;">Product Analysis</div>
+            <div style="font-size:10px;color:#64748B;">Product catalog → refine type</div>
+            <div style="padding:2px 6px;background:#DCFCE7;color:#166534;border-radius:10px;font-size:9px;font-weight:700;margin-top:4px;display:inline-block;">Verified</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #BBF7D0;border-radius:6px;overflow:hidden;margin-bottom:12px;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="background:#14532D;color:#fff;">
+                <th style="padding:8px 12px;text-align:left;font-size:11px;">Company</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;">Industry Type</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;">Type of Company</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;">Evidence Source</th>
+                <th style="padding:8px 12px;text-align:left;font-size:11px;">Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #F0FDF4;">
+                <td style="padding:8px 12px;color:#334155;font-weight:600;">Joe's CBD Store</td>
+                <td style="padding:8px 12px;"><span style="background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Hemp / CBD</span></td>
+                <td style="padding:8px 12px;"><span style="background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Retailer</span></td>
+                <td style="padding:8px 12px;font-size:11px;color:#64748B;">Website scan + License (NJ Hemp Retail)</td>
+                <td style="padding:8px 12px;"><span style="color:#16A34A;font-weight:700;">Verified ✓</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid #F0FDF4;">
+                <td style="padding:8px 12px;color:#334155;font-weight:600;">3rd Coast Blends</td>
+                <td style="padding:8px 12px;"><span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Hemp / CBD</span></td>
+                <td style="padding:8px 12px;"><span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Manufacturer</span></td>
+                <td style="padding:8px 12px;font-size:11px;color:#64748B;">Website scan (CBD products detected)</td>
+                <td style="padding:8px 12px;"><span style="color:#3B82F6;font-weight:700;">Suggested</span></td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px;color:#334155;font-weight:600;">Huy's CBD Store</td>
+                <td style="padding:8px 12px;"><span style="background:#FEF3C7;color:#D97706;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Unclassified</span></td>
+                <td style="padding:8px 12px;"><span style="background:#FEF3C7;color:#D97706;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Unclassified</span></td>
+                <td style="padding:8px 12px;font-size:11px;color:#D97706;">Awaiting first scan</td>
+                <td style="padding:8px 12px;"><span style="color:#D97706;font-weight:700;">Pending</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="padding:8px 12px;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:6px;font-size:11px;color:#065F46;">
+          💡 <strong>Progressive enrichment:</strong> Companies imported without industry classification enter as "Unclassified." As website scans, license checks, product catalog analysis, and compliance scans complete, the system automatically suggests and confirms classification based on real evidence. Manual override is always available.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<div class="section">
     <div class="section-header">
       <span class="badge badge-green">② Step 2b</span>
       <h2>Auto-Classification — Controlled Values</h2>
