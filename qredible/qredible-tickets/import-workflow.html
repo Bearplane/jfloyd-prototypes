@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unified Import Workflow — Qredible Ticket Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px;line-height:1.5}
+/* NAV */
+.nav{background:#1E3A5F;padding:0 24px;height:52px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.nav a{color:#93C5FD;font-size:13px;text-decoration:none}.nav a:hover{color:#fff}
+.nav-sep{color:#4B6A8F;font-size:13px}
+.nav-title{color:#fff;font-size:13px;font-weight:600}
+.nav-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;margin-left:auto}
+/* MAIN */
+.page{max-width:1100px;margin:0 auto;padding:32px 24px 80px}
+/* SECTION */
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.section-title{font-size:20px;font-weight:700;color:#1E293B}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.03em}
+.badge-yellow{background:#FEF9C3;color:#92400E;border:1px solid #FDE047}
+.badge-green{background:#DCFCE7;color:#15803D;border:1px solid #86EFAC}
+.badge-purple{background:#F3E8FF;color:#6B21A8;border:1px solid #C084FC}
+.badge-blue{background:#DBEAFE;color:#1D4ED8;border:1px solid #93C5FD}
+/* CARDS */
+.card{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:13px;font-weight:700;color:#1E3A5F;margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em}
+/* BEFORE GRID */
+.before-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.before-card{background:#fff;border-radius:10px;border:2px solid #FDE047;padding:20px;position:relative}
+.before-card-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
+.before-card-sub{font-size:12px;color:#64748B;margin-bottom:14px}
+.modal-sim{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:14px;margin-bottom:12px}
+.modal-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.modal-label{font-size:11px;font-weight:600;color:#64748B;width:90px;flex-shrink:0}
+.modal-input{flex:1;background:#fff;border:1px solid #CBD5E1;border-radius:6px;padding:5px 8px;font-size:12px;color:#94A3B8;font-family:'Plus Jakarta Sans',sans-serif}
+.modal-select{flex:1;background:#fff;border:1px solid #CBD5E1;border-radius:6px;padding:5px 8px;font-size:12px;color:#1E293B;font-family:'Plus Jakarta Sans',sans-serif}
+.modal-btn{background:#3B82F6;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px}
+.pain-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.pain-item{display:flex;gap:6px;font-size:12px;color:#92400E;background:#FEF9C3;border:1px solid #FDE68A;border-radius:6px;padding:6px 8px;align-items:flex-start}
+.pain-icon{flex-shrink:0;margin-top:1px}
+/* UPLOAD MODAL */
+.upload-modal{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px;max-width:560px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.modal-header{font-size:17px;font-weight:700;color:#1E293B;margin-bottom:16px}
+.pill-group{display:flex;gap:8px;margin-bottom:20px}
+.pill{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid #E2E8F0;background:#F8FAFC;color:#64748B}
+.pill.active{background:#3B82F6;border-color:#3B82F6;color:#fff}
+.upload-zone{border:2px dashed #CBD5E1;border-radius:10px;padding:28px;text-align:center;background:#F8FAFC;margin-bottom:12px}
+.upload-zone-icon{font-size:28px;margin-bottom:8px}
+.upload-zone-title{font-size:14px;font-weight:600;color:#1E293B;margin-bottom:4px}
+.upload-zone-sub{font-size:12px;color:#94A3B8}
+.supported{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.fmt-tag{background:#EFF6FF;color:#2563EB;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.or-div{display:flex;align-items:center;gap:8px;margin:12px 0;color:#94A3B8;font-size:12px}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#E2E8F0}
+.url-input-row{display:flex;gap:8px}
+.url-input{flex:1;border:1px solid #CBD5E1;border-radius:6px;padding:8px 12px;font-size:13px;color:#94A3B8;font-family:'Plus Jakarta Sans',sans-serif;outline:none}
+.url-btn{background:#64748B;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.file-detected{display:flex;align-items:center;gap:12px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:12px 16px;margin-top:12px}
+.file-check{background:#16A34A;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.file-name{font-size:13px;font-weight:700;color:#15803D;font-family:'IBM Plex Mono',monospace}
+.file-meta{font-size:11px;color:#64748B;margin-top:2px}
+.file-meta span{margin-right:10px}
+/* COLUMN MAPPER */
+.mapper-wrap{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px}
+.mapper-header-row{display:grid;grid-template-columns:1fr 40px 1fr 80px;gap:8px;margin-bottom:8px;padding:0 4px}
+.mapper-col-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.07em}
+.mapper-row{display:grid;grid-template-columns:1fr 40px 1fr 80px;gap:8px;align-items:center;padding:8px;border-radius:6px;margin-bottom:4px;background:#F8FAFC;border:1px solid #E2E8F0}
+.mapper-row.review{background:#FFFBEB;border-color:#FDE68A}
+.mapper-row.skipped{background:#F8FAFC;border-color:#E2E8F0;opacity:.75}
+.col-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:#1E3A5F;padding:6px 10px;background:#EFF6FF;border-radius:4px}
+.arrow{text-align:center;color:#94A3B8;font-size:16px}
+.field-select{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:6px 8px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1E293B;cursor:pointer}
+.field-select.review-sel{border-color:#F59E0B;background:#FFFBEB}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:12px;white-space:nowrap}
+.status-matched{background:#DCFCE7;color:#15803D}
+.status-review{background:#FEF9C3;color:#92400E}
+.status-skipped{background:#F1F5F9;color:#64748B}
+.mapper-summary{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin:16px 0 20px;font-size:13px;color:#1E40AF;display:flex;align-items:center;gap:8px}
+/* DATA PREVIEW */
+.preview-label{font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.preview-table{width:100%;border-collapse:collapse;font-size:12px}
+.preview-table th{background:#1E3A5F;color:#fff;padding:7px 10px;text-align:left;font-weight:600;font-size:11px}
+.preview-table td{padding:7px 10px;border-bottom:1px solid #E2E8F0;color:#1E293B}
+.preview-table tr:nth-child(even) td{background:#F8FAFC}
+.preview-table tr:last-child td{border-bottom:none}
+/* COMPANIES NOTE */
+.companies-note{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px 16px;margin-top:20px}
+.companies-note-title{font-size:13px;font-weight:700;color:#1D4ED8;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+/* VALIDATION */
+.validation-wrap{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px}
+.val-summary{display:flex;gap:16px;margin-bottom:20px;padding:14px 16px;background:#F8FAFC;border-radius:8px;border:1px solid #E2E8F0;align-items:center}
+.val-count{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+.val-count-total{color:#1E293B}
+.val-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-green{background:#16A34A}
+.dot-yellow{background:#D97706}
+.dot-red{background:#DC2626}
+.val-num-green{color:#15803D}
+.val-num-yellow{color:#92400E}
+.val-num-red{color:#B91C1C}
+.val-sep{width:1px;height:28px;background:#E2E8F0}
+.issue-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.issue-item{border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.issue-warn{background:#FFFBEB;border:1px solid #FDE68A}
+.issue-err{background:#FEF2F2;border:1px solid #FECACA}
+.issue-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.issue-body{flex:1}
+.issue-row-label{font-size:11px;font-weight:700;color:#64748B;font-family:'IBM Plex Mono',monospace;margin-bottom:2px}
+.issue-msg{font-size:13px;color:#1E293B;margin-bottom:8px}
+.issue-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-suggest{background:#3B82F6;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-keep{background:#fff;color:#64748B;border:1px solid #CBD5E1;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-skip{background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-update{background:#D97706;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-new{background:#16A34A;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-confirm{background:#16A34A;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-edit{background:#fff;color:#64748B;border:1px solid #CBD5E1;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.dup-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px}
+.dup-label{font-size:13px;font-weight:600;color:#1E293B}
+.dup-select{border:1px solid #CBD5E1;border-radius:6px;padding:6px 10px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1E293B}
+/* COA MATCHING */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.approach-card{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:20px}
+.approach-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.approach-tag{font-size:11px;font-weight:700;background:#F3E8FF;color:#6B21A8;border-radius:4px;padding:2px 7px}
+.approach-sub{font-size:12px;color:#64748B;margin-bottom:14px}
+.upload-mini{border:2px dashed #CBD5E1;border-radius:8px;padding:16px;text-align:center;background:#F8FAFC;margin-bottom:12px;font-size:12px;color:#64748B}
+.upload-mini-icon{font-size:20px;margin-bottom:4px}
+.coa-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px}
+.coa-table th{background:#1E3A5F;color:#fff;padding:7px 10px;text-align:left;font-weight:600;font-size:11px}
+.coa-table td{padding:7px 10px;border-bottom:1px solid #E2E8F0}
+.coa-table tr:last-child td{border-bottom:none}
+.coa-table tr:nth-child(even) td{background:#F8FAFC}
+.found-badge{color:#15803D;font-weight:700;font-size:12px}
+.notfound-badge{color:#DC2626;font-weight:700;font-size:12px}
+.conf-high{color:#15803D;font-weight:700;font-size:12px}
+.conf-med{color:#D97706;font-weight:700;font-size:12px}
+.conf-low{color:#DC2626;font-weight:700;font-size:12px}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:11px}
+.btn-apply{background:#7C3AED;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;width:100%;margin-top:4px}
+.auto-note{background:#F3E8FF;border:1px solid #C084FC;border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#581C87}
+.auto-note ul{margin-left:14px;margin-top:4px}
+.auto-note li{margin-bottom:2px}
+.action-btns{display:flex;gap:6px}
+.btn-accept{background:#16A34A;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer}
+.btn-reject{background:#fff;color:#DC2626;border:1px solid #FECACA;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer}
+.btn-assign{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
+/* MCC / MULTI-INDUSTRY */
+.industry-wrap{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px}
+.two-col-60{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start}
+.default-assign{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:14px;margin-top:10px}
+.default-assign-title{font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.assign-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.assign-label{font-size:12px;font-weight:600;color:#1E293B;width:130px;flex-shrink:0}
+.assign-select{flex:1;border:1px solid #CBD5E1;border-radius:6px;padding:6px 8px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif}
+.override-note{font-size:11px;color:#64748B;margin-top:6px;font-style:italic}
+.info-box{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;margin-top:14px;font-size:12px;color:#1D4ED8;display:flex;gap:8px;align-items:flex-start}
+.info-icon{flex-shrink:0;margin-top:1px}
+/* PHASES */
+.phases-wrap{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px}
+.phases-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.phase-col{border-radius:8px;padding:16px}
+.phase-col-1{background:#F0FDF4;border:1px solid #86EFAC}
+.phase-col-2{background:#EFF6FF;border:1px solid #BFDBFE}
+.phase-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.phase-title-1{color:#15803D}
+.phase-title-2{color:#1D4ED8}
+.phase-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+.pb1{background:#DCFCE7;color:#15803D}
+.pb2{background:#DBEAFE;color:#1D4ED8}
+.phase-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.phase-list li{font-size:13px;color:#374151;display:flex;gap:8px;align-items:flex-start}
+.phase-list li::before{content:'•';flex-shrink:0;margin-top:0;font-weight:700}
+.pl1::before{color:#16A34A}
+.pl2::before{color:#3B82F6}
+/* DIVIDER */
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,#CBD5E1,transparent);margin-bottom:48px}
+/* step header */
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.step-num{width:32px;height:32px;border-radius:50%;background:#3B82F6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.step-title{font-size:18px;font-weight:700;color:#1E293B}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#">← All Mockups</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-title">Unified Import Workflow</span>
+  <span class="nav-badge">QP-36XX</span>
+</nav>
+
+<div class="page">
+
+  <!-- SECTION 1: BEFORE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="badge badge-yellow">① Before</span>
+      <span class="section-title">Current State Limitations</span>
+    </div>
+
+    <div class="before-grid">
+
+      <!-- Company card -->
+      <div class="before-card">
+        <div class="before-card-title">Company Import</div>
+        <div class="before-card-sub">Current upload modal</div>
+        <div class="modal-sim">
+          <div class="modal-row">
+            <span class="modal-label">Industry Type</span>
+            <select class="modal-select"><option>Cannabis Retail</option></select>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Company Type</span>
+            <select class="modal-select"><option>Retailer</option></select>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Upload File</span>
+            <div class="modal-input">companies.xlsx</div>
+          </div>
+          <button class="modal-btn">Upload Companies</button>
+        </div>
+        <ul class="pain-list">
+          <li class="pain-item"><span class="pain-icon">⚠</span> Industry Type locked to ONE value for ALL rows in the file</li>
+          <li class="pain-item"><span class="pain-icon">⚠</span> No column mapping — file must match exact template</li>
+          <li class="pain-item"><span class="pain-icon">⚠</span> No validation feedback before import commits</li>
+        </ul>
+      </div>
+
+      <!-- Product card -->
+      <div class="before-card">
+        <div class="before-card-title">Product Import</div>
+        <div class="before-card-sub">Current upload modal</div>
+        <div class="modal-sim">
+          <div class="modal-row">
+            <span class="modal-label">Template</span>
+            <div class="modal-input">Download template first</div>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Products CSV</span>
+            <div class="modal-input">products-template.csv</div>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Images ZIP</span>
+            <div class="modal-input">product-images.zip</div>
+          </div>
+          <button class="modal-btn">Upload Products</button>
+        </div>
+        <ul class="pain-list">
+          <li class="pain-item"><span class="pain-icon">⚠</span> Rigid template — columns must match exactly</li>
+          <li class="pain-item"><span class="pain-icon">⚠</span> No column mapping from source files</li>
+          <li class="pain-item"><span class="pain-icon">⚠</span> Images require a separate ZIP upload step</li>
+        </ul>
+      </div>
+
+      <!-- COA card -->
+      <div class="before-card">
+        <div class="before-card-title">COA Import</div>
+        <div class="before-card-sub">Current upload / scrape</div>
+        <div class="modal-sim">
+          <div class="modal-row">
+            <span class="modal-label">Upload PDFs</span>
+            <div class="modal-input">Multiple COA files...</div>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">OR Scrape URL</span>
+            <div class="modal-input">https://brand.com/coa-page</div>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Match by</span>
+            <div class="modal-input" style="color:#1E293B">Filename only</div>
+          </div>
+          <button class="modal-btn">Import COAs</button>
+        </div>
+        <ul class="pain-list">
+          <li class="pain-item"><span class="pain-icon">⚠</span> Matching by filename only — fragile &amp; error-prone</li>
+          <li class="pain-item"><span class="pain-icon">⚠</span> No bulk matching to existing products</li>
+          <li class="pain-item"><span class="pain-icon">⚠</span> No confidence scoring for ambiguous matches</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 2: STEP 1 -->
+  <div class="section">
+    <div class="step-header">
+      <span class="badge badge-green">② After</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px">Step 1</div>
+        <div class="step-title">Upload &amp; Detect</div>
+      </div>
+    </div>
+
+    <div class="upload-modal">
+      <div class="modal-header">Import Data</div>
+
+      <div class="pill-group">
+        <div class="pill">Companies</div>
+        <div class="pill active">Products</div>
+        <div class="pill">COAs</div>
+      </div>
+
+      <div class="upload-zone">
+        <div class="upload-zone-icon">📂</div>
+        <div class="upload-zone-title">Drag &amp; drop your file, or click to browse</div>
+        <div class="upload-zone-sub">Supported formats:</div>
+        <div class="supported">
+          <span class="fmt-tag">CSV</span>
+          <span class="fmt-tag">XLSX</span>
+          <span class="fmt-tag">TSV</span>
+          <span class="fmt-tag">JSON</span>
+        </div>
+      </div>
+
+      <div class="or-div">OR</div>
+
+      <div class="url-input-row">
+        <input class="url-input" type="text" value="Paste URL to scrape COA page..." readonly />
+        <button class="url-btn">Scrape URL</button>
+      </div>
+
+      <div class="file-detected">
+        <div class="file-check">✓</div>
+        <div>
+          <div class="file-name">3rd-coast-products.xlsx</div>
+          <div class="file-meta">
+            <span>847 KB</span>
+            <span>20 rows detected</span>
+            <span>14 columns</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 3: STEP 2 COLUMN MAPPING -->
+  <div class="section">
+    <div class="step-header">
+      <span class="badge badge-green">② After</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px">Step 2</div>
+        <div class="step-title">Map Your Columns</div>
+      </div>
+    </div>
+
+    <div class="mapper-wrap">
+      <div class="mapper-header-row">
+        <div class="mapper-col-label">Your File Column</div>
+        <div></div>
+        <div class="mapper-col-label">Qredible Field</div>
+        <div class="mapper-col-label">Status</div>
+      </div>
+
+      <!-- Matched rows -->
+      <div class="mapper-row">
+        <div class="col-name">product_name</div>
+        <div class="arrow">→</div>
+        <select class="field-select"><option>Product Definition</option></select>
+        <span class="status-badge status-matched">✅ Matched</span>
+      </div>
+      <div class="mapper-row">
+        <div class="col-name">sku_number</div>
+        <div class="arrow">→</div>
+        <select class="field-select"><option>SKU</option></select>
+        <span class="status-badge status-matched">✅ Matched</span>
+      </div>
+      <div class="mapper-row">
+        <div class="col-name">retail_price</div>
+        <div class="arrow">→</div>
+        <select class="field-select"><option>Price</option></select>
+        <span class="status-badge status-matched">✅ Matched</span>
+      </div>
+
+      <!-- Review row -->
+      <div class="mapper-row review">
+        <div class="col-name">product_type</div>
+        <div class="arrow">→</div>
+        <select class="field-select review-sel">
+          <option>Classification</option>
+          <option>Product Definition</option>
+          <option>Category</option>
+          <option>— Skip this column —</option>
+        </select>
+        <span class="status-badge status-review">⚠️ Review</span>
+      </div>
+
+      <!-- More matched -->
+      <div class="mapper-row">
+        <div class="col-name">web_link</div>
+        <div class="arrow">→</div>
+        <select class="field-select"><option>URL</option></select>
+        <span class="status-badge status-matched">✅ Matched</span>
+      </div>
+      <div class="mapper-row">
+        <div class="col-name">batch_number</div>
+        <div class="arrow">→</div>
+        <select class="field-select"><option>Batch #</option></select>
+        <span class="status-badge status-matched">✅ Matched</span>
+      </div>
+      <div class="mapper-row">
+        <div class="col-name">item_description</div>
+        <div class="arrow">→</div>
+        <select class="field-select"><option>Description</option></select>
+        <span class="status-badge status-matched">✅ Matched</span>
+      </div>
+
+      <!-- Skipped rows -->
+      <div class="mapper-row skipped">
+        <div class="col-name">internal_code</div>
+        <div class="arrow">→</div>
+        <select class="field-select">
+          <option>— Skip this column —</option>
+          <option>Product Definition</option>
+          <option>SKU</option>
+        </select>
+        <span class="status-badge status-skipped">⏭️ Skipped</span>
+      </div>
+      <div class="mapper-row skipped">
+        <div class="col-name">vendor_notes</div>
+        <div class="arrow">→</div>
+        <select class="field-select"><option>— Skip this column —</option></select>
+        <span class="status-badge status-skipped">⏭️ Skipped</span>
+      </div>
+
+      <div class="mapper-summary">
+        ℹ️ <strong>7 of 9 columns auto-matched</strong> · 1 needs review · 1 skipped
+      </div>
+
+      <!-- Data Preview -->
+      <div class="preview-label">Data Preview — how imported rows will look</div>
+      <table class="preview-table">
+        <thead>
+          <tr>
+            <th>Product Definition</th>
+            <th>SKU</th>
+            <th>Price</th>
+            <th>Classification</th>
+            <th>Batch #</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Beach Break THC Seltzer</td>
+            <td class="mono">BB-SELT-12</td>
+            <td>$4.99</td>
+            <td>Beverages</td>
+            <td class="mono">BB-2025-041</td>
+            <td>12oz sparkling water 10mg THC</td>
+          </tr>
+          <tr>
+            <td>THC Gummies Passionfruit</td>
+            <td class="mono">GUM-PASS-10</td>
+            <td>$24.99</td>
+            <td>Edibles</td>
+            <td class="mono">GUM-2025-039</td>
+            <td>10-pack 10mg per gummy</td>
+          </tr>
+          <tr>
+            <td>THC Gummies Sour Apple</td>
+            <td class="mono">GUM-SAPL-10</td>
+            <td>$24.99</td>
+            <td>Edibles</td>
+            <td class="mono">GUM-2025-040</td>
+            <td>10-pack 10mg per gummy sour apple</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Companies note -->
+      <div class="companies-note">
+        <div class="companies-note-title">🏢 Companies Import — Per-Row Industry Assignment</div>
+        <p style="font-size:13px;color:#1E293B;margin-bottom:8px">When importing Companies, the column mapper can assign <strong>Industry Type</strong> and <strong>Type of Company</strong> per row from your file's own columns — no longer locked to a single value for the entire file.</p>
+        <table class="preview-table" style="margin-top:4px">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Your Column → Industry Type</th>
+              <th>Your Column → Type of Company</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Green Leaf Dispensary</td>
+              <td>Cannabis Retail</td>
+              <td>Retailer</td>
+            </tr>
+            <tr>
+              <td>Pacific Wellness Co.</td>
+              <td>Functional Mushrooms</td>
+              <td>Manufacturer</td>
+            </tr>
+            <tr>
+              <td>BotanicaRx Supply</td>
+              <td>Kratom</td>
+              <td>Distributor</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 4: STEP 3 VALIDATION -->
+  <div class="section">
+    <div class="step-header">
+      <span class="badge badge-green">② After</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px">Step 3</div>
+        <div class="step-title">Review &amp; Resolve</div>
+      </div>
+    </div>
+
+    <div class="validation-wrap">
+
+      <!-- Summary bar -->
+      <div class="val-summary">
+        <div class="val-count val-count-total">📋 <strong>20 rows</strong></div>
+        <div class="val-sep"></div>
+        <div class="val-count"><div class="val-dot dot-green"></div><span class="val-num-green"><strong>17</strong> valid</span></div>
+        <div class="val-count"><div class="val-dot dot-yellow"></div><span class="val-num-yellow"><strong>2</strong> warnings</span></div>
+        <div class="val-count"><div class="val-dot dot-red"></div><span class="val-num-red"><strong>1</strong> error</span></div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Issues to Resolve</div>
+
+      <div class="issue-list">
+
+        <!-- Warning 1 -->
+        <div class="issue-item issue-warn">
+          <div class="issue-icon">⚠️</div>
+          <div class="issue-body">
+            <div class="issue-row-label">Row 5</div>
+            <div class="issue-msg">Classification <strong>'Delta-8 Gummies'</strong> not recognized — did you mean <strong>'Edibles'</strong>?</div>
+            <div class="issue-actions">
+              <button class="btn-suggest">Accept Suggestion</button>
+              <button class="btn-keep">Keep Original</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning 2 -->
+        <div class="issue-item issue-warn">
+          <div class="issue-icon">⚠️</div>
+          <div class="issue-body">
+            <div class="issue-row-label">Row 12</div>
+            <div class="issue-msg">Price <strong>'$0.00'</strong> — confirm this is intentional?</div>
+            <div class="issue-actions">
+              <button class="btn-confirm">Confirm</button>
+              <button class="btn-edit">Edit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div class="issue-item issue-err">
+          <div class="issue-icon">❌</div>
+          <div class="issue-body">
+            <div class="issue-row-label">Row 8</div>
+            <div class="issue-msg">SKU <strong class="mono">'18181'</strong> already exists — Duplicate record found</div>
+            <div class="issue-actions">
+              <button class="btn-skip">Skip Row</button>
+              <button class="btn-update">Update Existing</button>
+              <button class="btn-new">Create New</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Dup handling -->
+      <div class="dup-row">
+        <span class="dup-label">🔧 When duplicates found (global default):</span>
+        <select class="dup-select">
+          <option>Skip duplicate rows</option>
+          <option>Update existing record</option>
+          <option>Create new record</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 5: COA BULK MATCHING -->
+  <div class="section">
+    <div class="section-header">
+      <span class="badge badge-purple">③ COA</span>
+      <span class="section-title">COA-to-Product Bulk Matching</span>
+    </div>
+
+    <div class="two-col">
+
+      <!-- Approach A -->
+      <div class="approach-card">
+        <div class="approach-title"><span class="approach-tag">Approach A</span> Upload Match File</div>
+        <div class="approach-sub">Provide an Excel/CSV with two columns: Product Name/SKU and COA Filename</div>
+        <div class="upload-mini">
+          <div class="upload-mini-icon">📎</div>
+          <div>Drop match-file.xlsx here</div>
+          <div style="font-size:11px;margin-top:3px">2 columns: Product Name/SKU · COA Filename</div>
+        </div>
+        <table class="coa-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>COA File</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Beach Break THC Seltzer</td>
+              <td class="mono">coa-164702-2025-12.pdf</td>
+              <td class="found-badge">✅ Found</td>
+            </tr>
+            <tr>
+              <td>THC Gummies Passionfruit</td>
+              <td class="mono">thc-gummies-passion.pdf</td>
+              <td class="found-badge">✅ Found</td>
+            </tr>
+            <tr>
+              <td>THC Gummies Sour Apple</td>
+              <td class="mono">missing-coa.pdf</td>
+              <td class="notfound-badge">❌ Not Found</td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn-apply">Apply Matches</button>
+      </div>
+
+      <!-- Approach B -->
+      <div class="approach-card">
+        <div class="approach-title"><span class="approach-tag">Approach B</span> Smart Auto-Match</div>
+        <div class="approach-sub">System matches COAs to products automatically — you review &amp; confirm</div>
+        <div class="auto-note">
+          <strong>Matching signals used:</strong>
+          <ul>
+            <li>Filename similarity to product name / SKU</li>
+            <li>Batch number extracted from filename</li>
+            <li>Aluma-extracted product name from COA PDF</li>
+          </ul>
+        </div>
+        <table class="coa-table">
+          <thead>
+            <tr>
+              <th>COA File</th>
+              <th>Matched Product</th>
+              <th>Conf.</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">coa-beach-break.pdf</td>
+              <td style="font-size:11px">Beach Break THC Seltzer</td>
+              <td class="conf-high">95% ▲</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-accept">✓</button>
+                  <button class="btn-reject">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="mono">thc-gummy-wp.pdf</td>
+              <td style="font-size:11px">THC Gummies Watermelon</td>
+              <td class="conf-med">82% ~</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-accept">✓</button>
+                  <button class="btn-reject">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="mono">unknown-lab-report.pdf</td>
+              <td style="font-size:11px;color:#94A3B8">— No Match —</td>
+              <td style="color:#94A3B8">—</td>
+              <td>
+                <button class="btn-assign">🔗 Assign</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px;color:#64748B;margin-top:8px">
+          <span style="color:#15803D;font-weight:700">▲ High</span> &gt;90% &nbsp;
+          <span style="color:#D97706;font-weight:700">~ Medium</span> 70–90% &nbsp;
+          <span style="color:#DC2626;font-weight:700">▼ Low</span> &lt;70%
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION 6: MULTI-INDUSTRY & MCC -->
+  <div class="section">
+    <div class="section-header">
+      <span class="badge badge-blue">④ Companies</span>
+      <span class="section-title">Company Import — Multi-Industry Type &amp; MCC Codes</span>
+    </div>
+
+    <div class="industry-wrap">
+      <div class="two-col-60">
+
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:8px">Per-Row Industry Assignment</div>
+          <p style="font-size:13px;color:#475569;margin-bottom:12px">Map columns in your file directly to <strong>Industry Type</strong> and <strong>Type of Company</strong> — each row can have a different industry, removing the single-value limitation of the current import.</p>
+
+          <div class="default-assign">
+            <div class="default-assign-title">Default Assignment (if file lacks industry columns)</div>
+            <div class="assign-row">
+              <span class="assign-label">Industry Type</span>
+              <select class="assign-select">
+                <option>Cannabis Retail</option>
+                <option>Functional Mushrooms</option>
+                <option>Kratom</option>
+              </select>
+            </div>
+            <div class="assign-row">
+              <span class="assign-label">Type of Company</span>
+              <select class="assign-select">
+                <option>Retailer</option>
+                <option>Manufacturer</option>
+                <option>Distributor</option>
+              </select>
+            </div>
+            <p class="override-note">Override per-row in the Validation step if needed</p>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:8px">MCC Code Association</div>
+          <p style="font-size:13px;color:#475569;margin-bottom:12px">Optional <span class="mono" style="background:#F1F5F9;padding:1px 5px;border-radius:3px;color:#1E3A5F">mcc_code</span> column links a Merchant Category Code to each company on import.</p>
+
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>Company Name</th>
+                <th>Industry Type</th>
+                <th>Type</th>
+                <th>MCC Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Green Leaf Dispensary</td>
+                <td>Cannabis Retail</td>
+                <td>Retailer</td>
+                <td class="mono">5912</td>
+              </tr>
+              <tr>
+                <td>Pacific Wellness Co.</td>
+                <td>Functional Mushrooms</td>
+                <td>Mfg.</td>
+                <td class="mono">5122</td>
+              </tr>
+              <tr>
+                <td>BotanicaRx Supply</td>
+                <td>Kratom</td>
+                <td>Distributor</td>
+                <td style="color:#94A3B8;font-style:italic">—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box">
+            <span class="info-icon">ℹ️</span>
+            <span>MCC codes build up during the underwriting process. Import sets the initial value; <strong>Q-Audit</strong> can update as more information is gathered.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- IMPLEMENTATION PHASES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title" style="font-size:17px">Implementation Phases</span>
+    </div>
+    <div class="phases-wrap">
+      <div class="phases-grid">
+        <div class="phase-col phase-col-1">
+          <div class="phase-title phase-title-1">
+            <span class="phase-badge pb1">Phase 1</span> MVP
+          </div>
+          <ul class="phase-list">
+            <li class="pl1">Column mapping for Products and Companies</li>
+            <li class="pl1">Data validation with error / warning / duplicate handling</li>
+            <li class="pl1">COA auto-match improvements (filename + batch + extracted name)</li>
+            <li class="pl1">Multi-industry per company in import</li>
+          </ul>
+        </div>
+        <div class="phase-col phase-col-2">
+          <div class="phase-title phase-title-2">
+            <span class="phase-badge pb2">Phase 2</span> Enhanced
+          </div>
+          <ul class="phase-list">
+            <li class="pl2">COA bulk match file upload</li>
+            <li class="pl2">Smart auto-match with confidence scores</li>
+            <li class="pl2">MCC code import / association</li>
+            <li class="pl2">Saved import mappings (remember column mappings per source)</li>
+            <li class="pl2">Import history / audit log</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
