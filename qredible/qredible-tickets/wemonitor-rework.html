@@ -155,7 +155,12 @@ tbody td:first-child{text-align:center}
 .module-title{font-size:15px;font-weight:700;color:#1E293B;padding:16px 20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:10px}
 /* UNASSIGNED */
 .unassigned{color:#94A3B8;font-style:italic;font-size:12px}
-</style>
+
+    .pill-pair { display: inline-flex; align-items: center; gap: 0; margin-right: 6px; margin-bottom: 2px; }
+    .pill-pair .pill-industry { border-radius: 12px 0 0 12px; padding-right: 4px; }
+    .pill-pair .pill-connector { font-size: 9px; color: #94A3B8; padding: 2px 2px; background: #F1F5F9; border-top: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
+    .pill-pair .pill-type { border-radius: 0 12px 12px 0; padding-left: 4px; }
+  </style>
 </head>
 <body>
 
@@ -654,6 +659,9 @@ tbody td:first-child{text-align:center}
       <h2>Filtered Views</h2>
     </div>
     <div class="section-body">
+      <div style="margin-bottom:16px;padding:10px 14px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;font-size:11px;color:#1E40AF;">
+        💡 <strong>Industry Type + Type of Company display:</strong> Shown as paired pills with arrow connector (e.g., <span style="display:inline-flex;align-items:center;gap:0;"><span style="padding:2px 6px 2px 8px;background:#DCFCE7;color:#166534;border-radius:12px 0 0 12px;font-size:10px;font-weight:600;">Hemp / CBD</span><span style="font-size:8px;color:#94A3B8;padding:0 2px;background:#F1F5F9;border-top:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;">→</span><span style="padding:2px 8px 2px 6px;background:#DCFCE7;color:#166534;border-radius:0 12px 12px 0;font-size:10px;font-weight:600;">Retailer</span></span>). These appear as badges under the company's Legal Name — NOT a separate column. Each IT+ToC pair is one connected visual unit. Multi-industry companies show multiple pairs. Filtering works on either dimension independently.
+      </div>
 
       <!-- View A: Hemp/CBD filter -->
       <div class="filter-demo">
