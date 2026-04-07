@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QP-XXXX — WeMonitor UI Rework + Pending Companies</title>
+<title>QP-3648 — WeMonitor UI Rework + Pending Companies</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -170,13 +170,13 @@ tbody td:first-child{text-align:center}
   <span class="nav-sep">/</span>
   <span class="nav-title">WeMonitor UI Rework</span>
   <span class="nav-sep">/</span>
-  <span class="ticket-badge">QP-XXXX</span>
+  <span class="ticket-badge">QP-3648</span>
 </nav>
 
 <div class="page">
   <div class="page-header">
     <h1>WeMonitor UI Rework + Pending Companies</h1>
-    <p>Design proposal: Enhanced pipeline view with industry filtering, bulk actions, MRI column, and underwriting queue tab.</p>
+    <p>Design proposal: Enhanced pipeline view with combined Industry Type + Type of Company pairing, bulk actions, MRI column, and underwriting queue tab.</p>
   </div>
 
   <!-- ═══════════════════════════════════════════════
@@ -193,7 +193,7 @@ tbody td:first-child{text-align:center}
         <span>Current WeMonitor has no industry filtering, no pending queue, no bulk actions, and limited scan visibility. Pain points annotated below.</span>
       </div>
       <div class="pain-points">
-        <span class="pain">No filtering by industry type</span>
+        <span class="pain">No filtering by Industry Type + Type of Company pair</span>
         <span class="pain">No Pending Companies tab (Active / Archived / Invites only)</span>
         <span class="pain">No bulk select or bulk actions</span>
         <span class="pain">No scan status indicators per industry</span>
@@ -318,9 +318,8 @@ tbody td:first-child{text-align:center}
         <button class="btn-filters">⚙ Filters <span class="filter-count">5</span></button>
       </div>
       <div class="filter-pills-row">
-        <div class="filter-pill"><span class="label">Industry:</span> Hemp / CBD <span class="pill-x">×</span></div>
-        <div class="filter-pill"><span class="label">Industry:</span> Guns &amp; Ammunition <span class="pill-x">×</span></div>
-        <div class="filter-pill"><span class="label">Type:</span> Retailer <span class="pill-x">×</span></div>
+        <div class="filter-pill"><span class="label">Industry Pair:</span> Hemp / CBD → Retailer <span class="pill-x">×</span></div>
+        <div class="filter-pill"><span class="label">Industry Pair:</span> Guns &amp; Ammo → Retailer <span class="pill-x">×</span></div>
         <div class="filter-pill"><span class="label">Team:</span> Rick McDonald <span class="pill-x">×</span></div>
         <div class="filter-pill"><span class="label">Scan:</span> No Product Scan <span class="pill-x">×</span></div>
         <span class="clear-all">Clear all</span>
@@ -344,7 +343,6 @@ tbody td:first-child{text-align:center}
           <tr>
             <th><input type="checkbox" class="cb"></th>
             <th>Legal Name</th>
-            <th>Industry</th>
             <th>DBA</th>
             <th>License Status</th>
             <th>Website Compliance</th>
@@ -359,11 +357,10 @@ tbody td:first-child{text-align:center}
           <!-- Row 1 -->
           <tr style="background:#EFF6FF">
             <td><input type="checkbox" class="cb" checked></td>
-            <td style="font-weight:700">3rd Coast Blends</td>
             <td>
+              <div style="font-weight:700;margin-bottom:4px">3rd Coast Blends</div>
               <div class="industry-pills">
-                <span class="pill pill-hemp">Hemp/CBD</span>
-                <span class="pill pill-retailer">Retailer</span>
+                <span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td style="color:#64748B;font-size:12px">Third Coast, 3CB</td>
@@ -378,10 +375,10 @@ tbody td:first-child{text-align:center}
           <!-- Row 2 -->
           <tr>
             <td><input type="checkbox" class="cb"></td>
-            <td style="font-weight:700">Westtown Payment Solutions</td>
             <td>
+              <div style="font-weight:700;margin-bottom:4px">Westtown Payment Solutions</div>
               <div class="industry-pills">
-                <span class="pill pill-lending">Online Lending</span>
+                <span class="pill-pair"><span class="pill pill-lending pill-industry">Online Lending</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td style="color:#64748B;font-size:12px">WPS Financial</td>
@@ -396,11 +393,10 @@ tbody td:first-child{text-align:center}
           <!-- Row 3 -->
           <tr>
             <td><input type="checkbox" class="cb"></td>
-            <td style="font-weight:700">USAG Merchant</td>
             <td>
+              <div style="font-weight:700;margin-bottom:4px">USAG Merchant</div>
               <div class="industry-pills">
-                <span class="pill pill-firearms">Firearms</span>
-                <span class="pill pill-retailer">Retailer</span>
+                <span class="pill-pair"><span class="pill pill-firearms pill-industry">Firearms</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td style="color:#64748B;font-size:12px">USAG, US Arms Group</td>
@@ -415,11 +411,11 @@ tbody td:first-child{text-align:center}
           <!-- Row 4 -->
           <tr style="background:#FFF7F7">
             <td><input type="checkbox" class="cb" checked></td>
-            <td style="font-weight:700">Joe's CBD &amp; Guns</td>
             <td>
+              <div style="font-weight:700;margin-bottom:4px">Joe's CBD &amp; Guns</div>
               <div class="industry-pills">
-                <span class="pill pill-hemp">Hemp/CBD</span>
-                <span class="pill pill-guns">Guns &amp; Ammo</span>
+                <span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
+                <span class="pill-pair"><span class="pill pill-guns pill-industry">Guns &amp; Ammo</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td style="color:#64748B;font-size:12px">Joes CBD, JCG</td>
@@ -434,11 +430,10 @@ tbody td:first-child{text-align:center}
           <!-- Row 5 -->
           <tr style="background:#FFF7F7">
             <td><input type="checkbox" class="cb" checked></td>
-            <td style="font-weight:700">Mood LLC</td>
             <td>
+              <div style="font-weight:700;margin-bottom:4px">Mood LLC</div>
               <div class="industry-pills">
-                <span class="pill pill-hemp">Hemp/CBD</span>
-                <span class="pill pill-retailer">Retailer</span>
+                <span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td style="color:#64748B;font-size:12px">Mood, Mood Cannabis</td>
@@ -493,7 +488,7 @@ tbody td:first-child{text-align:center}
         <button class="btn-filters">⚙ Filters <span class="filter-count">2</span></button>
       </div>
       <div class="filter-pills-row">
-        <div class="filter-pill"><span class="label">Industry:</span> Hemp / CBD <span class="pill-x">×</span></div>
+        <div class="filter-pill"><span class="label">Industry Pair:</span> Hemp / CBD → Retailer <span class="pill-x">×</span></div>
         <div class="filter-pill"><span class="label">Scan:</span> No Website Scan <span class="pill-x">×</span></div>
         <span class="clear-all">Clear all</span>
       </div>
@@ -515,7 +510,6 @@ tbody td:first-child{text-align:center}
           <tr>
             <th><input type="checkbox" class="cb"></th>
             <th>Legal Name</th>
-            <th>Industry</th>
             <th>Source</th>
             <th>Date Added</th>
             <th>Website Scan</th>
@@ -533,11 +527,8 @@ tbody td:first-child{text-align:center}
             <td>
               <div style="font-weight:700;margin-bottom:2px">Green Valley Botanicals</div>
               <div style="font-size:11px;color:#64748B">gvbotanicals.com</div>
-            </td>
-            <td>
-              <div class="industry-pills">
-                <span class="pill pill-hemp">Hemp/CBD</span>
-                <span class="pill pill-retailer">Retailer</span>
+              <div class="industry-pills" style="margin-top:6px">
+                <span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td><span class="src-pill">Import</span></td>
@@ -565,11 +556,8 @@ tbody td:first-child{text-align:center}
             <td>
               <div style="font-weight:700;margin-bottom:2px">Apex Arms Retailer</div>
               <div style="font-size:11px;color:#64748B">apexarms.shop</div>
-            </td>
-            <td>
-              <div class="industry-pills">
-                <span class="pill pill-firearms">Firearms</span>
-                <span class="pill pill-retailer">Retailer</span>
+              <div class="industry-pills" style="margin-top:6px">
+                <span class="pill-pair"><span class="pill pill-firearms pill-industry">Firearms</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td><span class="src-pill">Manual</span></td>
@@ -592,11 +580,8 @@ tbody td:first-child{text-align:center}
             <td>
               <div style="font-weight:700;margin-bottom:2px">CloudKratom LLC</div>
               <div style="font-size:11px;color:#64748B">cloudkratom.com</div>
-            </td>
-            <td>
-              <div class="industry-pills">
-                <span class="pill" style="background:#F0FDF4;color:#166534;border:1px solid #BBF7D0">Kratom</span>
-                <span class="pill pill-retailer">Retailer</span>
+              <div class="industry-pills" style="margin-top:6px">
+                <span class="pill-pair"><span class="pill" style="background:#F0FDF4;color:#166534;border-radius:12px 0 0 12px;border:1px solid #BBF7D0;border-right:none">Kratom</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td><span class="src-pill">API</span></td>
@@ -616,10 +601,8 @@ tbody td:first-child{text-align:center}
             <td>
               <div style="font-weight:700;margin-bottom:2px">NuVida Health</div>
               <div style="font-size:11px;color:#64748B">nuvidahealth.com</div>
-            </td>
-            <td>
-              <div class="industry-pills">
-                <span class="pill" style="background:#FDF4FF;color:#6B21A8;border:1px solid #E9D5FF">Func. Mushrooms</span>
+              <div class="industry-pills" style="margin-top:6px">
+                <span class="pill-pair"><span class="pill" style="background:#FDF4FF;color:#6B21A8;border-radius:12px 0 0 12px;border:1px solid #E9D5FF;border-right:none">Func. Mushrooms</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span>
               </div>
             </td>
             <td><span class="src-pill">Import</span></td>
@@ -665,14 +648,14 @@ tbody td:first-child{text-align:center}
 
       <!-- View A: Hemp/CBD filter -->
       <div class="filter-demo">
-        <div class="filter-demo-label">View A — Industry Type: Hemp / CBD</div>
+      <div class="filter-demo-label">View A — Search by Industry Type or Type of Company</div>
         <div class="filter-bar" style="border:none;padding:0 0 12px;background:transparent">
           <div class="filter-row1" style="margin-bottom:8px">
             <input class="search-input" style="max-width:260px" type="text" placeholder="Search by Legal Name, DBA, Website, MID..." readonly>
             <button class="btn-filters">⚙ Filters <span class="filter-count">1</span></button>
           </div>
           <div class="filter-pills-row">
-            <div class="filter-pill"><span class="label">Industry:</span> Hemp / CBD <span class="pill-x">×</span></div>
+            <div class="filter-pill"><span class="label">Industry Pair:</span> Hemp / CBD → Retailer <span class="pill-x">×</span></div>
             <span class="clear-all">Clear all</span>
           </div>
         </div>
@@ -683,7 +666,6 @@ tbody td:first-child{text-align:center}
               <tr>
                 <th><input type="checkbox" class="cb"></th>
                 <th>Legal Name</th>
-                <th>Industry</th>
                 <th>License Status</th>
                 <th>MRI</th>
                 <th>Team</th>
@@ -694,8 +676,7 @@ tbody td:first-child{text-align:center}
             <tbody>
               <tr>
                 <td><input type="checkbox" class="cb"></td>
-                <td style="font-weight:700">3rd Coast Blends</td>
-                <td><div class="industry-pills"><span class="pill pill-hemp">Hemp/CBD</span><span class="pill pill-retailer">Retailer</span></div></td>
+                <td><div style="font-weight:700;margin-bottom:4px">3rd Coast Blends</div><div class="industry-pills"><span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span></div></td>
                 <td><span class="lic lic-active">● Active</span></td>
                 <td><span class="mri mri-risk"><span class="mri-dot mri-dot-amber"></span>At Risk</span></td>
                 <td><div class="team"><div class="avatar av-green">M</div><span class="team-more">+3</span></div></td>
@@ -704,8 +685,7 @@ tbody td:first-child{text-align:center}
               </tr>
               <tr>
                 <td><input type="checkbox" class="cb"></td>
-                <td style="font-weight:700">Joe's CBD &amp; Guns</td>
-                <td><div class="industry-pills"><span class="pill pill-hemp">Hemp/CBD</span><span class="pill pill-guns">Guns &amp; Ammo</span></div></td>
+                <td><div style="font-weight:700;margin-bottom:4px">Joe's CBD &amp; Guns</div><div class="industry-pills"><span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span><span class="pill-pair"><span class="pill pill-guns pill-industry">Guns &amp; Ammo</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span></div></td>
                 <td><span class="lic lic-active">● Active</span></td>
                 <td><span class="mri mri-action"><span class="mri-dot mri-dot-red"></span>Action Required</span></td>
                 <td><div class="team"><div class="avatar av-purple">D</div></div></td>
@@ -714,8 +694,7 @@ tbody td:first-child{text-align:center}
               </tr>
               <tr>
                 <td><input type="checkbox" class="cb"></td>
-                <td style="font-weight:700">Mood LLC</td>
-                <td><div class="industry-pills"><span class="pill pill-hemp">Hemp/CBD</span><span class="pill pill-retailer">Retailer</span></div></td>
+                <td><div style="font-weight:700;margin-bottom:4px">Mood LLC</div><div class="industry-pills"><span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span></div></td>
                 <td><span class="lic lic-failed">● Failed</span></td>
                 <td><span class="mri mri-risk"><span class="mri-dot mri-dot-amber"></span>At Risk</span></td>
                 <td><div class="team"><div class="avatar av-green">M</div></div></td>
@@ -723,7 +702,7 @@ tbody td:first-child{text-align:center}
                 <td><button class="act-btn">⋯</button></td>
               </tr>
               <tr>
-                <td colspan="8" style="text-align:center;color:#94A3B8;font-style:italic;font-size:12px;padding:12px">+ 844 more Hemp/CBD companies…</td>
+                <td colspan="7" style="text-align:center;color:#94A3B8;font-style:italic;font-size:12px;padding:12px">+ 844 more Hemp/CBD companies…</td>
               </tr>
             </tbody>
           </table>
@@ -750,7 +729,6 @@ tbody td:first-child{text-align:center}
               <tr>
                 <th><input type="checkbox" class="cb"></th>
                 <th>Legal Name</th>
-                <th>Industry</th>
                 <th>License Status</th>
                 <th>MRI</th>
                 <th>Last Scan</th>
@@ -760,8 +738,7 @@ tbody td:first-child{text-align:center}
             <tbody>
               <tr>
                 <td><input type="checkbox" class="cb"></td>
-                <td style="font-weight:700">Westtown Payment Solutions</td>
-                <td><div class="industry-pills"><span class="pill pill-lending">Online Lending</span></div></td>
+                <td><div style="font-weight:700;margin-bottom:4px">Westtown Payment Solutions</div><div class="industry-pills"><span class="pill-pair"><span class="pill pill-lending pill-industry">Online Lending</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span></div></td>
                 <td><span class="lic lic-active">● Active</span></td>
                 <td><span class="mri mri-clear"><span class="mri-dot mri-dot-green"></span>Clear</span></td>
                 <td><span class="scan-date">03/15/2026</span></td>
@@ -769,15 +746,14 @@ tbody td:first-child{text-align:center}
               </tr>
               <tr>
                 <td><input type="checkbox" class="cb"></td>
-                <td style="font-weight:700">Sunrise Hemp Co.</td>
-                <td><div class="industry-pills"><span class="pill pill-hemp">Hemp/CBD</span><span class="pill pill-retailer">Retailer</span></div></td>
+                <td><div style="font-weight:700;margin-bottom:4px">Sunrise Hemp Co.</div><div class="industry-pills"><span class="pill-pair"><span class="pill pill-hemp pill-industry">Hemp/CBD</span><span class="pill-connector">→</span><span class="pill pill-retailer pill-type">Retailer</span></span></div></td>
                 <td><span class="lic lic-active">● Active</span></td>
                 <td><span class="mri mri-risk"><span class="mri-dot mri-dot-amber"></span>At Risk</span></td>
                 <td><span class="scan-date">03/10/2026</span></td>
                 <td><button class="act-btn">⋯</button></td>
               </tr>
               <tr>
-                <td colspan="7" style="text-align:center;color:#94A3B8;font-style:italic;font-size:12px;padding:12px">+ 21 more in Rick's queue…</td>
+                <td colspan="6" style="text-align:center;color:#94A3B8;font-style:italic;font-size:12px;padding:12px">+ 21 more in Rick's queue…</td>
               </tr>
             </tbody>
           </table>
@@ -805,9 +781,9 @@ tbody td:first-child{text-align:center}
         </thead>
         <tbody>
           <tr>
-            <td style="font-weight:600">Industry filtering</td>
+            <td style="font-weight:600">Industry/type pair filtering</td>
             <td><span class="check-no">❌</span> Not available</td>
-            <td><span class="check-yes">✅</span> Multi-select industry type</td>
+            <td><span class="check-yes">✅</span> Search/filter by industry type, type of company, or their paired combination</td>
           </tr>
           <tr>
             <td style="font-weight:600">Pending tab</td>
@@ -841,8 +817,8 @@ tbody td:first-child{text-align:center}
           </tr>
           <tr>
             <td style="font-weight:600">Multi-industry companies</td>
-            <td><span class="check-no">❌</span> Single industry pill only</td>
-            <td><span class="check-yes">✅</span> Multiple industry pills per company</td>
+            <td><span class="check-no">❌</span> Single flat industry pill only</td>
+            <td><span class="check-yes">✅</span> Multiple paired pills under Legal Name, one pair per Industry Type + Type of Company combination</td>
           </tr>
         </tbody>
       </table>
