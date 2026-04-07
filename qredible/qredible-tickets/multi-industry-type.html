@@ -503,7 +503,69 @@ tbody td{padding:9px 12px;color:#374151}
   </div>
 
   <!-- SECTION 6 -->
+  
+  <!-- Configuration Flow Diagram -->
   <div class="section">
+    <div class="section-header">
+      <span class="badge badge-blue">⚙ Architecture</span>
+      <h2>How Industry Type Drives Configuration</h2>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:#64748B;margin-bottom:16px;">Each Industry Type + Type of Company pair configures what systems run for merchants in that category. MRI aggregates the results — it's not configured separately.</p>
+      
+      <div style="display:flex;flex-direction:column;gap:0;align-items:center;margin-bottom:20px;">
+        <!-- Top: Industry Type Pair -->
+        <div style="padding:12px 20px;background:#1E3A5F;color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-align:center;min-width:300px;">
+          Industry Type + Type of Company<br/>
+          <span style="font-size:11px;font-weight:400;color:#93C5FD;">e.g., Hemp/CBD → Retailer</span>
+        </div>
+        <div style="font-size:20px;color:#CBD5E1;">↓</div>
+        
+        <!-- Config layer -->
+        <div style="display:flex;gap:12px;width:100%;max-width:700px;">
+          <div style="flex:1;padding:12px;background:#EFF6FF;border:2px solid #BFDBFE;border-radius:8px;text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:#1D4ED8;">🔍 Scan Profile</div>
+            <div style="font-size:10px;color:#475569;margin-top:4px;">Compliance Checks<br/>Analyst Review Checks<br/>Compliance Elements (keywords)</div>
+            <div style="font-size:9px;color:#93C5FD;margin-top:4px;">CONFIGURABLE per pair</div>
+          </div>
+          <div style="flex:1;padding:12px;background:#F0FDF4;border:2px solid #BBF7D0;border-radius:8px;text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:#166534;">🛡️ MRI Check Set</div>
+            <div style="font-size:10px;color:#475569;margin-top:4px;">Universal: OFAC, BBB, Google<br/>Industry: FDA, NMLS, ATF, DEA<br/>License types to verify</div>
+            <div style="font-size:9px;color:#16A34A;margin-top:4px;">CONFIGURABLE per pair</div>
+          </div>
+          <div style="flex:1;padding:12px;background:#FEF3C7;border:2px solid #FDE68A;border-radius:8px;text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:#92400E;">🏷️ Reg Attributes</div>
+            <div style="font-size:10px;color:#475569;margin-top:4px;">Auto-inherit to products<br/>COA field conditions<br/>Website finding triggers</div>
+            <div style="font-size:9px;color:#D97706;margin-top:4px;">CONFIGURABLE per pair</div>
+          </div>
+        </div>
+        
+        <div style="font-size:20px;color:#CBD5E1;">↓ results feed into</div>
+        
+        <!-- Output layer -->
+        <div style="display:flex;gap:12px;width:100%;max-width:700px;">
+          <div style="flex:1;padding:12px;background:#F1F5F9;border:2px solid #CBD5E1;border-radius:8px;text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:#334155;">📊 Website Compliance</div>
+            <div style="font-size:10px;color:#64748B;margin-top:4px;">Scan findings column<br/>in Pipeline</div>
+          </div>
+          <div style="flex:1;padding:12px;background:#F1F5F9;border:2px solid #CBD5E1;border-radius:8px;text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:#334155;">📦 Product Compliance</div>
+            <div style="font-size:10px;color:#64748B;margin-top:4px;">Attribute evaluation →<br/>compliance status</div>
+          </div>
+          <div style="flex:1;padding:12px;background:#DC2626;border:2px solid #991B1B;border-radius:8px;text-align:center;color:#fff;">
+            <div style="font-size:13px;font-weight:700;">🛡️ MRI Column</div>
+            <div style="font-size:10px;margin-top:4px;color:#FEE2E2;">READ-ONLY AGGREGATION<br/>Worst-case across all factors</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="padding:10px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:11px;color:#991B1B;">
+        ⚠️ <strong>Key distinction:</strong> MRI is NOT configured directly. You configure what <em>feeds into it</em> (scan profiles, MRI check sets, regulatory attributes). MRI displays the aggregated worst-case result. The MRI column/modal is a <em>dashboard</em>, not a configuration surface.
+      </div>
+    </div>
+  </div>
+
+<div class="section">
     <div class="section-header">
       <span class="section-num">§6</span>
       <h2>Q-Audit Admin — Types of Company</h2>
@@ -558,7 +620,7 @@ tbody td{padding:9px 12px;color:#374151}
                 <th>Industry Types</th>
                 <th>Type of Company</th>
                 <th>Description</th>
-                <th>Linked Attributes</th>
+                <th>Configuration Summary</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -569,7 +631,7 @@ tbody td{padding:9px 12px;color:#374151}
                 <td>Retail hemp products</td>
                 <td>
                   <div class="link-attrs">
-                    <span class="badge-sm"><span class="badge-count">3</span> Scans</span>
+                    <span class="badge-sm"><span class="badge-count">3</span> Scan Defaults</span>
                     <span class="badge-sm"><span class="badge-count">12</span> MRI</span>
                     <span class="badge-sm"><span class="badge-count">8</span> Regs</span>
                     <span class="badge-sm"><span class="badge-count">2</span> MCC</span>
@@ -583,7 +645,7 @@ tbody td{padding:9px 12px;color:#374151}
                 <td>Cannabis dispensary</td>
                 <td>
                   <div class="link-attrs">
-                    <span class="badge-sm"><span class="badge-count">2</span> Scans</span>
+                    <span class="badge-sm"><span class="badge-count">2</span> Scan Defaults</span>
                     <span class="badge-sm"><span class="badge-count">9</span> MRI</span>
                     <span class="badge-sm"><span class="badge-count">6</span> Regs</span>
                     <span class="badge-sm"><span class="badge-count">1</span> MCC</span>
@@ -597,7 +659,7 @@ tbody td{padding:9px 12px;color:#374151}
                 <td>FFL dealer</td>
                 <td>
                   <div class="link-attrs">
-                    <span class="badge-sm"><span class="badge-count">4</span> Scans</span>
+                    <span class="badge-sm"><span class="badge-count">4</span> Scan Defaults</span>
                     <span class="badge-sm"><span class="badge-count">15</span> MRI</span>
                     <span class="badge-sm"><span class="badge-count">11</span> Regs</span>
                     <span class="badge-sm"><span class="badge-count">3</span> MCC</span>
@@ -607,7 +669,7 @@ tbody td{padding:9px 12px;color:#374151}
               </tr>
             </tbody>
           </table>
-          <div class="annotation">Pairs table unchanged — still the source of truth. "Linked Attributes" column gives admins visibility into each pair's downstream connections (scan profiles, MRI checks, regulatory attributes, MCC codes).</div>
+          <div class="annotation">Pairs table unchanged — still the source of truth. "Configuration Summary" column gives admins visibility into each pair's downstream connections (scan profiles, MRI checks, regulatory attributes, MCC codes).</div>
         </div>
       </div>
     </div>
