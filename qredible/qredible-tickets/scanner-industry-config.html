@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanner Industry Configuration — Qredible Ticket</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px;line-height:1.5}
+a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
+
+/* NAV */
+.topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8}
+.topnav a{color:#93C5FD}.topnav .sep{color:#475569}.topnav .ticket-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.topnav .title{color:#fff;font-weight:600}
+
+/* PAGE */
+.page{max-width:960px;margin:0 auto;padding:32px 24px}
+.page-header{margin-bottom:32px}
+.page-header h1{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
+.page-header p{color:#64748B;font-size:13px}
+
+/* SECTION */
+.section{margin-bottom:40px}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.4px;text-transform:uppercase}
+.label-before{background:#FEF3C7;color:#92400E}
+.label-after{background:#DCFCE7;color:#166534}
+.label-lending{background:#DBEAFE;color:#1E40AF}
+.label-override{background:#EDE9FE;color:#4C1D95}
+.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:16px}
+
+/* ANNOTATION */
+.annotation{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:14px;line-height:1.6}
+.annotation.green{background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D}
+.annotation.blue{background:#EFF6FF;border-color:#BFDBFE;border-left-color:#3B82F6;color:#1E40AF}
+.annotation.purple{background:#F5F3FF;border-color:#DDD6FE;border-left-color:#7C3AED;color:#3B0764}
+
+/* MODAL WRAPPER */
+.modal-wrap{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);overflow:hidden;border:1px solid #E2E8F0}
+
+/* MODAL HEADER */
+.modal-header{background:#1E3A5F;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{color:#fff;font-size:15px;font-weight:700}
+.modal-header .close-btn{color:#94A3B8;font-size:18px;cursor:pointer;line-height:1}
+
+/* COMPANY BAR */
+.company-bar{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.company-name{font-weight:700;color:#1E293B;font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px}
+.pill-green{background:#DCFCE7;color:#166534}
+.pill-blue{background:#DBEAFE;color:#1E40AF}
+.pill-orange{background:#FEF3C7;color:#92400E}
+.pill-info{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
+.pill-success{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+.arrow-sep{color:#94A3B8;font-size:12px}
+
+/* MODAL BODY */
+.modal-body{padding:20px}
+
+/* INDUSTRY PROFILE SELECTOR */
+.profile-selector{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 14px;margin-bottom:16px}
+.profile-selector-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.profile-selector-top select,.profile-select-mock{background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:600;color:#166534;font-family:'Plus Jakarta Sans',sans-serif;flex:1;display:flex;align-items:center;gap:6px}
+.profile-badge-row{font-size:11px;color:#16A34A;margin-bottom:6px}
+.profile-links{display:flex;gap:12px;font-size:12px}
+.profile-links a{color:#3B82F6}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.form-input{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:8px 12px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:#1E293B;background:#fff;outline:none}
+.form-input:focus{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.12)}
+.form-textarea{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:8px 12px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:#1E293B;background:#fff;resize:none;height:60px;outline:none}
+.form-textarea:focus{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.12)}
+
+/* CHECKS GRID */
+.checks-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;margin-bottom:16px}
+.checks-col-header{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;padding:6px 0;border-bottom:1px solid #E2E8F0;margin-bottom:8px}
+.check-item{display:flex;align-items:flex-start;gap:8px;padding:5px 6px;border-radius:5px;margin-bottom:2px}
+.check-item.override-highlight{background:#EFF6FF;border:1px solid #BFDBFE}
+.check-item input[type=checkbox]{margin-top:2px;accent-color:#3B82F6;cursor:pointer;flex-shrink:0}
+.check-item input[type=checkbox]:disabled{accent-color:#94A3B8;cursor:not-allowed}
+.check-label{font-size:13px;color:#1E293B;flex:1}
+.check-label.muted{color:#94A3B8}
+.source-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.src-industry{background:#F0FDF4;color:#166534}
+.src-universal{background:#EFF6FF;color:#1E40AF}
+.src-override{background:#DBEAFE;color:#1E40AF}
+.locked-icon{font-size:11px;color:#94A3B8}
+
+/* KEYWORD SETS */
+.keyword-sets{margin-bottom:14px}
+.keyword-sets-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block}
+.keyword-pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.kw-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:default}
+.kw-green{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.kw-blue{background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE}
+.kw-add{background:#fff;color:#3B82F6;border:1px dashed #3B82F6;cursor:pointer;font-size:12px}
+.kw-pill .kw-src{font-size:10px;opacity:.7}
+
+/* MODAL FOOTER */
+.modal-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;transition:opacity .15s}
+.btn-primary{background:#3B82F6;color:#fff}.btn-primary:hover{opacity:.9}
+.btn-secondary{background:#fff;color:#1E293B;border:1px solid #CBD5E1}.btn-secondary:hover{background:#F8FAFC}
+.btn-danger{background:#fff;color:#DC2626;border:1px solid #FECACA}.btn-danger:hover{background:#FEF2F2}
+
+/* OVERRIDE BADGE */
+.override-badge-bar{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-size:12px;color:#1E40AF;font-weight:500}
+
+/* FLOW DIAGRAM */
+.flow-section{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px;margin-top:8px}
+.flow-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:16px;text-align:center}
+.flow-steps{display:flex;align-items:center;flex-wrap:wrap;gap:0;justify-content:center}
+.flow-step{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#1E3A5F;min-width:130px}
+.flow-step .step-num{font-size:10px;color:#94A3B8;font-weight:500;margin-bottom:2px}
+.flow-arrow{color:#3B82F6;font-size:18px;padding:0 6px;font-weight:700}
+
+/* DIVIDER */
+.divider{height:1px;background:#E2E8F0;margin:32px 0}
+
+/* NEW TAG */
+.new-tag{background:#3B82F6;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.3px;vertical-align:middle;margin-left:4px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html">← All Mockups</a>
+  <span class="sep">/</span>
+  <span class="title">Scanner Industry Configuration</span>
+  <span class="sep">/</span>
+  <span class="ticket-badge">QP-XXXX</span>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="page-header">
+    <h1>Q-ScanAI — Industry-Aware Scanner Configuration</h1>
+    <p>Feature mockup: Scanner Configuration modal enhanced with industry type defaults, automatic profile loading, and company-level overrides.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 1 — BEFORE
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label label-before">① Before — Current Scanner Configuration</div>
+    <div class="section-title">Current State: Manual, Industry-Agnostic Configuration</div>
+
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Q-ScanAI — Acme Hemp Co.</h2>
+        <span class="close-btn">✕</span>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input class="form-input" type="text" value="https://acmehempco.com" readonly>
+        </div>
+
+        <div class="checks-grid">
+          <!-- LEFT: Compliance -->
+          <div>
+            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
+            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">FDA Disclaimer</span></div>
+            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Terms of Use</span></div>
+            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Privacy Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Return/Refund Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Contact &amp; Business Info</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Age &amp; Access Controls</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Accepted Payment Methods</span></div>
+            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">SSL/TLS Security</span></div>
+          </div>
+          <!-- RIGHT: Analyst -->
+          <div>
+            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
+            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">THC Disclaimer</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Product Subscription Model</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Product/Service Match</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Price Points Match</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Prohibited Products Search</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">No Hidden Fees</span></div>
+            <div class="check-item"><input type="checkbox" disabled><span class="check-label">GMP Certificate</span></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Custom Keywords</label>
+          <textarea class="form-textarea" readonly>delta-8, delta-9, thc-o, hhc, synthetic cannabinoid</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">White-List Keywords</label>
+          <textarea class="form-textarea" readonly>hemp-derived, federally legal, 0.3% THC</textarea>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Save Configuration</button>
+        <button class="btn btn-primary">▶ Start AI Scan</button>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Current state:</strong> Same checks shown for ALL companies regardless of industry. No industry-aware defaults. Manual checkbox selection every time — operator must know which checks apply to each industry type.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 2 — AFTER (Hemp/CBD)
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label label-after">② After — Industry-Aware Scanner Configuration</div>
+    <div class="section-title">Hemp / CBD Retailer — Auto-Loaded Industry Profile</div>
+
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Q-ScanAI — Industry-Aware Configuration</h2>
+        <span class="close-btn">✕</span>
+      </div>
+
+      <!-- Company bar -->
+      <div class="company-bar">
+        <span class="company-name">3rd Coast Blends</span>
+        <span class="arrow-sep">·</span>
+        <span class="pill pill-green">Hemp / CBD</span>
+        <span class="arrow-sep">→</span>
+        <span class="pill pill-green">Retailer</span>
+        <span style="flex:1"></span>
+        <span class="pill pill-success">✓ Industry defaults loaded</span>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Industry Profile Selector -->
+        <div class="profile-selector">
+          <div class="profile-selector-top">
+            <span style="font-size:14px">⚙</span>
+            <div class="profile-select-mock" style="background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#166534;flex:1">
+              Active Profile: Hemp / CBD — Retailer &nbsp;▾
+            </div>
+            <span class="new-tag">NEW</span>
+          </div>
+          <div class="profile-badge-row">✓ Loaded 6 compliance checks, 2 analyst checks, 159 keywords from industry defaults</div>
+          <div class="profile-links">
+            <a href="#">↺ Reset to Defaults</a>
+            <span style="color:#D1FAE5">|</span>
+            <a href="#">⊕ Save as Company Override</a>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input class="form-input" type="text" value="https://3rdcoastblends.com" readonly>
+        </div>
+
+        <div class="checks-grid">
+          <!-- LEFT: Compliance -->
+          <div>
+            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">FDA Disclaimer</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Terms of Use</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Privacy Policy</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Return/Refund Policy</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Contact &amp; Business Info</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">SSL/TLS Security <span class="locked-icon">🔒</span></span>
+              <span class="source-badge src-universal">🌐 Universal</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Age &amp; Access Controls</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Accepted Payment Methods</span>
+            </div>
+          </div>
+          <!-- RIGHT: Analyst -->
+          <div>
+            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">THC Disclaimer</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Prohibited Products Search</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Product Subscription Model</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Product/Service Match</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Price Points Match</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">No Hidden Fees</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">GMP Certificate for Supplements</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Compliance Element Sets -->
+        <div class="keyword-sets">
+          <label class="keyword-sets-label">Active Compliance Element Sets <span class="new-tag">NEW</span></label>
+          <div class="keyword-pills">
+            <span class="kw-pill kw-green">CBD Health Claims — 137 keywords <span class="kw-src">🏭</span></span>
+            <span class="kw-pill kw-green">THC Content Keywords — 22 keywords <span class="kw-src">🏭</span></span>
+            <span class="kw-pill kw-add">+ Add Keyword Set</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Custom Keywords</label>
+          <textarea class="form-textarea" readonly>delta-8, delta-9, thc-o, hhc, synthetic cannabinoid</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">White-List Keywords</label>
+          <textarea class="form-textarea" readonly>hemp-derived, federally legal, 0.3% THC</textarea>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Save Configuration</button>
+        <button class="btn btn-primary">▶ Start AI Scan</button>
+      </div>
+    </div>
+
+    <div class="annotation green">
+      <strong>After:</strong> Industry profile loaded automatically when company's industry type is assigned. Operators see which checks are industry defaults vs. universal vs. unchecked — no guesswork.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 3 — ONLINE LENDING
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label label-lending">③ Different Industry — Online Lending</div>
+    <div class="section-title">Online Lending — Completely Different Defaults, Same Modal</div>
+
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Q-ScanAI — Industry-Aware Configuration</h2>
+        <span class="close-btn">✕</span>
+      </div>
+
+      <!-- Company bar -->
+      <div class="company-bar">
+        <span class="company-name">FastCash Financial</span>
+        <span class="arrow-sep">·</span>
+        <span class="pill pill-blue">Online Lending</span>
+        <span class="arrow-sep">→</span>
+        <span class="pill pill-blue">Lender</span>
+        <span style="flex:1"></span>
+        <span class="pill pill-info">✓ Industry defaults loaded</span>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Industry Profile Selector -->
+        <div class="profile-selector" style="background:#EFF6FF;border-color:#BFDBFE">
+          <div class="profile-selector-top">
+            <span style="font-size:14px">⚙</span>
+            <div class="profile-select-mock" style="background:#fff;border:1px solid #BFDBFE;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#1E40AF;flex:1">
+              Active Profile: Online Lending — Lender &nbsp;▾
+            </div>
+          </div>
+          <div class="profile-badge-row" style="color:#3B82F6">✓ Loaded 5 compliance checks, 4 analyst checks, 88 keywords from industry defaults</div>
+          <div class="profile-links">
+            <a href="#">↺ Reset to Defaults</a>
+            <span style="color:#BFDBFE">|</span>
+            <a href="#">⊕ Save as Company Override</a>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input class="form-input" type="text" value="https://fastcashfinancial.com" readonly>
+        </div>
+
+        <div class="checks-grid">
+          <!-- LEFT: Compliance -->
+          <div>
+            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">APR Disclosure</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Terms of Use</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Privacy Policy</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">SSL/TLS Security <span class="locked-icon">🔒</span></span>
+              <span class="source-badge src-universal">🌐 Universal</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Contact &amp; Business Info</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">FDA Disclaimer</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Age &amp; Access Controls</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Return/Refund Policy</span>
+            </div>
+          </div>
+          <!-- RIGHT: Analyst -->
+          <div>
+            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">MLA Reference</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">ECOA / Regulation B</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Right to Rescind</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">State License Disclosure</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">THC Disclaimer</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">GMP Certificate</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Prohibited Products Search</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Compliance Element Sets -->
+        <div class="keyword-sets">
+          <label class="keyword-sets-label">Active Compliance Element Sets</label>
+          <div class="keyword-pills">
+            <span class="kw-pill kw-blue">Prohibited Approval Language — 45 keywords <span class="kw-src">🏭</span></span>
+            <span class="kw-pill kw-blue">Deceptive Cost Language — 31 keywords <span class="kw-src">🏭</span></span>
+            <span class="kw-pill kw-blue">Restricted State Compliance — 12 keywords <span class="kw-src">🏭</span></span>
+            <span class="kw-pill kw-add">+ Add Keyword Set</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Custom Keywords</label>
+          <textarea class="form-textarea" readonly></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">White-List Keywords</label>
+          <textarea class="form-textarea" readonly></textarea>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Save Configuration</button>
+        <button class="btn btn-primary">▶ Start AI Scan</button>
+      </div>
+    </div>
+
+    <div class="annotation blue">
+      <strong>Same modal, completely different configuration</strong> based on industry type. Lending-specific checks (APR, MLA, ECOA, Right to Rescind) load automatically — hemp-specific checks (FDA Disclaimer, THC, GMP) do not apply and remain unchecked.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 4 — COMPANY OVERRIDE
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label label-override">④ Company-Level Override</div>
+    <div class="section-title">3rd Coast Blends — Hemp/CBD with 2 Company Overrides</div>
+
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Q-ScanAI — Industry-Aware Configuration</h2>
+        <span class="close-btn">✕</span>
+      </div>
+
+      <!-- Company bar -->
+      <div class="company-bar">
+        <span class="company-name">3rd Coast Blends</span>
+        <span class="arrow-sep">·</span>
+        <span class="pill pill-green">Hemp / CBD</span>
+        <span class="arrow-sep">→</span>
+        <span class="pill pill-green">Retailer</span>
+        <span style="flex:1"></span>
+        <span class="pill" style="background:#EDE9FE;color:#4C1D95;border:1px solid #DDD6FE">👤 2 company overrides active</span>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Override badge bar -->
+        <div class="override-badge-bar">
+          <span>👤 <strong>2 company-level overrides</strong> active — these differ from industry defaults</span>
+          <button class="btn btn-danger" style="padding:4px 12px;font-size:12px">↺ Reset to Industry Defaults</button>
+        </div>
+
+        <!-- Industry Profile Selector -->
+        <div class="profile-selector" style="background:#F5F3FF;border-color:#DDD6FE">
+          <div class="profile-selector-top">
+            <span style="font-size:14px">⚙</span>
+            <div style="background:#fff;border:1px solid #DDD6FE;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#4C1D95;flex:1">
+              Active Profile: Hemp / CBD — Retailer (Modified) &nbsp;▾
+            </div>
+          </div>
+          <div class="profile-badge-row" style="color:#7C3AED">⚠ Company overrides are active — profile differs from industry defaults</div>
+          <div class="profile-links">
+            <a href="#">↺ Reset to Defaults</a>
+            <span style="color:#DDD6FE">|</span>
+            <a href="#">⊕ Save as Company Override</a>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input class="form-input" type="text" value="https://3rdcoastblends.com" readonly>
+        </div>
+
+        <div class="checks-grid">
+          <!-- LEFT -->
+          <div>
+            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">FDA Disclaimer</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Terms of Use</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Privacy Policy</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Return/Refund Policy</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Contact &amp; Business Info</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">SSL/TLS Security <span class="locked-icon">🔒</span></span>
+              <span class="source-badge src-universal">🌐 Universal</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Age &amp; Access Controls</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Accepted Payment Methods</span>
+            </div>
+          </div>
+          <!-- RIGHT -->
+          <div>
+            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">THC Disclaimer</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" checked disabled>
+              <span class="check-label">Prohibited Products Search</span>
+              <span class="source-badge src-industry">🏭 Industry</span>
+            </div>
+            <!-- COMPANY OVERRIDES -->
+            <div class="check-item override-highlight">
+              <input type="checkbox" checked disabled>
+              <span class="check-label"><strong>GMP Certificate for Supplements</strong></span>
+              <span class="source-badge src-override">👤 Override</span>
+            </div>
+            <div class="check-item override-highlight">
+              <input type="checkbox" checked disabled>
+              <span class="check-label"><strong>Product Subscription Model</strong></span>
+              <span class="source-badge src-override">👤 Override</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Product/Service Match</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">Price Points Match</span>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" disabled>
+              <span class="check-label muted">No Hidden Fees</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Compliance Element Sets -->
+        <div class="keyword-sets">
+          <label class="keyword-sets-label">Active Compliance Element Sets</label>
+          <div class="keyword-pills">
+            <span class="kw-pill kw-green">CBD Health Claims — 137 keywords <span class="kw-src">🏭</span></span>
+            <span class="kw-pill kw-green">THC Content Keywords — 22 keywords <span class="kw-src">🏭</span></span>
+            <span class="kw-pill" style="background:#EDE9FE;color:#4C1D95;border:1px solid #DDD6FE">Supplement Quality Claims — 18 keywords <span class="kw-src">👤</span></span>
+            <span class="kw-pill kw-add">+ Add Keyword Set</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Custom Keywords</label>
+          <textarea class="form-textarea" readonly>delta-8, delta-9, thc-o, hhc, synthetic cannabinoid</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">White-List Keywords</label>
+          <textarea class="form-textarea" readonly>hemp-derived, federally legal, 0.3% THC</textarea>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Save Configuration</button>
+        <button class="btn btn-primary">▶ Start AI Scan</button>
+      </div>
+    </div>
+
+    <div class="annotation purple">
+      <strong>Company-level overrides</strong> are the operator's final say. Industry defaults are the starting point — operators can add or change checks per company. Overrides are preserved even when industry defaults change. The operator's choices take precedence. <strong>Blue highlighted rows</strong> indicate checks that differ from the industry default.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       HOW IT WORKS FLOW
+  ══════════════════════════════════════════ -->
+  <div class="flow-section">
+    <div class="flow-title">How It Works</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">Step 1</div>
+        Industry Type<br>assigned to company
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="step-num">Step 2</div>
+        Industry Scan Profile<br>loaded as default
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="step-num">Step 3</div>
+        Operator can override<br>per-company
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="step-num">Step 4</div>
+        Configuration saved<br>at company level
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="step-num">Step 5</div>
+        Scan runs with<br>final configuration
+      </div>
+    </div>
+  </div>
+
+  <div style="height:40px"></div>
+</div><!-- /page -->
+</body>
+</html>
