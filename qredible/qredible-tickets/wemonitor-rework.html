@@ -31,38 +31,40 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B
 .pain{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;font-size:12px;padding:5px 12px;border-radius:6px;display:flex;align-items:center;gap:6px}
 .pain::before{content:'⚠';font-size:11px}
 /* TABS */
-.tabs{display:flex;border-bottom:2px solid #E2E8F0;margin-bottom:0;padding:0 20px}
-.tab{padding:10px 18px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tabs{display:flex;align-items:center;gap:2px;flex-wrap:wrap;border-bottom:1px solid #E2E8F0;margin-bottom:0;padding:0 20px;background:#fff}
+.tab{padding:12px 16px;font-size:13px;font-weight:700;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .tab.active{color:#3B82F6;border-bottom-color:#3B82F6}
 .tab-count{background:#E2E8F0;color:#64748B;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px}
 .tab.active .tab-count{background:#DBEAFE;color:#1D4ED8}
 .tab-new{background:#3B82F6;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;letter-spacing:.04em}
 /* FILTER BAR */
-.filter-bar{padding:14px 20px;border-bottom:1px solid #E2E8F0;background:#F8FAFC}
-.filter-row1{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.filter-bar{padding:12px 20px;border-bottom:1px solid #E2E8F0;background:#F8FAFC}
+.filter-row1{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .search-input{flex:1;max-width:340px;padding:7px 12px 7px 34px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;color:#1E293B}
 .search-input::placeholder{color:#94A3B8}
-.btn-filters{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid #CBD5E1;border-radius:6px;background:#fff;font-size:13px;font-weight:600;color:#374151;cursor:pointer}
+.btn-filters{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #CBD5E1;border-radius:999px;background:#fff;font-size:13px;font-weight:700;color:#374151;cursor:pointer;box-shadow:0 1px 0 rgba(15,23,42,.03)}
 .filter-count{background:#3B82F6;color:#fff;font-size:11px;font-weight:700;padding:0 6px;border-radius:10px}
 .filter-pills-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.filter-pill{display:flex;align-items:center;gap:5px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px}
+.filter-pill{display:flex;align-items:center;gap:5px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px}
 .filter-pill .label{color:#6B7280;font-weight:400;margin-right:2px}
 .pill-x{cursor:pointer;color:#93C5FD;font-size:14px;line-height:1;margin-left:2px}
 .pill-x:hover{color:#3B82F6}
 .clear-all{font-size:12px;color:#3B82F6;cursor:pointer;font-weight:600;margin-left:4px;white-space:nowrap}
 /* PRIMARY ACTIONS */
-.primary-actions{display:flex;align-items:stretch;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:1px solid #E2E8F0;background:#FFFFFF}
-.action-cluster{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
-.action-card{min-width:138px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
-.action-card-title{font-size:12px;font-weight:700;color:#1E293B;line-height:1.2}
-.action-card-desc{font-size:11px;color:#64748B;line-height:1.35;min-height:28px}
-.action-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 10px;border-radius:6px;border:1px solid #CBD5E1;background:#fff;color:#1E3A5F;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 1px 0 rgba(15,23,42,.03)}
+.primary-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid #E2E8F0;background:linear-gradient(180deg,#FFFFFF 0%,#F8FAFC 100%)}
+.action-cluster{display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex:1}
+.action-card{display:flex;align-items:center;gap:10px;min-width:auto;background:transparent;border:none;border-radius:0;padding:0}
+.action-card-meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.action-card-title{font-size:11px;font-weight:800;color:#1E293B;line-height:1.1;text-transform:uppercase;letter-spacing:.04em}
+.action-card-desc{font-size:11px;color:#64748B;line-height:1.35}
+.action-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;border-radius:10px;border:1px solid #CBD5E1;background:#fff;color:#1E3A5F;font-size:11px;font-weight:800;white-space:nowrap;box-shadow:0 1px 0 rgba(15,23,42,.03)}
 .action-btn.primary{background:#1E3A5F;border-color:#1E3A5F;color:#fff}
 .action-btn.blue{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
 .action-btn.green{background:#F0FDF4;border-color:#BBF7D0;color:#166534}
 .action-btn.amber{background:#FFFBEB;border-color:#FDE68A;color:#92400E}
 .action-btn.purple{background:#F5F3FF;border-color:#DDD6FE;color:#6D28D9}
-.actions-export{display:flex;align-items:flex-start;justify-content:flex-end;min-width:170px}
+.actions-export{display:flex;align-items:center;justify-content:flex-end;padding-left:12px;border-left:1px solid #E2E8F0}
+.toolbar-label{font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-right:8px}
 /* BULK BAR */
 .bulk-bar{display:flex;align-items:center;gap:10px;padding:10px 20px;background:#EFF6FF;border-bottom:1px solid #BFDBFE}
 .bulk-count{font-size:13px;font-weight:700;color:#1D4ED8}
@@ -173,6 +175,15 @@ tbody td:first-child{text-align:center}
     .pill-pair .pill-industry { border-radius: 12px 0 0 12px; padding-right: 4px; }
     .pill-pair .pill-connector { font-size: 10px; color: #94A3B8; padding: 0 4px; background: transparent; border: none; }
     .pill-pair .pill-type { border-radius: 0 12px 12px 0; padding-left: 4px; }
+
+@media (max-width: 900px) {
+  .primary-actions{flex-direction:column;align-items:stretch}
+  .action-cluster{width:100%}
+  .action-card{width:100%;justify-content:space-between;padding:10px 0;border-bottom:1px dashed #E2E8F0}
+  .action-card:last-child{border-bottom:none}
+  .actions-export{width:100%;padding-left:0;border-left:none;border-top:1px solid #E2E8F0;padding-top:10px;justify-content:flex-start}
+  .search-input{max-width:none}
+}
   </style>
 </head>
 <body>
@@ -313,6 +324,49 @@ tbody td:first-child{text-align:center}
       WeMonitor — Enhanced Pipeline View
     </div>
 
+    <div class="primary-actions">
+      <div class="action-cluster">
+        <div class="action-card">
+          <button class="action-btn primary">＋ Add Company</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Add Company</div>
+            <div class="action-card-desc">Create a monitored company record directly in WeMonitor.</div>
+          </div>
+        </div>
+        <div class="action-card">
+          <button class="action-btn blue">⭱ Bulk Upload</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Bulk Upload</div>
+            <div class="action-card-desc">Import multiple companies from a template or onboarding file.</div>
+          </div>
+        </div>
+        <div class="action-card">
+          <button class="action-btn green">👤 Assign Team</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Assign Team Members</div>
+            <div class="action-card-desc">Route selected companies to analysts or account owners.</div>
+          </div>
+        </div>
+        <div class="action-card">
+          <button class="action-btn amber">⇪ Upload Contacts</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Upload Contacts &amp; Referrals</div>
+            <div class="action-card-desc">Attach contact and referral data to monitored companies in batch.</div>
+          </div>
+        </div>
+      </div>
+      <div class="actions-export">
+        <span class="toolbar-label">Export</span>
+        <div class="action-card">
+          <button class="action-btn purple">⤓ Export</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Export List of Companies</div>
+            <div class="action-card-desc">Download the filtered company list with key monitoring metadata.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Tab bar -->
     <div class="tabs">
       <div class="tab active">Active Companies <span class="tab-count">1,204</span></div>
@@ -336,38 +390,6 @@ tbody td:first-child{text-align:center}
         <div class="filter-pill"><span class="label">Team:</span> Rick McDonald <span class="pill-x">×</span></div>
         <div class="filter-pill"><span class="label">Scan:</span> No Product Scan <span class="pill-x">×</span></div>
         <span class="clear-all">Clear all</span>
-      </div>
-    </div>
-
-    <div class="primary-actions">
-      <div class="action-cluster">
-        <div class="action-card">
-          <div class="action-card-title">Add Company</div>
-          <div class="action-card-desc">Create a new monitored company record directly in WeMonitor.</div>
-          <button class="action-btn primary">＋ Add Company</button>
-        </div>
-        <div class="action-card">
-          <div class="action-card-title">Bulk Upload</div>
-          <div class="action-card-desc">Import multiple companies from a template or onboarding file.</div>
-          <button class="action-btn blue">⭱ Bulk Upload</button>
-        </div>
-        <div class="action-card">
-          <div class="action-card-title">Assign Team Members</div>
-          <div class="action-card-desc">Route selected companies to analysts or account owners.</div>
-          <button class="action-btn green">👤 Assign Team</button>
-        </div>
-        <div class="action-card">
-          <div class="action-card-title">Upload Contacts &amp; Referrals</div>
-          <div class="action-card-desc">Attach contact and referral data to monitored companies in batch.</div>
-          <button class="action-btn amber">⇪ Upload Contacts</button>
-        </div>
-      </div>
-      <div class="actions-export">
-        <div class="action-card" style="min-width:170px">
-          <div class="action-card-title">Export List of Companies</div>
-          <div class="action-card-desc">Download the filtered company list with key monitoring metadata.</div>
-          <button class="action-btn purple">⤓ Export</button>
-        </div>
       </div>
     </div>
 
@@ -515,6 +537,49 @@ tbody td:first-child{text-align:center}
       WeMonitor — Enhanced Pipeline View
     </div>
 
+    <div class="primary-actions">
+      <div class="action-cluster">
+        <div class="action-card">
+          <button class="action-btn primary">＋ Add Company</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Add Company</div>
+            <div class="action-card-desc">Create a new monitored company and route it into Pending first.</div>
+          </div>
+        </div>
+        <div class="action-card">
+          <button class="action-btn blue">⭱ Bulk Upload</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Bulk Upload</div>
+            <div class="action-card-desc">Import a queue of merchants that need underwriting and scan setup.</div>
+          </div>
+        </div>
+        <div class="action-card">
+          <button class="action-btn green">👤 Assign Team</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Assign Team Members</div>
+            <div class="action-card-desc">Distribute pending companies across analysts before promotion.</div>
+          </div>
+        </div>
+        <div class="action-card">
+          <button class="action-btn amber">⇪ Upload Contacts</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Upload Contacts &amp; Referrals</div>
+            <div class="action-card-desc">Load contact and referral records alongside pending-company intake.</div>
+          </div>
+        </div>
+      </div>
+      <div class="actions-export">
+        <span class="toolbar-label">Export</span>
+        <div class="action-card">
+          <button class="action-btn purple">⤓ Export</button>
+          <div class="action-card-meta">
+            <div class="action-card-title">Export Pending Queue</div>
+            <div class="action-card-desc">Export current underwriting worklist, statuses, and assignments.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Tab bar with Pending active -->
     <div class="tabs">
       <div class="tab">Active Companies <span class="tab-count">1,204</span></div>
@@ -536,38 +601,6 @@ tbody td:first-child{text-align:center}
         <div class="filter-pill"><span class="label">Industry Pair:</span> Hemp / CBD · Retailer <span class="pill-x">×</span></div>
         <div class="filter-pill"><span class="label">Scan:</span> No Website Scan <span class="pill-x">×</span></div>
         <span class="clear-all">Clear all</span>
-      </div>
-    </div>
-
-    <div class="primary-actions">
-      <div class="action-cluster">
-        <div class="action-card">
-          <div class="action-card-title">Add Company</div>
-          <div class="action-card-desc">Create a new monitored company and route it into Pending first.</div>
-          <button class="action-btn primary">＋ Add Company</button>
-        </div>
-        <div class="action-card">
-          <div class="action-card-title">Bulk Upload</div>
-          <div class="action-card-desc">Import a queue of merchants that need underwriting and scan setup.</div>
-          <button class="action-btn blue">⭱ Bulk Upload</button>
-        </div>
-        <div class="action-card">
-          <div class="action-card-title">Assign Team Members</div>
-          <div class="action-card-desc">Distribute pending companies across analysts before promotion.</div>
-          <button class="action-btn green">👤 Assign Team</button>
-        </div>
-        <div class="action-card">
-          <div class="action-card-title">Upload Contacts &amp; Referrals</div>
-          <div class="action-card-desc">Load contact and referral records alongside pending-company intake.</div>
-          <button class="action-btn amber">⇪ Upload Contacts</button>
-        </div>
-      </div>
-      <div class="actions-export">
-        <div class="action-card" style="min-width:170px">
-          <div class="action-card-title">Export Pending Queue</div>
-          <div class="action-card-desc">Export current underwriting worklist, statuses, and assignments.</div>
-          <button class="action-btn purple">⤓ Export</button>
-        </div>
       </div>
     </div>
 
