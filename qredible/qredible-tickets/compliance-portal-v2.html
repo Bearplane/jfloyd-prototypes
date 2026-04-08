@@ -1651,7 +1651,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
                 <span style="font-size:11px;color:#991B1B;font-weight:600;">PRODUCT_MISSING_COA</span>
               </div>
               <div style="font-size:13px;font-weight:500;color:#1a202e;">Gummy Bears 500mg</div>
-              <div style="font-size:12px;color:#6B7280;">Resolution: Upload COA · Not sent yet</div>
+              <div style="font-size:12px;color:#6B7280;">Resolution: Flexible evidence request · Upload COA, provide product URL, provide COA URL, or both · Not sent yet</div>
             </div>
             <div style="border:1px solid #E5E7EB;border-radius:6px;padding:12px;">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
@@ -1659,7 +1659,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
                 <span style="font-size:11px;color:#854D0E;font-weight:600;">COA_EXPIRED</span>
               </div>
               <div style="font-size:13px;font-weight:500;color:#1a202e;">Tincture 1000mg / #VCO-847</div>
-              <div style="font-size:12px;color:#6B7280;">Resolution: Upload COA · Not sent yet</div>
+              <div style="font-size:12px;color:#6B7280;">Resolution: Replacement evidence request · Upload updated COA or provide live website evidence · Not sent yet</div>
             </div>
             <div style="border:1px solid #E5E7EB;border-radius:6px;padding:12px;">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
@@ -2068,7 +2068,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
         <span style="font-size:11px;font-weight:700;background:#16a34a;color:white;padding:2px 8px;border-radius:4px;">QP-3586</span>
         <span style="font-size:11px;font-weight:700;background:#7C3AED;color:white;padding:2px 8px;border-radius:4px;">QP-3593</span>
         <span style="font-size:13px;color:#166634;font-weight:500;">Merchant Response Flow — inline response form per item type</span>
-        <span style="font-size:12px;color:#6B7280;">File upload for COAs · URL input for website · Radio for dispute/extension · Resolution types configurable per item</span>
+        <span style="font-size:12px;color:#6B7280;">File upload, product URL, COA URL, or combined evidence paths · Resolution types configurable per item</span>
       </div>
       <a href="https://qredible.atlassian.net/browse/QP-3586" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;">View Jira ticket →</a>
     </div>
@@ -2120,14 +2120,46 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
         <div class="item-response-body">
           <div class="text-sm"><strong>Product:</strong> Gummy Bears 500mg (SKU: GB-500)</div>
           <div class="item-desc">
-            A Certificate of Analysis (COA) is required for this product to verify cannabinoid content and confirm product safety. The COA must be from an ISO-accredited laboratory and dated within the past 2 years.
+            A Certificate of Analysis (COA) is required for this product to verify cannabinoid content and confirm product safety. Depending on merchant type, FLEX may require a direct COA upload, the product page URL where the COA appears, the exact COA URL, or both website URLs for evidence.
           </div>
-          <div class="item-field-label">Resolution: Upload COA</div>
+          <div class="item-field-label">Required evidence type</div>
+          <div class="radio-group mt-8">
+            <label class="radio-item">
+              <input type="radio" name="item1-evidence" checked>
+              Upload COA file
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="item1-evidence">
+              Provide product page URL where COA is shown
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="item1-evidence">
+              Provide direct COA URL
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="item1-evidence">
+              Provide both product page URL and direct COA URL
+            </label>
+          </div>
+
+          <div class="info-bar mt-12" style="background:#FFFBEB;border-color:#FDE68A;color:#92400E;">
+            <strong>Why this is flexible:</strong> card-present / retail merchants may only upload a COA file, while online merchants and lenders may be required to prove the COA is actually present on the website.
+          </div>
+
+          <div class="item-field-label mt-12">Upload COA file (if required)</div>
           <div class="upload-zone">
             <div class="upload-zone-icon">📄</div>
             Drop COA PDF here or click to browse · Max 25MB · PDF only
           </div>
-          <textarea class="form-textarea" placeholder="Describe what you're uploading (lab name, test date, etc.)..."></textarea>
+
+          <div class="item-field-label mt-12">Product Page URL (if required)</div>
+          <input class="drawer-input" placeholder="https://merchant.com/products/gummy-bears-500mg">
+
+          <div class="item-field-label mt-12">Direct COA URL (if required)</div>
+          <input class="drawer-input" placeholder="https://merchant.com/products/gummy-bears-500mg/coa.pdf">
+
+          <div class="item-field-label mt-12">Notes</div>
+          <textarea class="form-textarea" placeholder="Explain what you're providing, where the COA appears, or any special handling needed..."></textarea>
           <button class="btn-primary btn-disabled mt-12" style="width:100%;cursor:not-allowed;">Submit Response — Item 1</button>
         </div>
       </div>
@@ -2145,13 +2177,15 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
           <div class="text-sm"><strong>Product:</strong> Tincture 1000mg (SKU: TIN-1000)</div>
           <div class="text-sm mt-8"><strong>COA on file:</strong> #VCO-847 · CannTest Labs · <span style="color:#DC2626;font-weight:500;">Expired January 15, 2026</span></div>
           <div class="item-desc">
-            The COA currently on file for this product expired on January 15, 2026. Please upload a replacement COA dated after January 15, 2024.
+            The COA currently on file for this product expired on January 15, 2026. Please provide updated evidence. For online merchants, FLEX may require the live website location in addition to the replacement COA.
           </div>
           <div class="item-field-label">Upload Replacement COA</div>
           <div class="upload-zone">
             <div class="upload-zone-icon">📄</div>
             Drop replacement COA PDF here or click to browse · Max 25MB · PDF only
           </div>
+          <div class="item-field-label mt-12">Live Product Page URL (optional / if requested)</div>
+          <input class="drawer-input" placeholder="https://merchant.com/products/tincture-1000mg">
           <textarea class="form-textarea" placeholder="Describe what you're uploading (lab name, test date, etc.)..."></textarea>
           <button class="btn-primary btn-disabled mt-12" style="width:100%;cursor:not-allowed;">Submit Response — Item 2</button>
         </div>
@@ -2210,8 +2244,8 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
             </tr>
           </thead>
           <tbody>
-            <tr><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>PRODUCT_MISSING_COA</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>UPLOAD_FILE</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;">File upload zone + notes</td></tr>
-            <tr style="background:#F5F3FF;"><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>COA_EXPIRED</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>UPLOAD_FILE</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;">File upload zone + notes</td></tr>
+            <tr><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>PRODUCT_MISSING_COA</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>UPLOAD_FILE, PROVIDE_PRODUCT_URL, PROVIDE_COA_URL, PROVIDE_BOTH_URLS</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;">Flexible evidence request — upload, URL, or combined website evidence</td></tr>
+            <tr style="background:#F5F3FF;"><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>COA_EXPIRED</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>UPLOAD_FILE, PROVIDE_PRODUCT_URL, PROVIDE_BOTH_URLS</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;">Replacement COA upload with optional / required website proof</td></tr>
             <tr><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>COA_VIOLATIVE</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>UPLOAD_FILE, DISPUTE</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;">File upload + dispute option</td></tr>
             <tr style="background:#F5F3FF;"><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>COMPLIANCE_FINDING</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>PROVIDE_URL, REQUEST_EXTENSION, DISPUTE</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;">URL input + extension request + dispute</td></tr>
             <tr><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>LICENSE_ISSUE</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;"><code>UPLOAD_FILE, REQUEST_EXTENSION, DISPUTE</code></td><td style="padding:5px 10px;border:1px solid #DDD6FE;">File upload + extension + dispute</td></tr>
@@ -2221,6 +2255,9 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
         </table>
         <div style="margin-top:10px;"><strong>⚠ Open Questions — Product decision required before dev:</strong></div>
         <ul style="margin-top:6px;padding-left:18px;line-height:1.8;">
+          <li><strong>Flexible missing-COA resolution:</strong> Can a processor require upload only, URL only, or both depending on merchant type (retail/card-present vs online)?</li>
+          <li><strong>Product URL vs COA URL:</strong> If both are provided, should the system validate that the COA URL is actually reachable from the product page?</li>
+          <li><strong>Gallery / image evidence:</strong> Do we need a fifth resolution type for merchants whose COA appears only as an image in a product gallery?</li>
           <li><strong>Config scope:</strong> Per-item override at case creation only, or processor-level account defaults?</li>
           <li><strong>Dispute as merchant right:</strong> Should <code>DISPUTE</code> always be available regardless of processor settings?</li>
           <li><strong>Post-send restriction:</strong> Can a processor remove an allowed resolution type after a case has been sent?</li>
