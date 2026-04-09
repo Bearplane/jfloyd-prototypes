@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MyCOA Shared Workflow — Current State, Options, Recommendation</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --panel:#ffffff;
+    --panel-soft:#f8fafc;
+    --text:#0f172a;
+    --muted:#64748b;
+    --line:#dbe3ee;
+    --navy:#173252;
+    --blue:#2563eb;
+    --blue-soft:#eff6ff;
+    --green:#15803d;
+    --green-soft:#f0fdf4;
+    --amber:#b45309;
+    --amber-soft:#fff7ed;
+    --red:#b91c1c;
+    --red-soft:#fef2f2;
+    --violet:#7c3aed;
+    --violet-soft:#f5f3ff;
+    --shadow:0 20px 60px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(180deg,#f8fbff 0%,#f5f7fb 50%,#eef3fa 100%);color:var(--text)}
+  .nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;padding:12px 22px;border-bottom:1px solid rgba(219,227,238,.8);backdrop-filter:blur(10px);background:rgba(255,255,255,.86)}
+  .nav a{color:var(--blue);text-decoration:none;font-size:13px}
+  .nav span{font-size:13px;color:#94a3b8}
+  .page{max-width:1400px;margin:0 auto;padding:28px 24px 80px}
+  .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;margin-bottom:24px}
+  .hero-card,.side-card,.section,.option-card,.mini-card,.decision-card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+  .hero-card{padding:28px 30px;position:relative;overflow:hidden}
+  .hero-card:before{content:"";position:absolute;inset:auto -80px -80px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at center, rgba(37,99,235,.16), rgba(37,99,235,0));}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:var(--blue-soft);color:#1d4ed8;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  h1{margin:16px 0 10px;font-size:34px;line-height:1.05;letter-spacing:-.03em;max-width:820px}
+  .lead{max-width:820px;font-size:15px;line-height:1.75;color:#475569}
+  .hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+  .stat{padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--panel-soft)}
+  .stat-label{font-size:11px;font-weight:800;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .stat-value{font-size:14px;font-weight:700;color:#0f172a;line-height:1.45}
+  .side-stack{display:flex;flex-direction:column;gap:16px}
+  .side-card{padding:20px}
+  .side-card h3{margin:0 0 10px;font-size:15px}
+  .bullets{display:flex;flex-direction:column;gap:10px}
+  .bullet{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.55;color:#334155}
+  .dot{width:10px;height:10px;border-radius:999px;flex:0 0 auto;margin-top:5px}
+  .dot.blue{background:#3b82f6}.dot.red{background:#ef4444}.dot.amber{background:#f59e0b}.dot.green{background:#22c55e}.dot.violet{background:#8b5cf6}
+  .section{padding:22px 22px 24px;margin-top:22px}
+  .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .section-title h2{margin:0;font-size:21px;letter-spacing:-.02em}
+  .section-title p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .badge.blue{background:var(--blue-soft);color:#1d4ed8}
+  .badge.green{background:var(--green-soft);color:var(--green)}
+  .badge.red{background:var(--red-soft);color:var(--red)}
+  .badge.amber{background:var(--amber-soft);color:var(--amber)}
+  .badge.violet{background:var(--violet-soft);color:var(--violet)}
+  .state-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .mini-card{padding:18px;border-radius:18px;background:linear-gradient(180deg,#fff,#fbfdff)}
+  .mini-card h3{margin:0 0 10px;font-size:16px}
+  .mini-card ul{margin:0;padding-left:18px;color:#334155;font-size:13px;line-height:1.7}
+  .flow-wrap{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:stretch;margin-top:16px}
+  .flow-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--panel-soft)}
+  .flow-card h4{margin:0 0 8px;font-size:14px}
+  .flow-card p{margin:0;font-size:13px;color:#475569;line-height:1.6}
+  .arrow{display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:22px;font-weight:700}
+  .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .problem{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}
+  .problem h4{margin:0 0 8px;font-size:15px}
+  .problem p{margin:0;font-size:13px;line-height:1.6;color:#475569}
+  .options{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .option-card{padding:20px;border-radius:22px;position:relative}
+  .option-card.recommended{border:2px solid #22c55e;background:linear-gradient(180deg,#ffffff 0%,#f6fff8 100%)}
+  .option-card h3{margin:12px 0 8px;font-size:19px}
+  .option-card .sub{font-size:13px;color:#475569;line-height:1.7;margin-bottom:14px}
+  .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .pill{padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700}
+  .pill.low{background:#eef2ff;color:#4338ca}
+  .pill.med{background:#fff7ed;color:#b45309}
+  .pill.high{background:#fef2f2;color:#b91c1c}
+  .option-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .option-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.55;color:#334155}
+  .option-item .mark{font-weight:900}
+  .mark.good{color:#16a34a}.mark.bad{color:#dc2626}.mark.warn{color:#d97706}
+  .decision-card{padding:22px;background:linear-gradient(135deg,#173252 0%,#1e3a5f 100%);color:white;border:none}
+  .decision-card h2{margin:0 0 12px;font-size:24px}
+  .decision-card p{margin:0 0 14px;font-size:14px;line-height:1.75;color:#d7e6ff}
+  .decision-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start}
+  .decision-box{padding:16px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(255,255,255,.06)}
+  .decision-box h4{margin:0 0 10px;font-size:14px;color:#fff}
+  .decision-box ul{margin:0;padding-left:18px;color:#d7e6ff;font-size:13px;line-height:1.7}
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .step{padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--panel-soft)}
+  .step-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;background:#173252;color:#fff;font-size:13px;font-weight:800;margin-bottom:10px}
+  .step h4{margin:0 0 6px;font-size:14px}
+  .step p{margin:0;font-size:12px;color:#475569;line-height:1.6}
+  .talking-points{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .quote{padding:18px;border-left:4px solid #3b82f6;background:#f8fbff;border-radius:0 18px 18px 0;font-size:14px;line-height:1.8;color:#334155}
+  .footer-note{margin-top:18px;font-size:12px;color:#64748b;text-align:center}
+  @media (max-width: 1100px){
+    .hero,.state-grid,.problem-grid,.options,.decision-grid,.talking-points,.steps{grid-template-columns:1fr}
+    .flow-wrap{grid-template-columns:1fr;}
+    .arrow{transform:rotate(90deg)}
+  }
+</style>
+</head>
+<body>
+  <div class="nav">
+    <a href="../index.html">Qredible Prototypes</a>
+    <span>›</span>
+    <span class="nav-title">MyCOA Shared Workflow Decision Board</span>
+  </div>
+
+  <div class="page">
+    <div class="hero">
+      <div class="hero-card">
+        <span class="eyebrow">Decision artifact · team review</span>
+        <h1>MyCOA Shared Workflow — where we stand today, what’s being asked, and the best path forward</h1>
+        <p class="lead">
+          This board is meant to help the full team make a logical decision. It separates the <strong>current platform reality</strong> from the <strong>requested future-state</strong>, shows the real blockers, compares the available options, and recommends the path that balances speed, honesty, and architecture risk.
+        </p>
+
+        <div class="hero-grid">
+          <div class="stat">
+            <div class="stat-label">Current truth</div>
+            <div class="stat-value">MyCOA is still effectively <strong>single-company scoped</strong></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Requested future state</div>
+            <div class="stat-value">Wizard-first onboarding plus a <strong>shared merchant / processor workflow</strong></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Real blocker</div>
+            <div class="stat-value">Data ownership, permissions, and entitlement enforcement — <strong>not just wizard UI</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <div class="side-card">
+          <h3>What leadership should know</h3>
+          <div class="bullets">
+            <div class="bullet"><span class="dot blue"></span><span>We can ship a meaningful wizard faster than we can safely redesign shared data ownership.</span></div>
+            <div class="bullet"><span class="dot amber"></span><span>The requested collaboration model assumes capabilities the platform does not cleanly have today.</span></div>
+            <div class="bullet"><span class="dot red"></span><span>Paywall / plan limits are not robustly enforced enough yet to treat them as solved.</span></div>
+          </div>
+        </div>
+        <div class="side-card">
+          <h3>Decision the team actually needs to make</h3>
+          <div class="bullets">
+            <div class="bullet"><span class="dot green"></span><span>Are we building a <strong>wizard for merchant-owned MyCOA setup</strong>?</span></div>
+            <div class="bullet"><span class="dot violet"></span><span>Or are we building a <strong>true merchant / processor shared workspace</strong>?</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>1. Where the platform stands today</h2>
+          <p>The current system already supports pieces of the vision, but not the full collaborative behavior being requested.</p>
+        </div>
+        <span class="badge red">Current-state architecture</span>
+      </div>
+
+      <div class="state-grid">
+        <div class="mini-card">
+          <h3>What exists today</h3>
+          <ul>
+            <li>Products and COAs are owned by one company via <code>pl_company_id</code>.</li>
+            <li>Merchant Processors can monitor and annotate client-owned data in parts of Q-Monitor.</li>
+            <li>MyCOA has publishing / display behavior and viewer configuration.</li>
+            <li>Plan catalog, paywall flags, pricing, and some gating behavior already exist.</li>
+            <li>Invite, subscription, company relationship, and scanner systems all exist — but as separate flows.</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h3>What does not exist cleanly today</h3>
+          <ul>
+            <li>No true shared merchant / processor workspace around MyCOA.</li>
+            <li>No fine-grained permission model like “can edit but not delete” or “can publish but not archive.”</li>
+            <li>No robust server-side enforcement for product / COA limits in line with plan pricing.</li>
+            <li>No clean invite → wizard → tailored paywall → collaborative workflow pipeline.</li>
+            <li>No MP-aware MyCOA operating model.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-wrap">
+        <div class="flow-card">
+          <h4>Today’s ownership model</h4>
+          <p>Merchant-owned products and COAs. Processor visibility comes through monitoring / overlay behavior, not co-ownership.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="flow-card">
+          <h4>Requested experience</h4>
+          <p>Invite the merchant, run a setup wizard first, then show a tailored paywall, then let both sides operate in a coherent workflow.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="flow-card">
+          <h4>Why that breaks</h4>
+          <p>The requested flow assumes shared permissions, shared operating context, and plan-limit enforcement the platform does not cleanly provide today.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>2. The core blocker</h2>
+          <p>These are the four architecture questions hiding under the wizard discussion.</p>
+        </div>
+        <span class="badge amber">Blocker map</span>
+      </div>
+
+      <div class="problem-grid">
+        <div class="problem">
+          <h4>Data ownership</h4>
+          <p>Does the merchant remain the canonical owner of products and COAs, or do we introduce a new shared workflow layer?</p>
+        </div>
+        <div class="problem">
+          <h4>Permissions</h4>
+          <p>The current role model is too coarse for the requested future-state. We do not yet have relationship-aware action permissions.</p>
+        </div>
+        <div class="problem">
+          <h4>Invite / onboarding</h4>
+          <p>The current invite flow does not naturally become a wizard-first, plan-aware, processor-contextual onboarding experience.</p>
+        </div>
+        <div class="problem">
+          <h4>Entitlement enforcement</h4>
+          <p>Product and COA limits are not robustly server-side enforced today, so tailored plan selection has loophole risk.</p>
+        </div>
+        <div class="problem">
+          <h4>MyCOA scope</h4>
+          <p>MyCOA is still company-scoped, not processor-aware. That matters if the requested future-state assumes collaboration in one shared place.</p>
+        </div>
+        <div class="problem">
+          <h4>QP-3226 collision risk</h4>
+          <p>If we harden the wrong isolation model too early, we may make the requested future-state much harder to build cleanly later.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>3. Options moving forward</h2>
+          <p>These are the three viable paths based on the architecture we actually have today.</p>
+        </div>
+        <span class="badge blue">Option comparison</span>
+      </div>
+
+      <div class="options">
+        <div class="option-card">
+          <span class="badge blue">Option A</span>
+          <h3>Wizard-first onboarding only</h3>
+          <div class="sub">Build the quick-start wizard and tailored paywall inside the current ownership model. Merchant remains owner. Processor visibility stays in existing monitoring patterns.</div>
+          <div class="pill-row">
+            <span class="pill low">Fastest</span>
+            <span class="pill low">Lowest risk</span>
+          </div>
+          <div class="option-list">
+            <div class="option-item"><span class="mark good">+</span><span>Most honest to the current platform</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Gets a real deliverable in front of merchants faster</span></div>
+            <div class="option-item"><span class="mark warn">~</span><span>Does not solve true processor / merchant co-working</span></div>
+          </div>
+        </div>
+
+        <div class="option-card">
+          <span class="badge red">Option B</span>
+          <h3>Build the full shared workflow now</h3>
+          <div class="sub">Redesign the platform to support a true merchant / processor shared workflow now, including permissions, onboarding, and entitlement logic.</div>
+          <div class="pill-row">
+            <span class="pill high">Highest risk</span>
+            <span class="pill high">Largest scope</span>
+          </div>
+          <div class="option-list">
+            <div class="option-item"><span class="mark good">+</span><span>Closest to the fully requested future-state</span></div>
+            <div class="option-item"><span class="mark bad">−</span><span>Touches ownership, permissions, invites, and plan enforcement all at once</span></div>
+            <div class="option-item"><span class="mark bad">−</span><span>Easiest path to accidental architecture debt if rushed</span></div>
+          </div>
+        </div>
+
+        <div class="option-card recommended">
+          <span class="badge green">Option C · Recommended</span>
+          <h3>Phase it: wizard now, shared model after alignment</h3>
+          <div class="sub">Ship a meaningful wizard-first onboarding flow in the current model, then deliberately decide and design the shared merchant / processor workflow as a second architectural track.</div>
+          <div class="pill-row">
+            <span class="pill med">Balanced speed</span>
+            <span class="pill low">Lower architecture risk</span>
+          </div>
+          <div class="option-list">
+            <div class="option-item"><span class="mark good">+</span><span>Delivers progress now without pretending the platform already supports the full vision</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Creates a clean decision boundary for QP-3226 and permissions work</span></div>
+            <div class="option-item"><span class="mark warn">~</span><span>Requires discipline to keep Phase 1 honest and not sneak in half-shared behavior</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-grid">
+        <div>
+          <h2>Recommendation</h2>
+          <p>
+            <strong>Option C is the best path.</strong> Ship the MyCOA setup wizard as a wizard-first onboarding flow inside the current ownership model, and treat the full shared merchant / processor workflow as a separate architecture decision that must be resolved before it is promised as part of the same deliverable.
+          </p>
+          <p>
+            This gives the team something real to build now while staying honest about the fact that data ownership, permissions, and entitlement enforcement are not settled enough yet for the full requested future-state.
+          </p>
+        </div>
+        <div class="decision-box">
+          <h4>What to say in the meeting</h4>
+          <ul>
+            <li>We can move fast on the wizard itself.</li>
+            <li>The shared workflow is the part that needs architecture alignment.</li>
+            <li>The current system supports monitoring overlays, not true shared co-ownership.</li>
+            <li>Plan / paywall logic is not strong enough yet to treat limits as solved.</li>
+            <li>So the honest move is to split delivery from architecture decision-making.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>4. What would need to be resolved before the full requested option is safe</h2>
+          <p>If the team wants the full shared workflow later, these are the prerequisites.</p>
+        </div>
+        <span class="badge violet">Pre-work required</span>
+      </div>
+
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><h4>Ownership model</h4><p>Decide whether merchant remains canonical owner or whether a true shared workspace model is required.</p></div>
+        <div class="step"><div class="step-num">2</div><h4>Permission model</h4><p>Define relationship-aware actions like edit, delete, publish, review, and approve.</p></div>
+        <div class="step"><div class="step-num">3</div><h4>Invite flow</h4><p>Define what the invite creates, when wizard happens, when paywall happens, and where users land afterward.</p></div>
+        <div class="step"><div class="step-num">4</div><h4>Limit enforcement</h4><p>Decide what count matters, when it is checked, and how product/COA loopholes are prevented.</p></div>
+        <div class="step"><div class="step-num">5</div><h4>QP-3226 reframing</h4><p>Make sure data-isolation work does not accidentally harden a model that blocks the desired future-state.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>5. Friendly talking points for the team</h2>
+          <p>Use these to frame the discussion without forcing a premature technical decision.</p>
+        </div>
+        <span class="badge green">Meeting-ready language</span>
+      </div>
+
+      <div class="talking-points">
+        <div class="quote">
+          <strong>Today’s platform reality:</strong><br>
+          MyCOA is still fundamentally company-scoped. Merchant Processors can monitor and annotate some client-owned data, but we do not yet have a true shared merchant / processor workspace with granular permissions.
+        </div>
+        <div class="quote">
+          <strong>Requested future-state:</strong><br>
+          The desired wizard assumes a more collaborative workflow than the current architecture cleanly supports. That means the wizard conversation is really tied to a bigger ownership + permissions + entitlement decision.
+        </div>
+        <div class="quote">
+          <strong>Safe next move:</strong><br>
+          We can still ship a very strong wizard-first onboarding flow in the current model without pretending the deeper shared workflow problem is already solved.
+        </div>
+        <div class="quote">
+          <strong>Decision to make:</strong><br>
+          Are we building a better MyCOA onboarding experience now, or are we also trying to solve a new shared merchant / processor operating model at the same time?
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Source inputs for this board came from repo implementation analysis, today’s Fathom meeting reviews, and the MyCOA wizard architecture memo prepared on Apr 9, 2026.
+    </div>
+  </div>
+</body>
+</html>
