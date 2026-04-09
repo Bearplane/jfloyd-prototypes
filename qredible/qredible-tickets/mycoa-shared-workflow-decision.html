@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MyCOA Shared Workflow — Current State, Options, Recommendation</title>
+<title>MyCOA Shared Workflow — Decision Board</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -28,21 +28,26 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(180deg,#f8fbff 0%,#f5f7fb 50%,#eef3fa 100%);color:var(--text)}
+
   .nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;padding:12px 22px;border-bottom:1px solid rgba(219,227,238,.8);backdrop-filter:blur(10px);background:rgba(255,255,255,.86)}
   .nav a{color:var(--blue);text-decoration:none;font-size:13px}
   .nav span{font-size:13px;color:#94a3b8}
+
   .page{max-width:1400px;margin:0 auto;padding:28px 24px 80px}
+
   .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;margin-bottom:24px}
   .hero-card,.side-card,.section,.option-card,.mini-card,.decision-card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
   .hero-card{padding:28px 30px;position:relative;overflow:hidden}
-  .hero-card:before{content:"";position:absolute;inset:auto -80px -80px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at center, rgba(37,99,235,.16), rgba(37,99,235,0));}
+  .hero-card:before{content:"";position:absolute;inset:auto -80px -80px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at center, rgba(37,99,235,.16), rgba(37,99,235,0))}
   .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:var(--blue-soft);color:#1d4ed8;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-  h1{margin:16px 0 10px;font-size:34px;line-height:1.05;letter-spacing:-.03em;max-width:820px}
+  h1{margin:16px 0 10px;font-size:32px;line-height:1.1;letter-spacing:-.03em;max-width:820px}
   .lead{max-width:820px;font-size:15px;line-height:1.75;color:#475569}
+
   .hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
   .stat{padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--panel-soft)}
   .stat-label{font-size:11px;font-weight:800;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
   .stat-value{font-size:14px;font-weight:700;color:#0f172a;line-height:1.45}
+
   .side-stack{display:flex;flex-direction:column;gap:16px}
   .side-card{padding:20px}
   .side-card h3{margin:0 0 10px;font-size:15px}
@@ -50,29 +55,57 @@
   .bullet{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.55;color:#334155}
   .dot{width:10px;height:10px;border-radius:999px;flex:0 0 auto;margin-top:5px}
   .dot.blue{background:#3b82f6}.dot.red{background:#ef4444}.dot.amber{background:#f59e0b}.dot.green{background:#22c55e}.dot.violet{background:#8b5cf6}
+
   .section{padding:22px 22px 24px;margin-top:22px}
-  .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
   .section-title h2{margin:0;font-size:21px;letter-spacing:-.02em}
   .section-title p{margin:4px 0 0;font-size:13px;color:var(--muted)}
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
   .badge.blue{background:var(--blue-soft);color:#1d4ed8}
   .badge.green{background:var(--green-soft);color:var(--green)}
   .badge.red{background:var(--red-soft);color:var(--red)}
   .badge.amber{background:var(--amber-soft);color:var(--amber)}
   .badge.violet{background:var(--violet-soft);color:var(--violet)}
+
   .state-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .mini-card{padding:18px;border-radius:18px;background:linear-gradient(180deg,#fff,#fbfdff)}
   .mini-card h3{margin:0 0 10px;font-size:16px}
   .mini-card ul{margin:0;padding-left:18px;color:#334155;font-size:13px;line-height:1.7}
-  .flow-wrap{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:stretch;margin-top:16px}
-  .flow-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--panel-soft)}
-  .flow-card h4{margin:0 0 8px;font-size:14px}
-  .flow-card p{margin:0;font-size:13px;color:#475569;line-height:1.6}
-  .arrow{display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:22px;font-weight:700}
-  .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+  .flow-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px}
+  .flow-step{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--panel-soft);position:relative}
+  .flow-step.broken{border-color:#fca5a5;background:#fff5f5}
+  .flow-step-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;background:#173252;color:#fff;font-size:12px;font-weight:800;margin-bottom:10px}
+  .flow-step.broken .flow-step-num{background:#dc2626}
+  .flow-step h4{margin:0 0 6px;font-size:13px;font-weight:700}
+  .flow-step p{margin:0;font-size:12px;color:#475569;line-height:1.55}
+  .flow-step .status-tag{display:inline-block;margin-top:8px;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .status-tag.ready{background:#dcfce7;color:#166534}
+  .status-tag.partial{background:#fef3c7;color:#92400e}
+  .status-tag.missing{background:#fee2e2;color:#991b1b}
+
+  .problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
   .problem{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}
   .problem h4{margin:0 0 8px;font-size:15px}
   .problem p{margin:0;font-size:13px;line-height:1.6;color:#475569}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:16px;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .vs-col{padding:18px}
+  .vs-col.want{background:#f0fdf4;border-right:2px solid var(--line)}
+  .vs-col.actual{background:#fef2f2}
+  .vs-col h4{margin:0 0 10px;font-size:14px;font-weight:700}
+  .vs-col p{margin:0 0 8px;font-size:13px;line-height:1.6;color:#334155}
+  .vs-col p:last-child{margin-bottom:0}
+
+  .question-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .question-card{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}
+  .question-card h4{margin:0 0 8px;font-size:15px;color:var(--navy)}
+  .question-card p{margin:0 0 8px;font-size:13px;line-height:1.6;color:#475569}
+  .consequence{padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.6;color:#334155;margin-top:8px}
+  .consequence.yes{background:#f0fdf4;border-left:3px solid #22c55e}
+  .consequence.no{background:#fef2f2;border-left:3px solid #ef4444}
+  .consequence strong{display:block;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+
   .options{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .option-card{padding:20px;border-radius:22px;position:relative}
   .option-card.recommended{border:2px solid #22c55e;background:linear-gradient(180deg,#ffffff 0%,#f6fff8 100%)}
@@ -87,296 +120,562 @@
   .option-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.55;color:#334155}
   .option-item .mark{font-weight:900}
   .mark.good{color:#16a34a}.mark.bad{color:#dc2626}.mark.warn{color:#d97706}
-  .decision-card{padding:22px;background:linear-gradient(135deg,#173252 0%,#1e3a5f 100%);color:white;border:none}
+
+  .delivers-list{margin:10px 0 0;padding-left:18px;font-size:12px;line-height:1.65;color:#334155}
+  .delivers-list li{margin-bottom:4px}
+
+  .decision-card{padding:22px;background:linear-gradient(135deg,#173252 0%,#1e3a5f 100%);color:white;border:none;margin-top:22px}
   .decision-card h2{margin:0 0 12px;font-size:24px}
   .decision-card p{margin:0 0 14px;font-size:14px;line-height:1.75;color:#d7e6ff}
   .decision-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start}
   .decision-box{padding:16px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(255,255,255,.06)}
   .decision-box h4{margin:0 0 10px;font-size:14px;color:#fff}
   .decision-box ul{margin:0;padding-left:18px;color:#d7e6ff;font-size:13px;line-height:1.7}
-  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-  .step{padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--panel-soft)}
-  .step-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;background:#173252;color:#fff;font-size:13px;font-weight:800;margin-bottom:10px}
-  .step h4{margin:0 0 6px;font-size:14px}
-  .step p{margin:0;font-size:12px;color:#475569;line-height:1.6}
-  .talking-points{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .quote{padding:18px;border-left:4px solid #3b82f6;background:#f8fbff;border-radius:0 18px 18px 0;font-size:14px;line-height:1.8;color:#334155}
-  .footer-note{margin-top:18px;font-size:12px;color:#64748b;text-align:center}
+
+  .phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
+  .phase-card{padding:18px;border-radius:18px}
+  .phase-card.p1{background:#f0fdf4;border:1px solid #bbf7d0}
+  .phase-card.p2{background:#f5f3ff;border:1px solid #ddd6fe}
+  .phase-card h3{margin:0 0 6px;font-size:16px}
+  .phase-card .phase-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .phase-card.p1 .phase-label{color:#166534}
+  .phase-card.p2 .phase-label{color:#6d28d9}
+  .phase-card ul{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:#334155}
+  .phase-card .not-included{margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(0,0,0,.04);font-size:12px;line-height:1.6;color:#64748b}
+  .phase-card .not-included strong{color:#334155;display:block;margin-bottom:2px}
+
+  .callout{padding:16px 18px;border-radius:16px;margin-top:14px;font-size:13px;line-height:1.65;color:#334155}
+  .callout.blue{background:var(--blue-soft);border-left:4px solid #3b82f6}
+  .callout.amber{background:var(--amber-soft);border-left:4px solid #f59e0b}
+  .callout.red{background:var(--red-soft);border-left:4px solid #ef4444}
+  .callout.green{background:var(--green-soft);border-left:4px solid #22c55e}
+  .callout strong{font-weight:700}
+  .callout .tech-note{margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.06);font-size:11px;color:#64748b;font-family:'IBM Plex Mono',monospace}
+
+  .scenario{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff;margin-top:14px}
+  .scenario h4{margin:0 0 10px;font-size:15px}
+  .scenario p{margin:0 0 8px;font-size:13px;line-height:1.65;color:#475569}
+  .scenario p:last-child{margin-bottom:0}
+
+  .footer-note{margin-top:24px;font-size:12px;color:#64748b;text-align:center}
+
   @media (max-width: 1100px){
-    .hero,.state-grid,.problem-grid,.options,.decision-grid,.talking-points,.steps{grid-template-columns:1fr}
-    .flow-wrap{grid-template-columns:1fr;}
-    .arrow{transform:rotate(90deg)}
+    .hero,.state-grid,.problem-grid,.options,.decision-grid,.question-grid,.vs-grid,.phase-grid{grid-template-columns:1fr}
+    .flow-steps{grid-template-columns:1fr 1fr}
+    .vs-col.want{border-right:none;border-bottom:2px solid var(--line)}
+  }
+  @media (max-width: 640px){
+    .flow-steps{grid-template-columns:1fr}
+    h1{font-size:24px}
   }
 </style>
 </head>
 <body>
   <div class="nav">
     <a href="../index.html">Qredible Prototypes</a>
-    <span>›</span>
-    <span class="nav-title">MyCOA Shared Workflow Decision Board</span>
+    <span>&rsaquo;</span>
+    <span>MyCOA Shared Workflow &mdash; Decision Board</span>
   </div>
 
   <div class="page">
+
+    <!-- ============================================================ -->
+    <!-- HERO: CONTEXT + WHY YOU'RE READING THIS                      -->
+    <!-- ============================================================ -->
     <div class="hero">
       <div class="hero-card">
-        <span class="eyebrow">Decision artifact · team review</span>
-        <h1>MyCOA Shared Workflow — where we stand today, what’s being asked, and the best path forward</h1>
+        <span class="eyebrow">Decision required &middot; please review before our next sync</span>
+        <h1>MyCOA Setup Wizard &amp; Shared Workflow &mdash; what we can ship now vs. what needs more planning</h1>
         <p class="lead">
-          This board is meant to help the full team make a logical decision. It separates the <strong>current platform reality</strong> from the <strong>requested future-state</strong>, shows the real blockers, compares the available options, and recommends the path that balances speed, honesty, and architecture risk.
+          <strong>Why you&rsquo;re reading this:</strong> During the April 9 meetings, the team discussed launching MyCOA as a self-service product for merchants &mdash; starting with Westtown&rsquo;s 545 merchants. The conversation revealed that what sounds like &ldquo;build a setup wizard&rdquo; actually touches much deeper questions about how merchants and processors share data on the platform. This document lays out the situation clearly so we can <strong>make a decision together</strong> on how to move forward.
         </p>
 
         <div class="hero-grid">
           <div class="stat">
-            <div class="stat-label">Current truth</div>
-            <div class="stat-value">MyCOA is still effectively <strong>single-company scoped</strong></div>
+            <div class="stat-label">Revenue opportunity</div>
+            <div class="stat-value">Westtown: 545 merchants, mandatory MyCOA &mdash; <strong>~$32K/month</strong> potential</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Requested future state</div>
-            <div class="stat-value">Wizard-first onboarding plus a <strong>shared merchant / processor workflow</strong></div>
+            <div class="stat-label">What we can ship fast</div>
+            <div class="stat-value">Setup wizard, branded template, paywall &mdash; <strong>merchant manages their own COAs</strong></div>
           </div>
           <div class="stat">
-            <div class="stat-label">Real blocker</div>
-            <div class="stat-value">Data ownership, permissions, and entitlement enforcement — <strong>not just wizard UI</strong></div>
+            <div class="stat-label">What needs more work</div>
+            <div class="stat-value">Real-time collaboration between merchant and processor &mdash; <strong>shared data, shared controls</strong></div>
           </div>
         </div>
       </div>
 
       <div class="side-stack">
         <div class="side-card">
-          <h3>What leadership should know</h3>
+          <h3>The key question for the team</h3>
           <div class="bullets">
-            <div class="bullet"><span class="dot blue"></span><span>We can ship a meaningful wizard faster than we can safely redesign shared data ownership.</span></div>
-            <div class="bullet"><span class="dot amber"></span><span>The requested collaboration model assumes capabilities the platform does not cleanly have today.</span></div>
-            <div class="bullet"><span class="dot red"></span><span>Paywall / plan limits are not robustly enforced enough yet to treat them as solved.</span></div>
+            <div class="bullet"><span class="dot green"></span><span>Are we building a <strong>setup wizard so merchants can manage their own MyCOA</strong>? (Simpler, faster to ship)</span></div>
+            <div class="bullet"><span class="dot violet"></span><span>Or are we also building a <strong>shared workspace where merchants and processors collaborate on the same COAs in real time</strong>? (Much larger effort)</span></div>
           </div>
         </div>
         <div class="side-card">
-          <h3>Decision the team actually needs to make</h3>
+          <h3>Already in progress (separate from this decision)</h3>
           <div class="bullets">
-            <div class="bullet"><span class="dot green"></span><span>Are we building a <strong>wizard for merchant-owned MyCOA setup</strong>?</span></div>
-            <div class="bullet"><span class="dot violet"></span><span>Or are we building a <strong>true merchant / processor shared workspace</strong>?</span></div>
+            <div class="bullet"><span class="dot blue"></span><span><strong>Black Bear branded template</strong> &mdash; hardcoded template for coa.blackbeardispensary.com. On track for delivery this week. Does not depend on the wizard or shared workflow.</span></div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- SECTION 1: WHAT WAS REQUESTED                                -->
+    <!-- ============================================================ -->
     <div class="section">
       <div class="section-title">
         <div>
-          <h2>1. Where the platform stands today</h2>
-          <p>The current system already supports pieces of the vision, but not the full collaborative behavior being requested.</p>
+          <h2>1. What was requested in the April 9 meetings</h2>
+          <p>This is the end-to-end experience that was described. Each step is labeled with whether we can do it today.</p>
         </div>
-        <span class="badge red">Current-state architecture</span>
+        <span class="badge blue">Requested workflow</span>
+      </div>
+
+      <p style="font-size:14px;line-height:1.7;color:#475569;margin:0 0 16px">
+        Westtown wants to <strong>require all of their merchants</strong> to use MyCOA. The idea: Westtown sends an invite link to a merchant. The merchant sets up their branded COA page through a wizard, picks a subscription plan, and starts managing their own COAs. When they publish a COA, the processor (Westtown) is automatically notified &mdash; and the processor no longer needs to scan for COAs on that merchant&rsquo;s website.
+      </p>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-step-num">1</div>
+          <h4>Processor sends invite</h4>
+          <p>Westtown generates a co-branded invite link and sends it to a merchant (e.g., a CBD shop in Meadville, PA).</p>
+          <span class="status-tag missing">Not built yet</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">2</div>
+          <h4>Merchant clicks link &rarr; Setup Wizard</h4>
+          <p>The merchant enters their company name, uploads a logo, picks brand colors, and enters their shopping URL.</p>
+          <span class="status-tag partial">Wizard designed, not built</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">3</div>
+          <h4>Paywall appears</h4>
+          <p>After the wizard, the merchant sees subscription tiers (e.g., 25 products = $X/mo, 100 products = $Y/mo, unlimited). They pick a plan and pay.</p>
+          <span class="status-tag partial">Paywall exists but not tailored</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">4</div>
+          <h4>Merchant lands in MyCOA</h4>
+          <p>After paying, the merchant is taken to the MyCOA tab in the platform. They can see products and COAs and start managing them.</p>
+          <span class="status-tag ready">MyCOA tab exists</span>
+        </div>
+        <div class="flow-step broken">
+          <div class="flow-step-num">5</div>
+          <h4>Merchant sees existing data</h4>
+          <p>The merchant would see products/COAs that the processor already collected via scanning. This is the part that requires shared data.</p>
+          <span class="status-tag missing">Shared data not supported</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">6</div>
+          <h4>Merchant uploads &amp; publishes COAs</h4>
+          <p>The merchant uploads new COAs and hits &ldquo;Publish.&rdquo; The COA becomes visible on their branded MyCOA page.</p>
+          <span class="status-tag ready">Upload &amp; publish work today</span>
+        </div>
+        <div class="flow-step broken">
+          <div class="flow-step-num">7</div>
+          <h4>Processor is auto-notified</h4>
+          <p>When a merchant publishes a COA, the processor (Westtown) is automatically notified, and their product compliance view updates.</p>
+          <span class="status-tag missing">No cross-company notification</span>
+        </div>
+        <div class="flow-step broken">
+          <div class="flow-step-num">8</div>
+          <h4>Product scan replaced</h4>
+          <p>For MyCOA-enabled merchants, the processor no longer needs to scan for COAs. The &ldquo;Scan for COAs&rdquo; button is replaced with a &ldquo;MyCOA Enabled&rdquo; badge.</p>
+          <span class="status-tag missing">Not built yet</span>
+        </div>
+      </div>
+
+      <div class="callout amber" style="margin-top:18px">
+        <strong>Key takeaway:</strong> Steps 1&ndash;4 and 6 are achievable with moderate effort. Steps 5, 7, and 8 (highlighted in red above) require the merchant and processor to <em>share data and notify each other in real time</em> &mdash; which is a fundamentally different capability than what the platform does today.
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 2: CURRENT PLATFORM REALITY                          -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>2. What the platform can and cannot do today</h2>
+          <p>An honest look at what exists vs. what would need to be built &mdash; in plain terms.</p>
+        </div>
+        <span class="badge red">Current reality</span>
       </div>
 
       <div class="state-grid">
         <div class="mini-card">
-          <h3>What exists today</h3>
+          <h3>What works today</h3>
           <ul>
-            <li>Products and COAs are owned by one company via <code>pl_company_id</code>.</li>
-            <li>Merchant Processors can monitor and annotate client-owned data in parts of Q-Monitor.</li>
-            <li>MyCOA has publishing / display behavior and viewer configuration.</li>
-            <li>Plan catalog, paywall flags, pricing, and some gating behavior already exist.</li>
-            <li>Invite, subscription, company relationship, and scanner systems all exist — but as separate flows.</li>
+            <li><strong>MyCOA page &amp; publishing:</strong> A company can upload COAs, assign them to products, and publish them on a branded public page.</li>
+            <li><strong>Processor monitoring:</strong> Processors like Westtown and Flex can monitor merchant products and COAs through We Monitor &mdash; but as read-only observers, not co-editors.</li>
+            <li><strong>Subscription plans &amp; paywall:</strong> We have a plan catalog with pricing tiers and a paywall screen that shows plan options.</li>
+            <li><strong>Company invites:</strong> We can invite users to join a company and link companies to processors.</li>
+            <li><strong>Product scanning &amp; COA extraction:</strong> The system can scan merchant websites for products and extract COA data automatically.</li>
           </ul>
         </div>
         <div class="mini-card">
-          <h3>What does not exist cleanly today</h3>
+          <h3>What does not exist yet</h3>
           <ul>
-            <li>No true shared merchant / processor workspace around MyCOA.</li>
-            <li>No fine-grained permission model like “can edit but not delete” or “can publish but not archive.”</li>
-            <li>No robust server-side enforcement for product / COA limits in line with plan pricing.</li>
-            <li>No clean invite → wizard → tailored paywall → collaborative workflow pipeline.</li>
-            <li>No MP-aware MyCOA operating model.</li>
+            <li><strong>No shared workspace:</strong> MyCOA only knows about one company at a time. A processor cannot see or manage a merchant&rsquo;s MyCOA view, and a merchant cannot see what a processor has collected.</li>
+            <li><strong>No granular permissions:</strong> The system has basic roles (Admin, User) but no fine-grained controls like &ldquo;can upload but not delete&rdquo; or &ldquo;can view but not edit.&rdquo;</li>
+            <li><strong>No reliable product limits:</strong> Subscription plan limits (e.g., 25 products) are only enforced visually in the browser. The server accepts anything, meaning limits can be bypassed.</li>
+            <li><strong>No invite-to-wizard pipeline:</strong> Today&rsquo;s invite links just add someone to the platform. They cannot trigger a setup wizard, pre-select a plan, or tailor the paywall.</li>
+            <li><strong>No cross-company notifications:</strong> When one company publishes a COA, other companies watching that merchant are not automatically notified.</li>
           </ul>
         </div>
       </div>
 
-      <div class="flow-wrap">
-        <div class="flow-card">
-          <h4>Today’s ownership model</h4>
-          <p>Merchant-owned products and COAs. Processor visibility comes through monitoring / overlay behavior, not co-ownership.</p>
+      <div class="callout blue" style="margin-top:16px">
+        <strong>How it works under the hood (simplified):</strong> Every product and COA in the system belongs to exactly one company. When a processor like Westtown monitors a merchant, the processor can <em>view</em> the merchant&rsquo;s data and add approval notes &mdash; but the processor is reading the merchant&rsquo;s data, not sharing a workspace. Think of it like looking through a window vs. working in the same room.
+        <div class="tech-note">Technical: Products/COAs scoped by pl_company_id. MP access via CompanyParamPolicyHandler + pl_merchant_processor_client overlay tables. MyCOAProvider uses plCompanyId only &mdash; no MP context.</div>
+      </div>
+
+      <div class="callout red" style="margin-top:10px">
+        <strong>Why plan limits matter:</strong> If we offer subscription tiers (25 products for $X, 100 for $Y), we need to actually enforce those limits. Today, the server does not check plan limits when products are created &mdash; through direct upload, product scan, or COA extraction. All three paths bypass any limit. This must be fixed before we can safely charge merchants different prices for different tiers.
+        <div class="tech-note">Technical: No plan limit check in upsertProduct (API), ProductScan.service (Middleware), or CoaExtractionExport.service (Middleware). clientThreshold exists on plan features but is only read by UI helpers, never enforced server-side.</div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 3: WHERE THE REQUESTED FLOW BREAKS                   -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>3. Where the requested workflow breaks down</h2>
+          <p>Walking through each part of the vision and showing what works vs. what doesn&rsquo;t &mdash; with real scenarios.</p>
         </div>
-        <div class="arrow">→</div>
-        <div class="flow-card">
-          <h4>Requested experience</h4>
-          <p>Invite the merchant, run a setup wizard first, then show a tailored paywall, then let both sides operate in a coherent workflow.</p>
+        <span class="badge amber">Gap analysis</span>
+      </div>
+
+      <div class="vs-grid">
+        <div class="vs-col want">
+          <h4>What we want to happen</h4>
+          <p><strong>Invite:</strong> Westtown sends a co-branded invite link to a merchant. That link starts the MyCOA wizard and connects the merchant to the right subscription plan.</p>
+          <p><strong>Wizard:</strong> The merchant goes through a branded step-by-step setup (company name, logo, colors) and then sees a tailored paywall showing only the plans relevant to them.</p>
+          <p><strong>Shared data:</strong> After onboarding, the merchant can see products and COAs that Westtown already collected by scanning their website. They can take ownership, upload new COAs, and publish.</p>
+          <p><strong>Auto-notify:</strong> When the merchant publishes a COA, Westtown is notified automatically and their compliance dashboard updates in real time.</p>
         </div>
-        <div class="arrow">→</div>
-        <div class="flow-card">
-          <h4>Why that breaks</h4>
-          <p>The requested flow assumes shared permissions, shared operating context, and plan-limit enforcement the platform does not cleanly provide today.</p>
+        <div class="vs-col actual">
+          <h4>What actually happens today</h4>
+          <p><strong>Invite:</strong> Today&rsquo;s invite links add a user to the platform, but they cannot pre-select a plan, trigger a wizard, or carry any MyCOA-specific context. The merchant lands on a generic onboarding screen.</p>
+          <p><strong>Wizard:</strong> No setup wizard exists yet. The wizard has been designed (see the <a href="https://resplendent-stroopwafel-7eb3ac.netlify.app/wizard/" target="_blank">Netlify prototype</a>) but not built into the platform.</p>
+          <p><strong>Shared data:</strong> MyCOA only shows data belonging to one company. If the merchant logs in, they see <em>their</em> data &mdash; not what Westtown collected. The processor&rsquo;s scan results, notes, and approval decisions are invisible to the merchant.</p>
+          <p><strong>Auto-notify:</strong> No cross-company notification system exists. Real-time updates (like scan progress) are sent within a single company, not between companies.</p>
+        </div>
+      </div>
+
+      <div class="scenario" style="margin-top:18px">
+        <h4>The data-sharing dilemma (QP-3226)</h4>
+        <p>
+          There is a deeper conflict here. We have a separate ticket (QP-3226) that requires us to <strong>isolate data between processors</strong> &mdash; meaning if both Flex and Westtown monitor the same merchant, they should <em>not</em> see each other&rsquo;s scan results, notes, or approval decisions.
+        </p>
+        <p>
+          But the MyCOA shared workflow asks us to do the <em>opposite</em>: let a merchant see data that a processor collected on their behalf.
+        </p>
+        <p>
+          <strong>These two goals conflict.</strong> If we fully isolate data between companies (as QP-3226 requires), then sharing data between a merchant and their processor becomes harder. If we build the shared workflow first without isolation, we risk exposing one processor&rsquo;s work to another.
+        </p>
+        <p>
+          <strong>Example:</strong> Suppose Flex and Westtown both monitor &ldquo;Green Valley CBD.&rdquo; Westtown scans the website and finds 200 products. Flex does the same scan independently and finds 200 products with their own notes and compliance decisions. If Green Valley joins MyCOA through Westtown&rsquo;s invite, which set of products do they see? Do they see Flex&rsquo;s data too? What if they edit a product &mdash; does it change for both processors?
+        </p>
+      </div>
+
+      <div class="callout amber" style="margin-top:14px">
+        <strong>Bottom line:</strong> We need to decide the data-sharing model <em>before</em> we can safely build the shared merchant/processor workflow. Rushing this decision risks creating data leaks between processors or locking ourselves into an architecture that is expensive to change later.
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 4: OPEN QUESTIONS                                    -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>4. Open questions the team must answer</h2>
+          <p>These are blocking decisions. Each one affects how we build this and what gets delivered.</p>
+        </div>
+        <span class="badge violet">Decisions needed</span>
+      </div>
+
+      <div class="question-grid">
+        <div class="question-card">
+          <h4>Q1: Does the merchant see data the processor already collected?</h4>
+          <p>When a merchant joins MyCOA through Westtown&rsquo;s invite, do they immediately see the products and COAs that Westtown found by scanning their website?</p>
+          <div class="consequence yes"><strong>If yes:</strong> We need a data-sharing mechanism that transfers or links processor-collected data to the merchant&rsquo;s account. This is the single largest engineering effort in this project and touches the core data model.</div>
+          <div class="consequence no"><strong>If no:</strong> The merchant starts with a clean slate and uploads their own COAs. Much simpler to build, and we can ship faster. The processor&rsquo;s existing scan data remains separate.</div>
+        </div>
+
+        <div class="question-card">
+          <h4>Q2: Who controls the data once both parties are on the platform?</h4>
+          <p>If a merchant uploads a COA and Westtown reviews it, who can edit it? Delete it? Reassign it to a different product?</p>
+          <div class="consequence yes"><strong>If shared control:</strong> We need a permission system that does not exist today. Every action (edit, delete, publish, reassign) would need to check who is doing it and what their relationship is to the data.</div>
+          <div class="consequence no"><strong>If merchant-owned:</strong> The merchant controls their data. The processor can view and annotate it (as they do today with monitoring), but they cannot change it. Simpler, and aligns with the existing platform model.</div>
+        </div>
+
+        <div class="question-card">
+          <h4>Q3: Do we show subscription tiers the merchant can&rsquo;t use?</h4>
+          <p>If a merchant has 200 products, do we show them a 25-product tier on the paywall? What happens if they pick it?</p>
+          <div class="consequence yes"><strong>If we show all tiers:</strong> We need to enforce product limits on the server side. If a merchant on a 25-product plan tries to add product #26, the system must block it. This enforcement does not exist today.</div>
+          <div class="consequence no"><strong>If we hide irrelevant tiers:</strong> We need to know the merchant&rsquo;s product count before showing the paywall, which means we either pre-scan their website or ask them. Adds a step to the onboarding flow.</div>
+        </div>
+
+        <div class="question-card">
+          <h4>Q4: Is this invite separate from the future compliance portal invite?</h4>
+          <p>We are also planning a compliance portal for merchants. Will the MyCOA invite and the compliance portal invite be the same link, or separate?</p>
+          <div class="consequence yes"><strong>If same invite:</strong> We need a configurable invite system that can trigger different onboarding flows (MyCOA wizard vs. compliance portal setup) based on context. More flexible but more complex to build.</div>
+          <div class="consequence no"><strong>If separate invites:</strong> Simpler for now. The MyCOA invite only triggers the MyCOA wizard. The compliance portal invite is built later as its own flow. Risk: merchants may get two separate invite emails from the same processor.</div>
+        </div>
+
+        <div class="question-card">
+          <h4>Q5: Can a MyCOA merchant run product scans on their own website?</h4>
+          <p>Product scans automatically discover products from a website. Should MyCOA merchants have access to this feature?</p>
+          <div class="consequence yes"><strong>If yes:</strong> A scan could bring in hundreds of products instantly, potentially exceeding the merchant&rsquo;s plan limit. We need server-side enforcement (see Q3) before enabling this.</div>
+          <div class="consequence no"><strong>If no:</strong> Merchants manually manage their product list and upload COAs. Simpler, and avoids the plan-limit enforcement problem for now.</div>
+        </div>
+
+        <div class="question-card">
+          <h4>Q6: When a merchant publishes a COA, does it replace the processor&rsquo;s product scan?</h4>
+          <p>The April 9 meeting discussed replacing the &ldquo;Scan for COAs&rdquo; button with a &ldquo;MyCOA Enabled&rdquo; badge once a merchant is onboarded. Does the system stop scanning that merchant?</p>
+          <div class="consequence yes"><strong>If yes:</strong> We need a per-merchant flag that tells the processor&rsquo;s monitoring system to stop scanning and start trusting the merchant&rsquo;s MyCOA uploads instead. New logic needed in the scan workflow.</div>
+          <div class="consequence no"><strong>If no:</strong> The processor keeps scanning as usual, and MyCOA is just an additional data source. Simpler, but creates a confusing situation where the processor sees scan results AND MyCOA-published COAs for the same merchant.</div>
         </div>
       </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- SECTION 5: OPTIONS                                           -->
+    <!-- ============================================================ -->
     <div class="section">
       <div class="section-title">
         <div>
-          <h2>2. The core blocker</h2>
-          <p>These are the four architecture questions hiding under the wizard discussion.</p>
+          <h2>5. Three paths forward</h2>
+          <p>Based on where the platform actually stands today, here are the realistic options.</p>
         </div>
-        <span class="badge amber">Blocker map</span>
-      </div>
-
-      <div class="problem-grid">
-        <div class="problem">
-          <h4>Data ownership</h4>
-          <p>Does the merchant remain the canonical owner of products and COAs, or do we introduce a new shared workflow layer?</p>
-        </div>
-        <div class="problem">
-          <h4>Permissions</h4>
-          <p>The current role model is too coarse for the requested future-state. We do not yet have relationship-aware action permissions.</p>
-        </div>
-        <div class="problem">
-          <h4>Invite / onboarding</h4>
-          <p>The current invite flow does not naturally become a wizard-first, plan-aware, processor-contextual onboarding experience.</p>
-        </div>
-        <div class="problem">
-          <h4>Entitlement enforcement</h4>
-          <p>Product and COA limits are not robustly server-side enforced today, so tailored plan selection has loophole risk.</p>
-        </div>
-        <div class="problem">
-          <h4>MyCOA scope</h4>
-          <p>MyCOA is still company-scoped, not processor-aware. That matters if the requested future-state assumes collaboration in one shared place.</p>
-        </div>
-        <div class="problem">
-          <h4>QP-3226 collision risk</h4>
-          <p>If we harden the wrong isolation model too early, we may make the requested future-state much harder to build cleanly later.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">
-        <div>
-          <h2>3. Options moving forward</h2>
-          <p>These are the three viable paths based on the architecture we actually have today.</p>
-        </div>
-        <span class="badge blue">Option comparison</span>
+        <span class="badge blue">Options</span>
       </div>
 
       <div class="options">
         <div class="option-card">
           <span class="badge blue">Option A</span>
-          <h3>Wizard-first onboarding only</h3>
-          <div class="sub">Build the quick-start wizard and tailored paywall inside the current ownership model. Merchant remains owner. Processor visibility stays in existing monitoring patterns.</div>
+          <h3>Wizard &amp; paywall only</h3>
+          <div class="sub">Build the setup wizard and subscription paywall. The merchant manages their <em>own</em> COAs independently. No shared data with the processor.</div>
           <div class="pill-row">
-            <span class="pill low">Fastest</span>
+            <span class="pill low">~2&ndash;3 weeks</span>
             <span class="pill low">Lowest risk</span>
           </div>
           <div class="option-list">
-            <div class="option-item"><span class="mark good">+</span><span>Most honest to the current platform</span></div>
-            <div class="option-item"><span class="mark good">+</span><span>Gets a real deliverable in front of merchants faster</span></div>
-            <div class="option-item"><span class="mark warn">~</span><span>Does not solve true processor / merchant co-working</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Fastest path to revenue &mdash; merchants can start paying immediately</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Works within the existing platform &mdash; no risky architecture changes</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Delivers the branded MyCOA page Westtown asked for</span></div>
+            <div class="option-item"><span class="mark warn">~</span><span>Merchant starts from scratch &mdash; doesn&rsquo;t see processor&rsquo;s existing data</span></div>
+            <div class="option-item"><span class="mark warn">~</span><span>Processor must still scan independently &mdash; no auto-notification</span></div>
           </div>
+          <ul class="delivers-list">
+            <li>Setup wizard (company name, logo, colors, shopping URL)</li>
+            <li>MyCOA-specific invite link from processor</li>
+            <li>Paywall with subscription tiers</li>
+            <li>Branded template using new configurable design</li>
+          </ul>
         </div>
 
         <div class="option-card">
           <span class="badge red">Option B</span>
-          <h3>Build the full shared workflow now</h3>
-          <div class="sub">Redesign the platform to support a true merchant / processor shared workflow now, including permissions, onboarding, and entitlement logic.</div>
+          <h3>Full shared workflow now</h3>
+          <div class="sub">Build everything: wizard, paywall, shared data between merchant and processor, auto-notifications, product scan replacement, and permissions.</div>
           <div class="pill-row">
+            <span class="pill high">~8&ndash;12+ weeks</span>
             <span class="pill high">Highest risk</span>
-            <span class="pill high">Largest scope</span>
           </div>
           <div class="option-list">
-            <div class="option-item"><span class="mark good">+</span><span>Closest to the fully requested future-state</span></div>
-            <div class="option-item"><span class="mark bad">−</span><span>Touches ownership, permissions, invites, and plan enforcement all at once</span></div>
-            <div class="option-item"><span class="mark bad">−</span><span>Easiest path to accidental architecture debt if rushed</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Delivers the complete vision described in the meeting</span></div>
+            <div class="option-item"><span class="mark bad">&minus;</span><span>Requires building permissions, data sharing, notifications, and plan enforcement all at once</span></div>
+            <div class="option-item"><span class="mark bad">&minus;</span><span>Conflicts with QP-3226 (data isolation) &mdash; risk of building the wrong model</span></div>
+            <div class="option-item"><span class="mark bad">&minus;</span><span>Delays revenue &mdash; nothing ships until everything ships</span></div>
+            <div class="option-item"><span class="mark bad">&minus;</span><span>Open questions (see Section 4) are not answered yet &mdash; building without answers risks rework</span></div>
           </div>
         </div>
 
         <div class="option-card recommended">
-          <span class="badge green">Option C · Recommended</span>
-          <h3>Phase it: wizard now, shared model after alignment</h3>
-          <div class="sub">Ship a meaningful wizard-first onboarding flow in the current model, then deliberately decide and design the shared merchant / processor workflow as a second architectural track.</div>
+          <span class="badge green">Option C &middot; Recommended</span>
+          <h3>Phase it: ship the wizard now, design the shared model next</h3>
+          <div class="sub">Ship the wizard, paywall, and branded template in the current model (Phase 1). Then design and build the shared merchant/processor workflow as a deliberate Phase 2 after the open questions are answered.</div>
           <div class="pill-row">
-            <span class="pill med">Balanced speed</span>
-            <span class="pill low">Lower architecture risk</span>
+            <span class="pill med">Phase 1: ~2&ndash;3 weeks</span>
+            <span class="pill low">Lower risk</span>
           </div>
           <div class="option-list">
-            <div class="option-item"><span class="mark good">+</span><span>Delivers progress now without pretending the platform already supports the full vision</span></div>
-            <div class="option-item"><span class="mark good">+</span><span>Creates a clean decision boundary for QP-3226 and permissions work</span></div>
-            <div class="option-item"><span class="mark warn">~</span><span>Requires discipline to keep Phase 1 honest and not sneak in half-shared behavior</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Gets revenue flowing fast with the wizard and branded pages</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Gives time to properly design the shared workflow and answer the open questions</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Avoids building the wrong sharing model before QP-3226 is settled</span></div>
+            <div class="option-item"><span class="mark good">+</span><span>Phase 1 is useful on its own &mdash; even if Phase 2 takes longer than expected</span></div>
+            <div class="option-item"><span class="mark warn">~</span><span>Requires discipline to keep Phase 1 focused and not sneak in half-built sharing features</span></div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- RECOMMENDATION                                               -->
+    <!-- ============================================================ -->
     <div class="decision-card">
       <div class="decision-grid">
         <div>
-          <h2>Recommendation</h2>
+          <h2>Recommendation: Option C &mdash; Phase it</h2>
           <p>
-            <strong>Option C is the best path.</strong> Ship the MyCOA setup wizard as a wizard-first onboarding flow inside the current ownership model, and treat the full shared merchant / processor workflow as a separate architecture decision that must be resolved before it is promised as part of the same deliverable.
+            <strong>Ship the MyCOA setup wizard, paywall, and branded template now</strong> as Phase 1. This gets merchants onboarded and paying, and gives Westtown a real product to roll out to their 545 merchants.
           </p>
           <p>
-            This gives the team something real to build now while staying honest about the fact that data ownership, permissions, and entitlement enforcement are not settled enough yet for the full requested future-state.
+            <strong>Then design the shared merchant/processor workflow</strong> as Phase 2, after the open questions in Section 4 are answered and the QP-3226 data isolation approach is settled. This avoids building something we might have to tear apart later.
           </p>
         </div>
         <div class="decision-box">
-          <h4>What to say in the meeting</h4>
+          <h4>Why this is the right call</h4>
           <ul>
-            <li>We can move fast on the wizard itself.</li>
-            <li>The shared workflow is the part that needs architecture alignment.</li>
-            <li>The current system supports monitoring overlays, not true shared co-ownership.</li>
-            <li>Plan / paywall logic is not strong enough yet to treat limits as solved.</li>
-            <li>So the honest move is to split delivery from architecture decision-making.</li>
+            <li>The wizard itself is ready to build &mdash; designs exist, the tech is straightforward.</li>
+            <li>The shared workflow has unanswered questions that affect the entire platform architecture.</li>
+            <li>Rushing the shared model risks conflicting with data isolation work (QP-3226) already on the roadmap.</li>
+            <li>Phase 1 is valuable on its own &mdash; merchants get branded COA pages and self-service management.</li>
+            <li>Splitting the work is honest about what&rsquo;s ready and what isn&rsquo;t.</li>
           </ul>
         </div>
       </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- SECTION 6: PHASE 1 & PHASE 2 DETAILS                        -->
+    <!-- ============================================================ -->
     <div class="section">
       <div class="section-title">
         <div>
-          <h2>4. What would need to be resolved before the full requested option is safe</h2>
-          <p>If the team wants the full shared workflow later, these are the prerequisites.</p>
+          <h2>6. What ships in Phase 1 vs. Phase 2</h2>
+          <p>A clear boundary so everyone knows what to expect and what to plan for.</p>
         </div>
-        <span class="badge violet">Pre-work required</span>
+        <span class="badge green">Delivery plan</span>
       </div>
 
-      <div class="steps">
-        <div class="step"><div class="step-num">1</div><h4>Ownership model</h4><p>Decide whether merchant remains canonical owner or whether a true shared workspace model is required.</p></div>
-        <div class="step"><div class="step-num">2</div><h4>Permission model</h4><p>Define relationship-aware actions like edit, delete, publish, review, and approve.</p></div>
-        <div class="step"><div class="step-num">3</div><h4>Invite flow</h4><p>Define what the invite creates, when wizard happens, when paywall happens, and where users land afterward.</p></div>
-        <div class="step"><div class="step-num">4</div><h4>Limit enforcement</h4><p>Decide what count matters, when it is checked, and how product/COA loopholes are prevented.</p></div>
-        <div class="step"><div class="step-num">5</div><h4>QP-3226 reframing</h4><p>Make sure data-isolation work does not accidentally harden a model that blocks the desired future-state.</p></div>
+      <div class="phase-grid">
+        <div class="phase-card p1">
+          <div class="phase-label">Phase 1 &mdash; Ship now (~2&ndash;3 weeks)</div>
+          <h3>MyCOA Self-Service Onboarding</h3>
+          <ul>
+            <li><strong>Setup wizard:</strong> Company name, logo upload, brand colors (primary, secondary, accent), shopping URL</li>
+            <li><strong>Invite link:</strong> Processor generates a MyCOA-specific invite link for a merchant</li>
+            <li><strong>Paywall integration:</strong> After the wizard, show subscription tiers and process payment</li>
+            <li><strong>Branded template:</strong> New configurable MyCOA template (logo, colors, footer) replacing the current default</li>
+            <li><strong>Dynamic URL:</strong> Each merchant gets their unique MyCOA page URL</li>
+            <li><strong>Merchant self-management:</strong> Upload COAs, assign to products, publish/unpublish</li>
+          </ul>
+          <div class="not-included">
+            <strong>NOT included in Phase 1:</strong>
+            Merchant does NOT see processor-collected data. No shared editing. No cross-company notifications. No &ldquo;MyCOA Enabled&rdquo; badge replacing product scan. No server-side product limit enforcement (enforcement is a fast-follow). Merchants manage their own data independently.
+          </div>
+        </div>
+
+        <div class="phase-card p2">
+          <div class="phase-label">Phase 2 &mdash; Design then build (timeline TBD)</div>
+          <h3>Shared Merchant / Processor Workflow</h3>
+          <ul>
+            <li><strong>Answer open questions:</strong> Resolve the 6 questions in Section 4 before writing any code</li>
+            <li><strong>Data ownership model:</strong> Decide how merchant and processor data relates (separate copies? shared records? linked views?)</li>
+            <li><strong>Permission system:</strong> Build fine-grained controls for who can do what with shared data</li>
+            <li><strong>Cross-company notifications:</strong> Notify processors when merchants publish COAs</li>
+            <li><strong>&ldquo;MyCOA Enabled&rdquo; badge:</strong> Replace product scan button when merchant manages their own COAs</li>
+            <li><strong>Server-side plan enforcement:</strong> Enforce product/COA limits at the server level, not just in the browser</li>
+            <li><strong>QP-3226 alignment:</strong> Ensure the data isolation model and the sharing model work together</li>
+          </ul>
+          <div class="not-included">
+            <strong>Prerequisite:</strong>
+            Phase 2 should not start until the open questions are answered and the team has aligned on the data-sharing model. Starting without alignment risks building the wrong thing.
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- SECTION 7: PREREQUISITES FOR PHASE 2                         -->
+    <!-- ============================================================ -->
     <div class="section">
       <div class="section-title">
         <div>
-          <h2>5. Friendly talking points for the team</h2>
-          <p>Use these to frame the discussion without forcing a premature technical decision.</p>
+          <h2>7. What must be resolved before Phase 2 can start</h2>
+          <p>These are the building blocks. Each one is a decision or design that Phase 2 depends on.</p>
         </div>
-        <span class="badge green">Meeting-ready language</span>
+        <span class="badge violet">Phase 2 prerequisites</span>
       </div>
 
-      <div class="talking-points">
-        <div class="quote">
-          <strong>Today’s platform reality:</strong><br>
-          MyCOA is still fundamentally company-scoped. Merchant Processors can monitor and annotate some client-owned data, but we do not yet have a true shared merchant / processor workspace with granular permissions.
+      <div class="problem-grid">
+        <div class="problem">
+          <h4>1. Data ownership decision</h4>
+          <p>Does the merchant own all data outright, or do we create a shared data layer where both processor and merchant can contribute? This is the single most important architectural decision and affects every other piece.</p>
         </div>
-        <div class="quote">
-          <strong>Requested future-state:</strong><br>
-          The desired wizard assumes a more collaborative workflow than the current architecture cleanly supports. That means the wizard conversation is really tied to a bigger ownership + permissions + entitlement decision.
+        <div class="problem">
+          <h4>2. Permission system design</h4>
+          <p>Today we have Admin and User roles &mdash; nothing more. Phase 2 needs relationship-aware permissions: &ldquo;This processor can view but not edit this merchant&rsquo;s COAs.&rdquo; This requires a new permission framework.</p>
         </div>
-        <div class="quote">
-          <strong>Safe next move:</strong><br>
-          We can still ship a very strong wizard-first onboarding flow in the current model without pretending the deeper shared workflow problem is already solved.
+        <div class="problem">
+          <h4>3. QP-3226 alignment</h4>
+          <p>The data isolation ticket (QP-3226) and the shared workflow pull in opposite directions. We need to design both together so they don&rsquo;t conflict. The isolation work should not accidentally block the collaboration features we want later.</p>
         </div>
-        <div class="quote">
-          <strong>Decision to make:</strong><br>
-          Are we building a better MyCOA onboarding experience now, or are we also trying to solve a new shared merchant / processor operating model at the same time?
+        <div class="problem">
+          <h4>4. Invite system redesign</h4>
+          <p>Invites need to carry context: what type of onboarding flow, which plan options, which processor is inviting. Today&rsquo;s invite links are generic. This needs a new invite architecture.</p>
         </div>
+        <div class="problem">
+          <h4>5. Server-side plan enforcement</h4>
+          <p>Product and COA limits must be enforced by the server, not just hidden in the UI. This affects product creation, COA uploads, product scans, and bulk imports &mdash; all of which currently bypass limits.</p>
+        </div>
+        <div class="problem">
+          <h4>6. Cross-company event system</h4>
+          <p>Real-time notifications between companies (e.g., &ldquo;Merchant X just published a new COA&rdquo;) require a new event routing system. Today, real-time events only flow within a single company.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 8: SUMMARY FOR DISCUSSION                            -->
+    <!-- ============================================================ -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>8. Summary &mdash; for discussion</h2>
+          <p>Use these points to frame your thinking and feedback.</p>
+        </div>
+        <span class="badge green">Discussion guide</span>
+      </div>
+
+      <div class="question-grid">
+        <div class="question-card" style="border-left:4px solid #3b82f6">
+          <h4>What we can ship right now</h4>
+          <p>A real setup wizard, a paywall with subscription plans, and a branded MyCOA page for every merchant. The merchant manages their own COAs independently. This is Phase 1 and can be delivered in 2&ndash;3 weeks.</p>
+        </div>
+        <div class="question-card" style="border-left:4px solid #f59e0b">
+          <h4>What needs more thought first</h4>
+          <p>The shared workflow where merchants and processors collaborate on the same data in real time. This is a bigger architectural change that has unanswered questions and conflicts with other work on the roadmap (QP-3226).</p>
+        </div>
+        <div class="question-card" style="border-left:4px solid #22c55e">
+          <h4>The recommended path</h4>
+          <p>Ship Phase 1 now to start generating revenue and get merchants onboarded. Then take the time to properly design Phase 2 with the full team, making sure the sharing model and isolation model work together.</p>
+        </div>
+        <div class="question-card" style="border-left:4px solid #8b5cf6">
+          <h4>What we need from the team</h4>
+          <p>Agreement on the phased approach, and then answers to the 6 open questions in Section 4. Those answers will shape the Phase 2 design and determine how long it takes.</p>
+        </div>
+      </div>
+
+      <div class="callout green" style="margin-top:16px">
+        <strong>Next step:</strong> Please review this document, especially the open questions in Section 4, and come prepared to discuss your perspective. The sooner we align on the answers, the sooner we can begin Phase 2 design alongside Phase 1 delivery.
       </div>
     </div>
 
     <div class="footer-note">
-      Source inputs for this board came from repo implementation analysis, today’s Fathom meeting reviews, and the MyCOA wizard architecture memo prepared on Apr 9, 2026.
+      Prepared by Joseph Floyd &middot; April 9, 2026<br>
+      Based on: April 9 daily standup and product roadmap meetings, codebase implementation analysis across all repositories, QP-3226 ticket requirements, and MyCOA wizard prototype.
     </div>
   </div>
 </body>
