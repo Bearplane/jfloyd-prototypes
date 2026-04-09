@@ -266,9 +266,9 @@
         </div>
         <div class="flow-step broken">
           <div class="flow-step-num">5</div>
-          <h4>Merchant sees existing data</h4>
-          <p>The merchant would see products/COAs that the processor already collected via scanning. This is the part that requires shared data.</p>
-          <span class="status-tag missing">Shared data not supported</span>
+          <h4>Merchant sees existing data &mdash; with no guardrails</h4>
+          <p>The products and COAs the processor collected already exist under the merchant&rsquo;s company. Once the merchant joins as a user, they see everything &mdash; but with full unrestricted access and no permission controls governing the relationship.</p>
+          <span class="status-tag missing">No permission controls</span>
         </div>
         <div class="flow-step">
           <div class="flow-step-num">6</div>
@@ -291,7 +291,7 @@
       </div>
 
       <div class="callout amber" style="margin-top:18px">
-        <strong>Key takeaway:</strong> Steps 1&ndash;4 and 6 are achievable with moderate effort. Steps 5, 7, and 8 (highlighted in red above) require the merchant and processor to <em>share data and notify each other in real time</em> &mdash; which is a fundamentally different capability than what the platform does today.
+        <strong>Key takeaway:</strong> Steps 1&ndash;4 and 6 are achievable with moderate effort. Step 5 (highlighted in red) is tricky not because the data is separate &mdash; it already exists under the merchant&rsquo;s company &mdash; but because once the merchant joins, both parties have <em>full unrestricted access with no permission controls</em>. Steps 7 and 8 require new cross-company notification and scan-replacement logic that does not exist today.
       </div>
     </div>
 
@@ -312,7 +312,7 @@
           <h3>What works today</h3>
           <ul>
             <li><strong>MyCOA page &amp; publishing:</strong> A company can upload COAs, assign them to products, and publish them on a branded public page.</li>
-            <li><strong>Processor monitoring:</strong> Processors like Westtown and Flex can monitor merchant products and COAs through We Monitor &mdash; but as read-only observers, not co-editors.</li>
+            <li><strong>Processor management of merchant data:</strong> Processors like Westtown and Flex can add merchants to their We Monitor list, scan their websites, and ingest products and COAs directly into that merchant&rsquo;s company record. The processor has full create, edit, and delete permissions on those products and COAs with no restrictions. Every COA includes an audit trail showing who uploaded or modified each field.</li>
             <li><strong>Subscription plans &amp; paywall:</strong> We have a plan catalog with pricing tiers and a paywall screen that shows plan options.</li>
             <li><strong>Company invites:</strong> We can invite users to join a company and link companies to processors.</li>
             <li><strong>Product scanning &amp; COA extraction:</strong> The system can scan merchant websites for products and extract COA data automatically.</li>
@@ -321,9 +321,9 @@
         <div class="mini-card">
           <h3>What does not exist yet</h3>
           <ul>
-            <li><strong>No shared workspace:</strong> MyCOA only knows about one company at a time. A processor cannot see or manage a merchant&rsquo;s MyCOA view, and a merchant cannot see what a processor has collected.</li>
+            <li><strong>No permission controls on shared data:</strong> The processor and merchant already work against the <em>same</em> products and COAs (stored under the merchant&rsquo;s company). But once a merchant is invited as a user, both parties have full unrestricted access &mdash; there is no way to say &ldquo;the merchant can upload but the processor can delete&rdquo; or vice versa. There are zero permission controls governing the relationship.</li>
             <li><strong>No granular permissions:</strong> The system has basic roles (Admin, User) but no fine-grained controls like &ldquo;can upload but not delete&rdquo; or &ldquo;can view but not edit.&rdquo;</li>
-            <li><strong>No reliable product limits:</strong> Subscription plan limits (e.g., 25 products) are only enforced visually in the browser. The server accepts anything, meaning limits can be bypassed.</li>
+            <li><strong>No product limit concept:</strong> Product count limits (e.g., &ldquo;25 products max&rdquo;) do not exist anywhere in the system &mdash; not as a field on subscription plans, not as a configuration, and not as any form of enforcement. This would need to be designed as a new feature of the subscription plan system and then enforced on the server.</li>
             <li><strong>No invite-to-wizard pipeline:</strong> Today&rsquo;s invite links just add someone to the platform. They cannot trigger a setup wizard, pre-select a plan, or tailor the paywall.</li>
             <li><strong>No cross-company notifications:</strong> When one company publishes a COA, other companies watching that merchant are not automatically notified.</li>
           </ul>
@@ -331,13 +331,13 @@
       </div>
 
       <div class="callout blue" style="margin-top:16px">
-        <strong>How it works under the hood (simplified):</strong> Every product and COA in the system belongs to exactly one company. When a processor like Westtown monitors a merchant, the processor can <em>view</em> the merchant&rsquo;s data and add approval notes &mdash; but the processor is reading the merchant&rsquo;s data, not sharing a workspace. Think of it like looking through a window vs. working in the same room.
-        <div class="tech-note">Technical: Products/COAs scoped by pl_company_id. MP access via CompanyParamPolicyHandler + pl_merchant_processor_client overlay tables. MyCOAProvider uses plCompanyId only &mdash; no MP context.</div>
+        <strong>How it works under the hood (simplified):</strong> Every product and COA in the system belongs to exactly one company &mdash; the merchant&rsquo;s company. When a processor like Westtown monitors a merchant, the processor works <em>directly</em> on the merchant&rsquo;s data: scanning websites, creating products, ingesting COAs, editing fields, and deleting records. The processor operates on the merchant&rsquo;s company record with full permissions. An audit trail on each COA tracks who uploaded or modified it. The products and COAs visible in We Monitor&rsquo;s Product Compliance tab are the <strong>same records</strong> visible in that merchant&rsquo;s MyCOA view.
+        <div class="tech-note">Technical: Products/COAs scoped by pl_company_id (the merchant&rsquo;s company). MP accesses client data via CompanyParamPolicyHandler + pl_merchant_processor_client relationship with full CRUD. MyCOAProvider uses plCompanyId only &mdash; no MP context awareness.</div>
       </div>
 
       <div class="callout red" style="margin-top:10px">
-        <strong>Why plan limits matter:</strong> If we offer subscription tiers (25 products for $X, 100 for $Y), we need to actually enforce those limits. Today, the server does not check plan limits when products are created &mdash; through direct upload, product scan, or COA extraction. All three paths bypass any limit. This must be fixed before we can safely charge merchants different prices for different tiers.
-        <div class="tech-note">Technical: No plan limit check in upsertProduct (API), ProductScan.service (Middleware), or CoaExtractionExport.service (Middleware). clientThreshold exists on plan features but is only read by UI helpers, never enforced server-side.</div>
+        <strong>Why plan limits matter:</strong> If we want to offer subscription tiers (25 products for $X, 100 for $Y), we need a way to define and enforce those limits. Today, <strong>no product-count limit concept exists anywhere in the system.</strong> The subscription plan model supports feature visibility flags (showing/hiding UI elements per plan), but it has no mechanism for numeric caps like &ldquo;25 products max.&rdquo; Both the data model (adding a limit field to plans) and the enforcement (checking it server-side on every product-creation path &mdash; direct upload, product scan, COA extraction) would need to be built from scratch.
+        <div class="tech-note">Technical: No product-count limit field exists on pl_plan, pl_plan_feature, or PlanFeatureConfigDto. clientThreshold on plan features is used for monitoring slot counts (watchlist), not product counts. No limit check in upsertProduct (API), ProductScan.service (Middleware), or CoaExtractionExport.service (Middleware).</div>
       </div>
     </div>
 
@@ -358,14 +358,14 @@
           <h4>What we want to happen</h4>
           <p><strong>Invite:</strong> Westtown sends a co-branded invite link to a merchant. That link starts the MyCOA wizard and connects the merchant to the right subscription plan.</p>
           <p><strong>Wizard:</strong> The merchant goes through a branded step-by-step setup (company name, logo, colors) and then sees a tailored paywall showing only the plans relevant to them.</p>
-          <p><strong>Shared data:</strong> After onboarding, the merchant can see products and COAs that Westtown already collected by scanning their website. They can take ownership, upload new COAs, and publish.</p>
+          <p><strong>Controlled access:</strong> After onboarding, the merchant can see the products and COAs that Westtown already collected (which already live under the merchant&rsquo;s company). Both parties work on the same data, but with appropriate permission controls &mdash; e.g., the merchant can upload and publish COAs, while the processor retains oversight.</p>
           <p><strong>Auto-notify:</strong> When the merchant publishes a COA, Westtown is notified automatically and their compliance dashboard updates in real time.</p>
         </div>
         <div class="vs-col actual">
           <h4>What actually happens today</h4>
           <p><strong>Invite:</strong> Today&rsquo;s invite links add a user to the platform, but they cannot pre-select a plan, trigger a wizard, or carry any MyCOA-specific context. The merchant lands on a generic onboarding screen.</p>
           <p><strong>Wizard:</strong> No setup wizard exists yet. The wizard has been designed (see the <a href="https://resplendent-stroopwafel-7eb3ac.netlify.app/wizard/" target="_blank">Netlify prototype</a>) but not built into the platform.</p>
-          <p><strong>Shared data:</strong> MyCOA only shows data belonging to one company. If the merchant logs in, they see <em>their</em> data &mdash; not what Westtown collected. The processor&rsquo;s scan results, notes, and approval decisions are invisible to the merchant.</p>
+          <p><strong>Controlled access:</strong> The data already exists under the merchant&rsquo;s company &mdash; put there by the processor&rsquo;s scans. Once the merchant is invited as a user, they will see all of it. But both parties get <em>full unrestricted access</em> with no permission differentiation. There is no way to control what the merchant can vs. cannot do relative to the processor, or vice versa. The audit trail tracks who did what, but there are no guardrails.</p>
           <p><strong>Auto-notify:</strong> No cross-company notification system exists. Real-time updates (like scan progress) are sent within a single company, not between companies.</p>
         </div>
       </div>
@@ -405,23 +405,23 @@
 
       <div class="question-grid">
         <div class="question-card">
-          <h4>Q1: Does the merchant see data the processor already collected?</h4>
-          <p>When a merchant joins MyCOA through Westtown&rsquo;s invite, do they immediately see the products and COAs that Westtown found by scanning their website?</p>
-          <div class="consequence yes"><strong>If yes:</strong> We need a data-sharing mechanism that transfers or links processor-collected data to the merchant&rsquo;s account. This is the single largest engineering effort in this project and touches the core data model.</div>
-          <div class="consequence no"><strong>If no:</strong> The merchant starts with a clean slate and uploads their own COAs. Much simpler to build, and we can ship faster. The processor&rsquo;s existing scan data remains separate.</div>
+          <h4>Q1: Does the merchant get immediate access to processor-populated data?</h4>
+          <p>The products and COAs that Westtown collected by scanning already live under the merchant&rsquo;s company. When the merchant is invited as a user, do they immediately see and work with that data?</p>
+          <div class="consequence yes"><strong>If yes (use existing data):</strong> No data transfer is needed &mdash; the records are already there. But we need to decide on permission controls (see Q2), because right now both parties would have full unrestricted access. We also need to consider what happens when multiple processors monitor the same merchant (see the QP-3226 dilemma below).</div>
+          <div class="consequence no"><strong>If no (clean slate):</strong> We would need to hide or separate the processor&rsquo;s existing data from the merchant&rsquo;s MyCOA view, even though it already lives under their company. The merchant starts fresh and uploads their own COAs. This avoids the permission question for now but means duplicated effort and potentially conflicting product/COA records.</div>
         </div>
 
         <div class="question-card">
-          <h4>Q2: Who controls the data once both parties are on the platform?</h4>
-          <p>If a merchant uploads a COA and Westtown reviews it, who can edit it? Delete it? Reassign it to a different product?</p>
-          <div class="consequence yes"><strong>If shared control:</strong> We need a permission system that does not exist today. Every action (edit, delete, publish, reassign) would need to check who is doing it and what their relationship is to the data.</div>
-          <div class="consequence no"><strong>If merchant-owned:</strong> The merchant controls their data. The processor can view and annotate it (as they do today with monitoring), but they cannot change it. Simpler, and aligns with the existing platform model.</div>
+          <h4>Q2: Do we need permission controls once the merchant joins?</h4>
+          <p>Today, the processor has full unrestricted access to the merchant&rsquo;s products and COAs (create, edit, delete, reassign). Once the merchant is invited as a user of their own company, they will also have full unrestricted access to the same data. Do we need to differentiate what each party can do?</p>
+          <div class="consequence yes"><strong>If we add permissions:</strong> We need a permission system that does not exist today. Every action (edit, delete, publish, reassign) would need to check who is doing it and what their relationship is to the data. This is a significant new capability to build.</div>
+          <div class="consequence no"><strong>If we keep it unrestricted:</strong> Both the processor and the merchant can do anything to any product or COA, just as the processor can today. Simpler, but risks conflicts (e.g., the processor deletes a product the merchant just uploaded a COA for). The audit trail shows who did what, but there are no guardrails.</div>
         </div>
 
         <div class="question-card">
           <h4>Q3: Do we show subscription tiers the merchant can&rsquo;t use?</h4>
           <p>If a merchant has 200 products, do we show them a 25-product tier on the paywall? What happens if they pick it?</p>
-          <div class="consequence yes"><strong>If we show all tiers:</strong> We need to enforce product limits on the server side. If a merchant on a 25-product plan tries to add product #26, the system must block it. This enforcement does not exist today.</div>
+          <div class="consequence yes"><strong>If we show all tiers:</strong> We need to design product count limits as a new concept in the subscription plan system (no such field exists today), then enforce those limits on the server every time a product is created &mdash; through upload, scan, or COA extraction. This is net-new functionality.</div>
           <div class="consequence no"><strong>If we hide irrelevant tiers:</strong> We need to know the merchant&rsquo;s product count before showing the paywall, which means we either pre-scan their website or ask them. Adds a step to the onboarding flow.</div>
         </div>
 
@@ -435,7 +435,7 @@
         <div class="question-card">
           <h4>Q5: Can a MyCOA merchant run product scans on their own website?</h4>
           <p>Product scans automatically discover products from a website. Should MyCOA merchants have access to this feature?</p>
-          <div class="consequence yes"><strong>If yes:</strong> A scan could bring in hundreds of products instantly, potentially exceeding the merchant&rsquo;s plan limit. We need server-side enforcement (see Q3) before enabling this.</div>
+          <div class="consequence yes"><strong>If yes:</strong> A scan could bring in hundreds of products instantly, potentially exceeding whatever product limit we define for the merchant&rsquo;s plan. We would need to build the product-limit concept first (see Q3) and enforce it server-side before enabling this.</div>
           <div class="consequence no"><strong>If no:</strong> Merchants manually manage their product list and upload COAs. Simpler, and avoids the plan-limit enforcement problem for now.</div>
         </div>
 
@@ -573,7 +573,7 @@
           </ul>
           <div class="not-included">
             <strong>NOT included in Phase 1:</strong>
-            Merchant does NOT see processor-collected data. No shared editing. No cross-company notifications. No &ldquo;MyCOA Enabled&rdquo; badge replacing product scan. No server-side product limit enforcement (enforcement is a fast-follow). Merchants manage their own data independently.
+            No permission controls differentiating merchant vs. processor access. No cross-company notifications. No &ldquo;MyCOA Enabled&rdquo; badge replacing product scan. No product-count limits on subscription plans (limits need to be designed as a new concept and then enforced server-side &mdash; this is a fast-follow). Merchants manage their own data independently.
           </div>
         </div>
 
@@ -586,7 +586,7 @@
             <li><strong>Permission system:</strong> Build fine-grained controls for who can do what with shared data</li>
             <li><strong>Cross-company notifications:</strong> Notify processors when merchants publish COAs</li>
             <li><strong>&ldquo;MyCOA Enabled&rdquo; badge:</strong> Replace product scan button when merchant manages their own COAs</li>
-            <li><strong>Server-side plan enforcement:</strong> Enforce product/COA limits at the server level, not just in the browser</li>
+            <li><strong>Product/COA limits:</strong> Design product-count limits as a new feature of the subscription plan system (no such concept exists today), then enforce them server-side on every product-creation path</li>
             <li><strong>QP-3226 alignment:</strong> Ensure the data isolation model and the sharing model work together</li>
           </ul>
           <div class="not-included">
@@ -627,8 +627,8 @@
           <p>Invites need to carry context: what type of onboarding flow, which plan options, which processor is inviting. Today&rsquo;s invite links are generic. This needs a new invite architecture.</p>
         </div>
         <div class="problem">
-          <h4>5. Server-side plan enforcement</h4>
-          <p>Product and COA limits must be enforced by the server, not just hidden in the UI. This affects product creation, COA uploads, product scans, and bulk imports &mdash; all of which currently bypass limits.</p>
+          <h4>5. Product/COA limit system</h4>
+          <p>Product count limits do not exist as a concept anywhere in the system today &mdash; not as a data field, not as a configuration, not as enforcement. A new limiting-factor feature must be designed, added to the subscription plan data model, and then enforced server-side across all product-creation paths (direct upload, product scan, COA extraction, bulk import).</p>
         </div>
         <div class="problem">
           <h4>6. Cross-company event system</h4>
