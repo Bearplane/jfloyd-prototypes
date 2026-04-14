@@ -248,35 +248,42 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
         <span style="margin-left:auto;font-size:10px;color:#93C5FD">Step 4 of 4</span>
       </div>
       <div class="notif-body">
-        <p style="font-size:12px;color:#64748B;margin-bottom:14px">Based on your answers, you're subject to the following compliance policies. These determine what documents you need to provide, how your products are scanned, and how your compliance score is calculated.</p>
+        <p style="font-size:13px;color:#1E3A5F;font-weight:600;margin-bottom:14px">Here's what you'll need to do to stay compliant</p>
+        <p style="font-size:12px;color:#64748B;margin-bottom:14px">Based on your products, geographies, and payment rails, we've figured out what rules apply to your business. No policy configuration needed on your end — we handle that automatically.</p>
 
-        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:11px 14px;margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <code style="font-size:12px;font-weight:700;color:#1E3A5F">hemp-cbd-base-v3</code>
-            <span class="pill pill-active" style="font-size:9px">Active</span>
-          </div>
-          <div style="font-size:12px;color:#475569">Base compliance for hemp and CBD consumer products — COA documentation, Farm Bill attestation, Δ9-THC limits, product classification rules.</div>
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px 16px;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">📋 Documents &amp; Attestations</div>
+          <ul style="font-size:12px;color:#475569;line-height:1.8;margin:0;padding-left:18px">
+            <li>Current Certificate of Analysis (COA) for every finished product SKU</li>
+            <li>2018 Farm Bill Compliance Attestation on file</li>
+            <li>Active Texas retailer license — we'll verify this automatically via state records</li>
+            <li>Current ACH bank statement (renewed every 90 days)</li>
+            <li>MasterCard merchant agreement on file</li>
+          </ul>
         </div>
 
-        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:11px 14px;margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <code style="font-size:12px;font-weight:700;color:#1E3A5F">state-overlay-tx-v2</code>
-            <span class="pill pill-active" style="font-size:9px">Active</span>
-          </div>
-          <div style="font-size:12px;color:#475569">Texas-specific requirements — retailer license verification, prohibited-county shipping rules, state-level COA format requirements.</div>
+        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px 16px;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:700;color:#1E40AF;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">🔍 What we'll monitor automatically</div>
+          <ul style="font-size:12px;color:#475569;line-height:1.8;margin:0;padding-left:18px">
+            <li>Your product catalog for required labeling, disclaimers, and Δ9-THC limits (≤ 0.3%)</li>
+            <li>Your website for missing FDA disclaimers and prohibited claims</li>
+            <li>Shipping destinations — certain counties and states are off-limits for hemp/CBD</li>
+            <li>Quarterly chargeback thresholds and checkout disclosures for MasterCard network</li>
+          </ul>
         </div>
 
-        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:11px 14px;margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <code style="font-size:12px;font-weight:700;color:#1E3A5F">payment-rails-mc-v1</code>
-            <span class="pill pill-active" style="font-size:9px">Active</span>
-          </div>
-          <div style="font-size:12px;color:#475569">MasterCard processor requirements — prohibited product classifications for MC network, chargeback thresholds, required checkout disclosures.</div>
+        <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:14px 16px;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:700;color:#78350F;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">⏱ Next 7 days</div>
+          <div style="font-size:12px;color:#78350F;line-height:1.6">You'll see a guided checklist on your dashboard. Most merchants in your category finish onboarding within a week. We'll email you if anything's blocking.</div>
+        </div>
+
+        <div style="font-size:11px;color:#94A3B8;margin-top:10px;font-style:italic;border-top:1px dashed #E2E8F0;padding-top:8px">
+          🛠 <strong>Internal only (not visible to merchant):</strong> this merchant is assigned <code style="font-size:10px">hemp-cbd-base-v3</code> + <code style="font-size:10px">state-overlay-tx-v2</code> + <code style="font-size:10px">payment-rails-mc-v1</code>. Staff can see and adjust the assignment in Q-Audit; the merchant only ever sees consequences on their dashboard.
         </div>
       </div>
       <div class="notif-footer">
-        <button class="btn btn-ghost">This doesn't look right →</button>
-        <button class="btn btn-primary">Confirm &amp; continue →</button>
+        <button class="btn btn-ghost">Something looks off →</button>
+        <button class="btn btn-primary">Got it, take me to my dashboard →</button>
       </div>
     </div>
 
@@ -551,19 +558,22 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
     <div class="notif-card">
       <div class="notif-head">
         <span>🔔</span>
-        <span style="font-weight:700">Policy update notice</span>
+        <span style="font-weight:700">Heads up — your compliance requirements are changing</span>
         <span style="background:#F59E0B;color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;text-transform:uppercase">Advisory</span>
         <span style="margin-left:auto;font-size:10px;color:#93C5FD">Apr 15, 2026</span>
       </div>
       <div class="notif-body">
-        <p style="margin-bottom:10px">Your policy <code style="font-size:12px;background:#F1F5F9;padding:1px 5px;border-radius:3px">hemp-cbd-base-v3</code> is updating to <strong>v4 on May 15, 2026</strong>.</p>
-        <p style="font-size:13px;color:#475569;margin-bottom:10px"><strong>New requirement:</strong> All CBD products must display the batch number on the product label. Applies to all finished product SKUs in your catalog.</p>
-        <p style="font-size:12px;color:#64748B">You have <strong>30 days</strong> to comply. Items not compliant by May 15 will move to "Action Needed" status on your compliance dashboard.</p>
+        <p style="margin-bottom:10px;font-size:13px;color:#1E3A5F;font-weight:600">A new rule applies to your CBD products starting <strong>May 15, 2026</strong>.</p>
+        <p style="font-size:13px;color:#475569;margin-bottom:10px"><strong>What's changing:</strong> All CBD products must display the batch number on the product label. This applies to every finished-product SKU in your catalog.</p>
+        <p style="font-size:12px;color:#64748B;margin-bottom:10px">You have <strong>30 days</strong> to update your labels. Items not compliant by May 15 will appear as "Action Needed" on your dashboard — they won't be removed, just flagged until fixed.</p>
+        <p style="font-size:11px;color:#94A3B8;font-style:italic;border-top:1px dashed #E2E8F0;padding-top:8px">
+          🛠 <strong>Internal only:</strong> triggered by <code style="font-size:10px">hemp-cbd-base-v3 → v4</code> bulletin — delivered to every merchant on v3. Staff see the diff + grace period + affected SKU count in Q-Audit.
+        </p>
       </div>
       <div class="notif-footer">
-        <button class="btn btn-ghost">View full notice</button>
+        <button class="btn btn-ghost">View full details</button>
         <button class="btn btn-warn">Request exemption →</button>
-        <button class="btn btn-primary">See what to do →</button>
+        <button class="btn btn-primary">See what I need to fix →</button>
       </div>
     </div>
   </div>
