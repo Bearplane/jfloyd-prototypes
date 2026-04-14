@@ -529,7 +529,7 @@
         <span class="card-ticket">QP-3700 &bull; NEW</span>
       </div>
       <div class="card-name">MID Management &#8212; Merchant Identifier Assignment</div>
-      <p class="card-desc">Bulk management UI for assigning merchant identifiers (MIDs) to monitored companies. MIDs are processor-specific (scoped via <code>pl_merchant_processor_client</code>) &#8212; a merchant's MID for one processor is never visible to another. New MID column in the WeMonitor table, bulk modal supporting multiple MIDs per company (multi-DBA via <code>pl_company_dba.merchant_identifier</code>), and batch CSV upload flow. Complements policy-first but tracked separately.</p>
+      <p class="card-desc">Bulk management UI for assigning merchant identifiers (MIDs) to monitored companies. MIDs render <strong>inline in the Legal Name cell</strong> &#8212; no new column. Processor-scoped via <code>pl_merchant_processor_client</code>; source field <code>pl_company_dba.merchant_identifier</code> (per-DBA, multiple per company). Surfaces: inline chip list in Legal Name cell, Manage MIDs modal (3 entry points), batch CSV upload. Complements policy-first but tracked separately.</p>
       <div class="card-pills">
         <span class="pill pill-blue">WeMonitor</span>
         <span class="pill pill-green">Net New</span>

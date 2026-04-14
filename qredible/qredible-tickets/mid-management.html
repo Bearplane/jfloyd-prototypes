@@ -174,7 +174,7 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
 <!-- BANNER -->
 <div class="banner">
   <strong>MID Management — WeMonitor Surface (April 2026) —</strong>
-  MIDs are stored on <code>pl_company_dba.merchant_identifier</code> and set today via direct DB writes with no UI. This mockup proposes adding MID management to the WeMonitor surface with bulk assign, processor-scoping enforced via <code>pl_merchant_processor_client</code>, and CSV upload.
+  MIDs are stored on <code>pl_company_dba.merchant_identifier</code> but there is no UI to add, edit, or search them. This mockup proposes surfacing MIDs <strong>inline in the Legal Name cell</strong> of the WeMonitor table (matching the existing company-identity block pattern — company name, MIDs, then pills), adding search-by-MID to the search field, and a bulk management modal for assigning and editing MIDs — all processor-scoped so your MIDs are never visible to other processors monitoring the same company. <strong>No new column.</strong>
 </div>
 
 <!-- PAGE -->
@@ -183,6 +183,45 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
   <div class="page-header">
     <h1>MID Management — Merchant Identifier Assignment</h1>
     <p>WeMonitor surface addition: bulk-assign and manage Merchant IDs per company, scoped to the current processor's relationship.</p>
+  </div>
+
+  <!-- REQUIREMENTS -->
+  <div class="section" style="background:#EFF6FF;border:2px solid #3B82F6;border-radius:14px;padding:24px 28px;margin-bottom:40px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#1E40AF;margin-bottom:12px">Acceptance criteria — for dev team review</div>
+    <ol style="padding-left:20px;font-size:13px;color:#1E293B;line-height:1;list-style:none;counter-reset:req">
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #DBEAFE">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R1</span>
+        <span><strong>Legal Name cell</strong> displays assigned MIDs inline as a second line between company name and existing state/industry/type pills. Multiple MIDs render comma-separated with truncation for long lists (e.g., <code style="font-size:11px;background:#DBEAFE;padding:1px 5px;border-radius:3px">MID 501234, 501235, +2 more</code>). MIDs shown are scoped to the current processor. <strong>No new table column is added.</strong></span>
+      </li>
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #DBEAFE">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R2</span>
+        <span><strong>Search field</strong> accepts MID numbers as a search term. Placeholder updated to "Search by Legal Name, DBA, MID Number, or Website...". Search is exact-match on MID number and is processor-scoped.</span>
+      </li>
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #DBEAFE">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R3</span>
+        <span><strong>Manage MIDs modal</strong> lets staff add, edit, remove, and label MIDs per company. No limit on count. Each row: MID value, optional label, created date. Three entry points: click MID text in Legal Name cell · row actions menu · "Add MIDs" link when none assigned.</span>
+      </li>
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #DBEAFE">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R4</span>
+        <span><strong>Bulk CSV</strong> — upload <code style="font-size:11px;background:#DBEAFE;padding:1px 5px;border-radius:3px">(company_id, mid_value, optional_label)</code> rows. Errors (company not found, invalid MID format, duplicate within same processor) surfaced per row in upload summary.</span>
+      </li>
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #DBEAFE">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R5</span>
+        <span><strong>Processor scoping</strong> enforced at API layer — all MID reads/writes filter by <code style="font-size:11px;background:#DBEAFE;padding:1px 5px;border-radius:3px">pl_merchant_processor_client.pl_merchant_processor_company_id</code>. A merchant monitored by two processors carries two independent MID sets. Processor A never sees Processor B's MIDs.</span>
+      </li>
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #DBEAFE">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R6</span>
+        <span><strong>Data source:</strong> <code style="font-size:11px;background:#DBEAFE;padding:1px 5px;border-radius:3px">pl_company_dba.merchant_identifier</code>. Join path: <code style="font-size:11px;background:#DBEAFE;padding:1px 5px;border-radius:3px">pl_company_dba → pl_company → pl_merchant_processor_client</code>. MID and DBA name are independent fields — a MID can be assigned without a DBA name and vice versa.</span>
+      </li>
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #DBEAFE">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R7</span>
+        <span><strong>Row action:</strong> "Manage MIDs" added to the WeMonitor row actions menu alongside existing actions (Add Company, Assign Team Members, etc.).</span>
+      </li>
+      <li style="counter-increment:req;display:flex;gap:12px;padding:8px 0">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#3B82F6;white-space:nowrap;padding-top:1px">R8</span>
+        <span><strong>No new column.</strong> The Legal Name cell is the primary MID surface. This is explicit because an earlier mockup iteration proposed a dedicated MID column — that is not the intended design.</span>
+      </li>
+    </ol>
   </div>
 
   <!-- SECTION 1 -->
@@ -202,14 +241,14 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
         </ul>
       </div>
       <div class="card">
-        <h3>After this feature</h3>
+        <h3>After this feature (no new column)</h3>
         <ul>
-          <li>New MID column visible in the WeMonitor merchant table</li>
-          <li>Inline "Manage MIDs" action per merchant row</li>
-          <li>Bulk modal for add / edit / remove per company</li>
+          <li>MIDs surface <strong>inline in the Legal Name cell</strong> — between company name and existing state/industry/type pills. Matches the existing company-identity block pattern in production.</li>
+          <li>WeMonitor search field accepts MID number as a search term alongside Legal Name, DBA, and Website</li>
+          <li>"Manage MIDs" added to row actions menu; also reachable by clicking MID text or "Add MIDs" link when none assigned</li>
+          <li>Modal for add / edit / remove per company — no limit on MID count</li>
           <li>CSV upload for batch MID assignment at scale</li>
-          <li>All MIDs scoped to the current processor — Processor A's MIDs are never visible to Processor B monitoring the same merchant</li>
-          <li>Scoping enforced via <code>pl_merchant_processor_client.pl_merchant_processor_company_id</code> filter</li>
+          <li>All MIDs scoped to current processor via <code>pl_merchant_processor_client.pl_merchant_processor_company_id</code> filter — invisible to other processors</li>
           <li>Optional label/note per MID (e.g. "Retail", "Wholesale")</li>
         </ul>
       </div>
@@ -220,12 +259,23 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
 
   <!-- SECTION 2 — TABLE -->
   <div class="section">
-    <div class="section-label blue">② WeMonitor Table — MID Column</div>
+    <div class="section-label blue">② WeMonitor Table — MID Inline in Legal Name Cell</div>
     <div class="section-title">WeMonitor — Monitored Merchants (WestTown Payments, LLC)</div>
 
     <div class="table-toolbar">
       <button class="btn-bulk">☰ Bulk Assign MIDs</button>
-      <span class="search-area">Showing 5 of 142 merchants — filtered: All</span>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div style="position:relative">
+          <input type="text" placeholder="Search by Legal Name, DBA, MID Number, or Website..."
+            style="width:400px;border:2px solid #3B82F6;border-radius:6px;padding:7px 12px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;color:#1E293B;outline:none;background:#fff"
+            value="501234">
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;background:#EFF6FF;color:#1E40AF;font-weight:700;padding:1px 7px;border-radius:10px;font-family:'IBM Plex Mono',monospace">MID match</span>
+        </div>
+        <div style="font-size:11px;color:#64748B;max-width:400px;text-align:right;line-height:1.4">
+          Search matches exact MID number, legal name, any DBA, or any website URL.<br>
+          <span style="color:#475569">MID search is processor-scoped — you only search against MIDs you've assigned.</span>
+        </div>
+      </div>
     </div>
 
     <div class="tbl-wrap">
@@ -233,76 +283,112 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
         <thead>
           <tr>
             <th class="checkbox-col"><input type="checkbox"></th>
-            <th>Company</th>
-            <th>Status</th>
+            <th>Legal Name</th>
+            <th>License Status</th>
+            <th>Website Compliance</th>
             <th>Last Scan</th>
-            <th class="new-col">MID(s) ★ New</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Row 1 -->
+
+          <!-- Row 1 — single MID -->
           <tr>
             <td><input type="checkbox"></td>
-            <td><a class="company-link" href="#">Rocky Seeds</a><br><span style="font-size:11px;color:#94A3B8">1 DBA</span></td>
+            <td>
+              <!-- Line 1: company name -->
+              <a class="company-link" href="#">Rocky Seeds</a>
+              <!-- Line 2: MID(s) — NEW, inline under name -->
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B;margin:3px 0 4px">
+                <span style="color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px">MID</span>
+                &nbsp;<a href="#" style="color:#3B82F6;font-weight:600">WSTTN-001842</a>
+              </div>
+              <!-- Line 3: pills — unchanged from production -->
+              <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:1px">
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">CA</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Hemp / CBD</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Retailer</span>
+              </div>
+            </td>
             <td><span class="badge badge-active">Active</span></td>
+            <td><span class="badge badge-active">Pass</span></td>
             <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-04-13</td>
-            <td class="new-col">
-              <span class="mid-chip">WSTTN-001842</span>
-            </td>
-            <td><a class="action-link" href="#">Manage MIDs</a></td>
+            <td><a class="action-link" href="#">Manage MIDs ↗</a></td>
           </tr>
-          <!-- Row 2 -->
+
+          <!-- Row 2 — multiple MIDs -->
           <tr>
             <td><input type="checkbox"></td>
-            <td><a class="company-link" href="#">Bulk Marijuana Seeds</a><br><span style="font-size:11px;color:#94A3B8">2 DBAs</span></td>
+            <td>
+              <a class="company-link" href="#">Bulk Marijuana Seeds</a>
+              <!-- Multiple MIDs — comma-separated inline -->
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B;margin:3px 0 4px">
+                <span style="color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px">MIDs</span>
+                &nbsp;<a href="#" style="color:#3B82F6;font-weight:600">WSTTN-003391</a>,
+                <a href="#" style="color:#3B82F6;font-weight:600">WSTTN-003392</a>
+                <span style="color:#94A3B8;font-size:10px">&nbsp;(retail · wholesale)</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:1px">
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">TX</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Hemp / CBD</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Wholesaler</span>
+              </div>
+            </td>
             <td><span class="badge badge-active">Active</span></td>
+            <td><span class="badge badge-pending">Review</span></td>
             <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-04-12</td>
-            <td class="new-col">
-              <span class="mid-chip">WSTTN-003391</span>
-              <span class="mid-chip">WSTTN-003392</span>
-              <br><span style="font-size:10px;color:#94A3B8;margin-top:3px;display:inline-block">retail · wholesale</span>
-            </td>
-            <td><a class="action-link" href="#">Manage MIDs</a></td>
+            <td><a class="action-link" href="#">Manage MIDs ↗</a></td>
           </tr>
-          <!-- Row 3 -->
+
+          <!-- Row 3 — many MIDs (truncated) -->
           <tr>
             <td><input type="checkbox"></td>
-            <td><a class="company-link" href="#">Crop King Seeds</a><br><span style="font-size:11px;color:#94A3B8">1 DBA</span></td>
-            <td><span class="badge badge-active">Active</span></td>
-            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-04-11</td>
-            <td class="new-col">
-              <span class="mid-chip">WSTTN-007204</span>
+            <td>
+              <a class="company-link" href="#">Hemp Depot</a>
+              <!-- Truncated MID list -->
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B;margin:3px 0 4px">
+                <span style="color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px">MIDs</span>
+                &nbsp;<a href="#" style="color:#3B82F6;font-weight:600">WSTTN-009811</a>,
+                <a href="#" style="color:#3B82F6;font-weight:600">WSTTN-009812</a>,
+                <a href="#" style="color:#3B82F6;font-weight:600;white-space:nowrap">+2 more</a>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:1px">
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">CO</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Hemp / CBD</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Processor</span>
+              </div>
             </td>
-            <td><a class="action-link" href="#">Manage MIDs</a></td>
-          </tr>
-          <!-- Row 4 -->
-          <tr>
-            <td><input type="checkbox"></td>
-            <td><a class="company-link" href="#">Hemp Depot</a><br><span style="font-size:11px;color:#94A3B8">3 DBAs</span></td>
             <td><span class="badge badge-pending">Pending</span></td>
+            <td><span class="badge badge-active">Pass</span></td>
             <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-04-10</td>
-            <td class="new-col">
-              <span class="mid-chip">WSTTN-009811</span>
-              <span class="mid-chip">WSTTN-009812</span>
-              <span class="mid-chip">WSTTN-009813</span>
-            </td>
-            <td><a class="action-link" href="#">Manage MIDs</a></td>
+            <td><a class="action-link" href="#">Manage MIDs ↗</a></td>
           </tr>
-          <!-- Row 5 — empty state -->
+
+          <!-- Row 4 — no MID assigned -->
           <tr>
             <td><input type="checkbox"></td>
-            <td><a class="company-link" href="#">CBD North</a><br><span style="font-size:11px;color:#94A3B8">1 DBA</span></td>
-            <td><span class="badge badge-active">Active</span></td>
-            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-04-09</td>
-            <td class="new-col">
-              <span class="mid-empty">No MID &nbsp;<a href="#">+ Assign MID</a></span>
+            <td>
+              <a class="company-link" href="#">CBD North</a>
+              <!-- Empty MID state — subtle affordance -->
+              <div style="margin:3px 0 4px">
+                <span class="mid-empty">No MID assigned &nbsp;<a href="#">+ Add MIDs</a></span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:1px">
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">OR</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Hemp / CBD</span>
+                <span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px">Retailer</span>
+              </div>
             </td>
-            <td><a class="action-link" href="#">Manage MIDs</a></td>
+            <td><span class="badge badge-active">Active</span></td>
+            <td><span class="badge badge-active">Pass</span></td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-04-09</td>
+            <td><a class="action-link" href="#">Manage MIDs ↗</a></td>
           </tr>
+
         </tbody>
       </table>
     </div>
+    <p style="font-size:11px;color:#64748B;font-style:italic;margin-top:10px">The Legal Name cell always had 3 layers in production: company name → identity signals → pills. MIDs become a second line in that block. No new column introduced.</p>
   </div>
 
   <div class="divider"></div>
@@ -311,6 +397,8 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
   <div class="section">
     <div class="section-label" style="background:#F0FDF4;color:#166534">③ Manage MIDs Modal — Single Company</div>
     <div class="section-title">Modal: "Manage Merchant IDs — Bulk Marijuana Seeds"</div>
+
+    <p style="font-size:13px;color:#475569;margin:0 0 18px">Open via: <strong>click the MIDs text under a company's legal name</strong>, OR use the <strong>Manage MIDs</strong> option in the row actions menu, OR click the <strong>Add MIDs</strong> link when a company has none assigned.</p>
 
     <div class="modal-wrap">
       <!-- Modal Header -->
@@ -488,7 +576,7 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
         <div class="arch-icon">📋</div>
         <div class="arch-text">
           <strong>WeMonitor table query</strong>
-          The table only fetches MIDs where <code>pl_merchant_processor_client.pl_merchant_processor_company_id = current_processor_id</code>. The MID column in the UI is therefore always processor-scoped by construction.
+          The table only fetches MIDs where <code>pl_merchant_processor_client.pl_merchant_processor_company_id = current_processor_id</code>. The MIDs shown inline in the Legal Name cell are therefore always processor-scoped by construction.
         </div>
       </div>
 
@@ -496,7 +584,7 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
         <div class="arch-icon">🗂️</div>
         <div class="arch-text">
           <strong>Multiple MIDs per company (multiple DBAs)</strong>
-          <code>pl_company_dba.merchant_identifier</code> is per-DBA. A company with 3 DBAs can have 3 different MIDs under a single processor, all shown as a chip list in the MID column.
+          <code>pl_company_dba.merchant_identifier</code> is per-DBA. A company with 3 DBAs can have 3 different MIDs under a single processor, all shown as a chip list inline in the Legal Name cell.
         </div>
       </div>
 
@@ -532,6 +620,11 @@ input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer}
     <div class="oq-card">
       <div class="oq-num">Q5 — MCC (Merchant Category Code)</div>
       <p>No MCC field exists on any entity today. If MCC is eventually needed alongside MID (common in card-brand reporting), should it live in the same "Manage MIDs" modal as an additional field per-MID, or in a separate surface? Flagging early to avoid a schema refactor later.</p>
+    </div>
+
+    <div class="oq-card">
+      <div class="oq-num">Q6 — MID format validation</div>
+      <p>What validation rules apply to MID values at write time? Processors use different formats — some are 16-digit numeric strings, others are alphanumeric with dashes (e.g. <code style="font-family:'IBM Plex Mono',monospace;font-size:11px">WSTTN-001842</code>). Should the API enforce a regex pattern, a length constraint, or accept any non-empty string and leave format enforcement to the processor? Clarifying this before implementation avoids a later migration if validation requirements differ by processor.</p>
     </div>
 
   </div>
