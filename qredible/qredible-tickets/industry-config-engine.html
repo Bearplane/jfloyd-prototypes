@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Industry Configuration Engine — Q-Audit Global Settings</title>
+<title>Policy Editor (formerly Industry Config Engine) — Legacy View</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -188,9 +188,20 @@ a:hover{text-decoration:underline}
 <nav class="topnav">
   <a href="https://jfloyd-qredible.netlify.app/">← All Mockups</a>
   <span class="sep">/</span>
-  <span class="current">Industry Configuration Engine</span>
-  <span class="badge">QP-3620</span>
+  <span class="current">Policy Editor (formerly Industry Config Engine)</span>
+  <span class="badge">QP-3647 (rescoped)</span>
 </nav>
+
+<!-- LEGACY-VIEW CALLOUT -->
+<div style="background:#FEF3C7;border-bottom:1px solid #FDE68A;padding:12px 24px;font-size:13px;color:#78350F;line-height:1.5">
+  ⚠️ <strong>Legacy view —</strong> this page is the pre-pivot industry-configuration mockup. For the canonical policy-first authoring surface, see the new <a href="policy-editor.html" style="color:#B45309;font-weight:700;text-decoration:underline">Policy Editor mockup</a>. This page is kept for historical context and for the in-place Section 2 authoring view below.
+</div>
+
+<!-- POLICY-FIRST RESTRUCTURE BANNER -->
+<div style="background:#EFF6FF;border-bottom:3px solid #3B82F6;padding:14px 24px;font-size:13px;color:#1E3A5F;line-height:1.5">
+  <strong style="color:#1E3A5F">Policy-First Restructure (April 2026) —</strong>
+  This mockup was originally scoped as the <em>Industry Configuration Engine</em>. Following the Architecture Audit, it becomes the <em>Policy Editor</em> — a form-driven UI for authoring versioned policy documents. Most of the existing screens on this page (the Global Settings grid, the edit panels, the flow diagrams) are reusable; the framing shifts from "configure by industry" to "author a policy that drives everything." A <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">policy_id</code> becomes the primary key for every piece of configuration shown below.
+</div>
 
 <div class="page">
 
@@ -199,8 +210,8 @@ a:hover{text-decoration:underline}
   <!-- ═══════════════════════════════════════════════════════ -->
   <div class="section">
     <div class="section-header">
-      <div class="section-title">Global Settings — Enhanced Grid</div>
-      <div class="section-sub">20 configuration areas — 3 new tiles support the Industry Configuration Engine</div>
+      <div class="section-title">Q-Audit Global Settings — Enhanced Grid</div>
+      <div class="section-sub">20 configuration areas — 3 new tiles anchor the Policy Editor workflow. Every tile\u2019s content is scoped to a policy_id going forward; settings become the default source when a policy is authored.</div>
     </div>
 
     <div class="settings-grid">
@@ -244,19 +255,19 @@ a:hover{text-decoration:underline}
   <hr class="section-divider">
 
   <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- SECTION 2: INDUSTRY TYPE ENHANCED EDIT VIEW -->
+  <!-- SECTION 2: POLICY EDIT VIEW -->
   <!-- ═══════════════════════════════════════════════════════ -->
   <div class="section">
     <div class="section-header">
-      <div class="section-title">Industry Types — Enhanced Edit View</div>
-      <div class="section-sub">Clicking Edit on "Hemp / CBD" now exposes linked scan profiles, MRI configuration, regulatory bindings, and MCC codes</div>
+      <div class="section-title">Policy Editor — Authoring View</div>
+      <div class="section-sub">Clicking Edit on the hemp-cbd-v3 policy exposes the full policy document: applicable tiers, signals (checklist), product classification, MRI configuration, scoring model, and report configuration.</div>
     </div>
 
     <div class="edit-panel">
       <div class="edit-panel-header">
         <div>
-          <div class="edit-panel-title">✏️ Edit Industry Type</div>
-          <div class="edit-panel-sub">Hemp / CBD</div>
+          <div class="edit-panel-title">📜 Edit Policy</div>
+          <div class="edit-panel-sub">hemp-cbd-v3 &nbsp;·&nbsp; v3.0 &nbsp;·&nbsp; published Apr 1, 2026 &nbsp;·&nbsp; Active</div>
         </div>
         <button class="btn btn-outline btn-sm" style="color:#93C5FD;border-color:#334155;background:transparent">Cancel</button>
       </div>
@@ -264,12 +275,16 @@ a:hover{text-decoration:underline}
 
         <!-- Base fields -->
         <div class="form-row">
-          <label class="form-label">Industry Type Name</label>
-          <input class="form-input" type="text" value="Hemp / CBD">
+          <label class="form-label">Policy ID</label>
+          <input class="form-input" type="text" value="hemp-cbd-v3" readonly>
         </div>
         <div class="form-row">
-          <label class="form-label">Description</label>
-          <textarea class="form-input form-textarea">Hemp-derived CBD products including tinctures, edibles, topicals, and capsules. Subject to FDA regulations on health claims and 0.3% THC federal limit.</textarea>
+          <label class="form-label">Human-Readable Name</label>
+          <input class="form-input" type="text" value="Hemp / CBD Compliance Program v3">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Description &amp; Narrative (what processors and merchants read)</label>
+          <textarea class="form-input form-textarea">Hemp-derived CBD products including tinctures, edibles, topicals, and capsules. Subject to FDA regulations on health claims and 0.3% THC federal limit. This policy defines qualifying merchant tiers, scanner signals, product classifications, MRI check requirements, scoring model, and report configuration. Version 3 adds the Texas THCA bulletin addendum (CB-THCA-TX-2026-01).</textarea>
         </div>
 
         <!-- ── ACCORDION: Linked Types of Company ── -->

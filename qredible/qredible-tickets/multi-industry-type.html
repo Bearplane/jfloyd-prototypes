@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QP-3646 — Multi-Industry Type Support</title>
+<title>QP-3646 — Multi-Policy Merchant Assignment (rescoped)</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -162,13 +162,19 @@ tbody td{padding:9px 12px;color:#374151}
 <nav class="topnav">
   <span class="breadcrumb">← <a href="https://jfloyd-qredible.netlify.app/" style="color:#93C5FD">All Mockups</a></span>
   <span class="sep">/</span>
-  <span class="breadcrumb"><span>Multi-Industry Type Support</span></span>
-  <span class="badge">QP-3646</span>
+  <span class="breadcrumb"><span>Multi-Policy Merchant Assignment</span></span>
+  <span class="badge">QP-3646 (rescoped)</span>
 </nav>
 
+<!-- POLICY-FIRST RESTRUCTURE BANNER -->
+<div style="background:#EFF6FF;border-bottom:3px solid #3B82F6;padding:14px 32px;font-size:13px;color:#1E3A5F;line-height:1.5">
+  <strong style="color:#1E3A5F">Policy-First Restructure (April 2026) —</strong>
+  This ticket has been rescoped from <em>Multi-Industry Type Support</em> to <em>Multi-Policy Merchant Assignment</em>. Merchant records now carry a <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">policy_ids[]</code> array (M:N). Each assigned policy contributes its signals, product classifications, and MRI checks to the scan independently. Simpler than the industry/type aggregation originally scoped because conflicts between policies surface as separate findings rather than being silently merged. UI reuses ~50% of the original scope. See the Architecture Audit doc for full context.
+</div>
+
 <div class="page">
-  <div class="page-title">Multi-Industry Type Support</div>
-  <div class="page-sub">Breaking the 1:1 Industry Type / Type of Company constraint — UI impact across all touchpoints</div>
+  <div class="page-title">Multi-Policy Merchant Assignment</div>
+  <div class="page-sub">A merchant can be governed by multiple policies simultaneously (e.g., a CBD retailer that also sells peptides). Each policy contributes independently — no silent merge, no forced 1:1 industry constraint.</div>
 
   <!-- SECTION 1 -->
   <div class="section">
@@ -199,13 +205,13 @@ tbody td{padding:9px 12px;color:#374151}
         <div class="col-after">
           <div class="col-label">AFTER</div>
           <div class="form-group">
-            <label class="form-label">Industry Types <span style="color:#DC2626">*</span></label>
+            <label class="form-label">Applicable Policies <span style="color:#DC2626">*</span></label>
             <ul class="check-list">
               <li class="check-item checked">
                 <span class="cb"></span> Hemp / CBD
               </li>
               <div class="cascade-group hemp">
-                <div class="sub-label">Types of Company — Hemp / CBD</div>
+                <div class="sub-label">Tier — hemp-cbd-v3</div>
                 <div class="sub-check checked"><span class="cb"></span> Retailer</div>
                 <div class="sub-check"><span class="cb"></span> Cultivator</div>
                 <div class="sub-check"><span class="cb"></span> Distributor</div>
@@ -228,7 +234,7 @@ tbody td{padding:9px 12px;color:#374151}
               <li class="check-item"><span class="cb"></span> On-Line Dating Industry</li>
             </ul>
           </div>
-          <div class="annotation">Checking an industry reveals its Type of Company options. Multiple pairs can be selected. Each checked pair becomes a row in the junction table.</div>
+          <div class="annotation">Selecting a policy reveals its available tier options. Multiple policies can be assigned. Each assigned policy becomes a row in the merchant_policy_ids[] array.</div>
         </div>
       </div>
     </div>
@@ -274,7 +280,7 @@ tbody td{padding:9px 12px;color:#374151}
               </div>
             </div>
           </div>
-          <div class="annotation">Each IT+ToC pair renders as a visually grouped unit. Dividers separate location, Hemp/CBD group, and Guns group. Color-coded per industry.</div>
+          <div class="annotation">Each policy assignment renders as a visually grouped unit. Dividers separate location and policy groups. Color-coded per policy.</div>
         </div>
       </div>
     </div>
@@ -335,7 +341,7 @@ tbody td{padding:9px 12px;color:#374151}
               </div>
             </div>
           </div>
-          <div class="annotation">Label changes to plural "MERCHANT TYPES". Location pills separated from industry pills. "✏️ Manage Types" opens the IT+ToC assignment panel.</div>
+          <div class="annotation">Label changes to plural "MERCHANT TYPES". Location pills separated from policy pills. "✏️ Manage Types" opens the IT+ToC assignment panel.</div>
         </div>
       </div>
     </div>
@@ -358,11 +364,11 @@ tbody td{padding:9px 12px;color:#374151}
             </div>
             <div class="modal-body">
               <div class="modal-section">
-                <div class="modal-section-label">Industry Type / Type of Company</div>
+                <div class="modal-section-label">Applicable Policy</div>
                 <select class="form-select" disabled style="margin-bottom:8px">
                   <option>Other / Other</option>
                 </select>
-                <div style="font-size:11px;color:#64748B">All companies in this upload will be assigned this industry type.</div>
+                <div style="font-size:11px;color:#64748B">All companies in this upload will be assigned this policy.</div>
               </div>
               <div style="border-top:1px solid #E2E8F0;padding-top:12px;margin-top:4px">
                 <div class="modal-section-label">Upload File</div>
@@ -382,10 +388,10 @@ tbody td{padding:9px 12px;color:#374151}
             <div class="modal-body">
               <div class="info-box" style="margin-bottom:14px">
                 <span class="note-icon">ℹ️</span>
-                <span>Industry types can be assigned <strong>per-row</strong> via column mapping, or set as a <strong>default</strong> below. Aligns with QP-3638 / QP-3642.</span>
+                <span>Policies can be assigned <strong>per-row</strong> via column mapping, or set as a <strong>default</strong> below.</span>
               </div>
               <div class="modal-section">
-                <div class="modal-section-label">Default Industry Assignment <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>
+                <div class="modal-section-label">Default Policy Assignment <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>
                 <ul class="check-list" style="margin-bottom:8px">
                   <li class="check-item checked"><span class="cb"></span> Hemp / CBD</li>
                   <div class="cascade-group hemp" style="margin-bottom:4px">
@@ -457,7 +463,7 @@ tbody td{padding:9px 12px;color:#374151}
             </div>
             <div class="rtq-progress-wrap">
               <div class="rtq-progress-bar"><div class="fill"></div></div>
-              <div class="rtq-pct">0 of 10 requirements complete · 2 industry types</div>
+              <div class="rtq-pct">0 of 10 requirements complete · 2 policys</div>
             </div>
             <div class="rtq-steps">
               <div class="rtq-step" style="font-size:10px">Overview<br><span style="font-weight:400;color:#94A3B8">Basics · Contact · Mgmt · Entity</span></div>
@@ -467,7 +473,7 @@ tbody td{padding:9px 12px;color:#374151}
             <div class="rtq-body">
               <div class="info-box" style="margin-bottom:10px;font-size:11px">
                 <span>ℹ️</span>
-                <span>Questions are aggregated across all your industry types. Shared requirements appear once, not duplicated.</span>
+                <span>Questions are aggregated across all your policys. Shared requirements appear once, not duplicated.</span>
               </div>
               <div class="rtq-section">
                 <div class="rtq-section-header hemp">🌿 Hemp / CBD — Retailer</div>
@@ -508,16 +514,16 @@ tbody td{padding:9px 12px;color:#374151}
   <div class="section">
     <div class="section-header">
       <span class="badge badge-blue">⚙ Architecture</span>
-      <h2>How Industry Type Drives Configuration</h2>
+      <h2>How Policy Assignment Drives Configuration</h2>
     </div>
     <div class="section-body">
-      <p style="font-size:13px;color:#64748B;margin-bottom:16px;">Each Industry Type + Type of Company pair configures what systems run for merchants in that category. MRI aggregates the results — it's not configured separately.</p>
+      <p style="font-size:13px;color:#64748B;margin-bottom:16px;">Each Policy assignment configures what systems run for merchants in that category. MRI aggregates the results — it's not configured separately.</p>
       
       <div style="display:flex;flex-direction:column;gap:0;align-items:center;margin-bottom:20px;">
-        <!-- Top: Industry Type Pair -->
+        <!-- Top: Applicable Policy -->
         <div style="padding:12px 20px;background:#1E3A5F;color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-align:center;min-width:300px;">
-          Industry Type + Type of Company<br/>
-          <span style="font-size:11px;font-weight:400;color:#93C5FD;">e.g., Hemp/CBD → Retailer</span>
+          📜 Applicable Policy<br/>
+          <span style="font-size:11px;font-weight:400;color:#93C5FD;">e.g., hemp-cbd-v3 (Retailer tier)</span>
         </div>
         <div style="font-size:20px;color:#CBD5E1;">↓</div>
         
@@ -530,7 +536,7 @@ tbody td{padding:9px 12px;color:#374151}
           </div>
           <div style="flex:1;padding:12px;background:#F0FDF4;border:2px solid #BBF7D0;border-radius:8px;text-align:center;">
             <div style="font-size:13px;font-weight:700;color:#166534;">🛡️ MRI Check Set</div>
-            <div style="font-size:10px;color:#475569;margin-top:4px;">Universal: OFAC, BBB, Google<br/>Industry: FDA, NMLS, ATF, DEA<br/>License types to verify</div>
+            <div style="font-size:10px;color:#475569;margin-top:4px;">Universal: OFAC, BBB, Google<br/>Policy-specific: FDA, NMLS, ATF, DEA<br/>License types to verify</div>
             <div style="font-size:9px;color:#16A34A;margin-top:4px;">CONFIGURABLE per pair</div>
           </div>
           <div style="flex:1;padding:12px;background:#FEF3C7;border:2px solid #FDE68A;border-radius:8px;text-align:center;">
@@ -578,7 +584,7 @@ tbody td{padding:9px 12px;color:#374151}
           <table>
             <thead>
               <tr>
-                <th>Industry Types</th>
+                <th>Applicable Policies</th>
                 <th>Type of Company</th>
                 <th>Description</th>
                 <th>Action</th>
@@ -617,7 +623,7 @@ tbody td{padding:9px 12px;color:#374151}
           <table>
             <thead>
               <tr>
-                <th>Industry Types</th>
+                <th>Applicable Policies</th>
                 <th>Type of Company</th>
                 <th>Description</th>
                 <th>Configuration Summary</th>
@@ -690,18 +696,18 @@ tbody td{padding:9px 12px;color:#374151}
         <tbody>
           <tr>
             <td>Data Model</td>
-            <td class="before">Single Industry Type + Type of Company per company (two columns)</td>
+            <td class="before">Single Applicable Policy per company (two columns)</td>
             <td class="after">Array of IT+ToC pairs per company (junction table — many-to-many)</td>
           </tr>
           <tr>
             <td>Sign-Up</td>
             <td class="before">Single-select dropdowns — one pair at registration</td>
-            <td class="after">Multi-select with cascading Type of Company per checked industry</td>
+            <td class="after">Multi-select with cascading Type of Company per checked policy</td>
           </tr>
           <tr>
             <td>Pipeline</td>
             <td class="before">One pair shown as flat pills</td>
-            <td class="after">Multiple pairs, visually grouped with dividers + color-coded per industry</td>
+            <td class="after">Multiple pairs, visually grouped with dividers + color-coded per policy</td>
           </tr>
           <tr>
             <td>Company Page</td>
@@ -720,13 +726,13 @@ tbody td{padding:9px 12px;color:#374151}
           </tr>
           <tr>
             <td>Scan Profile</td>
-            <td class="before">One industry scan profile per company</td>
-            <td class="after">Union of all assigned industry scan profiles</td>
+            <td class="before">One policy signal set per company</td>
+            <td class="after">Union of all assigned policy signal sets</td>
           </tr>
           <tr>
             <td>MRI Profile</td>
             <td class="before">One industry check set per company</td>
-            <td class="after">Union of all assigned industry MRI check sets</td>
+            <td class="after">Union of MRI check sets from all assigned policies</td>
           </tr>
         </tbody>
       </table>

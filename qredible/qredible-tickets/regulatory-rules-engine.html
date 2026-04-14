@@ -976,9 +976,22 @@
 <nav class="proto-nav">
   <a href="../">← All Mockups</a>
   <span>/</span>
-  <span>Regulatory Attributes & Rules Engine</span>
-  <span class="ticket-badge">QP-3539 · QP-3540 · QP-3541 · QP-3542</span>
+  <span>Regulatory Attributes & Rules Engine (see banner)</span>
+  <span class="ticket-badge">QP-3539 · QP-3540 · QP-3541 · QP-3542 (Tobacco/Vape MVP)</span>
 </nav>
+
+<!-- POLICY-FIRST RESTRUCTURE BANNER -->
+<div style="background:#FFFBEB;border-top:1px solid #FDE68A;border-bottom:3px solid #F59E0B;padding:14px 24px;font-size:13px;color:#78350F;line-height:1.55">
+  <div style="font-weight:700;color:#78350F;margin-bottom:6px">Policy-First Restructure (April 2026) — two-part update</div>
+  <div style="margin-bottom:6px">
+    <strong>1. Active implementation tickets (QP-3539–QP-3542 — Tobacco/Vape MVP):</strong>
+    <span style="color:#92400E"> Unchanged.</span> The Product Compliance Status column, FDA ENDS authorization matching, and Product Family L2 restructure all proceed as designed. Only the data source shifts: the authorization list and product classification rules will be referenced from a versioned policy document (<code style="background:#FEF3C7;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">tobacco-vape-v1.product_classification.watchlist_source</code>) once the Policy Store lands.
+  </div>
+  <div>
+    <strong>2. Superseded tickets (QP-3603 Regulatory Attributes Management · QP-3604 Compliance Rules Engine):</strong>
+    <span style="color:#B91C1C"> Cut.</span> The three-layer ontology (Attributes → Bindings → Rules) described below is replaced by encoding attributes as fields on <code style="background:#FEF3C7;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">policy.checklist[]</code> signals directly. The Attributes management screen (Section 3) and Rules Builder (Section 5) become authoring sections inside the Policy Editor, not standalone UIs. The concept survives; the separate tables do not. See Architecture Audit doc for full context.
+  </div>
+</div>
 
 <div class="page">
 
@@ -1162,17 +1175,23 @@
       </div>
 
       <div class="settings-grid">
-        <!-- NEW: Regulatory Attributes -->
-        <div class="settings-tile highlight">
-          <div class="tile-icon">🏷️</div>
-          <div class="tile-name">Regulatory Attributes <span class="new-badge">NEW</span></div>
-          <div class="tile-count">12 attributes · 5 active rules</div>
+        <!-- NEW CANONICAL: Policies (replaces Regulatory Attributes + Compliance Rules) -->
+        <div class="settings-tile highlight" style="background:#F0FDF4;border-color:#BBF7D0">
+          <div class="tile-icon">📜</div>
+          <div class="tile-name">Policies <span class="new-badge" style="background:#16A34A">POLICY-FIRST</span></div>
+          <div class="tile-count">4 policies · 3 active · 1 draft</div>
         </div>
-        <!-- NEW: Compliance Rules -->
-        <div class="settings-tile highlight">
+        <!-- SUPERSEDED: Regulatory Attributes (now a section inside Policy Editor) -->
+        <div class="settings-tile" style="opacity:.55;background:#FEF2F2;border-color:#FECACA">
+          <div class="tile-icon">🏷️</div>
+          <div class="tile-name">Regulatory Attributes <span class="new-badge" style="background:#DC2626">SUPERSEDED</span></div>
+          <div class="tile-count">Folded into Policy Editor</div>
+        </div>
+        <!-- SUPERSEDED: Compliance Rules (now a section inside Policy Editor) -->
+        <div class="settings-tile" style="opacity:.55;background:#FEF2F2;border-color:#FECACA">
           <div class="tile-icon">⚖️</div>
-          <div class="tile-name">Compliance Rules <span class="new-badge">NEW</span></div>
-          <div class="tile-count">5 rules · 3 active</div>
+          <div class="tile-name">Compliance Rules <span class="new-badge" style="background:#DC2626">SUPERSEDED</span></div>
+          <div class="tile-count">Folded into Policy Editor</div>
         </div>
         <!-- Existing tiles -->
         <div class="settings-tile">
@@ -1185,10 +1204,10 @@
           <div class="tile-name">Rejection Reasons</div>
           <div class="tile-count">18 reasons active</div>
         </div>
-        <div class="settings-tile">
+        <div class="settings-tile" style="opacity:.55">
           <div class="tile-icon">🏭</div>
-          <div class="tile-name">Industry Types</div>
-          <div class="tile-count">7 industries</div>
+          <div class="tile-name">Industry Types <span class="new-badge" style="background:#64748B">LEGACY</span></div>
+          <div class="tile-count">Read-only · Replaced by Policies</div>
         </div>
         <div class="settings-tile">
           <div class="tile-icon">🕷️</div>
@@ -1218,8 +1237,8 @@
       </div>
     </div>
 
-    <div class="annotation">
-      <strong>Where these live:</strong> The <strong>Regulatory Attributes</strong> and <strong>Compliance Rules</strong> tiles are added to the existing Q-Audit Global Settings page alongside Document Types, Rejection Reasons, and other configuration tiles. They are the management interface for the entire regulatory compliance framework. Access is restricted to Admin and Compliance Officer roles.
+    <div class="annotation" style="background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D">
+      <strong>Post-pivot (April 2026):</strong> The canonical tile is now <strong>Policies</strong> (green, policy-first). The former Regulatory Attributes and Compliance Rules tiles are visually present but marked <em>SUPERSEDED</em> — their authoring UIs become sections inside the Policy Editor (see <a href="policy-editor.html" style="color:#16A34A;font-weight:600">policy-editor.html</a>). Industry Types is marked <em>LEGACY</em> and is read-only until its data is migrated into policy documents. Sections 3+ below preserve the old Regulatory Attributes / Rules Engine screens for historical reference; treat them as <em>not being built as standalone UIs</em>.
     </div>
   </div><!-- /section 2 -->
 
