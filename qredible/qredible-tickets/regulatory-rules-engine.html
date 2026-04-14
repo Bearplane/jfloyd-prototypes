@@ -984,12 +984,11 @@
 <div style="background:#FFFBEB;border-top:1px solid #FDE68A;border-bottom:3px solid #F59E0B;padding:14px 24px;font-size:13px;color:#78350F;line-height:1.55">
   <div style="font-weight:700;color:#78350F;margin-bottom:6px">Policy-First Restructure (April 2026) — two-part update</div>
   <div style="margin-bottom:6px">
-    <strong>1. Active implementation tickets (QP-3539–QP-3542 — Tobacco/Vape MVP):</strong>
+    <strong>Active implementation tickets (QP-3539–QP-3542 — Tobacco/Vape MVP):</strong>
     <span style="color:#92400E"> Unchanged.</span> The Product Compliance Status column, FDA ENDS authorization matching, and Product Family L2 restructure all proceed as designed. Only the data source shifts: the authorization list and product classification rules will be referenced from a versioned policy document (<code style="background:#FEF3C7;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">tobacco-vape-v1.product_classification.watchlist_source</code>) once the Policy Store lands.
   </div>
   <div>
-    <strong>2. Superseded tickets (QP-3603 Regulatory Attributes Management · QP-3604 Compliance Rules Engine):</strong>
-    <span style="color:#B91C1C"> Cut.</span> The three-layer ontology (Attributes → Bindings → Rules) described below is replaced by encoding attributes as fields on <code style="background:#FEF3C7;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">policy.checklist[]</code> signals directly. The Attributes management screen (Section 3) and Rules Builder (Section 5) become authoring sections inside the Policy Editor, not standalone UIs. The concept survives; the separate tables do not. See Architecture Audit doc for full context.
+    <strong>Policy-first direction:</strong> Compliance rules authoring moves into the Policy Editor — a policy doc becomes the single versioned container for checklist, enforcement rules, scan configuration, and COA validation thresholds. Existing Q-Audit tiles (Product Classification, Compliance Elements, etc.) remain operational; policies drive values in those tables rather than replacing them. Evidence tagging vocabulary is seeded from existing <code style="background:#FEF3C7;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">pl_compliance_element.elementName</code> values — no new admin surface needed.
   </div>
 </div>
 
@@ -1181,18 +1180,6 @@
           <div class="tile-name">Policies <span class="new-badge" style="background:#16A34A">POLICY-FIRST</span></div>
           <div class="tile-count">4 policies · 3 active · 1 draft</div>
         </div>
-        <!-- SUPERSEDED: Regulatory Attributes (now a section inside Policy Editor) -->
-        <div class="settings-tile" style="opacity:.55;background:#FEF2F2;border-color:#FECACA">
-          <div class="tile-icon">🏷️</div>
-          <div class="tile-name">Regulatory Attributes <span class="new-badge" style="background:#DC2626">SUPERSEDED</span></div>
-          <div class="tile-count">Folded into Policy Editor</div>
-        </div>
-        <!-- SUPERSEDED: Compliance Rules (now a section inside Policy Editor) -->
-        <div class="settings-tile" style="opacity:.55;background:#FEF2F2;border-color:#FECACA">
-          <div class="tile-icon">⚖️</div>
-          <div class="tile-name">Compliance Rules <span class="new-badge" style="background:#DC2626">SUPERSEDED</span></div>
-          <div class="tile-count">Folded into Policy Editor</div>
-        </div>
         <!-- Existing tiles -->
         <div class="settings-tile">
           <div class="tile-icon">📄</div>
@@ -1204,10 +1191,10 @@
           <div class="tile-name">Rejection Reasons</div>
           <div class="tile-count">18 reasons active</div>
         </div>
-        <div class="settings-tile" style="opacity:.55">
+        <div class="settings-tile">
           <div class="tile-icon">🏭</div>
-          <div class="tile-name">Industry Types <span class="new-badge" style="background:#64748B">LEGACY</span></div>
-          <div class="tile-count">Read-only · Replaced by Policies</div>
+          <div class="tile-name">Industry Types</div>
+          <div class="tile-count">Hemp, Cannabis, Kratom, etc.</div>
         </div>
         <div class="settings-tile">
           <div class="tile-icon">🕷️</div>
@@ -1238,7 +1225,7 @@
     </div>
 
     <div class="annotation" style="background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D">
-      <strong>Post-pivot (April 2026):</strong> The canonical tile is now <strong>Policies</strong> (green, policy-first). The former Regulatory Attributes and Compliance Rules tiles are visually present but marked <em>SUPERSEDED</em> — their authoring UIs become sections inside the Policy Editor (see <a href="policy-editor.html" style="color:#16A34A;font-weight:600">policy-editor.html</a>). Industry Types is marked <em>LEGACY</em> and is read-only until its data is migrated into policy documents. Sections 3+ below preserve the old Regulatory Attributes / Rules Engine screens for historical reference; treat them as <em>not being built as standalone UIs</em>.
+      <strong>Policy-first (April 2026):</strong> The canonical new tile is <strong>Policies</strong> (green). Compliance rules authoring moves into the <a href="policy-editor.html" style="color:#16A34A;font-weight:600">Policy Editor</a> — a policy doc is the single versioned container for checklist, enforcement rules, scan config, and COA thresholds. The existing Q-Audit tiles (Document Types, Rejection Reasons, Industry Types, Product Classification, Compliance Elements, etc.) remain in place and operational; policies drive values in those tables rather than replacing them.
     </div>
   </div><!-- /section 2 -->
 

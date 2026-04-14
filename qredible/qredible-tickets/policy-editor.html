@@ -135,13 +135,13 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
   <span class="sep">/</span>
   <span class="title">Policy Editor</span>
   <span class="sep">/</span>
-  <span class="ticket-badge">QP-3647 (rescoped)</span>
+  <span class="ticket-badge">QP-3647</span>
 </nav>
 
 <!-- POLICY-FIRST BANNER -->
 <div class="banner">
-  <strong>Policy-First Restructure (April 2026) —</strong>
-  This ticket was formerly "Industry Config Engine." After the Architecture Audit, it has been <strong>rescoped</strong> as the canonical editor for versioned policy documents. A policy document is the single unit of truth for compliance configuration: tiers, checklist, product classification, MRI config, payment rails, scoring model, report config, and enforcement rules — all live inside one versioned <code>policy.json</code>. Superseded tickets: <strong>QP-3603</strong> (Regulatory Attributes Management) and <strong>QP-3604</strong> (Compliance Rules Engine).
+  <strong>Policy Editor — Reusable Scan Configuration Authoring (April 2026) —</strong>
+  A policy document is the single versioned container for a reusable scan configuration: tiers, checklist, product classification, MRI config, payment rails, scoring model, report config, and enforcement rules — all in one versioned <code>policy.json</code>. Create once, assign to thousands of merchants, edit and every future scan picks up the change. Also fulfills <a href="https://qredible.atlassian.net/browse/QP-2943" style="color:#1E40AF;font-weight:600">QP-2943</a> — the UI for per-company compliance rules that previously had no admin surface.
 </div>
 
 <!-- PAGE -->
@@ -149,7 +149,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 
   <div class="page-header">
     <h1>Policy Editor — Versioned Policy Document Authoring</h1>
-    <p>Author, review, publish, and version the JSON policy documents that drive the compliance engine. Replaces the former industry-config surface.</p>
+    <p>Author, review, publish, and version the policy documents that drive the compliance engine. A policy is the durable container for a reusable scan configuration — created once, assigned to thousands of merchants.</p>
   </div>
 
   <!-- SECTION 1 — EDITOR -->
@@ -299,7 +299,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
       <div class="vh-row">
         <div class="vh-version">v1</div>
-        <div class="vh-msg">Initial policy — forked from legacy hemp industry config</div>
+        <div class="vh-msg">Initial policy — hemp / CBD consumer products baseline</div>
         <div class="vh-author">Joseph Floyd</div>
         <div class="vh-date">2026-02-04</div>
       </div>
@@ -354,6 +354,175 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       <div class="annotation green" style="margin-top:20px">
         <strong>The win —</strong> All six consumers read from the same versioned policy document. A change in the Policy Editor propagates without a code deploy, without a schema migration, and without touching six separate Jira tickets.
       </div>
+    </div>
+  </div>
+
+  <hr style="height:1px;background:#E2E8F0;border:none;margin:40px 0">
+
+  <!-- SECTION 4 — QP-2943 CONTEXT -->
+  <div class="section">
+    <div class="section-label" style="background:#FEF3C7;color:#92400E">④ QP-2943 Connection</div>
+    <div class="section-title">The Policy Editor IS the compliance rules UI QP-2943 requested</div>
+
+    <div class="flow-section">
+      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:8px;padding:16px 20px;font-size:13px;color:#78350F;line-height:1.75">
+        Per-company compliance rules already exist in the <code style="font-size:11px;background:#FEF3C7;padding:1px 5px;border-radius:3px">pl_company_config_param</code> table — COA validation rules (<code style="font-size:11px;background:#FEF3C7;padding:1px 5px;border-radius:3px">coa_validation_rule</code> JSON: Δ9-THC threshold, THC-O threshold, COA expiration period, <code style="font-size:11px;background:#FEF3C7;padding:1px 5px;border-radius:3px">bypassCategoryRules</code>) — but they are hardcoded via direct DB writes with <strong>no UI exposure</strong> to add or edit them. Existing ticket <a href="https://qredible.atlassian.net/browse/QP-2943" style="color:#92400E;font-weight:700">QP-2943</a> asked for a "Compliance Rules tab in Settings."
+        <br/><br/>
+        <strong>The Policy Editor IS the fulfillment of QP-2943.</strong> Instead of a separate rules tab, policies become the one place compliance rules live. The hook point is already in the codebase: <code style="font-size:11px;background:#FEF3C7;padding:1px 5px;border-radius:3px">resolveCoaValidationRule()</code> in <code style="font-size:11px;background:#FEF3C7;padding:1px 5px;border-radius:3px">CoaExtractionExportService:~380</code> — a single-line swap to read from <code style="font-size:11px;background:#FEF3C7;padding:1px 5px;border-radius:3px">PolicyLookupService</code> instead of the direct config param read. No new infrastructure needed.
+      </div>
+    </div>
+  </div>
+
+  <hr style="height:1px;background:#E2E8F0;border:none;margin:40px 0">
+
+  <!-- SECTION 5 — COA REQUIREMENT FRAMING -->
+  <div class="section">
+    <div class="section-label" style="background:#DCFCE7;color:#166534">⑤ COA Requirement — How It Actually Works</div>
+    <div class="section-title">A policy's COA rule drives <code style="font-size:14px">PlCategoryEntity.coaRequirement</code></div>
+
+    <div class="flow-section">
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-left:4px solid #16A34A;border-radius:8px;padding:16px 20px;font-size:13px;color:#14532D;line-height:1.75;margin-bottom:16px">
+        COA requirement does not live on individual products — it lives on <strong>Product Classification rows</strong> (<code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">PlCategoryEntity.coaRequirement</code>). The enum values are: <code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">REQUIRED</code> / <code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">CONDITIONAL</code> / <code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">NOT_REQUIRED</code> (<code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">CategoryCoaRequirement</code> enum in the API). Products inherit from their classification at runtime via <code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">ProductHelper.determineCOARequirement()</code>, which iterates categories by <code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">priority</code>.
+        <br/><br/>
+        <strong>A policy's COA rule is a governance layer that drives these classification rows.</strong> The Policy Editor sets the rule; the Product Classification admin tile (Q-Audit Global Settings) remains the operational source of truth at runtime. The runtime does not change — it keeps querying <code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">PlCategoryEntity.coaRequirement</code> exactly as it does today. Priority awareness matters: an override story must account for the <code style="font-size:11px;background:#DCFCE7;padding:1px 5px;border-radius:3px">priority</code> iteration order when two classifications conflict.
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748B;letter-spacing:.4px;margin-bottom:8px">REQUIRED</div>
+          <div style="font-size:12px;color:#1E293B">COA must be on file and current for all products in this classification</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748B;letter-spacing:.4px;margin-bottom:8px">CONDITIONAL</div>
+          <div style="font-size:12px;color:#1E293B">COA required when <code style="font-size:10px">merchant.type</code> or other policy condition is met</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px 16px;text-align:center">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748B;letter-spacing:.4px;margin-bottom:8px">NOT_REQUIRED</div>
+          <div style="font-size:12px;color:#1E293B">Product classification does not require a COA for this category</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr style="height:1px;background:#E2E8F0;border:none;margin:40px 0">
+
+  <!-- SECTION 6 — REAL VOCABULARY -->
+  <div class="section">
+    <div class="section-label" style="background:#E0F2FE;color:#075985">⑥ Real Vocabulary — Enum Values Policies Reference</div>
+    <div class="section-title">Policies declare enforcement rules using these exact system enum values</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#1E3A5F;margin-bottom:8px">Severity — <code style="font-size:11px">ComplianceFindingSeverityEnum</code></div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;margin-bottom:14px">
+          <div style="padding:9px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F5F9"><code style="font-size:11px">HIGH</code> <span style="color:#64748B;font-size:12px">→ UI label</span> <strong style="color:#EF4444;font-size:12px">S3 — High Priority</strong></div>
+          <div style="padding:9px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F5F9"><code style="font-size:11px">MEDIUM</code> <span style="color:#64748B;font-size:12px">→ UI label</span> <strong style="color:#F59E0B;font-size:12px">S2 — Medium Priority</strong></div>
+          <div style="padding:9px 14px;display:flex;align-items:center;gap:10px"><code style="font-size:11px">LOW</code> <span style="color:#64748B;font-size:12px">→ UI label</span> <strong style="color:#3B82F6;font-size:12px">S1 — Low Priority</strong></div>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;color:#1E3A5F;margin-bottom:8px">Product Issue Types — <code style="font-size:11px">ProductIssueTypeEnum</code></div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px;font-size:12px;color:#1E293B;line-height:2">
+          <code>MISSING_COA</code> · <code>EXPIRED_COA</code> · <code>UNAUTHORIZED</code><br/>
+          <code>NEWLY_ADDED</code> · <code>PRODUCT_RECALL</code>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;color:#1E3A5F;margin-bottom:8px;margin-top:14px">Website Issue Types — <code style="font-size:11px">WebsiteIssueTypeEnum</code></div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px;font-size:12px;color:#1E293B;line-height:2">
+          <code>FDA_DISCLAIMER</code> · <code>NON_COMPLIANCE</code> · <code>AGE_RESTRICTION</code>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#1E3A5F;margin-bottom:8px">COA Disposition — <code style="font-size:11px">TypeDisposition</code></div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;margin-bottom:14px">
+          <div style="padding:8px 14px;border-bottom:1px solid #F1F5F9;font-size:12px;display:flex;gap:8px;align-items:center"><span style="background:#DCFCE7;color:#166534;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">OK</span> <code>APPROVED</code> · <code>NOT_REQUIRED</code></div>
+          <div style="padding:8px 14px;border-bottom:1px solid #F1F5F9;font-size:12px;display:flex;gap:8px;align-items:center"><span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">WARN</span> <code>PENDING</code> · <code>EMPTY</code></div>
+          <div style="padding:8px 14px;border-bottom:1px solid #F1F5F9;font-size:12px;display:flex;gap:8px;align-items:center"><span style="background:#FEE2E2;color:#991B1B;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">FAIL</span> <code>VIOLATIVE</code> (parent)</div>
+          <div style="padding:8px 14px;border-bottom:1px solid #F1F5F9;font-size:12px;color:#64748B;padding-left:28px"><code>↳ VIOLATIVE_THCO</code> — THC-O &gt; 0%</div>
+          <div style="padding:8px 14px;border-bottom:1px solid #F1F5F9;font-size:12px;color:#64748B;padding-left:28px"><code>↳ VIOLATIVE_DELTA9_THC</code> — Δ9 &gt; 0.3%</div>
+          <div style="padding:8px 14px;border-bottom:1px solid #F1F5F9;font-size:12px;color:#64748B;padding-left:28px"><code>↳ VIOLATIVE_EXPIRED_COA</code></div>
+          <div style="padding:8px 14px;font-size:12px;display:flex;gap:8px;align-items:center"><span style="background:#F1F5F9;color:#475569;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">OTHER</span> <code>REJECTED</code></div>
+        </div>
+
+        <div style="background:#FEF3C7;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:8px;padding:12px 14px;font-size:12px;color:#78350F;line-height:1.65">
+          <strong>Disposition granularity bug (prerequisite fix):</strong> <code>CoaHelper.buildDisposition():475</code> always writes the generic <code>VIOLATIVE</code> — the subtypes are never written today. The policy enforcement engine needs granular subtypes to distinguish Δ9, THC-O, and expiration violations. Fix required before enforcement rules on disposition subtypes will work.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr style="height:1px;background:#E2E8F0;border:none;margin:40px 0">
+
+  <!-- SECTION 7 — VIOLATIVE DRILL-DOWN -->
+  <div class="section">
+    <div class="section-label" style="background:#FEE2E2;color:#991B1B">⑦ Violative Drill-Down — Enforcement Pattern</div>
+    <div class="section-title">One top-level "Violative" outcome with granular sub-outcomes — matching production UI</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#1E3A5F;margin-bottom:12px">Production disposition filter pattern</div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden">
+          <div style="background:#F8FAFC;padding:10px 16px;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #E2E8F0">Disposition Filter</div>
+          <div style="padding:14px 16px;font-size:13px;color:#1E293B">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span style="background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px">Violative</span>
+              <span style="color:#64748B;font-size:12px">(368)</span>
+            </div>
+            <div style="padding-left:14px;border-left:2px solid #E2E8F0;font-size:12px;color:#475569;line-height:2.2">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:14px">🧪</span>
+                <span>THC-O &gt; 0%</span>
+                <span style="color:#94A3B8;font-family:'IBM Plex Mono',monospace;font-size:11px">(11)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:14px">🧪</span>
+                <span>Delta-9 THC &gt; 0.3%</span>
+                <span style="color:#94A3B8;font-family:'IBM Plex Mono',monospace;font-size:11px">(6)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:14px">📄</span>
+                <span>Expired COA</span>
+                <span style="color:#94A3B8;font-family:'IBM Plex Mono',monospace;font-size:11px">(345)</span>
+              </div>
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:#94A3B8;font-style:italic">Beaker icon = % threshold violation · Document icon = expiration</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#1E3A5F;margin-bottom:12px">Policy enforcement declaration</div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;margin-bottom:14px">
+          <div style="background:#F8FAFC;padding:10px 16px;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #E2E8F0">Enforcement Rules — Section 09</div>
+          <div style="padding:14px 16px;font-size:12px;color:#1E293B;line-height:1.7">
+            <div style="margin-bottom:10px">
+              <strong>Outcome: Violative (any)</strong> → suspend processing until resolved<br/>
+              <span style="color:#64748B;font-size:11px">Maps to: <code>VIOLATIVE</code> parent — catches all sub-types</span>
+            </div>
+            <div style="padding-left:14px;border-left:2px solid #E2E8F0">
+              <div style="margin-bottom:6px">
+                <strong>↳ Outcome: THC-O over 0%</strong> → immediate escalation + alert<br/>
+                <span style="color:#64748B;font-size:11px">Maps to: <code>VIOLATIVE_THCO</code></span>
+              </div>
+              <div style="margin-bottom:6px">
+                <strong>↳ Outcome: Δ9-THC over 0.3%</strong> → escalation + alert<br/>
+                <span style="color:#64748B;font-size:11px">Maps to: <code>VIOLATIVE_DELTA9_THC</code></span>
+              </div>
+              <div>
+                <strong>↳ Outcome: Expired COA</strong> → 14-day grace period notice<br/>
+                <span style="color:#64748B;font-size:11px">Maps to: <code>VIOLATIVE_EXPIRED_COA</code></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-left:4px solid #3B82F6;border-radius:8px;padding:12px 14px;font-size:12px;color:#1E40AF;line-height:1.65">
+          Policy can enforce at the parent level (any violative → action) or at the granular sub-outcome level (expired COA gets a grace period; THC-O gets immediate escalation). Same pattern as the production disposition filter — one collapsed view, drill-down on demand.
+        </div>
+      </div>
+
     </div>
   </div>
 
