@@ -268,6 +268,7 @@
       <option value="wemonitor">We Monitor</option>
       <option value="scan-ops">Scan Operations &amp; Q-ScanAI</option>
       <option value="q-audit">Q-Audit</option>
+      <option value="policy-v3">Policy-driven compliance (v3)</option>
       <option value="regulatory">Regulatory &amp; Classification</option>
       <option value="case-management">Case Management</option>
       <option value="roadmap">Roadmap &amp; Planning</option>
@@ -848,6 +849,110 @@
       </div>
       <div class="card-footer">
         <span class="card-date">Mar 27, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
+  </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       POLICY-DRIVEN COMPLIANCE (v3)
+  ══════════════════════════════════════ -->
+  <div class="section-header" data-section-cat="policy-v3" onclick="toggleSection(this)">
+    <span class="section-title">Policy-driven compliance (v3)</span>
+    <span class="section-count">5 mockups</span>
+    <span class="section-chevron">&#9662;</span>
+  </div>
+  <div class="section-content" data-section-cat="policy-v3">
+  <div class="card-grid">
+
+    <a data-status="todo" data-category="policy-v3" data-date="2026-04-14" href="qredible-tickets/report-generation.html" class="proto-card" data-keywords="compliance report generate claude sonnet 4.6 web_search async job polling spinner stage labels policy-aware report generation qp-3701">
+      <div class="card-top">
+        <div class="card-icon">&#128196;</div>
+        <span class="card-ticket">QP-3701 &bull; NEW</span>
+      </div>
+      <div class="card-name">Compliance Report Generation &#8212; Brian&#8217;s Centerpiece</div>
+      <p class="card-desc">Single "Produce Compliance Report" button flow. 30&#8211;60s async job: active policy JSON as system prompt, merchant evidence as user content, <code>claude-sonnet-4-6</code> + <code>web_search</code> as evaluator. Stage-labeled spinner, polling pattern, "Under the hood" collapsible with model/policy/token/audit-log details.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">Policy-First</span>
+        <span class="pill pill-green">Net New</span>
+        <span class="pill pill-green">Mockup ready</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Apr 14, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
+    <a data-status="todo" data-category="policy-v3" data-date="2026-04-14" href="qredible-tickets/report-rendered.html" class="proto-card" data-keywords="compliance report rendered output pdf-style policy-aware sections executive summary tier assessment checklist product classification mri recommended actions claude-sonnet-4-6 CoaStatusEnum TypeDisposition SeverityLevelEnum qp-3701">
+      <div class="card-top">
+        <div class="card-icon">&#128202;</div>
+        <span class="card-ticket">QP-3701 &bull; NEW</span>
+      </div>
+      <div class="card-name">Compliance Report &#8212; Rendered Output</div>
+      <p class="card-desc">PDF-style on-screen report driven at runtime from <code>report_configuration.sections[]</code> in the policy JSON. Sections: Executive Summary, Tier Assessment, Checklist Results (with <code>SeverityLevelEnum</code> S1/S2/S3), Product Classification Findings (<code>CoaStatusEnum</code> + <code>TypeDisposition</code>), MRI Risk Intelligence, Recommended Actions. Footer pins model + policy version + job ID.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">Policy-First</span>
+        <span class="pill pill-green">Net New</span>
+        <span class="pill pill-green">Mockup ready</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Apr 14, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
+    <a data-status="todo" data-category="policy-v3" data-date="2026-04-14" href="qredible-tickets/track-b-catalog-upload.html" class="proto-card" data-keywords="track b card-present retail catalog upload csv xlsx column mapping validation diff review coa requirement PlCategoryEntity coaRequirement pl_category compliance review wizard brian qp-3702">
+      <div class="card-top">
+        <div class="card-icon">&#128281;</div>
+        <span class="card-ticket">QP-3702 &bull; NEW</span>
+      </div>
+      <div class="card-name">Track B Catalog Upload &#8212; Card-Present Retail Wizard</div>
+      <p class="card-desc">4-step upload wizard for card-present retail merchants: drag-drop CSV/XLSX &#8594; column mapping &#8594; validation preview (errors + warnings per row) &#8594; confirm &amp; run compliance review. Diff view on re-upload (added/removed/changed products). <code>PlCategoryEntity.coaRequirement</code> (REQUIRED/CONDITIONAL/NOT_REQUIRED) determines COA need per line item at classification time.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">Policy-First</span>
+        <span class="pill pill-green">Net New</span>
+        <span class="pill pill-green">Mockup ready</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Apr 14, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
+    <a data-status="todo" data-category="policy-v3" data-date="2026-04-14" href="qredible-tickets/policy-authoring-wizard.html" class="proto-card" data-keywords="policy authoring wizard guided mode dials levers component builder noah stepper license verification payment rail product classification mri two-layer narrative json qp-3703">
+      <div class="card-top">
+        <div class="card-icon">&#129520;</div>
+        <span class="card-ticket">QP-3703 &bull; NEW</span>
+      </div>
+      <div class="card-name">Policy Authoring Wizard &#8212; Noah&#8217;s Guided Mode</div>
+      <p class="card-desc">Stepper UI for building policy components without writing JSON. Walkthrough: component type &#8594; jurisdiction &#8594; verification requirements &#8594; operational config &#8594; review &amp; save. After save: shows the resulting JSON appended to <code>checklist[]</code>, demonstrating the two-layer narrative + machine-readable model. Links to Policy Editor expert JSON mode.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">Policy-First</span>
+        <span class="pill pill-green">Net New</span>
+        <span class="pill pill-green">Mockup ready</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Apr 14, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
+    <a data-status="todo" data-category="policy-v3" data-date="2026-04-14" href="qredible-tickets/mri-marketplace.html" class="proto-card" data-keywords="mri marketplace modular third-party checks vital4 ofac pep sanctions fda warning letters ftc adverse media whois domain age chargeback policy_scored risk_intelligence false positives confidence threshold auto-dismiss human review queue explainability qp-3704">
+      <div class="card-top">
+        <div class="card-icon">&#128269;</div>
+        <span class="card-ticket">QP-3704 &bull; NEW</span>
+      </div>
+      <div class="card-name">MRI Marketplace &#8212; Modular Risk Intelligence Checks</div>
+      <p class="card-desc">Catalog of third-party MRI checks (Vital4, OFAC, PEP/Sanctions, FDA, FTC, adverse media, WHOIS, chargeback signals). Per-check: <code>policy_scored</code> vs <code>risk_intelligence</code> mode, tier eligibility, refresh frequency. Solves the hundreds-of-false-positives UX problem: confidence-threshold slider (340 flags/day &#8594; 12 at 0.72), auto-dismiss rules, human review queue, "why this matched" explainability panel.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">Policy-First</span>
+        <span class="pill pill-green">Net New</span>
+        <span class="pill pill-green">Mockup ready</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Apr 14, 2026</span>
         <span class="card-cta">View mockup &#8594;</span>
       </div>
     </a>
