@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Policy Editor — Qredible Ticket</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px;line-height:1.5}
+a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* NAV */
+.topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8}
+.topnav a{color:#93C5FD}
+.topnav .sep{color:#475569}
+.topnav .ticket-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.topnav .title{color:#fff;font-weight:600}
+
+/* POLICY-FIRST BANNER */
+.banner{background:#EFF6FF;border-bottom:3px solid #3B82F6;padding:14px 24px;font-size:13px;color:#1E3A5F;line-height:1.55}
+.banner strong{color:#1E3A5F}
+.banner code{background:#DBEAFE;padding:1px 5px;border-radius:3px;font-size:12px}
+
+/* PAGE */
+.page{max-width:1200px;margin:0 auto;padding:32px 24px}
+.page-header{margin-bottom:28px}
+.page-header h1{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:6px}
+.page-header p{color:#64748B;font-size:13px}
+
+/* SECTION */
+.section{margin-bottom:40px}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.4px;text-transform:uppercase;background:#EDE9FE;color:#4C1D95}
+.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:16px}
+
+/* EDITOR LAYOUT */
+.editor{background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.06);overflow:hidden;display:grid;grid-template-columns:240px 1fr;min-height:640px}
+
+/* EDITOR HEADER (spans both columns via outer wrap) */
+.editor-header{grid-column:1 / -1;background:#1E3A5F;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #0F172A}
+.editor-header h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
+.editor-header .policy-id{background:#3B82F6;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 9px;border-radius:4px}
+.editor-header .version-badge{background:rgba(255,255,255,.12);font-size:11px;padding:3px 9px;border-radius:12px;color:#BFDBFE}
+.editor-header .actions{display:flex;gap:8px}
+.editor-header .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;border:none;cursor:pointer}
+.editor-header .btn-ghost{background:rgba(255,255,255,.1);color:#fff}
+.editor-header .btn-primary{background:#10B981;color:#fff}
+
+/* EDITOR META BAR */
+.editor-meta{grid-column:1 / -1;background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:10px 20px;display:flex;align-items:center;gap:18px;font-size:12px;color:#64748B}
+.editor-meta strong{color:#1E293B;font-weight:600}
+.editor-meta .dot{width:6px;height:6px;border-radius:50%;background:#CBD5E1;display:inline-block}
+
+/* LEFT NAV — 8 policy sections */
+.policy-nav{background:#F8FAFC;border-right:1px solid #E2E8F0;padding:16px 0}
+.policy-nav-title{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.6px;padding:0 20px 10px 20px}
+.policy-nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:#475569;cursor:pointer;border-left:3px solid transparent}
+.policy-nav-item:hover{background:#fff}
+.policy-nav-item.active{background:#fff;border-left-color:#3B82F6;color:#1E3A5F;font-weight:600}
+.policy-nav-item .nav-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#94A3B8;width:16px}
+.policy-nav-item.active .nav-num{color:#3B82F6}
+.policy-nav-item .badge{margin-left:auto;font-size:9px;background:#DBEAFE;color:#1E40AF;padding:1px 6px;border-radius:10px;font-weight:700}
+
+/* EDITOR BODY */
+.editor-body{padding:24px 28px;background:#fff}
+.editor-body h3{font-size:15px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
+.editor-body .section-sub{font-size:12px;color:#64748B;margin-bottom:18px}
+
+/* FORM ROWS */
+.form-row{display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #F1F5F9}
+.form-row:last-child{border-bottom:none}
+.form-label{font-size:12px;font-weight:600;color:#475569;padding-top:6px}
+.form-label .hint{display:block;font-size:11px;color:#94A3B8;font-weight:400;margin-top:2px}
+.form-input{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:7px 11px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:#1E293B;background:#fff;outline:none}
+.form-input:focus{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.12)}
+.form-input.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+
+/* CHECKLIST EDITOR */
+.checklist-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:14px}
+.checklist-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border:1px solid #E2E8F0;border-radius:6px;margin-bottom:6px;font-size:12px}
+.checklist-row .grip{color:#CBD5E1;cursor:grab;font-size:14px}
+.checklist-row .key{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#475569;background:#F1F5F9;padding:2px 7px;border-radius:3px}
+.checklist-row .label{flex:1;color:#1E293B;font-weight:500}
+.checklist-row .pill{font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px}
+.pill-req{background:#FEE2E2;color:#991B1B}
+.pill-cond{background:#FEF3C7;color:#92400E}
+.pill-opt{background:#E0F2FE;color:#075985}
+.btn-add{margin-top:8px;background:#fff;border:1px dashed #3B82F6;color:#3B82F6;padding:7px 14px;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer;width:100%}
+
+/* JSON PREVIEW */
+.json-panel{margin-top:18px;background:#0F172A;border-radius:8px;overflow:hidden}
+.json-panel-header{background:#1E293B;padding:9px 14px;font-size:11px;font-weight:600;color:#94A3B8;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #0F172A}
+.json-panel-header .tag{background:#334155;color:#93C5FD;padding:2px 8px;border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:10px}
+.json-panel pre{padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;color:#E2E8F0;overflow-x:auto}
+.json-panel pre .k{color:#93C5FD}
+.json-panel pre .s{color:#86EFAC}
+.json-panel pre .n{color:#FCA5A5}
+.json-panel pre .c{color:#64748B}
+
+/* FLOW DIAGRAM */
+.flow-section{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px;margin-top:8px}
+.flow-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:16px;text-align:center}
+.flow-steps{display:flex;align-items:center;flex-wrap:wrap;gap:0;justify-content:center}
+.flow-step{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#1E3A5F;min-width:140px}
+.flow-step .step-num{font-size:10px;color:#94A3B8;font-weight:500;margin-bottom:2px}
+.flow-step.highlight{background:#F0FDF4;border-color:#BBF7D0;color:#166534}
+.flow-arrow{color:#3B82F6;font-size:18px;padding:0 8px;font-weight:700}
+
+/* ANNOTATIONS */
+.annotation{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:14px;line-height:1.6}
+.annotation.green{background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D}
+.annotation.blue{background:#EFF6FF;border-color:#BFDBFE;border-left-color:#3B82F6;color:#1E40AF}
+
+/* VERSION HISTORY PANEL */
+.version-history{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden}
+.vh-header{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:12px 18px;font-size:13px;font-weight:700;color:#1E3A5F}
+.vh-row{padding:12px 18px;border-bottom:1px solid #F1F5F9;display:grid;grid-template-columns:100px 1fr 140px 100px;gap:14px;align-items:center;font-size:12px}
+.vh-row:last-child{border-bottom:none}
+.vh-version{font-family:'IBM Plex Mono',monospace;font-weight:600;color:#1E3A5F}
+.vh-version .active{background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;margin-left:6px;font-family:'Plus Jakarta Sans',sans-serif}
+.vh-msg{color:#475569}
+.vh-author{color:#64748B;font-size:11px}
+.vh-date{color:#94A3B8;font-size:11px;text-align:right}
+
+/* DIVIDER */
+.divider{height:1px;background:#E2E8F0;margin:40px 0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a href="https://jfloyd-qredible.netlify.app/">← All Mockups</a>
+  <span class="sep">/</span>
+  <span class="title">Policy Editor</span>
+  <span class="sep">/</span>
+  <span class="ticket-badge">QP-3647 (rescoped)</span>
+</nav>
+
+<!-- POLICY-FIRST BANNER -->
+<div class="banner">
+  <strong>Policy-First Restructure (April 2026) —</strong>
+  This ticket was formerly "Industry Config Engine." After the Architecture Audit, it has been <strong>rescoped</strong> as the canonical editor for versioned policy documents. A policy document is the single unit of truth for compliance configuration: tiers, checklist, product classification, MRI config, payment rails, scoring model, report config, and enforcement rules — all live inside one versioned <code>policy.json</code>. Superseded tickets: <strong>QP-3603</strong> (Regulatory Attributes Management) and <strong>QP-3604</strong> (Compliance Rules Engine).
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <div class="page-header">
+    <h1>Policy Editor — Versioned Policy Document Authoring</h1>
+    <p>Author, review, publish, and version the JSON policy documents that drive the compliance engine. Replaces the former industry-config surface.</p>
+  </div>
+
+  <!-- SECTION 1 — EDITOR -->
+  <div class="section">
+    <div class="section-label">① Authoring View</div>
+    <div class="section-title">Editor: <code>hemp-cbd-v3</code> — Draft being prepared for publish</div>
+
+    <div class="editor">
+      <!-- header -->
+      <div class="editor-header">
+        <h2>
+          <span>📜 Policy Editor</span>
+          <span class="policy-id">hemp-cbd-v3</span>
+          <span class="version-badge">Draft · +17 changes vs v2</span>
+        </h2>
+        <div class="actions">
+          <button class="btn btn-ghost">Preview Diff</button>
+          <button class="btn btn-ghost">Save Draft</button>
+          <button class="btn btn-primary">Publish v3 →</button>
+        </div>
+      </div>
+
+      <!-- meta bar -->
+      <div class="editor-meta">
+        <span><strong>Policy ID:</strong> <code>hemp-cbd-v3</code></span>
+        <span class="dot"></span>
+        <span><strong>Effective:</strong> On publish</span>
+        <span class="dot"></span>
+        <span><strong>Last saved:</strong> 2 min ago by Joseph Floyd</span>
+        <span class="dot"></span>
+        <span><strong>Assigned merchants:</strong> 84 (on publish)</span>
+        <span class="dot"></span>
+        <span style="color:#16A34A;font-weight:600;">● Ready to publish</span>
+      </div>
+
+      <!-- left nav -->
+      <div class="policy-nav">
+        <div class="policy-nav-title">Policy Sections</div>
+        <div class="policy-nav-item"><span class="nav-num">01</span>Metadata</div>
+        <div class="policy-nav-item"><span class="nav-num">02</span>Merchant Tiers<span class="badge">3</span></div>
+        <div class="policy-nav-item active"><span class="nav-num">03</span>Checklist<span class="badge">+5</span></div>
+        <div class="policy-nav-item"><span class="nav-num">04</span>Product Classification</div>
+        <div class="policy-nav-item"><span class="nav-num">05</span>MRI Configuration</div>
+        <div class="policy-nav-item"><span class="nav-num">06</span>Payment Rails</div>
+        <div class="policy-nav-item"><span class="nav-num">07</span>Scoring Model</div>
+        <div class="policy-nav-item"><span class="nav-num">08</span>Report Configuration</div>
+        <div class="policy-nav-item"><span class="nav-num">09</span>Enforcement Rules</div>
+      </div>
+
+      <!-- body -->
+      <div class="editor-body">
+        <h3>Checklist — What merchants on this policy must provide</h3>
+        <div class="section-sub">Each checklist item becomes a required/conditional/optional document or attestation at onboarding and during renewal.</div>
+
+        <div class="form-row">
+          <div class="form-label">Policy name<span class="hint">Display name shown on merchant screens</span></div>
+          <input class="form-input" value="Hemp / CBD Consumer Products — 2026.v3"/>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">Inheritance<span class="hint">Policies can extend a parent</span></div>
+          <input class="form-input mono" value="extends: hemp-cbd-v2"/>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">Checklist items<span class="hint">Drag to reorder · Click to edit</span></div>
+          <div class="checklist-box">
+            <div class="checklist-row">
+              <span class="grip">⋮⋮</span>
+              <span class="key">coa.finished_product</span>
+              <span class="label">Finished Product COA</span>
+              <span class="pill pill-req">Required</span>
+            </div>
+            <div class="checklist-row">
+              <span class="grip">⋮⋮</span>
+              <span class="key">coa.bulk_material</span>
+              <span class="label">Bulk Material COA</span>
+              <span class="pill pill-cond">Conditional</span>
+            </div>
+            <div class="checklist-row">
+              <span class="grip">⋮⋮</span>
+              <span class="key">license.state_cultivation</span>
+              <span class="label">State Cultivation License</span>
+              <span class="pill pill-req">Required</span>
+            </div>
+            <div class="checklist-row">
+              <span class="grip">⋮⋮</span>
+              <span class="key">attestation.farm_bill</span>
+              <span class="label">2018 Farm Bill Compliance Attestation</span>
+              <span class="pill pill-req">Required</span>
+            </div>
+            <div class="checklist-row" style="border-color:#BFDBFE;background:#EFF6FF">
+              <span class="grip">⋮⋮</span>
+              <span class="key">product.thc_delta_limit</span>
+              <span class="label">Δ9-THC ≤ 0.3% dry weight — document upload</span>
+              <span class="pill pill-req">Required</span>
+              <span style="font-size:9px;color:#1E40AF;font-weight:700;background:#DBEAFE;padding:2px 6px;border-radius:3px;">NEW IN v3</span>
+            </div>
+            <button class="btn-add">+ Add checklist item</button>
+          </div>
+        </div>
+
+        <div class="annotation blue">
+          <strong>Why this is one edit instead of three tickets —</strong>
+          Pre-pivot, adding a new checklist item meant (a) a new attribute row in the Regulatory Attributes table, (b) a rule definition in the Compliance Rules Engine, and (c) a code change to map it into the scanner. Now it is one line in the policy doc, versioned by the editor, and every downstream system (scanner, onboarding, MRI, reports) reads it from the same source.
+        </div>
+
+        <!-- JSON preview -->
+        <div class="json-panel">
+          <div class="json-panel-header">
+            <span>Live JSON Preview — <code style="color:#93C5FD">hemp-cbd-v3.checklist</code></span>
+            <span class="tag">read-only</span>
+          </div>
+<pre><span class="c">// Section 3 — checklist[]</span>
+<span class="k">"checklist"</span>: [
+  { <span class="k">"key"</span>: <span class="s">"coa.finished_product"</span>,   <span class="k">"label"</span>: <span class="s">"Finished Product COA"</span>,             <span class="k">"status"</span>: <span class="s">"required"</span> },
+  { <span class="k">"key"</span>: <span class="s">"coa.bulk_material"</span>,       <span class="k">"label"</span>: <span class="s">"Bulk Material COA"</span>,                 <span class="k">"status"</span>: <span class="s">"conditional"</span>, <span class="k">"when"</span>: <span class="s">"merchant.type == 'wholesaler'"</span> },
+  { <span class="k">"key"</span>: <span class="s">"license.state_cultivation"</span>, <span class="k">"label"</span>: <span class="s">"State Cultivation License"</span>,         <span class="k">"status"</span>: <span class="s">"required"</span> },
+  { <span class="k">"key"</span>: <span class="s">"attestation.farm_bill"</span>,    <span class="k">"label"</span>: <span class="s">"2018 Farm Bill Compliance Attestation"</span>, <span class="k">"status"</span>: <span class="s">"required"</span> },
+  { <span class="k">"key"</span>: <span class="s">"product.thc_delta_limit"</span>,  <span class="k">"label"</span>: <span class="s">"Δ9-THC ≤ 0.3% dry weight"</span>,          <span class="k">"status"</span>: <span class="s">"required"</span>, <span class="k">"newIn"</span>: <span class="s">"v3"</span> }
+]</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 2 — VERSION HISTORY -->
+  <div class="section">
+    <div class="section-label" style="background:#DBEAFE;color:#1E40AF">② Versioning</div>
+    <div class="section-title">Version History — <code>hemp-cbd</code></div>
+
+    <div class="version-history">
+      <div class="vh-header">Published versions</div>
+      <div class="vh-row">
+        <div class="vh-version">v3<span class="active">Draft</span></div>
+        <div class="vh-msg">+5 checklist items, updated scoring weights, new Δ9-THC documentation rule</div>
+        <div class="vh-author">Joseph Floyd</div>
+        <div class="vh-date">in progress</div>
+      </div>
+      <div class="vh-row">
+        <div class="vh-version">v2<span class="active" style="background:#E0F2FE;color:#075985">Active</span></div>
+        <div class="vh-msg">Added MRI tier mapping, revised enforcement rules for retail vs wholesale</div>
+        <div class="vh-author">Brian</div>
+        <div class="vh-date">2026-03-12</div>
+      </div>
+      <div class="vh-row">
+        <div class="vh-version">v1</div>
+        <div class="vh-msg">Initial policy — forked from legacy hemp industry config</div>
+        <div class="vh-author">Joseph Floyd</div>
+        <div class="vh-date">2026-02-04</div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Publish flow —</strong> Clicking <em>Publish v3 →</em> creates an immutable policy record, keeps v2 available for rollback, and re-scans all 84 assigned merchants against the new checklist. Merchants with new required items see them in their onboarding queue on next login.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 3 — DATA FLOW -->
+  <div class="section">
+    <div class="section-label" style="background:#F0FDF4;color:#166534">③ Data Flow</div>
+    <div class="section-title">Where the policy goes after publish</div>
+
+    <div class="flow-section">
+      <div class="flow-title">Single source → every downstream consumer</div>
+      <div class="flow-steps">
+        <div class="flow-step highlight">
+          <div class="step-num">①</div>
+          Policy Editor<br/><span style="color:#16A34A;font-size:10px;font-family:'IBM Plex Mono',monospace">hemp-cbd-v3</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">②</div>
+          Q-ScanAI<br/><span style="font-size:10px;color:#64748B">policy.checklist[]</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">③</div>
+          Merchant Onboarding<br/><span style="font-size:10px;color:#64748B">checklist.required</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">④</div>
+          MRI Engine<br/><span style="font-size:10px;color:#64748B">mri_configuration</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">⑤</div>
+          Scoring Model<br/><span style="font-size:10px;color:#64748B">scoring_model</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">⑥</div>
+          Enforcement<br/><span style="font-size:10px;color:#64748B">enforcement_rules</span>
+        </div>
+      </div>
+
+      <div class="annotation green" style="margin-top:20px">
+        <strong>The win —</strong> All six consumers read from the same versioned policy document. A change in the Policy Editor propagates without a code deploy, without a schema migration, and without touching six separate Jira tickets.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

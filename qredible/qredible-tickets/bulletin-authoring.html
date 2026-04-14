@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulletin Authoring — Qredible Ticket</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px;line-height:1.5}
+a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* NAV */
+.topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8}
+.topnav a{color:#93C5FD}
+.topnav .sep{color:#475569}
+.topnav .ticket-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.topnav .title{color:#fff;font-weight:600}
+
+/* POLICY-FIRST BANNER */
+.banner{background:#EFF6FF;border-bottom:3px solid #3B82F6;padding:14px 24px;font-size:13px;color:#1E3A5F;line-height:1.55}
+.banner strong{color:#1E3A5F}
+.banner code{background:#DBEAFE;padding:1px 5px;border-radius:3px;font-size:12px}
+
+/* PAGE */
+.page{max-width:1160px;margin:0 auto;padding:32px 24px}
+.page-header{margin-bottom:28px}
+.page-header h1{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:6px}
+.page-header p{color:#64748B;font-size:13px}
+
+/* SECTION */
+.section{margin-bottom:40px}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.4px;text-transform:uppercase;background:#FEF3C7;color:#92400E}
+.section-label.green{background:#DCFCE7;color:#166534}
+.section-label.blue{background:#DBEAFE;color:#1E40AF}
+.section-label.purple{background:#EDE9FE;color:#4C1D95}
+.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:16px}
+
+/* CARD */
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.06);overflow:hidden}
+.card-header{background:#1E3A5F;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.card-header h2{font-size:15px;font-weight:700}
+.card-header .chip{background:#3B82F6;font-size:11px;padding:3px 9px;border-radius:4px;font-weight:600}
+.card-body{padding:22px 26px}
+
+/* AUTHORING LAYOUT */
+.authoring{display:grid;grid-template-columns:1fr 340px;gap:0;min-height:560px}
+.authoring-main{padding:22px 26px;border-right:1px solid #E2E8F0}
+.authoring-side{background:#F8FAFC;padding:20px 22px}
+
+/* FORM */
+.form-group{margin-bottom:18px}
+.form-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.form-input{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:9px 12px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:#1E293B;background:#fff;outline:none}
+.form-input:focus{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.12)}
+.form-textarea{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:10px 12px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:#1E293B;background:#fff;resize:vertical;min-height:120px;outline:none;line-height:1.55}
+.form-textarea:focus{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.12)}
+
+/* SEVERITY SELECTOR */
+.severity-row{display:flex;gap:8px}
+.sev-option{flex:1;border:1px solid #CBD5E1;border-radius:6px;padding:9px 10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;background:#fff}
+.sev-option.active.info{background:#EFF6FF;border-color:#3B82F6;color:#1E40AF}
+.sev-option.advisory{color:#92400E}
+.sev-option.active.advisory{background:#FFFBEB;border-color:#F59E0B}
+.sev-option.critical{color:#991B1B}
+.sev-option.active.critical{background:#FEF2F2;border-color:#DC2626}
+
+/* AFFECTED POLICIES */
+.policy-chip-list{display:flex;flex-wrap:wrap;gap:6px}
+.policy-chip{display:inline-flex;align-items:center;gap:6px;background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;font-size:12px;font-weight:600;padding:4px 11px;border-radius:16px}
+.policy-chip .x{color:#16A34A;cursor:pointer;font-weight:700}
+.policy-chip.add{background:#fff;border:1px dashed #3B82F6;color:#3B82F6;cursor:pointer}
+
+/* SIDE PANEL — LIVE PREVIEW */
+.preview-label{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.bulletin-preview{background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.bulletin-head{padding:11px 14px;background:#FFFBEB;border-bottom:1px solid #FDE68A;display:flex;align-items:center;gap:8px}
+.bulletin-head .sev-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:#F59E0B;color:#fff;text-transform:uppercase;letter-spacing:.4px}
+.bulletin-head .timestamp{font-size:10px;color:#92400E;margin-left:auto}
+.bulletin-body{padding:14px 16px}
+.bulletin-body h4{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:8px}
+.bulletin-body p{font-size:12px;color:#475569;line-height:1.55;margin-bottom:10px}
+.bulletin-body .affected{font-size:11px;color:#64748B;margin-top:10px;padding-top:10px;border-top:1px solid #F1F5F9}
+.bulletin-body .affected strong{color:#1E3A5F}
+.bulletin-cta{background:#1E3A5F;color:#fff;padding:8px 14px;font-size:11px;font-weight:600;text-align:center;letter-spacing:.4px;text-transform:uppercase}
+
+/* DELIVERY CHECKLIST */
+.delivery-list{margin-top:18px;padding-top:16px;border-top:1px solid #E2E8F0}
+.delivery-list-title{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.delivery-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:#475569}
+.delivery-item .check{width:14px;height:14px;border-radius:3px;background:#DCFCE7;border:1px solid #86EFAC;display:flex;align-items:center;justify-content:center;color:#166534;font-size:10px;font-weight:700}
+.delivery-item.off .check{background:#F1F5F9;border-color:#CBD5E1;color:#94A3B8}
+
+/* FOOTER ACTIONS */
+.card-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:14px 22px;display:flex;justify-content:space-between;align-items:center}
+.btn{padding:9px 18px;border-radius:6px;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none}
+.btn-primary{background:#3B82F6;color:#fff}
+.btn-secondary{background:#fff;color:#1E293B;border:1px solid #CBD5E1}
+.btn-publish{background:#10B981;color:#fff}
+.save-hint{font-size:11px;color:#94A3B8}
+
+/* BULLETIN LIST */
+.bulletin-list{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden}
+.bl-header{padding:13px 18px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;font-size:13px;font-weight:700;color:#1E3A5F;display:flex;justify-content:space-between;align-items:center}
+.bl-row{padding:14px 18px;border-bottom:1px solid #F1F5F9;display:grid;grid-template-columns:90px 1fr 180px 100px 90px;gap:14px;align-items:center;font-size:12px}
+.bl-row:last-child{border-bottom:none}
+.bl-row .sev{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;text-align:center}
+.sev-info{background:#DBEAFE;color:#1E40AF}
+.sev-advisory{background:#FEF3C7;color:#92400E}
+.sev-critical{background:#FEE2E2;color:#991B1B}
+.bl-row .title{color:#1E3A5F;font-weight:600}
+.bl-row .affected-small{color:#64748B;font-size:11px;margin-top:2px}
+.bl-row .policies{color:#475569;font-family:'IBM Plex Mono',monospace;font-size:10px}
+.bl-row .status-pill{font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;text-align:center}
+.status-live{background:#DCFCE7;color:#166534}
+.status-draft{background:#F1F5F9;color:#64748B}
+.bl-row .date{color:#94A3B8;font-size:11px;text-align:right}
+
+/* FLOW */
+.flow-section{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px}
+.flow-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:16px;text-align:center}
+.flow-steps{display:flex;align-items:center;flex-wrap:wrap;gap:0;justify-content:center}
+.flow-step{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#1E3A5F;min-width:130px}
+.flow-step .step-num{font-size:10px;color:#94A3B8;font-weight:500;margin-bottom:2px}
+.flow-step.highlight{background:#FFFBEB;border-color:#FDE68A;color:#92400E}
+.flow-arrow{color:#3B82F6;font-size:18px;padding:0 8px;font-weight:700}
+
+.annotation{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:14px;line-height:1.6}
+.annotation.green{background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D}
+.annotation.blue{background:#EFF6FF;border-color:#BFDBFE;border-left-color:#3B82F6;color:#1E40AF}
+
+.divider{height:1px;background:#E2E8F0;margin:40px 0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a href="https://jfloyd-qredible.netlify.app/">← All Mockups</a>
+  <span class="sep">/</span>
+  <span class="title">Bulletin Authoring</span>
+  <span class="sep">/</span>
+  <span class="ticket-badge">QP-NEW · policy-first-new</span>
+</nav>
+
+<!-- POLICY-FIRST BANNER -->
+<div class="banner">
+  <strong>Policy-First New Surface (April 2026) —</strong>
+  Bulletins are the <strong>user-facing output of policy changes</strong>. When a policy is published with a new required item, a changed severity, or an enforcement update, the team writes a bulletin explaining <em>what changed and what merchants need to do</em>. Bulletins are attached to one or more <code>policy_ids</code> and fan out to every merchant assigned to those policies. This ticket is net-new under the policy-first pivot (label: <code>policy-first-new</code>).
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <div class="page-header">
+    <h1>Bulletin Authoring — Merchant-Facing Policy Change Notices</h1>
+    <p>Author, preview, and publish bulletins that accompany policy changes. Delivered in-app, via email, and on the merchant portal.</p>
+  </div>
+
+  <!-- SECTION 1 — AUTHORING -->
+  <div class="section">
+    <div class="section-label">① Authoring</div>
+    <div class="section-title">Compose bulletin — <em>Δ9-THC Documentation Rule</em></div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>📣 New Bulletin — Draft</h2>
+        <span class="chip">Linked to hemp-cbd-v3</span>
+      </div>
+
+      <div class="authoring">
+
+        <!-- MAIN AUTHORING COLUMN -->
+        <div class="authoring-main">
+
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input class="form-input" value="New Δ9-THC documentation required for hemp / CBD merchants"/>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Severity</label>
+            <div class="severity-row">
+              <div class="sev-option info">ℹ️ Info</div>
+              <div class="sev-option active advisory">⚠️ Advisory</div>
+              <div class="sev-option critical">⛔ Critical</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Summary (shown in merchant portal list view)</label>
+            <textarea class="form-textarea" style="min-height:70px;">Hemp / CBD merchants must now upload documentation confirming Δ9-THC concentration ≤ 0.3% dry weight for each finished product SKU. Existing SKUs have 30 days to comply; new SKUs are blocked until uploaded.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Full message (merchant portal detail view · supports markdown)</label>
+            <textarea class="form-textarea">Hi team,
+
+As of **April 15, 2026**, hemp and CBD merchants on the *hemp-cbd-v3* policy must provide Δ9-THC concentration documentation for every finished product SKU.
+
+**What you need to do:**
+- Upload a lab-issued certificate confirming Δ9-THC ≤ 0.3% dry weight
+- Apply per SKU, not per product line
+- Existing SKUs: 30-day grace period ending May 15, 2026
+- New SKUs: required at submission
+
+**Where to upload:** Product Catalog → select SKU → Compliance Documents → Δ9-THC Report.
+
+Questions? Reply to this bulletin and a compliance analyst will respond within 1 business day.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Affected policies</label>
+            <div class="policy-chip-list">
+              <span class="policy-chip">📜 hemp-cbd-v3 <span class="x">×</span></span>
+              <span class="policy-chip">📜 hemp-cbd-wholesale-v3 <span class="x">×</span></span>
+              <span class="policy-chip add">+ Add policy</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Grace period</label>
+            <input class="form-input" style="max-width:220px" value="30 days from publish"/>
+          </div>
+
+        </div>
+
+        <!-- SIDE PANEL — PREVIEW + DELIVERY -->
+        <div class="authoring-side">
+          <div class="preview-label">Live Merchant Preview</div>
+          <div class="bulletin-preview">
+            <div class="bulletin-head">
+              <span class="sev-badge">Advisory</span>
+              <span style="font-size:11px;color:#92400E;font-weight:600;">Qredible Compliance</span>
+              <span class="timestamp">in 2 min</span>
+            </div>
+            <div class="bulletin-body">
+              <h4>New Δ9-THC documentation required</h4>
+              <p>Hemp / CBD merchants must now upload documentation confirming Δ9-THC ≤ 0.3% dry weight for each finished product SKU…</p>
+              <div class="affected">
+                <strong>Applies to:</strong> hemp-cbd-v3, hemp-cbd-wholesale-v3<br/>
+                <strong>Grace period:</strong> 30 days
+              </div>
+            </div>
+            <div class="bulletin-cta">Open in merchant portal →</div>
+          </div>
+
+          <div class="delivery-list">
+            <div class="delivery-list-title">Delivery channels</div>
+            <div class="delivery-item"><span class="check">✓</span>Merchant portal (in-app banner)</div>
+            <div class="delivery-item"><span class="check">✓</span>Email to primary contacts (84 merchants)</div>
+            <div class="delivery-item"><span class="check">✓</span>Q-ScanAI onboarding queue entry</div>
+            <div class="delivery-item off"><span class="check">○</span>SMS (not enabled for Advisory)</div>
+          </div>
+
+          <div class="annotation blue" style="margin-top:16px;font-size:11px">
+            <strong>Audience sized from policy —</strong> 84 merchants currently on <code>hemp-cbd-v3</code>. Number updates live if you add/remove policies above.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+        <span class="save-hint">Draft auto-saved · 3 seconds ago</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary">Save Draft</button>
+          <button class="btn btn-secondary">Preview Email</button>
+          <button class="btn btn-publish">Publish & Send →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 2 — BULLETIN LIST -->
+  <div class="section">
+    <div class="section-label green">② Library</div>
+    <div class="section-title">Published bulletins — all policies</div>
+
+    <div class="bulletin-list">
+      <div class="bl-header">
+        <span>Bulletins</span>
+        <span style="font-size:11px;color:#94A3B8;font-weight:500">47 total · 3 drafts</span>
+      </div>
+
+      <div class="bl-row">
+        <span class="sev sev-advisory">Advisory</span>
+        <div>
+          <div class="title">New Δ9-THC documentation required for hemp / CBD merchants</div>
+          <div class="affected-small">84 merchants · 30-day grace period</div>
+        </div>
+        <div class="policies">hemp-cbd-v3, hemp-cbd-wholesale-v3</div>
+        <div><span class="status-pill status-draft">Draft</span></div>
+        <div class="date">—</div>
+      </div>
+
+      <div class="bl-row">
+        <span class="sev sev-critical">Critical</span>
+        <div>
+          <div class="title">FDA ENDS list updated — 6 previously authorized products removed</div>
+          <div class="affected-small">12 merchants affected · immediate action</div>
+        </div>
+        <div class="policies">tobacco-vape-v1</div>
+        <div><span class="status-pill status-live">Live</span></div>
+        <div class="date">2026-04-09</div>
+      </div>
+
+      <div class="bl-row">
+        <span class="sev sev-info">Info</span>
+        <div>
+          <div class="title">Q-Audit UI refresh — new side nav for compliance analysts</div>
+          <div class="affected-small">All merchants · informational only</div>
+        </div>
+        <div class="policies">(all policies)</div>
+        <div><span class="status-pill status-live">Live</span></div>
+        <div class="date">2026-04-02</div>
+      </div>
+
+      <div class="bl-row">
+        <span class="sev sev-advisory">Advisory</span>
+        <div>
+          <div class="title">Peptide merchants: new structured element taxonomy in Q-ScanAI</div>
+          <div class="affected-small">31 merchants · 14-day review window</div>
+        </div>
+        <div class="policies">peptide-v1</div>
+        <div><span class="status-pill status-live">Live</span></div>
+        <div class="date">2026-03-28</div>
+      </div>
+
+      <div class="bl-row">
+        <span class="sev sev-advisory">Advisory</span>
+        <div>
+          <div class="title">Westtown MID cleanup in progress — temporary score fluctuations expected</div>
+          <div class="affected-small">Operational notice · 257 merchants</div>
+        </div>
+        <div class="policies">(ops-wide)</div>
+        <div><span class="status-pill status-live">Live</span></div>
+        <div class="date">2026-03-19</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 3 — FLOW -->
+  <div class="section">
+    <div class="section-label purple">③ Workflow</div>
+    <div class="section-title">From policy edit to merchant inbox</div>
+
+    <div class="flow-section">
+      <div class="flow-title">Policy change → bulletin → merchant</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-num">①</div>
+          Policy Editor<br/><span style="font-size:10px;color:#64748B">v3 drafted</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">
+          <div class="step-num">②</div>
+          Bulletin Author<br/><span style="font-size:10px;color:#92400E">this screen</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">③</div>
+          Audience Resolver<br/><span style="font-size:10px;color:#64748B">policy_ids → merchants</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">④</div>
+          Delivery Fanout<br/><span style="font-size:10px;color:#64748B">in-app · email · queue</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">⑤</div>
+          Merchant Portal<br/><span style="font-size:10px;color:#64748B">banner + inbox</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="step-num">⑥</div>
+          Compliance Queue<br/><span style="font-size:10px;color:#64748B">action tracked</span>
+        </div>
+      </div>
+
+      <div class="annotation green" style="margin-top:20px">
+        <strong>Why this ticket exists —</strong> Before the policy-first pivot there was no canonical way to tell merchants <em>why</em> a compliance requirement changed. Support handled it ad-hoc over email. Bulletins close that gap: every policy change that a merchant needs to act on ships with a matching bulletin, and the audience is computed from the same <code>policy_ids</code> that drive the rest of the engine.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
