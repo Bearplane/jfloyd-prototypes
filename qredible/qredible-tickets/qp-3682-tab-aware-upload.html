@@ -162,7 +162,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
   ═══════════════════════════════════════ -->
   <div class="section-block">
     <div class="section-label label-blue">Example 1 — Add Company modal · Pending tab selected (default)</div>
-    <div class="section-title">Modal opens with Pending pre-selected — operator adds a single merchant for review</div>
+    <div class="section-title">Modal opens with Pending pre-selected (default)</div>
 
     <div class="modal-wrap">
       <div class="modal-header">
@@ -193,17 +193,12 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 
         <div class="field-group">
           <label>Destination tab <span class="required-pill">Required</span></label>
-          <div class="callout callout-blue" style="margin-bottom:10px;font-size:11px">
-            Choose where this company lands after it's created. <strong>Pending</strong> queues it for review before live monitoring begins.
-          </div>
           <div class="seg-control">
             <button class="seg-option pending-opt">
               ⏳ Pending
-              <span class="seg-sub">Queue for review first</span>
             </button>
             <button class="seg-option" style="color:#64748B">
               ✅ Active
-              <span class="seg-sub">Start monitoring immediately</span>
             </button>
           </div>
           <div class="dest-indicator dest-pending">⏳ Will be added to the Pending tab</div>
@@ -224,7 +219,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
   ═══════════════════════════════════════ -->
   <div class="section-block">
     <div class="section-label label-green">Example 2 — Add Company modal · Active tab selected</div>
-    <div class="section-title">Operator switches to Active — monitoring starts immediately on submit</div>
+    <div class="section-title">Operator switches to Active tab</div>
 
     <div class="modal-wrap">
       <div class="modal-header">
@@ -255,17 +250,12 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 
         <div class="field-group">
           <label>Destination tab <span class="required-pill">Required</span></label>
-          <div class="callout callout-blue" style="margin-bottom:10px;font-size:11px">
-            Choose where this company lands after it's created. <strong>Active</strong> starts website and product compliance monitoring immediately.
-          </div>
           <div class="seg-control">
             <button class="seg-option" style="color:#64748B">
               ⏳ Pending
-              <span class="seg-sub">Queue for review first</span>
             </button>
             <button class="seg-option active-opt">
               ✅ Active
-              <span class="seg-sub">Start monitoring immediately</span>
             </button>
           </div>
           <div class="dest-indicator dest-active">✅ Will be added to Active Companies</div>
@@ -286,7 +276,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
   ═══════════════════════════════════════ -->
   <div class="section-block">
     <div class="section-label label-blue">Example 3 — Bulk Upload modal · Pending batch (default)</div>
-    <div class="section-title">CSV upload — entire batch lands in Pending for review before promotion to Active</div>
+    <div class="section-title">CSV upload — entire batch lands in the Pending tab (default)</div>
 
     <div class="modal-wrap" style="max-width:620px">
       <div class="modal-header">
@@ -307,11 +297,9 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
           <div class="seg-control">
             <button class="seg-option pending-opt">
               ⏳ Pending
-              <span class="seg-sub">Queue batch for review first</span>
             </button>
             <button class="seg-option" style="color:#64748B">
               ✅ Active
-              <span class="seg-sub">Start monitoring immediately</span>
             </button>
           </div>
           <div class="dest-indicator dest-pending">⏳ All companies in this batch will be added to the Pending tab</div>
@@ -363,11 +351,9 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
           <div class="seg-control">
             <button class="seg-option pending-opt">
               ⏳ Pending
-              <span class="seg-sub">Queue batch for review first</span>
             </button>
             <button class="seg-option" style="color:#64748B">
               ✅ Active
-              <span class="seg-sub">Start monitoring immediately</span>
             </button>
           </div>
         </div>
@@ -428,7 +414,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
           <div class="sb-icon">✅</div>
           <div>
             <h3>44 companies added to Pending</h3>
-            <p>Your batch has been queued for review. Errors in 3 rows were skipped.<br>
+            <p>Errors in 3 rows were skipped.<br>
             <a href="#">View Pending tab →</a></p>
           </div>
         </div>
@@ -440,7 +426,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
           <div class="sb-icon">✅</div>
           <div>
             <h3>Rocky Seeds LLC added to Active Companies</h3>
-            <p>The company is now being monitored.<br>
+            <p>The company has been added to Active Companies.<br>
             <a href="#">View Active Companies →</a></p>
           </div>
         </div>
@@ -452,7 +438,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
           <div class="sb-icon">⏳</div>
           <div>
             <h3>Rocky Seeds LLC added to Pending</h3>
-            <p>The company is queued for review before monitoring begins.<br>
+            <p>The company has been added to the Pending tab.<br>
             <a href="#">View Pending tab →</a></p>
           </div>
         </div>
