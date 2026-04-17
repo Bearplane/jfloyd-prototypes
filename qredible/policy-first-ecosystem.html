@@ -204,6 +204,11 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 .node:hover > .node-tooltip{opacity:1;transform:translateX(0)}
 
 /* Intel (top panel) → tooltip forced BELOW node (never above; prevents viewport-top clipping) */
+/* The Intel panel has backdrop-filter which creates a stacking context; its sibling
+   nucleus-wrap contains the nucleus with its own transform/animation stacking contexts.
+   Without explicit z-index on .area.intel, the nucleus renders on top of tooltips that
+   extend below into row 2. Raise the whole Intel panel's stacking context. */
+.area.intel{z-index:30}
 .area.intel .node-tooltip{
   left:0 !important;
   right:auto !important;
@@ -211,10 +216,9 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
   bottom:auto !important;
   transform:translateY(-8px);
   z-index:110;
+  max-width:min(320px, calc(100vw - 40px));
 }
 .area.intel .node:hover > .node-tooltip{transform:translateY(0)}
-/* Width override for intel so the tooltip never extends past the panel horizontally */
-.area.intel .node-tooltip{max-width:min(320px, calc(100vw - 40px))}
 
 /* Auth (left middle) → tooltip to the RIGHT (default) — aligned to the bottom if node is in upper half */
 .area.auth .node-tooltip{top:0}
