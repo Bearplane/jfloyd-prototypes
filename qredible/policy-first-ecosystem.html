@@ -203,34 +203,42 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 .node-tooltip code{background:#0f172a;padding:1px 5px;border-radius:3px;color:#7dd3fc;font-family:'IBM Plex Mono',monospace;font-size:10.5px}
 .node:hover > .node-tooltip{opacity:1;transform:translateX(0)}
 
-/* Intel (top panel) → tooltip pinned to TOP-RIGHT of viewport (position:fixed).
-   NOTE: backdrop-filter on .area creates a containing block for position:fixed
-   descendants, breaking viewport-anchored positioning. We strip backdrop-filter
-   from .area.intel only so fixed-positioning anchors to the viewport. The blur
-   effect is imperceptible against the page's solid dark background. */
-.area.intel{backdrop-filter:none !important; -webkit-backdrop-filter:none !important}
-.area.intel .node-tooltip{
-  position:fixed !important;
-  top:96px !important;
-  right:24px !important;
-  left:auto !important;
-  bottom:auto !important;
-  width:360px !important;
-  max-width:calc(100vw - 48px) !important;
-  transform:translateY(-6px) scale(.98);
-  transform-origin:top right;
-  z-index:9999 !important;
-  border:1px solid rgba(125,211,252,.5);
-  box-shadow:0 24px 64px rgba(0,0,0,.9), 0 0 0 1px rgba(59,130,246,.25);
+/* Intel (top panel) → hide the inline tooltips entirely; a single portal tooltip
+   at body level (below) is shown instead. This sidesteps all stacking-context
+   and containing-block issues that come with position:fixed nested inside
+   backdrop-filter panels. See #intel-portal-tooltip below and the JS at page end. */
+.area.intel .node-tooltip{display:none !important}
+
+#intel-portal-tooltip{
+  position:fixed;
+  top:96px;
+  right:28px;
+  width:380px;
+  max-width:calc(100vw - 56px);
+  background:#020617;
+  border:1px solid rgba(125,211,252,.55);
+  border-radius:10px;
+  padding:12px 14px;
+  font-size:11.5px;
+  line-height:1.55;
+  color:#e2e8f0;
+  z-index:9999;
+  box-shadow:0 24px 64px rgba(0,0,0,.9), 0 0 0 1px rgba(59,130,246,.22);
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(-6px);
+  transition:opacity .18s ease, transform .18s ease;
 }
-.area.intel .node-tooltip::before{
-  content:"Intelligence Layer detail";
-  display:block;
+#intel-portal-tooltip.visible{opacity:1;transform:translateY(0)}
+#intel-portal-tooltip b{color:#f8fafc;font-weight:700}
+#intel-portal-tooltip code{background:#0f172a;padding:1px 5px;border-radius:3px;color:#7dd3fc;font-family:'IBM Plex Mono',monospace;font-size:10.5px}
+#intel-portal-tooltip .eyebrow{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
   font-size:9.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;
   color:#7dd3fc;margin-bottom:8px;
   padding-bottom:8px;border-bottom:1px dashed rgba(125,211,252,.25);
 }
-.area.intel .node:hover > .node-tooltip{transform:translateY(0) scale(1)}
+#intel-portal-tooltip .eyebrow .src{color:#94a3b8;font-weight:600;letter-spacing:.3px;text-transform:none;font-size:10.5px}
 
 /* Auth (left middle) → tooltip to the RIGHT (default) — aligned to the bottom if node is in upper half */
 .area.auth .node-tooltip{top:0}
@@ -945,6 +953,46 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
   </div>
 
 </div>
+
+<!-- Portal tooltip for Intelligence Layer. One element, updated on hover of any
+     Intel node. Rendered at body level so it escapes every stacking context
+     and containing block. -->
+<div id="intel-portal-tooltip" aria-hidden="true"></div>
+
+<script>
+(function(){
+  const portal = document.getElementById('intel-portal-tooltip');
+  if (!portal) return;
+  const nodes = document.querySelectorAll('.area.intel .node');
+  nodes.forEach(node => {
+    const src = node.querySelector('.node-tooltip');
+    if (!src) return;
+    const titleEl = node.querySelector('.node-title');
+    const title = titleEl ? titleEl.textContent.trim() : 'Detail';
+    const contentHTML = src.innerHTML;
+    node.addEventListener('mouseenter', () => {
+      portal.innerHTML =
+        '<div class="eyebrow"><span>Intelligence Layer detail</span>' +
+        '<span class="src">' + title.replace(/</g,'&lt;') + '</span></div>' +
+        contentHTML;
+      portal.classList.add('visible');
+    });
+    node.addEventListener('mouseleave', () => {
+      portal.classList.remove('visible');
+    });
+    node.addEventListener('focusin', () => {
+      portal.innerHTML =
+        '<div class="eyebrow"><span>Intelligence Layer detail</span>' +
+        '<span class="src">' + title.replace(/</g,'&lt;') + '</span></div>' +
+        contentHTML;
+      portal.classList.add('visible');
+    });
+    node.addEventListener('focusout', () => {
+      portal.classList.remove('visible');
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
