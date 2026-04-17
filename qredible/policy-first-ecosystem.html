@@ -203,12 +203,18 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 .node-tooltip code{background:#0f172a;padding:1px 5px;border-radius:3px;color:#7dd3fc;font-family:'IBM Plex Mono',monospace;font-size:10.5px}
 .node:hover > .node-tooltip{opacity:1;transform:translateX(0)}
 
-/* Intel (top panel) → tooltip BELOW node */
+/* Intel (top panel) → tooltip forced BELOW node (never above; prevents viewport-top clipping) */
 .area.intel .node-tooltip{
-  left:0;top:calc(100% + 10px);
-  transform:translateY(-6px);
+  left:0 !important;
+  right:auto !important;
+  top:calc(100% + 14px) !important;
+  bottom:auto !important;
+  transform:translateY(-8px);
+  z-index:110;
 }
 .area.intel .node:hover > .node-tooltip{transform:translateY(0)}
+/* Width override for intel so the tooltip never extends past the panel horizontally */
+.area.intel .node-tooltip{max-width:min(320px, calc(100vw - 40px))}
 
 /* Auth (left middle) → tooltip to the RIGHT (default) — aligned to the bottom if node is in upper half */
 .area.auth .node-tooltip{top:0}
