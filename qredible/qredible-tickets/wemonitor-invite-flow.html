@@ -17,7 +17,7 @@
 
   Cross-ticket refs (real Jira keys only — no internal "B.2 · N" labels):
   - QP-3731 = this ticket (We Monitor invite flow + MyCOA feature toggle)
-  - QP-TBD  = Q-Config plan→feature mapping (verify in Jira before merge)
+  - QP-3732 = Q-Config Subscription Builder — Focus Features toggle (MyCOA, Compliance Portal)
 */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
@@ -217,7 +217,7 @@ tr.selected{background:#F7F5FF}
     <div class="info-pill">ℹ DESIGN NOTES — NOT IN BUILD</div>
     <ul>
       <li><strong>Columns:</strong> checkbox · Legal Name · Email Invite Status · Company Status · Feature · Activity Dates · Team Members · Actions. License Status is <strong>removed</strong>. Inner Active/Pending sub-tabs are <strong>removed</strong> (Company Status pill carries that state inline).</li>
-      <li><strong>Feature column = MyCOA toggle only.</strong> MyCOA is the only available feature at launch. Do not add Q-ScanAI, Policy Portal, or any other options here; plan→feature mapping lives in Q-Config (see <code>QP-TBD</code> — verify Jira key before merge).</li>
+      <li><strong>Feature column = MyCOA toggle only.</strong> MyCOA is the only available feature at launch. Do not add Q-ScanAI, Policy Portal, or any other options here; plan→feature mapping lives in Q-Config (<a href="https://qredible.atlassian.net/browse/QP-3732" target="_blank"><code>QP-3732</code></a>).</li>
       <li><strong>MyCOA toggle behavior:</strong> ON → recipient is routed into the MyCOA setup wizard after joining and before the paywall. OFF → wizard is skipped. The inviter can flip the toggle at any time <em>pre-join</em>; after the invite is accepted the toggle is locked to whatever value was stamped on the token.</li>
       <li><strong>Activity Dates</strong> is a 3-line stack: <code>Sent: MM/DD/YYYY</code> · <code>Joined: MM/DD/YYYY</code> · <code>Last Active: MM/DD/YYYY</code>. Missing values render as <code>—</code>.</li>
       <li><strong>Email template modal</strong> is a single modal (not side-by-side default/override). A <code>{{FEATURE_BLURB}}</code> token in the body renders MyCOA copy when the per-invite toggle is ON, and a blank string when OFF.</li>
@@ -520,7 +520,7 @@ Click below to get started — this invitation expires in 14 days.</textarea>
       <ol style="margin:8px 0 0 20px">
         <li>The recipient accepts the invite and completes account signup.</li>
         <li>They are routed <strong>directly into the MyCOA setup wizard</strong> — upload first COA, display preferences, domain/CNAME intent.</li>
-        <li>On wizard completion they hit the <strong>paywall</strong>, filtered to MyCOA-eligible plans (plan→feature mapping lives in Q-Config, ticket <code>QP-TBD</code> — verify before merge).</li>
+        <li>On wizard completion they hit the <strong>paywall</strong>, filtered to MyCOA-eligible plans (plan→feature mapping lives in Q-Config, <a href="https://qredible.atlassian.net/browse/QP-3732" target="_blank">QP-3732</a>).</li>
         <li>Plan selection finalizes the MyCOA subscription; the published MyCOA page goes live.</li>
       </ol>
     </div>
