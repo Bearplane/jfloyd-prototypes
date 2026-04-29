@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QP-3766 — Q-Audit Lookups · Delete + Reassign</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:13px;line-height:1.5}
+
+/* TOP NAV */
+.nav{background:#0F172A;border-bottom:1px solid rgba(255,255,255,.08);padding:10px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.nav a{color:#93C5FD;text-decoration:none;font-size:12px;font-weight:600}
+.nav a:hover{color:#fff}
+.nav .sep{color:#334155}
+.nav .cur{color:#F8FAFC;font-size:12px;font-weight:600}
+.ticket-badge{background:#1E3A5F;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.02em;margin-left:auto}
+
+.page{max-width:1400px;margin:0 auto;padding:28px 24px 80px}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:24px;font-weight:700;color:#1E293B;margin-bottom:6px}
+.page-header p{color:#475569;font-size:14px;max-width:980px;line-height:1.6}
+.meta-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.meta-pill{background:#fff;border:1px solid #E2E8F0;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;color:#475569}
+.meta-pill.strong{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
+.meta-pill.scope{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.meta-pill.cross{background:#F3E8FF;border-color:#D8B4FE;color:#6B21A8}
+
+.section{background:#fff;border-radius:12px;border:1px solid #E2E8F0;margin-bottom:24px;overflow:hidden}
+.section-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #E2E8F0}
+.section-head h2{font-size:15px;font-weight:700;color:#1E293B}
+.section-sub{font-size:12px;color:#64748B;margin-left:auto}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#1E3A5F;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+
+.badge-new{background:#DCFCE7;color:#166534;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+.badge-existing{background:#F1F5F9;color:#475569;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+.badge-warn{background:#FEF3C7;color:#92400E;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+
+/* CROSS-CUTTING TILE GRID */
+.cross-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px}
+@media(max-width:1100px){.cross-grid{grid-template-columns:repeat(2,1fr)}}
+.cross-tile{border:1px solid #E2E8F0;border-radius:10px;background:#FCFDFE;overflow:hidden;display:flex;flex-direction:column}
+.cross-tile-head{padding:10px 12px;background:#fff;border-bottom:1px solid #E2E8F0;font-size:11px;font-weight:800;color:#1E293B;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.cross-tile-head .lk-dot{width:8px;height:8px;border-radius:50%;background:#1E3A5F;flex-shrink:0}
+.cross-tile-body{padding:12px;font-size:11px;color:#475569;flex:1;display:flex;flex-direction:column;gap:8px}
+.cross-tile .ex{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0F172A;background:#F1F5F9;padding:4px 8px;border-radius:5px;border:1px solid #E2E8F0}
+.cross-tile .deps{display:flex;align-items:center;gap:6px;font-size:11px;color:#92400E;background:#FEF3C7;border:1px solid #FCD34D;padding:4px 8px;border-radius:6px}
+.cross-tile.from-2878{border-color:#86EFAC;background:#F0FDF4}
+.cross-tile.from-2878 .cross-tile-head{background:#DCFCE7;color:#166534}
+.cross-tile.from-2878 .cross-tile-head .lk-dot{background:#16A34A}
+
+/* GENERIC TABLE-LIKE PREVIEW */
+.lookup-row{display:flex;align-items:center;gap:8px;padding:6px 8px;background:#fff;border:1px solid #E2E8F0;border-radius:6px;font-size:11px;color:#0F172A}
+.lookup-row .name{font-weight:600;flex:1}
+.lookup-row .icon-x{width:18px;height:18px;background:#FEE2E2;color:#B91C1C;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;cursor:pointer}
+
+/* Q-AUDIT MODAL CHROME (same as MCC mockup) */
+.qa-shell{background:#FCFDFE}
+.qa-topnav{background:#0F172A;padding:0 20px;display:flex;align-items:center;gap:0;height:40px}
+.qa-topnav .qa-logo{color:#fff;font-size:14px;font-weight:800;margin-right:24px;letter-spacing:-.01em}
+.qa-topnav .qa-nav-item{padding:0 16px;height:40px;display:flex;align-items:center;color:#94A3B8;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent}
+.qa-topnav .qa-nav-item.active{color:#fff;border-bottom-color:#F05252}
+.qa-subnav{padding:0 20px;background:#fff;border-bottom:1px solid #E2E8F0;display:flex;gap:0;align-items:center}
+.qa-subnav .qa-sub-item{padding:11px 14px;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent}
+.qa-subnav .qa-sub-item.active{color:#0F172A;border-bottom-color:#1E3A5F}
+.gs-bar{padding:14px 20px;background:#FCFDFE;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:10px}
+.gs-bar .gs-title{font-size:14px;font-weight:700;color:#0F172A}
+
+table.qa-table{width:100%;border-collapse:collapse;font-size:12px}
+table.qa-table thead th{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:10px 12px;text-align:left;font-size:10px;font-weight:800;color:#64748B;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+table.qa-table tbody td{padding:11px 12px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
+table.qa-table tbody tr:hover{background:#F8FAFC}
+
+.action-cell{display:flex;gap:4px}
+.icon-btn{width:26px;height:26px;border:1px solid #E2E8F0;border-radius:5px;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#64748B;cursor:pointer;font-size:12px}
+.icon-btn:hover{border-color:#94A3B8;color:#0F172A}
+.icon-btn.danger:hover{color:#B91C1C;border-color:#FCA5A5}
+.icon-btn.targeted{border-color:#F05252;color:#F05252;background:#FEF2F2}
+
+.row-action-menu{position:absolute;background:#fff;border:1px solid #E2E8F0;border-radius:8px;box-shadow:0 8px 24px rgba(15,23,42,.12);min-width:200px;padding:4px;z-index:5}
+.row-action-menu .menu-item{padding:8px 12px;font-size:12px;color:#0F172A;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.row-action-menu .menu-item:hover{background:#F8FAFC}
+.row-action-menu .menu-item.danger{color:#B91C1C}
+.row-action-menu .menu-item.danger:hover{background:#FEE2E2}
+.row-action-menu .menu-item .ic{width:14px;text-align:center;color:#94A3B8}
+.row-action-menu .menu-item.danger .ic{color:#EF4444}
+.row-action-menu .divider{height:1px;background:#F1F5F9;margin:4px 0}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #CBD5E1;background:#fff;color:#1E293B;font-family:inherit}
+.btn:hover{background:#F8FAFC}
+.btn.primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn.primary:hover{background:#0F172A}
+.btn.danger-primary{background:#B91C1C;border-color:#B91C1C;color:#fff}
+.btn.danger{color:#B91C1C;border-color:#FCA5A5}
+.btn.subtle{background:#F1F5F9;border-color:#E2E8F0;color:#334155}
+.btn.sm{padding:5px 10px;font-size:11px}
+
+/* MODAL STAGE */
+.modal-stage{background:linear-gradient(180deg,#F7F5FF 0%, #EFEAFB 100%);padding:30px;border-radius:12px;border:1px solid #E9D5FF;margin-bottom:24px}
+.modal-stage-label{font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.modal-stage-label::before{content:'';width:8px;height:8px;border-radius:50%;background:#9333EA}
+
+.modal{background:#fff;border-radius:12px;border:1px solid #E2E8F0;box-shadow:0 4px 16px rgba(15,23,42,.08);max-width:580px;margin:0 auto;overflow:hidden}
+.modal.wide{max-width:680px}
+.modal.danger-trim{border-top:4px solid #F05252}
+.modal.warn-trim{border-top:4px solid #F59E0B}
+.modal-head{padding:18px 22px;border-bottom:1px solid #E2E8F0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.modal-head h3{font-size:15px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:10px}
+.modal-head .x{width:24px;height:24px;border:none;background:#F1F5F9;border-radius:6px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.modal-head .icn-warn{width:28px;height:28px;border-radius:8px;background:#FEF3C7;color:#92400E;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.modal-head .icn-info{width:28px;height:28px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.modal-body{padding:20px 22px}
+.modal-body p{font-size:13px;color:#475569;line-height:1.6;margin-bottom:14px}
+.modal-foot{padding:14px 22px;background:#FCFDFE;border-top:1px solid #E2E8F0;display:flex;justify-content:flex-end;gap:8px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.field input[type=text]{width:100%;padding:9px 12px;border:1px solid #CBD5E1;border-radius:8px;font-size:13px;color:#0F172A;font-family:inherit;background:#fff}
+
+/* FROM-TO PREVIEW */
+.from-to-preview{background:#F7F5FF;border:1px solid #E9D5FF;border-radius:8px;padding:14px 16px;margin:14px 0;display:flex;align-items:center;gap:12px;font-size:12px}
+.from-to-preview .ftbl{display:flex;flex-direction:column;gap:2px;flex:1}
+.from-to-preview .ftbl .lbl{font-size:9px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em}
+.from-to-preview .ftbl .val{font-weight:700;color:#0F172A}
+.from-to-preview .arrow{font-size:18px;color:#9333EA;font-weight:800}
+.from-to-preview.preview-line{font-size:13px}
+
+/* PICKER DROPDOWN */
+.picker-wrap{position:relative}
+.picker-input{width:100%;padding:9px 36px 9px 12px;border:1px solid #1E3A5F;border-radius:8px;font-size:13px;color:#0F172A;font-family:inherit;background:#fff;box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+.picker-input::after{content:'▾'}
+.picker-dropdown{margin-top:6px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;max-height:280px;overflow-y:auto;box-shadow:0 8px 24px rgba(15,23,42,.10)}
+.picker-search{padding:10px 12px;border-bottom:1px solid #F1F5F9}
+.picker-search input{width:100%;padding:7px 10px;font-size:12px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit}
+.picker-opt{padding:9px 14px;font-size:12px;color:#0F172A;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.picker-opt:hover{background:#F8FAFC}
+.picker-opt.selected{background:#EFF6FF;color:#1D4ED8;font-weight:700}
+.picker-opt .count{font-size:10px;color:#94A3B8;font-family:'IBM Plex Mono',monospace}
+.picker-opt .crossed{color:#94A3B8;text-decoration:line-through}
+.picker-opt.disabled{color:#94A3B8;cursor:not-allowed;background:#FCFDFE}
+.picker-opt.disabled .reason{font-size:10px;color:#B91C1C;font-weight:600}
+
+/* PROGRESS BAR */
+.progress-card{background:#fff;border-radius:8px;border:1px solid #E2E8F0;padding:18px 20px;text-align:center}
+.progress-spinner{width:42px;height:42px;border:4px solid #F1F5F9;border-top-color:#1E3A5F;border-radius:50%;margin:0 auto 14px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-text{font-size:13px;font-weight:700;color:#0F172A;margin-bottom:6px}
+.progress-sub{font-size:11px;color:#64748B;margin-bottom:14px;font-family:'IBM Plex Mono',monospace}
+.progress-bar{height:6px;background:#F1F5F9;border-radius:3px;overflow:hidden;margin-bottom:8px}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,#1E3A5F,#3B82F6);border-radius:3px;width:32%;transition:width .3s;animation:progress 2s ease-in-out infinite}
+@keyframes progress{0%{width:32%}50%{width:68%}100%{width:32%}}
+.progress-counts{font-size:11px;color:#475569;font-family:'IBM Plex Mono',monospace}
+
+/* AUDIT LOG ROW */
+.activity-row{padding:14px 18px;border-bottom:1px solid #F1F5F9;display:flex;align-items:flex-start;gap:14px;background:#fff}
+.activity-row:hover{background:#F8FAFC}
+.activity-row.highlighted{background:#F0FDF4;border-left:3px solid #16A34A}
+.activity-icn{width:32px;height:32px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:800}
+.activity-icn.delete-reassign{background:#FEF3C7;color:#92400E}
+.activity-body{flex:1;font-size:12px;color:#334155;line-height:1.6}
+.activity-body .lead{font-weight:700;color:#0F172A;font-size:13px}
+.activity-meta{font-size:10px;color:#94A3B8;font-family:'IBM Plex Mono',monospace;margin-top:4px}
+.activity-target{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0F172A;background:#F1F5F9;padding:1px 6px;border-radius:4px;border:1px solid #E2E8F0}
+
+/* TOAST */
+.toast-stage{padding:30px;background:linear-gradient(180deg,#FEF2F2 0%, #FEE2E2 100%);border-radius:12px;border:1px solid #FCA5A5;margin-bottom:24px;text-align:center}
+.toast{display:inline-flex;align-items:center;gap:14px;padding:14px 18px 14px 14px;background:#fff;border-radius:10px;border:1px solid #FCA5A5;box-shadow:0 8px 24px rgba(185,28,28,.15);max-width:560px;text-align:left}
+.toast .ic{width:36px;height:36px;border-radius:50%;background:#FEE2E2;color:#B91C1C;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0}
+.toast .txt{flex:1;font-size:12px;color:#334155;line-height:1.55}
+.toast .txt strong{color:#0F172A;font-weight:700}
+.toast .x{background:none;border:none;color:#94A3B8;cursor:pointer;font-size:16px;padding:0 4px}
+
+/* SOURCE TAGS */
+.src-tag{display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#94A3B8;background:#F8FAFC;border:1px dashed #CBD5E1;padding:1px 6px;border-radius:4px;letter-spacing:.02em;white-space:nowrap}
+.src-tag::before{content:'⌥';color:#94A3B8;font-size:10px}
+.src-row{padding:8px 16px;background:#FCFDFE;border-top:1px dashed #E2E8F0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.src-row .src-label{font-size:10px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-right:6px}
+
+/* TWO-COL BRANCH GRID */
+.branch-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:20px}
+@media(max-width:900px){.branch-grid{grid-template-columns:1fr}}
+.branch{border:1px solid #E2E8F0;border-radius:10px;background:#FCFDFE;overflow:hidden}
+.branch-head{padding:10px 14px;border-bottom:1px solid #E2E8F0;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.branch-head.a{background:#F0FDF4;color:#166534}
+.branch-head.b{background:#FFFBEB;color:#92400E}
+.branch-head .pip{width:8px;height:8px;border-radius:50%}
+.branch-head.a .pip{background:#16A34A}
+.branch-head.b .pip{background:#F59E0B}
+.branch-body{padding:14px}
+.branch-body p{font-size:12px;color:#475569;line-height:1.55;margin-bottom:10px}
+
+/* SOURCE FOOTER */
+.source-footer{background:#FCFDFE;border:1px solid #E2E8F0;border-radius:12px;padding:16px 20px;margin-top:24px}
+.source-footer h3{font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.source-footer ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:6px 20px}
+.source-footer li{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#475569;line-height:1.6}
+.source-footer li .nm{color:#1E3A5F;font-weight:600}
+.source-footer li .desc{color:#94A3B8}
+
+.cross-link{padding:14px 18px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;font-size:12px;color:#78350F;display:flex;gap:10px;align-items:center;margin-top:16px}
+.cross-link a{color:#B45309;font-weight:700;text-decoration:underline}
+
+footer.foot{margin-top:40px;padding-top:18px;border-top:1px solid #E2E8F0;text-align:center;font-size:11px;color:#94A3B8}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="../index.html">Qredible Prototypes</a>
+  <span class="sep">/</span>
+  <a href="../index.html?filter=q-audit">Q-Audit</a>
+  <span class="sep">/</span>
+  <span class="cur">Global Settings · Delete + Reassign</span>
+  <span class="ticket-badge">QP-3766</span>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h1>Q-Audit Lookups — Delete + Reassign workflow</h1>
+    <p>When a Q-Audit Global Settings lookup value (Industry Type, Type of Company, Product Classification, MCC Code) has dependent records, deletion now routes through <strong>Delete + Reassign</strong> — an atomic migration of dependents to a replacement value before the source is removed. The same modal pattern is shared across all four lookups, with a per-lookup label and dependent-count surface.</p>
+    <div class="meta-row">
+      <span class="meta-pill cross">Cross-cutting</span>
+      <span class="meta-pill strong">4 lookups affected</span>
+      <span class="meta-pill">Atomic transaction</span>
+      <span class="meta-pill scope">Blocks QP-2878</span>
+    </div>
+  </div>
+
+  <!-- 1. CROSS-CUTTING DEMONSTRATION -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">1</span>
+      <h2>Same workflow, four lookups</h2>
+      <span class="section-sub">One modal pattern, parameterized per lookup</span>
+    </div>
+    <div class="cross-grid">
+
+      <div class="cross-tile">
+        <div class="cross-tile-head"><span class="lk-dot"></span>Industry Types</div>
+        <div class="cross-tile-body">
+          <div>Existing modal · Q-Audit · Global Settings</div>
+          <div class="ex">qaudit.lookup.industry_types</div>
+          <div class="lookup-row">
+            <span class="name">Cannabis / MJ Only</span>
+            <span class="icon-x">🗑</span>
+          </div>
+          <div class="deps">⚠ 12 companies depend on this value</div>
+        </div>
+      </div>
+
+      <div class="cross-tile">
+        <div class="cross-tile-head"><span class="lk-dot"></span>Types of Company</div>
+        <div class="cross-tile-body">
+          <div>Existing modal · Q-Audit · Global Settings</div>
+          <div class="ex">qaudit.lookup.types_of_company</div>
+          <div class="lookup-row">
+            <span class="name">Cannabis/CBD-Distributor</span>
+            <span class="icon-x">🗑</span>
+          </div>
+          <div class="deps">⚠ 47 companies depend on this value</div>
+        </div>
+      </div>
+
+      <div class="cross-tile">
+        <div class="cross-tile-head"><span class="lk-dot"></span>Product Classification</div>
+        <div class="cross-tile-body">
+          <div>Existing modal · Q-Audit · Global Settings</div>
+          <div class="ex">qaudit.lookup.product_classification</div>
+          <div class="lookup-row">
+            <span class="name">Topical · CBD Salve</span>
+            <span class="icon-x">🗑</span>
+          </div>
+          <div class="deps">⚠ 318 products depend on this value</div>
+        </div>
+      </div>
+
+      <div class="cross-tile from-2878">
+        <div class="cross-tile-head"><span class="lk-dot"></span>MCC Codes <span style="margin-left:auto;font-size:9px;background:#16A34A;color:#fff;padding:1px 5px;border-radius:3px">FROM QP-2878</span></div>
+        <div class="cross-tile-body">
+          <div>New modal · introduced by QP-2878</div>
+          <div class="ex">qaudit.lookup.mcc_codes</div>
+          <div class="lookup-row">
+            <span class="name"><span style="font-family:'IBM Plex Mono',monospace;font-weight:700">5912</span> · Drug Stores and Pharmacies</span>
+            <span class="icon-x">🗑</span>
+          </div>
+          <div class="deps">⚠ 84 companies depend on this MCC</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="src-row">
+      <span class="src-label">Source</span>
+      <span class="src-tag">qaudit_lookup_delete_reassign_workflow</span>
+    </div>
+  </section>
+
+  <!-- 2. TWO BRANCHES -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">2</span>
+      <h2>Two branches when admin clicks Delete</h2>
+      <span class="section-sub">System decides based on dependent-record count</span>
+    </div>
+    <div class="branch-grid">
+      <div class="branch">
+        <div class="branch-head a"><span class="pip"></span>Branch A · No dependents</div>
+        <div class="branch-body">
+          <p>Existing behavior — unchanged. Simple confirmation dialog. Delete is irreversible but immediate.</p>
+          <div class="modal" style="max-width:none;box-shadow:none">
+            <div class="modal-head">
+              <h3><span class="icn-warn">!</span>Delete this Industry Type?</h3>
+            </div>
+            <div class="modal-body" style="padding:16px 22px">
+              <p style="margin-bottom:10px"><strong style="color:#0F172A">"Functional Mushrooms — Subspecies"</strong> isn't used by any company. Delete is permanent.</p>
+            </div>
+            <div class="modal-foot">
+              <button class="btn">Cancel</button>
+              <button class="btn danger-primary">Delete</button>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:10px"><span class="src-tag">qaudit_lookup_delete_simple_dialog</span></div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="branch-head b"><span class="pip"></span>Branch B · Has dependents</div>
+        <div class="branch-body">
+          <p>New behavior. Replacement is mandatory before delete can proceed. Migration + delete is atomic — either both succeed or both roll back.</p>
+          <div style="height:140px;background:linear-gradient(180deg,#FFFBEB 0%, #FEF3C7 100%);border-radius:8px;border:1px solid #FDE68A;display:flex;align-items:center;justify-content:center;font-size:12px;color:#92400E;font-weight:700">
+            ↓ See Section 3 — Delete + Reassign modal
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. DELETE + REASSIGN MODAL (PICKER OPEN) -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">3</span>
+      <h2>Delete + Reassign modal — picker open</h2>
+      <span class="badge-new">Net new modal</span>
+      <span class="section-sub">Industry Types example · 12 companies depend on "Cannabis / MJ Only"</span>
+    </div>
+    <div class="modal-stage">
+      <div class="modal-stage-label">Modal · Delete + Reassign</div>
+      <div class="modal wide warn-trim">
+        <div class="modal-head">
+          <h3><span class="icn-warn">⚠</span>12 companies are using <span style="font-family:'IBM Plex Mono',monospace;background:#F1F5F9;padding:2px 8px;border-radius:5px;border:1px solid #E2E8F0;font-size:13px">Cannabis / MJ Only</span></h3>
+          <button class="x">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Pick a replacement Industry Type to migrate the 12 dependent companies to <strong>before</strong> the source value is deleted. Migration + delete run atomically — either both succeed or neither does.</p>
+
+          <div class="field">
+            <label>Replacement Industry Type</label>
+            <div class="picker-wrap">
+              <input type="text" class="picker-input" value="Cannabis / CBD" readonly/>
+            </div>
+
+            <div class="picker-dropdown">
+              <div class="picker-search"><input type="text" placeholder="Search Industry Types…"/></div>
+              <div class="picker-opt selected">
+                <span>Cannabis / CBD</span>
+                <span class="count">8 companies use this</span>
+              </div>
+              <div class="picker-opt">
+                <span>Hemp / CBD</span>
+                <span class="count">15 companies use this</span>
+              </div>
+              <div class="picker-opt">
+                <span>Functional Mushrooms</span>
+                <span class="count">3 companies use this</span>
+              </div>
+              <div class="picker-opt">
+                <span>Nutraceuticals/Supplements</span>
+                <span class="count">22 companies use this</span>
+              </div>
+              <div class="picker-opt">
+                <span>Smoke Shops (Vape, eCig)</span>
+                <span class="count">5 companies use this</span>
+              </div>
+              <div class="picker-opt">
+                <span>Online Tobacco</span>
+                <span class="count">6 companies use this</span>
+              </div>
+              <div class="picker-opt disabled">
+                <span class="crossed">Cannabis / MJ Only</span>
+                <span class="reason">excluded — being deleted</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="from-to-preview">
+            <div class="ftbl">
+              <span class="lbl">Migrate from</span>
+              <span class="val">Cannabis / MJ Only</span>
+            </div>
+            <div class="arrow">→</div>
+            <div class="ftbl">
+              <span class="lbl">To</span>
+              <span class="val">Cannabis / CBD</span>
+            </div>
+            <div style="border-left:1px solid #E9D5FF;padding-left:14px;margin-left:6px">
+              <div style="font-size:9px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em">Records</div>
+              <div style="font-weight:700;color:#0F172A;font-size:14px;font-family:'IBM Plex Mono',monospace">12</div>
+            </div>
+          </div>
+
+          <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;font-size:11px;color:#475569;line-height:1.6">
+            <strong style="color:#0F172A">What happens:</strong> 12 <span class="activity-target">pl_company.industry_type_id</span> values are reassigned, the activity log records the migration, then <span class="activity-target">Cannabis / MJ Only</span> is removed from <span class="activity-target">qaudit.lookup.industry_types</span>. All in one transaction.
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn">Cancel</button>
+          <button class="btn primary">Migrate &amp; delete</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;text-align:center">
+        <span class="src-tag">qaudit_lookup_delete_reassign_modal</span>
+        <span class="src-tag">qaudit_lookup_replacement_picker</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. IN-PROGRESS STATE -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">4</span>
+      <h2>Migration in progress (large dependent count)</h2>
+      <span class="badge-new">Net new state</span>
+      <span class="section-sub">Shown when dependent count &gt;500 — Product Classification example</span>
+    </div>
+
+    <div class="modal-stage">
+      <div class="modal-stage-label">Modal · Migration in progress</div>
+      <div class="modal warn-trim" style="max-width:520px">
+        <div class="modal-head">
+          <h3><span class="icn-info">↻</span>Migrating Product Classification</h3>
+        </div>
+        <div class="modal-body">
+          <div class="progress-card">
+            <div class="progress-spinner"></div>
+            <div class="progress-text">Migrating 1,284 records…</div>
+            <div class="progress-sub">Topical · CBD Salve  →  Topical · Hemp Salve</div>
+            <div class="progress-bar"><div class="fill"></div></div>
+            <div class="progress-counts">412 / 1,284 reassigned · ~22s remaining</div>
+          </div>
+          <div style="margin-top:14px;font-size:11px;color:#64748B;text-align:center">Don't close this window. Cancelling now will roll back any reassigned records.</div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn subtle">Cancel migration</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;text-align:center"><span class="src-tag">qaudit_lookup_migration_progress_state</span></div>
+    </div>
+  </section>
+
+  <!-- 5. AUDIT LOG ENTRY -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">5</span>
+      <h2>Q-Audit Activity Log — entry after successful migration</h2>
+      <span class="badge-new">New event type</span>
+      <span class="section-sub">Q-Audit · Activity Log</span>
+    </div>
+
+    <div class="qa-shell">
+      <div class="gs-bar">
+        <span class="gs-title">Activity Log · Q-Audit Global Settings</span>
+        <span style="margin-left:auto;font-size:11px;color:#64748B">Today · 4 events</span>
+      </div>
+
+      <div class="activity-row">
+        <div class="activity-icn">+</div>
+        <div class="activity-body">
+          <div class="lead">Industry Type added — Functional Mushrooms — Subspecies</div>
+          <div>Created in <span class="activity-target">qaudit.lookup.industry_types</span></div>
+          <div class="activity-meta">2026-04-29 09:14 EDT · brian@qredible.com · evt_018a92f1</div>
+        </div>
+      </div>
+
+      <div class="activity-row highlighted">
+        <div class="activity-icn delete-reassign">⇄</div>
+        <div class="activity-body">
+          <div class="lead">Delete + Reassign · Industry Type · <span class="activity-target">Cannabis / MJ Only</span> → <span class="activity-target">Cannabis / CBD</span> · 12 records migrated</div>
+          <div>Migrated 12 <span class="activity-target">pl_company.industry_type_id</span> values then removed source value from <span class="activity-target">qaudit.lookup.industry_types</span>. Atomic transaction · committed.</div>
+          <div class="activity-meta">2026-04-29 11:08 EDT · joseph@qredible.com · evt_018a93b7 · txn_27c4d</div>
+        </div>
+      </div>
+
+      <div class="activity-row">
+        <div class="activity-icn">⇄</div>
+        <div class="activity-body">
+          <div class="lead">Reassign (no delete) · Type of Company · Cannabis/CBD-Cultivator → Cannabis/CBD-Cultivator (renamed) · 8 records</div>
+          <div>Standalone Reassign — source value retained.</div>
+          <div class="activity-meta">2026-04-29 11:21 EDT · ronaldo@qredible.com · evt_018a93c2</div>
+        </div>
+      </div>
+
+      <div class="activity-row">
+        <div class="activity-icn" style="background:#FEE2E2;color:#B91C1C">×</div>
+        <div class="activity-body">
+          <div class="lead">Re-import master MCC list · 904 → 906 rows</div>
+          <div>2 new MCCs added · 0 deprecated · industry-type associations preserved.</div>
+          <div class="activity-meta">2026-04-29 11:42 EDT · joseph@qredible.com · evt_018a9412</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="src-row">
+      <span class="src-label">Source</span>
+      <span class="src-tag">qaudit_lookup_migration_audit_log_row</span>
+    </div>
+  </section>
+
+  <!-- 6. STANDALONE REASSIGN ACTION -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">6</span>
+      <h2>Per-row Action menu — Edit / Reassign / Delete</h2>
+      <span class="badge-new">New menu item: Reassign</span>
+      <span class="section-sub">Stretch from QP-3766 — same modal but no deletion step</span>
+    </div>
+
+    <div class="qa-shell" style="position:relative;overflow:visible">
+      <div class="gs-bar">
+        <span class="gs-title">Industry Types</span>
+      </div>
+      <table class="qa-table">
+        <thead>
+          <tr>
+            <th>Industry Type</th>
+            <th>Description</th>
+            <th style="width:140px">Last Modified</th>
+            <th style="width:120px;text-align:right">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700">Cannabis / CBD</td>
+            <td style="color:#475569">Cannabis with CBD focus, including hemp-derived CBD products</td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-04-21</td>
+            <td><div class="action-cell" style="justify-content:flex-end"><button class="icon-btn">✎</button><button class="icon-btn">⇄</button><button class="icon-btn danger">🗑</button></div></td>
+          </tr>
+          <tr style="background:#F8FAFC;position:relative">
+            <td style="font-weight:700">Cannabis / MJ Only</td>
+            <td style="color:#475569">Cannabis without CBD focus; recreational or medical only</td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-03-10</td>
+            <td>
+              <div class="action-cell" style="justify-content:flex-end;position:relative">
+                <button class="icon-btn">✎</button>
+                <button class="icon-btn targeted">⇄</button>
+                <button class="icon-btn danger">🗑</button>
+                <div class="row-action-menu" style="right:0;top:32px">
+                  <div class="menu-item"><span class="ic">✎</span>Edit</div>
+                  <div class="menu-item" style="background:#EFF6FF;color:#1D4ED8;font-weight:700"><span class="ic" style="color:#1D4ED8">⇄</span>Reassign dependents…</div>
+                  <div class="divider"></div>
+                  <div class="menu-item danger"><span class="ic">🗑</span>Delete… <span style="margin-left:auto;font-size:9px;background:#FEE2E2;color:#B91C1C;padding:1px 4px;border-radius:3px;font-weight:700">12 deps</span></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:700">Hemp / CBD</td>
+            <td style="color:#475569">Hemp-derived CBD products, federally legal under 2018 Farm Bill</td>
+            <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#64748B">2026-02-18</td>
+            <td><div class="action-cell" style="justify-content:flex-end"><button class="icon-btn">✎</button><button class="icon-btn">⇄</button><button class="icon-btn danger">🗑</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="padding:14px 18px;background:#F8FAFC;border-top:1px solid #E2E8F0;font-size:12px;color:#475569;line-height:1.6">
+      <strong style="color:#0F172A">Reassign vs. Delete + Reassign:</strong> Reassign opens the same picker modal but the source value is <em>retained</em> — useful when an admin wants to re-bucket dependents without losing the source as a future option. Delete + Reassign migrates dependents <em>and</em> removes the source.
+    </div>
+
+    <div class="src-row">
+      <span class="src-label">Source</span>
+      <span class="src-tag">qaudit_lookup_standalone_reassign_action</span>
+    </div>
+  </section>
+
+  <!-- 7. FAILURE CASE -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">7</span>
+      <h2>Failure case — atomic rollback</h2>
+      <span class="badge-warn">Error state</span>
+      <span class="section-sub">If migration fails mid-flight, both source and dependents are unchanged</span>
+    </div>
+
+    <div class="toast-stage">
+      <div style="font-size:11px;font-weight:800;color:#B91C1C;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:8px;justify-content:center">
+        <span style="width:8px;height:8px;border-radius:50%;background:#B91C1C;display:inline-block"></span>Toast — error state
+      </div>
+      <div class="toast">
+        <div class="ic">!</div>
+        <div class="txt">
+          <strong>Migration failed</strong> — both the source value and its dependents are unchanged.<br/>
+          <span style="color:#64748B">Connection to <code style="background:#F1F5F9;padding:1px 4px;border-radius:3px;font-size:11px">pl_company</code> dropped after 412/1284 reassignments. Transaction rolled back automatically. Try again, or check the activity log for <code style="background:#F1F5F9;padding:1px 4px;border-radius:3px;font-size:11px">txn_27c4d</code>.</span>
+        </div>
+        <button class="x">×</button>
+      </div>
+      <div style="margin-top:14px;font-size:11px;color:#7F1D1D">
+        <strong>Guarantee:</strong> Q-Audit never leaves a lookup in a half-deleted state. The atomic transaction ensures the modal is safe to retry.
+      </div>
+    </div>
+    <div style="padding:0 16px 12px"><span class="src-tag">qaudit_lookup_migration_failure_toast</span></div>
+  </section>
+
+  <!-- CROSS LINK -->
+  <div class="cross-link">
+    <span style="font-size:18px">🔗</span>
+    <div>
+      <strong>Companion ticket:</strong> <a href="qaudit-mcc-codes.html">QP-2878 · MCC Codes</a> — adds the fourth lookup that adopts this workflow on day one. QP-3766 must ship before QP-2878 so MCC deletions can route their company dependents safely.
+    </div>
+  </div>
+
+  <!-- SOURCE FOOTER -->
+  <div class="source-footer">
+    <h3>Q-Config sources annotated on this mockup</h3>
+    <ul>
+      <li><span class="nm">qaudit_lookup_delete_reassign_workflow</span><br/><span class="desc">Cross-cutting workflow shared by all four lookups</span></li>
+      <li><span class="nm">qaudit_lookup_delete_simple_dialog</span><br/><span class="desc">Branch A — existing simple confirm when no dependents</span></li>
+      <li><span class="nm">qaudit_lookup_delete_reassign_modal</span><br/><span class="desc">Branch B — Delete + Reassign modal chrome</span></li>
+      <li><span class="nm">qaudit_lookup_replacement_picker</span><br/><span class="desc">Searchable picker dropdown for replacement value</span></li>
+      <li><span class="nm">qaudit_lookup_migration_progress_state</span><br/><span class="desc">Progress modal shown when dependent count &gt;500</span></li>
+      <li><span class="nm">qaudit_lookup_migration_audit_log_row</span><br/><span class="desc">New event type in Q-Audit Activity Log</span></li>
+      <li><span class="nm">qaudit_lookup_standalone_reassign_action</span><br/><span class="desc">Per-row Reassign menu item — migrate without delete</span></li>
+      <li><span class="nm">qaudit_lookup_migration_failure_toast</span><br/><span class="desc">Atomic-rollback error toast</span></li>
+    </ul>
+  </div>
+
+  <footer class="foot">QP-3766 · Q-Audit Global Settings · Delete + Reassign · 2026-04-29</footer>
+
+</div>
+
+</body>
+</html>
