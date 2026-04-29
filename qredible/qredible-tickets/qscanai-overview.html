@@ -315,6 +315,18 @@ h1,h2,h3,h4{letter-spacing:-.2px}
 .tag.p{background:var(--purple-bg);color:var(--purple)}
 .tag.gr{background:var(--line-soft);color:var(--muted)}
 
+/* FIGURE / DIAGRAM EMBEDS */
+.figure{margin:0;background:#FAFBFC;border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.figure.dark{background:linear-gradient(135deg,#FAFBFC 0%,#F1F5F9 100%)}
+.figure img{display:block;width:100%;max-width:100%;height:auto;background:#FAF9F5;border-radius:8px;border:1px solid var(--line)}
+.figure figcaption{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;padding:0 4px}
+.figure figcaption .fc-l{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.figure figcaption .fc-t{font-size:13px;font-weight:700;color:var(--ink);margin-top:3px;letter-spacing:-.1px}
+.figure figcaption .fc-d{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5;max-width:760px}
+.figure figcaption .fc-link{font-size:11.5px;font-weight:600;color:var(--blue);white-space:nowrap;text-decoration:none}
+.figure figcaption .fc-link:hover{text-decoration:underline}
+.figure figcaption .fc-link::after{content:' \2197'}
+
 /* PRINT */
 @media print{
   body{background:#fff;font-size:11px}
@@ -469,134 +481,17 @@ h1,h2,h3,h4{letter-spacing:-.2px}
       </div>
     </header>
 
-    <div class="arch">
-      <!-- API GATEWAY (top, full width) -->
-      <div class="arch-row">
-        <div class="arch-label">External / API Surface</div>
-        <div class="arch-grid c1">
-          <div class="mod gw">
-            <span class="mn">15</span>
-            <div class="mt">API Gateway Layer</div>
-            <div class="ms">REST endpoints &middot; JWT auth &middot; per-merchant API keys &middot; rate limiting &middot; request/response schema validation. Surfaces every module to operators and the future Policy Configurator UI.</div>
-          </div>
+    <figure class="figure">
+      <img src="assets/qscanai/diagrams/system-architecture.svg" alt="Q-ScanAI 15-module system architecture: API gateway, configuration plane (Configuration Management, Policy Assignment), Workflow Orchestration Engine, four execution modules (Discovery, Policy Execution, Rule Engine, Action Execution), Context &amp; Data Flow, support layer (Input Resolution, Credential &amp; Security, Content Fingerprint), and three cross-cutting modules (Audit &amp; Observability, Notification Router, Reporting &amp; Analytics).">
+      <figcaption>
+        <div>
+          <div class="fc-l">Figure 1 &middot; Module Map</div>
+          <div class="fc-t">Q-ScanAI &mdash; system architecture</div>
+          <div class="fc-d">Fifteen modules across five layers. Rules are configuration; the engine is generic; audit is cross-cutting. Source: <code>design-proposal.md &sect;3.1</code>.</div>
         </div>
-      </div>
-      <div class="arch-arrow">&darr;</div>
-
-      <!-- CONFIG + ASSIGNMENT -->
-      <div class="arch-row">
-        <div class="arch-label">Configuration Plane &mdash; Rules as Versioned Data</div>
-        <div class="arch-grid c2">
-          <div class="mod">
-            <span class="mn">1</span>
-            <div class="mt">Configuration Management</div>
-            <div class="ms">Versioning, lifecycle transitions, four-eyes promotion gate, config diff API, template &rarr; instance float-to-latest, regulatory-version linking.</div>
-          </div>
-          <div class="mod">
-            <span class="mn">2</span>
-            <div class="mt">Policy Assignment</div>
-            <div class="ms">Assign / override / exclude profiles &middot; inheritance resolver &middot; conflict detection &middot; bulk assignment confirmation gate &middot; effective-date windows.</div>
-          </div>
-        </div>
-      </div>
-      <div class="arch-arrow">&darr; snapshot &amp; resolved profiles &darr;</div>
-
-      <!-- ORCHESTRATION ENGINE (full width, highlighted) -->
-      <div class="arch-row">
-        <div class="arch-label">Runtime Plane &mdash; The Engine</div>
-        <div class="arch-grid c1">
-          <div class="mod eng">
-            <span class="mn">3</span>
-            <div class="mt">Workflow Orchestration Engine</div>
-            <div class="ms">Intake &rarr; Snapshot &rarr; DAG build &rarr; Tier scheduling &rarr; Cooperative concurrency &rarr; Checkpoints &rarr; Partial result publishing &rarr; Cancellation. The conductor.</div>
-          </div>
-        </div>
-      </div>
-      <div class="arch-arrow">&darr;</div>
-
-      <!-- 4 ENGINE CHILDREN -->
-      <div class="arch-row">
-        <div class="arch-grid c4">
-          <div class="mod">
-            <span class="mn">9</span>
-            <div class="mt">Page / File / Resource Discovery</div>
-            <div class="ms">Streams items into the pipeline. Handlers: WEBSITE_CRAWLER, COA_DOCUMENT_FETCHER, S3_FOLDER_LISTING, CANNASPY_LICENSE_FETCHER, &hellip;</div>
-          </div>
-          <div class="mod">
-            <span class="mn">4</span>
-            <div class="mt">Policy Execution Engine</div>
-            <div class="ms">Dispatches each policy by executing its action bindings (PRE / MAIN / POST / ON_FAIL / ON_SUCCESS) in topological order. No registered handler classes.</div>
-          </div>
-          <div class="mod">
-            <span class="mn">6</span>
-            <div class="mt">Rule Engine</div>
-            <div class="ms">json-rules-engine. Composite AND / OR / NOT &middot; equality, regex, fuzzy, page-section scoping, multi-method confidence aggregation, threshold counting.</div>
-          </div>
-          <div class="mod">
-            <span class="mn">5</span>
-            <div class="mt">Action Tree Executor</div>
-            <div class="ms">Hybrid sync + queue &middot; idempotency cache &middot; exponential backoff with jitter &middot; circuit breaker per endpoint &middot; DLQ routing &middot; conditional branching nodes.</div>
-          </div>
-        </div>
-      </div>
-      <div class="arch-arrow">&darr;</div>
-
-      <!-- CONTEXT (full width, purple) -->
-      <div class="arch-row">
-        <div class="arch-grid c1">
-          <div class="mod ctx">
-            <span class="mn">7</span>
-            <div class="mt">Context &amp; Data Flow Module</div>
-            <div class="ms">Typed shared store across 4 scopes (item / group / scan / merchant) &middot; provenance per entry &middot; inline-vs-blob threshold &middot; schema validation at read/write boundaries.</div>
-          </div>
-        </div>
-      </div>
-      <div class="arch-arrow">&darr;</div>
-
-      <!-- INPUT + CRED -->
-      <div class="arch-row">
-        <div class="arch-grid c2">
-          <div class="mod">
-            <span class="mn">8</span>
-            <div class="mt">Input Resolution</div>
-            <div class="ms">Resolves any input reference (inline / S3 / DB-KV / context lookup) into a runtime value. Validates against typed input schemas. Used for parameters and action arguments.</div>
-          </div>
-          <div class="mod">
-            <span class="mn">11</span>
-            <div class="mt">Credential &amp; Security</div>
-            <div class="ms">AWS Secrets Manager resolver &middot; per-tenant namespacing &middot; credential references in configs &middot; just-in-time injection at action execution &middot; rotation hook.</div>
-          </div>
-        </div>
-      </div>
-      <div class="arch-arrow">&darr; cross-cutting reporting &darr;</div>
-
-      <!-- CROSS-CUTTING -->
-      <div class="arch-row last">
-        <div class="arch-label">Cross-Cutting &mdash; Every Module Reports Here</div>
-        <div class="arch-grid c4">
-          <div class="mod cross">
-            <span class="mn">10</span>
-            <div class="mt">Audit &amp; Observability</div>
-            <div class="ms">Hash-chained append-only audit log &middot; OpenTelemetry distributed tracing (traceId = scanRunId) &middot; Pino structured logs &middot; action timeline reconstruction.</div>
-          </div>
-          <div class="mod cross">
-            <span class="mn">12</span>
-            <div class="mt">Notification Router</div>
-            <div class="ms">Severity-based routing: low &rarr; digest email, medium &rarr; Slack, high &rarr; PagerDuty / immediate webhook. DLQ-backed escalation.</div>
-          </div>
-          <div class="mod cross">
-            <span class="mn">13</span>
-            <div class="mt">Reporting &amp; Analytics</div>
-            <div class="ms">Typed rollup tables (counts, severity breakdowns, delta vs previous run, per-check-type breakdowns). Per-scan check-type aggregates without raw scans.</div>
-          </div>
-          <div class="mod cross">
-            <span class="mn">14</span>
-            <div class="mt">Content Fingerprint Service</div>
-            <div class="ms">SHA-256 normalization + storage. Skip-on-unchanged decision. Cache invalidation on policy version change. Force-scan override.</div>
-          </div>
-        </div>
-      </div>
-    </div>
+        <a class="fc-link" href="assets/qscanai/diagrams/system-architecture.svg" target="_blank" rel="noopener">View full size</a>
+      </figcaption>
+    </figure>
   </section>
 
   <!-- ===================== SECTION 4: TWO KINDS OF WORK ===================== -->
@@ -655,31 +550,17 @@ h1,h2,h3,h4{letter-spacing:-.2px}
     </header>
 
     <div class="lifecycle">
-      <div class="lc-flow">
-        <div class="lc-state s-draft">
-          <div class="lc-name">DRAFT</div>
-          <div class="lc-title">Author &amp; reviewers only</div>
-          <div class="lc-desc">Editable as new versions. Not used in any scan, production or test. Old versions immutable from creation.</div>
-        </div>
-        <div class="lc-arrow"><div class="lab">submit</div>&rarr;</div>
-        <div class="lc-state s-test">
-          <div class="lc-name">TESTABLE</div>
-          <div class="lc-title">Test environment only</div>
-          <div class="lc-desc">Visible in test mode. Test scans write to isolated <code>qsa_test_*</code> tables. Successful runs increment <code>successful_test_count</code>.</div>
-        </div>
-        <div class="lc-arrow"><div class="lab">activate</div>&rarr;</div>
-        <div class="lc-state s-active">
-          <div class="lc-name">ACTIVE</div>
-          <div class="lc-title">Production-visible</div>
-          <div class="lc-desc">Used by all production scans for assigned merchants. Cannot be edited &mdash; only superseded by a new version.</div>
-        </div>
-        <div class="lc-arrow"><div class="lab">supersede</div>&rarr;</div>
-        <div class="lc-state s-deprec">
-          <div class="lc-name">DEPRECATED</div>
-          <div class="lc-title">Read-only history</div>
-          <div class="lc-desc">Replaced by a newer active version. Past scans pinned to this version still resolve correctly. Rollback re-activates it.</div>
-        </div>
-      </div>
+      <figure class="figure" style="margin-bottom:18px;background:#fff">
+        <img src="assets/qscanai/diagrams/policy-state-machine.svg" alt="Policy version state machine: draft to testable on submit; testable to active on approve, gated by four promotion checks (cycle, schema, four-eyes, successful test); active to deprecated when superseded; rollback re-activates a prior version; canary path for staged rollout.">
+        <figcaption>
+          <div>
+            <div class="fc-l">Figure 2 &middot; Policy Version Lifecycle</div>
+            <div class="fc-t">Draft &rarr; Testable &rarr; Active &rarr; Deprecated &mdash; with promotion gates, canary, and rollback</div>
+            <div class="fc-d">Every policy, rule, action, template, and profile passes through this state machine. Source: <code>lifecycle-and-state-transitions.md &sect;2</code>.</div>
+          </div>
+          <a class="fc-link" href="assets/qscanai/diagrams/policy-state-machine.svg" target="_blank" rel="noopener">View full size</a>
+        </figcaption>
+      </figure>
 
       <div class="gates">
         <h4>&#128274;&nbsp;Four promotion gates &mdash; all must clear before draft &rarr; testable &rarr; active</h4>
@@ -711,30 +592,17 @@ h1,h2,h3,h4{letter-spacing:-.2px}
 
     <div class="find-wrap">
       <div class="find-flow">
-        <div class="find-states">
-          <div class="fs new">
-            <div class="fsn">NEW</div>
-            <div class="fsd">First time we've seen this finding for <code>(merchant, item, policy)</code>. Engine sets on first FAIL.</div>
-          </div>
-          <div class="fs ongoing">
-            <div class="fsn">ONGOING</div>
-            <div class="fsd">Already seen and still failing. Engine sets on subsequent FAIL.</div>
-          </div>
-          <div class="fs resolved">
-            <div class="fsn">RESOLVED</div>
-            <div class="fsd">Previously failed; the current scan PASSED. Engine sets on PASS after a prior FAIL.</div>
-          </div>
-          <div class="fs cleared">
-            <div class="fsn">ANALYST_CLEARED</div>
-            <div class="fsd">Compliance analyst reviewed and explicitly closed the finding with required notes.</div>
-          </div>
-        </div>
-        <div class="find-arrows">
-          <span>first FAIL &rarr;</span>
-          <span>still failing &rarr;</span>
-          <span>PASS &rarr;</span>
-          <span>analyst clears</span>
-        </div>
+        <figure class="figure" style="background:#fff;margin-bottom:14px">
+          <img src="assets/qscanai/diagrams/finding-state-machine.svg" alt="Compliance finding state machine: NEW on first FAIL; ONGOING on subsequent FAIL; RESOLVED on PASS after a prior FAIL; ANALYST_CLEARED when an analyst reviews and closes; reopen path back to NEW or ONGOING when content or policy version changes; first_detected_at is preserved across every transition.">
+          <figcaption>
+            <div>
+              <div class="fc-l">Figure 3 &middot; Finding Lifecycle</div>
+              <div class="fc-t">NEW &rarr; ONGOING &rarr; RESOLVED &rarr; ANALYST_CLEARED</div>
+              <div class="fc-d">Persistent compliance memory survives scans. <code>first_detected_at</code> is set once and preserved across every transition. Source: <code>lifecycle-and-state-transitions.md &sect;9</code>.</div>
+            </div>
+            <a class="fc-link" href="assets/qscanai/diagrams/finding-state-machine.svg" target="_blank" rel="noopener">View full size</a>
+          </figcaption>
+        </figure>
 
         <div class="find-reopen">
           <b>Reopen logic.</b> If a RESOLVED finding re-appears in a later scan, it auto-reopens to ONGOING with <code>previous_occurrences++</code>. If an ANALYST_CLEARED finding re-appears <i>and</i> the content hash or policy version has changed, it reopens. If both are unchanged, the analyst's clearance is respected.
@@ -755,11 +623,23 @@ h1,h2,h3,h4{letter-spacing:-.2px}
     <header class="sec-head">
       <div class="sec-num">07</div>
       <div class="sec-titles">
-        <div class="sec-eyebrow">CBD merchant scan &mdash; abbreviated walkthrough</div>
+        <div class="sec-eyebrow">How a scan flows &mdash; abstract, then a CBD merchant walkthrough</div>
         <h2>A real scan, end-to-end</h2>
-        <p class="sec-sub">A processor's CBD merchant inherits 16 active checks from the <i>CBD Standard v3</i> profile, with one local override and one excluded check. The engine runs them in DAG order, persists results, and fires the configured action tree.</p>
+        <p class="sec-sub">First the abstract: every scan run goes through seven stages, writing to the same set of tables in the same order. Then the concrete: a processor's CBD merchant inherits 16 active checks from the <i>CBD Standard v3</i> profile, runs them in DAG order, persists results, and fires the configured action tree.</p>
       </div>
     </header>
+
+    <figure class="figure" style="margin-bottom:24px">
+      <img src="assets/qscanai/diagrams/scan-lifecycle.svg" alt="Q-ScanAI scan lifecycle in seven stages: Trigger (POST /scans or scheduler), Snapshot (pin active config versions), Pre-flight (cycle check, credential probe, SSL probe), Discovery (open iterator handler), Execution loop (per item, per tier — fingerprint check, policy bindings PRE/MAIN/POST, rule eval, action tree), Aggregation (parent policies roll up children), Finalize (compute deltas vs prior run, publish status). Annotations show which database tables are written at each stage.">
+      <figcaption>
+        <div>
+          <div class="fc-l">Figure 4 &middot; Scan Run Lifecycle</div>
+          <div class="fc-t">How a scan flows in seven stages</div>
+          <div class="fc-d">Trigger &rarr; Snapshot &rarr; Pre-flight &rarr; Discovery &rarr; Execution &rarr; Aggregation &rarr; Finalize. Each stage's data writes are annotated. Source: <code>execution-flow.md</code> + <code>design-proposal.md &sect;6</code>.</div>
+        </div>
+        <a class="fc-link" href="assets/qscanai/diagrams/scan-lifecycle.svg" target="_blank" rel="noopener">View full size</a>
+      </figcaption>
+    </figure>
 
     <div class="cbd-grid">
       <aside class="merch-card">
@@ -856,6 +736,18 @@ h1,h2,h3,h4{letter-spacing:-.2px}
         </div>
       </div>
     </div>
+
+    <figure class="figure" style="margin-top:24px">
+      <img src="assets/qscanai/diagrams/data-flow-cbd-merchant.svg" alt="Sequence diagram for the CBD merchant scan: API receives POST /scans, snapshots active versions, enqueues to BullMQ; worker opens discovery iterator (Playwright crawl); for each tier, the policy execution engine dispatches policies — content fingerprint check, AI prompt build, rule evaluation, evidence write. Arrows show writes to qsa_scan_run, qsa_policy_execution_result, qsa_compliance_finding, qsa_action_invocation, and the audit log at each step.">
+      <figcaption>
+        <div>
+          <div class="fc-l">Figure 5 &middot; Data Flow &mdash; CBD Merchant Sequence</div>
+          <div class="fc-t">The same scan as a sequence diagram</div>
+          <div class="fc-d">Reinforces the prose walkthrough above by showing exactly which tables are written at each step &mdash; <code>qsa_scan_run</code>, <code>qsa_policy_execution_result</code>, <code>qsa_compliance_finding</code>, <code>qsa_action_invocation</code>, <code>qsa_audit_log</code>. Source: <code>webscan-example.md</code>.</div>
+        </div>
+        <a class="fc-link" href="assets/qscanai/diagrams/data-flow-cbd-merchant.svg" target="_blank" rel="noopener">View full size</a>
+      </figcaption>
+    </figure>
   </section>
 
   <!-- ===================== SECTION 8: MULTI-TENANT ===================== -->
