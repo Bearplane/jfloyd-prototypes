@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Compliance Portal v3 — End-to-End Vertical Slice — QP-3579–QP-3590, QP-3610</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Uber Move','Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:#F1F5F9;color:#1E293B;font-size:13px;line-height:1.5}
+a{color:#1A202E;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* ─── PROTO NAV ─── */
+.nav{background:#0F172A;border-bottom:1px solid rgba(255,255,255,.08);padding:10px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.nav a{color:#93C5FD;text-decoration:none;font-size:12px;font-weight:600}
+.nav a:hover{color:#fff}
+.nav .sep{color:#334155}
+.nav .cur{color:#F8FAFC;font-size:12px;font-weight:600}
+.ticket-badge{background:#1A202E;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.02em;margin-left:auto}
+.spec-badge{background:#F05252;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+
+/* ─── PAGE LAYOUT ─── */
+.page{max-width:1320px;margin:0 auto;padding:28px 24px 80px}
+.page-header{margin-bottom:28px}
+.page-header h1{font-size:24px;font-weight:700;color:#0F172A;margin-bottom:6px}
+.page-header p.lede{color:#475569;font-size:14px;max-width:980px;line-height:1.55}
+.meta-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.meta-pill{background:#fff;border:1px solid #E2E8F0;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;color:#475569}
+.meta-pill.strong{background:#1A202E;border-color:#1A202E;color:#fff}
+.meta-pill.scope{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.meta-pill.spec{background:#FEE2E2;border-color:#FCA5A5;color:#991B1B}
+
+/* ─── ANCHOR NAV (sticky toc) ─── */
+.toc{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:14px 18px;margin-bottom:24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px}
+.toc strong{color:#0F172A;text-transform:uppercase;letter-spacing:.06em;font-size:11px;font-weight:800}
+.toc a{padding:4px 10px;background:#F1F5F9;border-radius:6px;color:#1E293B;font-weight:600;font-size:11px}
+.toc a:hover{background:#1A202E;color:#fff;text-decoration:none}
+
+/* ─── SECTION CARD ─── */
+.section{background:#fff;border-radius:12px;border:1px solid #E2E8F0;margin-bottom:24px;overflow:hidden;scroll-margin-top:80px}
+.section-head{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid #E2E8F0;background:#FCFDFE}
+.section-head h2{font-size:16px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:10px}
+.section-head .qp{background:#1A202E;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.section-head .qp.multi{background:#475569}
+.section-sub{font-size:12px;color:#64748B;margin-left:auto;text-align:right;line-height:1.4}
+.section-body{padding:22px}
+.section-body.tight{padding:14px 22px}
+.section-body.flush{padding:0}
+
+/* ─── VERTICAL SLICE LOOP DIAGRAM ─── */
+.slice{background:linear-gradient(180deg,#0F172A 0%,#1E293B 100%);border-radius:12px;padding:28px 24px;margin-bottom:24px;color:#F8FAFC}
+.slice h2{font-size:13px;font-weight:800;color:#F05252;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.slice .slice-sub{font-size:13px;color:#CBD5E1;margin-bottom:20px;max-width:720px;line-height:1.5}
+.slice-loop{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative}
+@media(max-width:980px){.slice-loop{grid-template-columns:repeat(2,1fr)}}
+.slice-step{background:rgba(255,255,255,.04);border:1px solid rgba(240,82,82,.3);border-radius:10px;padding:14px 16px;position:relative}
+.slice-step .num{position:absolute;top:-12px;left:14px;width:24px;height:24px;background:#F05252;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;font-family:'IBM Plex Mono',monospace}
+.slice-step h4{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;margin-top:6px}
+.slice-step p{font-size:11px;color:#94A3B8;line-height:1.5}
+.slice-step .qp-list{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.slice-step .qp-list span{background:rgba(240,82,82,.15);color:#FCA5A5;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px}
+.slice-arrow{display:none}
+@media(min-width:981px){
+  .slice-loop{padding-bottom:8px}
+  .slice-loop::after{content:'↻ closes back to step 1 (case status update)';position:absolute;left:0;right:0;bottom:-22px;text-align:center;font-size:10px;color:#94A3B8;font-style:italic}
+}
+
+/* ─── SCOPE TABLE ─── */
+.scope-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+.scope-table th{background:#F8FAFC;padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#475569;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid #E2E8F0;white-space:nowrap}
+.scope-table td{padding:10px 14px;border-bottom:1px solid #F1F5F9;vertical-align:top}
+.scope-table tr:last-child td{border-bottom:none}
+.scope-table tr.in-scope td{background:#F0FDF4}
+.scope-table tr.in-scope:hover td{background:#DCFCE7}
+.scope-table tr.out-scope td{background:#FEF2F2}
+.scope-table tr.out-scope:hover td{background:#FEE2E2}
+.scope-key{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px}
+.scope-status{font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.scope-status.in{background:#16A34A;color:#fff}
+.scope-status.out{background:#94A3B8;color:#fff}
+.scope-status.deferred{background:#F59E0B;color:#fff}
+
+/* ─── ENGINEER CALLOUT ─── */
+.eng{background:#0F172A;color:#F8FAFC;border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;margin-top:14px}
+.eng .eng-label{display:inline-block;background:#F05252;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.06em;margin-bottom:8px;text-transform:uppercase}
+.eng strong{color:#F05252;font-weight:700}
+.eng .key{color:#FCA5A5}
+.eng .val{color:#A7F3D0}
+.eng .com{color:#64748B}
+.eng .endpoint{display:inline-block;background:rgba(240,82,82,.15);color:#FCA5A5;padding:1px 6px;border-radius:3px;margin-right:4px}
+.eng pre{font-family:inherit;white-space:pre-wrap}
+
+/* ─── DATA SHAPE CALLOUT ─── */
+.shape{background:#F7F5FF;border:1px solid #DDD6FE;border-radius:8px;padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;margin-top:10px;color:#1E293B}
+.shape .shape-label{display:inline-block;background:#5B21B6;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.06em;margin-bottom:6px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.shape .key{color:#5B21B6;font-weight:700}
+.shape .val{color:#0F172A}
+.shape .typ{color:#7C3AED;font-style:italic}
+.shape .com{color:#64748B}
+
+/* ─── STATE MACHINE ─── */
+.fsm{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:14px;background:#F7F5FF;border:1px solid #DDD6FE;border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:11px}
+.fsm .state{padding:4px 10px;background:#fff;border:1px solid #DDD6FE;border-radius:6px;color:#5B21B6;font-weight:700}
+.fsm .state.start{background:#1A202E;color:#fff;border-color:#1A202E}
+.fsm .state.end{background:#16A34A;color:#fff;border-color:#16A34A}
+.fsm .state.dispute{background:#F05252;color:#fff;border-color:#F05252}
+.fsm .arrow{color:#5B21B6;font-weight:700}
+.fsm .label{font-size:9px;color:#7C3AED;font-style:italic}
+
+/* ─── APP MOCK SHELL ─── */
+.app-mock{border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;background:#fff;margin:8px 0}
+.app-mock.dim{opacity:.97}
+.app-tabs{background:#fff;border-bottom:1px solid #E2E8F0;padding:0 16px;display:flex;gap:0;overflow-x:auto}
+.app-tab{padding:11px 14px;font-size:13px;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-weight:500}
+.app-tab.active{color:#0F172A;border-bottom-color:#F05252;font-weight:600}
+.app-tab .new-pill{display:inline-block;background:#F05252;color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px;margin-left:5px;letter-spacing:.04em;vertical-align:middle}
+.app-topbar{background:#fff;border-bottom:1px solid #E2E8F0;padding:8px 16px;display:flex;align-items:center;gap:12px;font-size:12px}
+.app-topbar .brand{font-weight:800;color:#1A202E;font-size:14px}
+.app-topbar .crumb{color:#94A3B8;font-size:11px}
+.app-topbar .spacer{flex:1}
+.app-topbar .co-chip{display:inline-flex;align-items:center;gap:6px;background:#F1F5F9;border:1px solid #E2E8F0;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;color:#334155}
+.app-topbar .user-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #E2E8F0;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;color:#334155}
+.app-topbar .avatar{width:20px;height:20px;border-radius:50%;background:#1A202E;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+
+/* ─── DATA TABLE ─── */
+.dt{width:100%;border-collapse:collapse;font-size:12px}
+.dt th{background:#FCFDFE;border-bottom:1px solid #E2E8F0;padding:10px 12px;text-align:left;font-size:10px;font-weight:800;color:#64748B;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.dt th.col-new{background:#FEE2E2;color:#991B1B;position:relative}
+.dt th.col-new::after{content:'NEW';background:#F05252;color:#fff;font-size:8px;font-weight:800;padding:1px 4px;border-radius:3px;margin-left:5px;letter-spacing:.04em;vertical-align:middle}
+.dt td{padding:11px 12px;border-bottom:1px solid #F1F5F9;font-size:13px;color:#334155;vertical-align:middle}
+.dt tbody tr:hover td{background:#F8FAFC}
+.dt tr.selected td{background:#FEF2F2}
+
+/* ─── PILLS ─── */
+.pill{display:inline-block;border-radius:12px;font-size:11px;font-weight:700;padding:2px 8px;white-space:nowrap;letter-spacing:.02em}
+.pill-low{background:#DCFCE7;color:#166534}
+.pill-medium{background:#FEF9C3;color:#854D0E}
+.pill-high{background:#FEE2E2;color:#991B1B}
+.pill-draft{background:#F1F5F9;color:#475569}
+.pill-open{background:#DBEAFE;color:#1E40AF}
+.pill-pending{background:#FEF3C7;color:#92400E}
+.pill-review{background:#EDE9FE;color:#5B21B6}
+.pill-resolved{background:#DCFCE7;color:#166534}
+.pill-disputed{background:#FEE2E2;color:#991B1B}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #CBD5E1;background:#fff;color:#1E293B;font-family:inherit;white-space:nowrap}
+.btn:hover{background:#F8FAFC}
+.btn.primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn.primary:hover{background:#0F172A}
+.btn.danger{background:#F05252;border-color:#F05252;color:#fff}
+.btn.danger:hover{background:#DC2626}
+.btn.ghost{background:transparent;border-color:transparent;color:#64748B}
+.btn.ghost:hover{background:#F1F5F9;color:#1E293B}
+.btn.sm{padding:5px 10px;font-size:11px}
+.btn.lg{padding:10px 20px;font-size:13px}
+.btn.disabled{opacity:.45;cursor:not-allowed}
+
+/* ─── ACTION ROW (inline buttons in table) ─── */
+.actions-inline{display:flex;gap:6px}
+.actions-inline .ic{width:26px;height:26px;border:1px solid #E2E8F0;border-radius:5px;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#64748B;cursor:pointer;font-size:11px;font-weight:700}
+.actions-inline .ic:hover{border-color:#1A202E;color:#1A202E}
+.actions-inline .ic.create{color:#F05252;border-color:#FCA5A5}
+.actions-inline .ic.create:hover{background:#F05252;color:#fff;border-color:#F05252}
+
+/* ─── CASE BADGE ─── */
+.case-badge{display:inline-flex;align-items:center;gap:4px;background:#FEE2E2;color:#991B1B;border-radius:12px;padding:2px 9px;font-size:11px;font-weight:800;cursor:pointer;border:none;font-family:inherit}
+.case-badge:hover{background:#FCA5A5}
+.case-badge.zero{background:#F1F5F9;color:#94A3B8;font-weight:600}
+.case-badge.zero:hover{background:#E2E8F0}
+
+/* ─── DASHBOARD WIDGET ─── */
+.widgets{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;padding:18px}
+.widget{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.widget.span-8{grid-column:span 8}
+.widget.span-6{grid-column:span 6}
+.widget.span-4{grid-column:span 4}
+.widget.span-12{grid-column:span 12}
+@media(max-width:1000px){.widget.span-8,.widget.span-6,.widget.span-4{grid-column:span 12}}
+.widget-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.widget-title{font-size:13px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:6px}
+.widget-title .ic{font-size:14px}
+.widget-sub{font-size:11px;color:#64748B;font-weight:500}
+.widget-stat{font-size:28px;font-weight:800;color:#0F172A;letter-spacing:-.01em;line-height:1}
+.widget-stat .s{font-size:12px;color:#64748B;font-weight:600;margin-left:4px}
+.widget-stat.warn{color:#F05252}
+.widget-list{display:flex;flex-direction:column;gap:6px}
+.widget-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F8FAFC;border-radius:6px;font-size:12px;color:#334155;cursor:pointer}
+.widget-list-item:hover{background:#F1F5F9}
+.widget-list-item .ic{flex-shrink:0;width:8px;height:8px;border-radius:50%}
+.widget-list-item .ic.high{background:#F05252}
+.widget-list-item .ic.med{background:#F59E0B}
+.widget-list-item .ic.low{background:#16A34A}
+.widget-list-item .lbl{flex:1}
+.widget-list-item .meta{font-size:10px;color:#94A3B8;font-family:'IBM Plex Mono',monospace}
+.widget .cta{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;padding:8px;background:#1A202E;color:#fff;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.widget .cta:hover{background:#0F172A}
+.widget.upsell{background:linear-gradient(180deg,#F7F5FF 0%,#fff 60%);border-color:#DDD6FE}
+.widget.urgent{border-color:#FCA5A5;background:linear-gradient(180deg,#FEE2E2 0%,#fff 60%)}
+
+/* ─── CASE DETAIL LAYOUT ─── */
+.case-detail{display:grid;grid-template-columns:2fr 1fr;gap:0;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;background:#fff}
+@media(max-width:1000px){.case-detail{grid-template-columns:1fr}}
+.case-main{padding:20px;border-right:1px solid #E2E8F0}
+.case-side{padding:20px;background:#FCFDFE}
+.case-meta-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.case-num{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#0F172A;background:#F1F5F9;padding:3px 8px;border-radius:4px}
+.case-h{font-size:18px;font-weight:700;color:#0F172A;margin:6px 0 12px}
+.case-side h4{font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.case-side .field{font-size:12px;color:#0F172A;margin-bottom:12px}
+.case-side .field strong{font-weight:700}
+.case-side .sla-warn{color:#991B1B;font-weight:700}
+
+/* ─── ITEM CARD ─── */
+.item-card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px 18px;margin-bottom:12px}
+.item-card.active{border-color:#F05252;box-shadow:0 0 0 3px rgba(240,82,82,.1)}
+.item-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.item-type{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:#5B21B6;background:#EDE9FE;padding:2px 6px;border-radius:3px}
+.item-h{font-size:14px;font-weight:700;color:#0F172A;margin-top:6px}
+.item-desc{font-size:12px;color:#475569;line-height:1.55;margin-top:6px}
+.item-resolution{margin-top:10px;padding:10px 12px;background:#F8FAFC;border-radius:6px;border-left:3px solid #1A202E}
+.item-resolution .lbl{font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.item-resolution .val{font-size:13px;color:#0F172A;font-weight:600}
+.item-resolution .sub{font-size:11px;color:#64748B;margin-top:3px}
+
+/* ─── UPLOAD ZONE ─── */
+.upload{border:2px dashed #CBD5E1;border-radius:10px;padding:30px 20px;text-align:center;background:#F8FAFC;cursor:pointer;transition:all .15s}
+.upload:hover{border-color:#F05252;background:#FFF5F5}
+.upload.has-file{border-color:#16A34A;background:#F0FDF4;border-style:solid}
+.upload .ic{font-size:36px;margin-bottom:8px}
+.upload .lbl{font-size:13px;font-weight:700;color:#0F172A;margin-bottom:4px}
+.upload .sub{font-size:11px;color:#64748B}
+.upload.has-file .lbl{color:#166534}
+.upload.has-file .sub{color:#15803D}
+
+/* ─── EMAIL MOCK ─── */
+.email-mock{background:#fff;border:1px solid #E2E8F0;border-radius:10px;max-width:560px;margin:0 auto;overflow:hidden}
+.email-head{padding:12px 16px;border-bottom:1px solid #F1F5F9;font-size:12px;color:#64748B;background:#FCFDFE}
+.email-head .from{color:#0F172A;font-weight:700}
+.email-head .subj{color:#0F172A;font-weight:600;margin-top:6px}
+.email-body{padding:24px}
+.email-body h2{font-size:18px;font-weight:700;color:#0F172A;margin-bottom:8px}
+.email-body p{font-size:13px;color:#475569;line-height:1.6;margin-bottom:12px}
+.email-body .item-summary{background:#F8FAFC;border-left:3px solid #F05252;padding:10px 14px;margin:14px 0;font-size:12px;color:#334155}
+.email-body .item-summary strong{color:#0F172A}
+.email-body .cta-btn{display:inline-block;background:#1A202E;color:#fff;text-align:center;padding:12px 24px;border-radius:6px;font-size:13px;font-weight:700;text-decoration:none;margin:8px 0}
+.email-body .small{font-size:11px;color:#94A3B8;margin-top:16px}
+
+/* ─── SIGNUP FORM MOCK ─── */
+.signup-mock{max-width:440px;margin:0 auto;background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:32px 28px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.signup-mock h3{font-size:20px;font-weight:700;color:#0F172A;margin-bottom:6px}
+.signup-mock p.sub{font-size:13px;color:#64748B;margin-bottom:20px}
+.signup-field{margin-bottom:14px}
+.signup-field label{display:block;font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.signup-field input{width:100%;padding:10px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#0F172A;background:#fff}
+.signup-field input:focus{outline:none;border-color:#1A202E;box-shadow:0 0 0 3px rgba(26,32,46,.08)}
+.signup-field input.locked{background:#F1F5F9;cursor:not-allowed;color:#64748B}
+.signup-mock .submit{width:100%;background:#1A202E;color:#fff;border:none;padding:12px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.signup-mock .legal{font-size:10px;color:#94A3B8;line-height:1.5;margin-top:14px;text-align:center}
+
+/* ─── ANNOTATIONS ─── */
+.annot{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;margin:14px 0;font-size:12px;color:#78350F;line-height:1.55}
+.annot.note{background:#F7F5FF;border-color:#DDD6FE;color:#5B21B6}
+.annot.warn{background:#FEF2F2;border-color:#FCA5A5;color:#991B1B}
+.annot.success{background:#F0FDF4;border-color:#86EFAC;color:#166534}
+.annot .ic{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.annot strong{font-weight:700}
+
+/* ─── DEFER MARKER ─── */
+.defer{display:inline-flex;align-items:center;gap:6px;background:#F59E0B;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase}
+
+/* ─── HANDOFF TABLE ─── */
+.handoff{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+.handoff th{background:#0F172A;color:#fff;padding:10px 14px;text-align:left;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.handoff td{padding:11px 14px;border-bottom:1px solid #F1F5F9;vertical-align:top;font-family:'IBM Plex Mono',monospace;font-size:11px}
+.handoff td:first-child{font-weight:700;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px}
+.handoff td.api{color:#5B21B6;font-weight:700}
+.handoff td.ui{color:#1A202E}
+.handoff td.note{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#64748B;font-style:italic}
+
+/* ─── FUTURE STATE BANNER ─── */
+.future{background:linear-gradient(135deg,#1E293B 0%,#5B21B6 100%);color:#fff;padding:24px;border-radius:12px;display:flex;align-items:center;gap:20px}
+.future .ic{font-size:36px}
+.future h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.future p{font-size:12px;color:#CBD5E1;line-height:1.55}
+.future a{color:#FCA5A5;text-decoration:underline;font-family:'IBM Plex Mono',monospace;font-size:11px}
+
+/* ─── FOOTNOTES ─── */
+.footnotes{margin-top:32px;padding:18px 20px;background:#F1F5F9;border-radius:10px;font-size:11px;color:#475569;line-height:1.6}
+.footnotes h4{font-size:11px;font-weight:800;color:#0F172A;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.footnotes ol{margin-left:18px}
+.footnotes li{margin-bottom:4px}
+
+/* ─── HELPERS ─── */
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;gap:8px}
+.center{text-align:center}
+.muted{color:#94A3B8}
+.tight{margin:0;padding:0}
+.divider{height:1px;background:#E2E8F0;margin:18px 0}
+
+/* ─── LIGHTBOX-LIKE STAGE ─── */
+.stage{background:linear-gradient(180deg,#F8FAFC 0%,#E2E8F0 100%);padding:30px 24px}
+.stage.dark{background:linear-gradient(180deg,#0F172A 0%,#1E293B 100%)}
+.stage .stage-label{font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;text-align:center}
+
+/* Modal wash for any in-flow modal sims */
+.modal-wash{background:#F7F5FF;padding:24px;border:1px solid #DDD6FE;border-radius:12px;display:flex;justify-content:center}
+.modal-card{background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(15,23,42,.12);max-width:560px;width:100%;overflow:hidden}
+.modal-head{padding:16px 20px;border-bottom:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:14px;font-weight:700;color:#0F172A}
+.modal-body{padding:20px}
+.modal-foot{padding:14px 20px;border-top:1px solid #F1F5F9;background:#FCFDFE;display:flex;gap:8px;justify-content:flex-end}
+
+/* Table caption / note row */
+.tbl-caption{padding:10px 14px;background:#FCFDFE;border-bottom:1px solid #E2E8F0;font-size:11px;color:#64748B;font-style:italic}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PROTO NAV
+     ═══════════════════════════════════════════════════════════════════ -->
+<nav class="nav">
+  <a href="../">← All Mockups</a>
+  <span class="sep">/</span>
+  <span class="cur">Compliance Portal v3 — End-to-End Vertical Slice</span>
+  <span class="spec-badge">Engineer Spec</span>
+  <span class="ticket-badge">QP-3579 · 3580 · 3581 · 3582 · 3583 · 3584 · 3585 · 3586 · 3590 · 3610</span>
+</nav>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       PAGE HEADER
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <h1>Compliance Portal v3 — End-to-End Vertical Slice</h1>
+    <p class="lede">
+      Joseph's v1 implementation slice: build the case-management loop end-to-end across Q-Monitor (processor side) and Merchant Portal (merchant side), trimmed to <strong>one item type</strong> and <strong>one resolution type</strong> for first release. This mockup is an <strong>engineer-readable spec</strong> — Joseph implements in RTQ-Admin-UI / RTQ-Admin-API / Middleware while recording the development sessions for dev-team training. Every section calls out component boundaries, API endpoints, data shapes, and state transitions.
+    </p>
+    <div class="meta-row">
+      <span class="meta-pill strong">v1 Vertical Slice</span>
+      <span class="meta-pill">Owner: Joseph Floyd</span>
+      <span class="meta-pill">Target: FlexPay June 2026 launch</span>
+      <span class="meta-pill">10 tickets in scope · 4 deferred</span>
+      <span class="meta-pill scope">v1: ONE item type · ONE resolution type</span>
+      <span class="meta-pill spec">Engineer Spec — not stakeholder marketing</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       VERTICAL SLICE LOOP DIAGRAM
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="slice">
+    <h2>The Vertical Slice — what gets built end-to-end</h2>
+    <p class="slice-sub">Findings from any of three sources can become a case. Cases land in Internal Case Management for review and send-out. Merchants log in, respond, and resolution flows back to the processor. Closing the loop is the v1 success criterion.</p>
+    <div class="slice-loop">
+      <div class="slice-step">
+        <div class="num">1</div>
+        <h4>Finding → Case</h4>
+        <p>"Create Case" action exposed on Q-ScanAI Findings, Product Compliance, and License Check. Selected findings persist as a draft case.</p>
+        <div class="qp-list"><span>QP-3581</span><span>QP-3582</span><span>QP-3610</span><span>QP-3579</span><span>QP-3580</span></div>
+      </div>
+      <div class="slice-step">
+        <div class="num">2</div>
+        <h4>Q-Monitor surfaces case</h4>
+        <p>Active Case Count column in We Monitor table. Internal Case Management screen lists, sorts, sends drafts to merchant.</p>
+        <div class="qp-list"><span>QP-3583</span><span>QP-3584</span></div>
+      </div>
+      <div class="slice-step">
+        <div class="num">3</div>
+        <h4>Merchant responds</h4>
+        <p>Merchant logs in, sees case on dashboard, opens the one item, uploads the one resolution. v1 = single item / single resolution type.</p>
+        <div class="qp-list"><span>QP-3585</span><span>QP-3586</span><span>QP-3590</span></div>
+      </div>
+      <div class="slice-step">
+        <div class="num">4</div>
+        <h4>Loop closes</h4>
+        <p>Response surfaces in Internal Case Management. Processor accepts → case status RESOLVED. Merchant + processor both see updated state.</p>
+        <div class="qp-list"><span>QP-3584</span><span>QP-3586</span><span>QP-3580</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       TOC
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="toc">
+    <strong>Sections</strong>
+    <a href="#scope">Scope · IN/OUT</a>
+    <a href="#sec-a">A · Create Case</a>
+    <a href="#sec-b">B · Q-Monitor</a>
+    <a href="#sec-c">C · Merchant Auth</a>
+    <a href="#sec-d">D · Merchant Dashboard</a>
+    <a href="#sec-e">E · Merchant Response</a>
+    <a href="#sec-f">F · Loop closure</a>
+    <a href="#sec-g">G · Data model</a>
+    <a href="#sec-h">H · v2 Deferred</a>
+    <a href="#sec-i">I · Handoff</a>
+    <a href="#sec-j">J · Future-state ref</a>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SCOPE TABLE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="scope">
+    <div class="section-head">
+      <h2>Scope — IN / OUT for v1 vertical slice</h2>
+      <div class="section-sub">10 in scope · 3 deferred to v2 · 1 umbrella<br/>per Joseph's 2026-04-29 walkthrough</div>
+    </div>
+    <table class="scope-table">
+      <thead>
+        <tr><th style="width:90px">Ticket</th><th>Title</th><th style="width:140px">Status</th><th>Where in this mockup</th></tr>
+      </thead>
+      <tbody>
+        <tr class="in-scope"><td class="scope-key">QP-3579</td><td>Case Entity & Data Model — PlComplianceCase</td><td><span class="scope-status in">v1 IN</span></td><td>Section G · Data Model</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3580</td><td>Case CRUD API — Create / Read / Update</td><td><span class="scope-status in">v1 IN</span></td><td>Section G · API contracts (every section references)</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3581</td><td>"Create Case" action on Q-ScanAI Findings</td><td><span class="scope-status in">v1 IN</span></td><td>Section A.1</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3582</td><td>"Create Case" action on Product Compliance</td><td><span class="scope-status in">v1 IN</span></td><td>Section A.2 (the v1 demo path)</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3583</td><td>Active Case Count column in We Monitor</td><td><span class="scope-status in">v1 IN</span></td><td>Section B.1</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3584</td><td>Internal Case Management Screen — /qmonitor/cases</td><td><span class="scope-status in">v1 IN</span></td><td>Section B.2 + B.3 + Section F</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3585</td><td>Merchant Portal Authentication & Onboarding</td><td><span class="scope-status in">v1 IN</span></td><td>Section C</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3586</td><td>Merchant Compliance Portal Dashboard</td><td><span class="scope-status in">v1 IN</span></td><td>Section D</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3590</td><td>Compliance Case Dispute Resolution (merchant view)</td><td><span class="scope-status in">v1 IN</span></td><td>Section E</td></tr>
+        <tr class="in-scope"><td class="scope-key">QP-3610</td><td>"Create Case" action on License Check</td><td><span class="scope-status in">v1 IN</span></td><td>Section A.3</td></tr>
+        <tr class="out-scope"><td class="scope-key">QP-3472</td><td>Cases & Compliance Portal (umbrella epic)</td><td><span class="scope-status out">Frame only</span></td><td>This mockup IS the implementation of the epic's v1</td></tr>
+        <tr class="out-scope"><td class="scope-key">QP-3591</td><td>Closure Rules / Force-Close (90-day archive)</td><td><span class="scope-status deferred">v2 deferred</span></td><td>Section H · placeholder + defer marker</td></tr>
+        <tr class="out-scope"><td class="scope-key">QP-3592</td><td>Compliance Case Reporting (Processor)</td><td><span class="scope-status deferred">v2 deferred</span></td><td>Section H · placeholder + defer marker</td></tr>
+        <tr class="out-scope"><td class="scope-key">QP-3593</td><td>Configurable Resolution Types per Case Item</td><td><span class="scope-status deferred">v2 deferred</span></td><td>Section H · placeholder. v1 hardcodes ONE resolution type</td></tr>
+      </tbody>
+    </table>
+    <div class="annot note">
+      <span class="ic">i</span>
+      <div><strong>v1 hardcoding:</strong> for first release, the demo path is COA_EXPIRED (item type) → UPLOAD_REPLACEMENT_COA (resolution type). Per Joseph: "merchant resolution being provided with one data element and resolution type and then building up from there." QP-3593 (configurable resolution types) is what unlocks multi-itemType support in v2.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION A — CREATE CASE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-a">
+    <div class="section-head">
+      <h2>A · Create Case from Findings <span class="qp multi">QP-3581 · 3582 · 3610 · 3579 · 3580</span></h2>
+      <div class="section-sub">Three entry points → one shared CaseDraftDrawer<br/>Output: PlComplianceCase row in DRAFT status</div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:#475569;margin-bottom:16px">The "Create Case" action lives on three surfaces. Each surface auto-detects the <code class="mono">itemType</code> from the source row and pre-fills the case draft. v1 routes all three through one component (<code class="mono">CaseDraftDrawer</code>) — different entry, identical commit path.</p>
+
+      <!-- A.2 — Product Compliance (THE v1 DEMO PATH) -->
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:18px 0 8px">A.1 · Product Compliance &nbsp;<span class="defer" style="background:#F05252">v1 demo path</span></h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3582. The path Joseph demos for v1: an expired COA on a product → "Create Case" → draft persists.</p>
+
+      <div class="app-mock">
+        <div class="app-topbar">
+          <span class="brand">Q</span>
+          <span class="brand" style="color:#0F172A">Q-Monitor</span>
+          <span class="crumb">/ FLEX Payment Solutions / Black Bear Wellness LLC</span>
+          <span class="spacer"></span>
+          <span class="co-chip">FLEX Payment Solutions</span>
+          <span class="user-chip"><span class="avatar">JF</span> Joseph</span>
+        </div>
+        <div class="app-tabs">
+          <span class="app-tab">We Monitor</span>
+          <span class="app-tab">Findings</span>
+          <span class="app-tab active">Product Compliance</span>
+          <span class="app-tab">Licenses</span>
+          <span class="app-tab">Cases <span class="new-pill">NEW</span></span>
+        </div>
+        <table class="dt">
+          <thead>
+            <tr>
+              <th><input type="checkbox" checked/></th>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>COAs</th>
+              <th>Status</th>
+              <th>Severity</th>
+              <th class="col-new">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="selected">
+              <td><input type="checkbox" checked/></td>
+              <td><strong>Tincture 1000mg Full Spectrum</strong></td>
+              <td class="mono">BBW-TINC-1000</td>
+              <td>1 valid · <span style="color:#F05252;font-weight:700">1 expired</span></td>
+              <td><span class="pill pill-pending">EXPIRED COA</span></td>
+              <td><span class="pill pill-high">High Risk</span></td>
+              <td>
+                <button class="btn danger sm">+ Create Case</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"/></td>
+              <td>Gummies 25mg Sour Apple</td>
+              <td class="mono">BBW-GUM-25SA</td>
+              <td>2 valid</td>
+              <td><span class="pill pill-resolved">Compliant</span></td>
+              <td><span class="pill pill-low">Low</span></td>
+              <td><span class="muted" style="font-size:11px">—</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"/></td>
+              <td>Capsules 50mg Broad Spectrum</td>
+              <td class="mono">BBW-CAP-50BS</td>
+              <td><span style="color:#F05252;font-weight:700">No COA</span></td>
+              <td><span class="pill pill-high">MISSING COA</span></td>
+              <td><span class="pill pill-medium">Medium</span></td>
+              <td><button class="btn danger sm">+ Create Case</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="annot">
+        <span class="ic">!</span>
+        <div><strong>Severity language</strong>: rendered as <strong>"Low / Medium / High Risk"</strong> text — never <code class="mono">S1/S2/S3</code> codes. (Per Joseph 2026-04-29 walkthrough, replacing badge codes from earlier mocks.)</div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · QP-3582 · "Create Case" on Product Compliance</span><pre>
+<span class="com">// Component that wraps the Action column button</span>
+<span class="key">&lt;CreateCaseAction</span>
+  <span class="key">source=</span><span class="val">"PRODUCT_COMPLIANCE"</span>
+  <span class="key">selectedRows=</span><span class="val">{[</span><span class="val">{ plProductId, vaultCoaId, severity, finding }</span><span class="val">]}</span>
+  <span class="key">onCreate=</span><span class="val">{() =&gt; openCaseDraftDrawer(items)}</span>
+<span class="key">/&gt;</span>
+
+<span class="com">// On click → POST to Case CRUD API (QP-3580)</span>
+<span class="endpoint">POST /api/qmonitor/cases</span> <span class="com">→ returns caseId in DRAFT</span>
+<span class="com">  Body shape:</span>
+{
+  <span class="key">"merchantId"</span>: <span class="val">"black-bear-wellness-llc"</span>,
+  <span class="key">"items"</span>: [{
+    <span class="key">"itemType"</span>: <span class="val">"COA_EXPIRED"</span>,           <span class="com">// auto-detected from source row</span>
+    <span class="key">"plProductId"</span>: <span class="val">"BBW-TINC-1000"</span>,
+    <span class="key">"vaultCoaId"</span>: <span class="val">"coa_8f3a2d"</span>,           <span class="com">// the SPECIFIC expired COA</span>
+    <span class="key">"severity"</span>: <span class="val">"HIGH"</span>,
+    <span class="key">"finding"</span>: <span class="val">"COA expired 2026-03-15; Δ9-THC unverified"</span>
+  }],
+  <span class="key">"source"</span>: <span class="val">"PRODUCT_COMPLIANCE"</span>
+}
+
+<span class="com">// v1 hardcodes: itemType=COA_EXPIRED → resolutionType=UPLOAD_REPLACEMENT_COA
+// QP-3593 (deferred) is what makes resolutionType configurable per itemType</span></pre>
+      </div>
+
+      <!-- A.2 — Q-ScanAI Findings -->
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.2 · Q-ScanAI Findings <span class="defer" style="background:#94A3B8">v1 stretch</span></h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3581. Same pattern, different source row + itemType auto-detection.</p>
+
+      <div class="app-mock">
+        <div class="app-topbar">
+          <span class="brand">Q</span><span class="brand" style="color:#0F172A">Q-Monitor</span>
+          <span class="crumb">/ FLEX Payment Solutions / Black Bear Wellness LLC / Findings</span>
+          <span class="spacer"></span>
+          <span class="user-chip"><span class="avatar">JF</span> Joseph</span>
+        </div>
+        <div class="app-tabs">
+          <span class="app-tab">We Monitor</span>
+          <span class="app-tab active">Findings</span>
+          <span class="app-tab">Product Compliance</span>
+          <span class="app-tab">Licenses</span>
+          <span class="app-tab">Cases <span class="new-pill">NEW</span></span>
+        </div>
+        <table class="dt">
+          <thead>
+            <tr><th><input type="checkbox"/></th><th>Finding</th><th>Source URL</th><th>Severity</th><th>Detected</th><th class="col-new">Action</th></tr>
+          </thead>
+          <tbody>
+            <tr class="selected">
+              <td><input type="checkbox" checked/></td>
+              <td><strong>Missing privacy policy link</strong></td>
+              <td class="mono" style="font-size:11px">blackbearwellness.com/footer</td>
+              <td><span class="pill pill-medium">Medium</span></td>
+              <td>2026-04-26</td>
+              <td><button class="btn danger sm">+ Create Case</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"/></td>
+              <td>Unverified health claim "cures anxiety"</td>
+              <td class="mono" style="font-size:11px">blackbearwellness.com/blog/cbd-101</td>
+              <td><span class="pill pill-high">High Risk</span></td>
+              <td>2026-04-26</td>
+              <td><button class="btn danger sm">+ Create Case</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · QP-3581 · "Create Case" on Q-ScanAI Findings</span><pre>
+<span class="key">&lt;CreateCaseAction</span> <span class="key">source=</span><span class="val">"QSCANAI_FINDING"</span> <span class="key">selectedRows=</span><span class="val">{[{ findingId, url, type, severity }]}</span> <span class="key">/&gt;</span>
+
+<span class="com">// itemType auto-detection rule (in Middleware):</span>
+<span class="com">//   QSCANAI_FINDING.type === "MISSING_PRIVACY_POLICY"  → itemType=COMPLIANCE_FINDING</span>
+<span class="com">//   QSCANAI_FINDING.type === "UNVERIFIED_HEALTH_CLAIM" → itemType=COMPLIANCE_FINDING</span>
+<span class="com">//   v1: not the demo path. Wired up but only COA_EXPIRED has the full merchant response UI.</span></pre>
+      </div>
+
+      <!-- A.3 — License Check -->
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.3 · License Check <span class="defer" style="background:#94A3B8">v1 stretch</span></h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3610. Third entry point. Auto-detects <code class="mono">itemType=LICENSE_ISSUE</code>.</p>
+
+      <div class="app-mock">
+        <div class="app-topbar">
+          <span class="brand" style="color:#0F172A">Q-Monitor</span>
+          <span class="crumb">/ FLEX Payment Solutions / Black Bear Wellness LLC / Licenses</span>
+          <span class="spacer"></span>
+          <span class="user-chip"><span class="avatar">JF</span> Joseph</span>
+        </div>
+        <div class="app-tabs">
+          <span class="app-tab">We Monitor</span>
+          <span class="app-tab">Findings</span>
+          <span class="app-tab">Product Compliance</span>
+          <span class="app-tab active">Licenses</span>
+          <span class="app-tab">Cases <span class="new-pill">NEW</span></span>
+        </div>
+        <table class="dt">
+          <thead>
+            <tr><th>License Type</th><th>Authority</th><th>Status</th><th>Expires</th><th>Severity</th><th class="col-new">Action</th></tr>
+          </thead>
+          <tbody>
+            <tr class="selected">
+              <td><strong>Hemp Processor License</strong></td>
+              <td class="mono" style="font-size:11px">VT Agency of Agriculture</td>
+              <td><span class="pill pill-high">EXPIRED</span></td>
+              <td>2026-03-31</td>
+              <td><span class="pill pill-high">High Risk</span></td>
+              <td><button class="btn danger sm">+ Create Case</button></td>
+            </tr>
+            <tr>
+              <td>Sales Tax License</td>
+              <td class="mono" style="font-size:11px">VT Dept of Taxes</td>
+              <td><span class="pill pill-resolved">Active</span></td>
+              <td>2026-12-31</td>
+              <td><span class="pill pill-low">Low</span></td>
+              <td><span class="muted" style="font-size:11px">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Shared Drawer -->
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.4 · Shared Case Draft Drawer (the commit point)</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">All three entry points open this same drawer. Pre-filled from selection. Save → DRAFT case persisted; Send → OPEN + invite email if merchant has no portal.</p>
+
+      <div class="modal-wash">
+        <div class="modal-card" style="max-width:700px">
+          <div class="modal-head"><span class="modal-title">Create Compliance Case</span><span style="font-size:11px;color:#64748B">From: Product Compliance · 1 item selected</span></div>
+          <div class="modal-body">
+            <div class="row" style="margin-bottom:16px">
+              <div class="col" style="flex:1">
+                <label style="font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em">Case Title</label>
+                <input value="Black Bear Wellness — Expired COA on Tincture 1000mg" style="padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;width:100%"/>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom:16px;gap:12px">
+              <div class="col" style="flex:1">
+                <label style="font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em">Merchant</label>
+                <input value="Black Bear Wellness LLC" disabled style="padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;width:100%;background:#F1F5F9;color:#64748B"/>
+              </div>
+              <div class="col" style="flex:1">
+                <label style="font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em">Priority</label>
+                <select style="padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;width:100%"><option selected>High Risk</option><option>Medium</option><option>Low</option></select>
+              </div>
+              <div class="col" style="flex:1">
+                <label style="font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em">SLA Deadline</label>
+                <input value="2026-05-13" type="date" style="padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;width:100%"/>
+              </div>
+            </div>
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><strong style="font-size:12px;color:#0F172A">Items (1)</strong><span style="font-size:10px;color:#64748B">v1: 1 item per case</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;background:#fff;border-radius:6px;border:1px solid #E2E8F0">
+                <span class="item-type">COA_EXPIRED</span>
+                <span style="font-size:12px;color:#0F172A;font-weight:600">Tincture 1000mg Full Spectrum</span>
+                <span style="font-size:11px;color:#64748B" class="mono">coa_8f3a2d</span>
+                <span class="spacer" style="flex:1"></span>
+                <span class="pill pill-high">High Risk</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn">Save as Draft</button>
+            <button class="btn primary">Save & Send to Merchant</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · CaseDraftDrawer (shared component)</span><pre>
+<span class="com">// File: apps/qmonitor/components/cases/CaseDraftDrawer.tsx</span>
+<span class="key">&lt;CaseDraftDrawer</span>
+  <span class="key">prefilled=</span><span class="val">{caseDraftFromFindings(selectedRows, source)}</span>
+  <span class="key">onSaveDraft=</span><span class="val">{(draft) =&gt; api.cases.saveDraft(draft)}</span>     <span class="endpoint">POST /api/qmonitor/cases</span>
+  <span class="key">onSend=</span><span class="val">{(draft) =&gt; api.cases.send(draft)}</span>             <span class="endpoint">POST /api/qmonitor/cases/:id/send</span>
+<span class="key">/&gt;</span>
+
+<span class="com">// Side effects on Send:
+//   1. case.status: DRAFT → OPEN
+//   2. if !merchant.portalAccount → trigger MerchantInviteEmail (QP-3585 pathway)
+//   3. emit ActivityEvent { type: "CASE_SENT", caseId, ts }</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION B — Q-MONITOR SIDE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-b">
+    <div class="section-head">
+      <h2>B · Q-Monitor Surfaces (processor side) <span class="qp multi">QP-3583 · 3584</span></h2>
+      <div class="section-sub">Active Case Count column on We Monitor<br/>+ Internal Case Management screen</div>
+    </div>
+    <div class="section-body">
+
+      <!-- B.1 -->
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">B.1 · We Monitor — Active Case Count column</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3583. New column on the existing We Monitor table. Click the count → side panel with the merchant's active cases. Aware that dev team is actively reworking We Monitor for industry filters; <strong>this column adds, never restructures</strong>.</p>
+
+      <div class="app-mock">
+        <div class="app-topbar">
+          <span class="brand" style="color:#0F172A">Q-Monitor</span>
+          <span class="crumb">/ FLEX Payment Solutions / We Monitor</span>
+          <span class="spacer"></span>
+          <span class="user-chip"><span class="avatar">JF</span> Joseph</span>
+        </div>
+        <div class="app-tabs">
+          <span class="app-tab active">We Monitor</span>
+          <span class="app-tab">Findings</span>
+          <span class="app-tab">Product Compliance</span>
+          <span class="app-tab">Licenses</span>
+          <span class="app-tab">Cases <span class="new-pill">NEW</span></span>
+        </div>
+        <table class="dt">
+          <thead>
+            <tr><th>Legal Name</th><th>License</th><th>Website</th><th>Products</th><th>Findings</th><th class="col-new">Cases</th><th class="col-new">Portal</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Black Bear Wellness LLC</strong><br/><span style="font-size:11px;color:#64748B">DBA: Black Bear CBD</span></td>
+              <td><span class="pill pill-resolved">Active · Hemp</span></td>
+              <td><span class="pill pill-medium">3 findings</span></td>
+              <td>6 compliant · 2 violative</td>
+              <td>2 high · 1 med</td>
+              <td><button class="case-badge">3 active</button></td>
+              <td><span class="pill pill-low">Portal Active</span></td>
+              <td><div class="actions-inline"><span class="ic create" title="Create Case">+</span><span class="ic" title="Scan">↻</span><span class="ic" title="More">⋯</span></div></td>
+            </tr>
+            <tr>
+              <td><strong>Green Mountain Hemp Co.</strong></td>
+              <td><span class="pill pill-resolved">Active · Hemp</span></td>
+              <td><span class="pill pill-resolved">Compliant</span></td>
+              <td>4 compliant</td>
+              <td>0 findings</td>
+              <td><button class="case-badge zero">0</button></td>
+              <td><span class="pill pill-pending">Invited</span></td>
+              <td><div class="actions-inline"><span class="ic create">+</span><span class="ic">↻</span><span class="ic">⋯</span></div></td>
+            </tr>
+            <tr>
+              <td><strong>Vermont Organics LLC</strong></td>
+              <td><span class="pill pill-high">License Expired</span></td>
+              <td><span class="pill pill-high">8 findings</span></td>
+              <td>1 compliant · 5 violative</td>
+              <td>5 high · 3 med</td>
+              <td><button class="case-badge">7 active</button></td>
+              <td><span class="muted" style="font-size:11px">No portal</span></td>
+              <td><div class="actions-inline"><span class="ic create">+</span><span class="ic">↻</span><span class="ic">⋯</span></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tbl-caption">↑ Click <strong>"3 active"</strong> badge → opens side panel with the merchant's 3 cases (case list filtered by merchantId)</div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · QP-3583 · Active Case Count column</span><pre>
+<span class="com">// New column added to existing &lt;WeMonitorTable&gt; — additive only, no row restructure</span>
+<span class="key">&lt;CaseCountCell</span>
+  <span class="key">merchantId=</span><span class="val">{row.merchantId}</span>
+  <span class="key">onClick=</span><span class="val">{() =&gt; openSidePanel(&lt;CaseListPanel filterMerchantId=</span><span class="val">{row.merchantId}</span><span class="val">/&gt;)}</span>
+<span class="key">/&gt;</span>
+
+<span class="com">// Data source: already-loaded WeMonitor row should not require an extra fetch
+//   Add `activeCaseCount: int` to /api/qmonitor/wemonitor row response (Middleware change)</span>
+<span class="endpoint">GET /api/qmonitor/wemonitor</span> <span class="com">→ row[].activeCaseCount</span>
+
+<span class="com">// "active" = case.status IN (OPEN, IN_REVIEW, DISPUTED)
+// DRAFT is NOT counted (merchant can't see it yet)</span></pre>
+      </div>
+
+      <!-- B.2 Internal Case Management list -->
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">B.2 · Internal Case Management — case list</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3584. Route: <code class="mono">/qmonitor/cases</code>. The processor's home for cases. Filter tabs, bulk actions, side-panel detail.</p>
+
+      <div class="app-mock">
+        <div class="app-topbar">
+          <span class="brand" style="color:#0F172A">Q-Monitor</span>
+          <span class="crumb">/ FLEX Payment Solutions / Cases</span>
+          <span class="spacer"></span>
+          <button class="btn primary">+ New Case</button>
+          <span class="user-chip"><span class="avatar">JF</span> Joseph</span>
+        </div>
+        <div class="app-tabs">
+          <span class="app-tab">We Monitor</span>
+          <span class="app-tab">Findings</span>
+          <span class="app-tab">Product Compliance</span>
+          <span class="app-tab">Licenses</span>
+          <span class="app-tab active">Cases <span class="new-pill">NEW</span></span>
+        </div>
+        <div style="padding:12px 16px;border-bottom:1px solid #E2E8F0;display:flex;gap:8px;align-items:center">
+          <span class="btn sm primary">All <span style="background:rgba(255,255,255,.2);padding:1px 6px;border-radius:10px;margin-left:4px">12</span></span>
+          <span class="btn sm">Drafts <span style="background:#F1F5F9;color:#475569;padding:1px 6px;border-radius:10px;margin-left:4px">3</span></span>
+          <span class="btn sm">Active <span style="background:#FEE2E2;color:#991B1B;padding:1px 6px;border-radius:10px;margin-left:4px">7</span></span>
+          <span class="btn sm">In Review <span style="background:#EDE9FE;color:#5B21B6;padding:1px 6px;border-radius:10px;margin-left:4px">2</span></span>
+          <span class="btn sm">Resolved</span>
+          <span class="spacer" style="flex:1"></span>
+          <input placeholder="Search cases…" style="padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;width:200px"/>
+        </div>
+        <table class="dt">
+          <thead>
+            <tr><th><input type="checkbox"/></th><th>Case #</th><th>Title</th><th>Merchant</th><th>Status</th><th>Items</th><th>SLA</th><th>Assigned</th><th>Updated</th></tr>
+          </thead>
+          <tbody>
+            <tr class="selected" style="cursor:pointer">
+              <td><input type="checkbox"/></td>
+              <td class="mono">CR-2026-0042</td>
+              <td><strong>Expired COA on Tincture 1000mg</strong><br/><span style="font-size:11px;color:#64748B">From: Product Compliance</span></td>
+              <td>Black Bear Wellness LLC</td>
+              <td><span class="pill pill-open">OPEN</span></td>
+              <td>1 pending / 1</td>
+              <td><span style="color:#991B1B;font-weight:700">May 13 (2d) ⚠</span></td>
+              <td><span class="user-chip"><span class="avatar" style="width:18px;height:18px;font-size:8px">JF</span> Joseph</span></td>
+              <td>2h ago</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"/></td>
+              <td class="mono">CR-2026-0041</td>
+              <td>Missing privacy policy</td>
+              <td>Vermont Organics LLC</td>
+              <td><span class="pill pill-pending">DRAFT</span></td>
+              <td>0 / 1</td>
+              <td>—</td>
+              <td><span class="user-chip"><span class="avatar" style="width:18px;height:18px;font-size:8px">JF</span> Joseph</span></td>
+              <td>1d ago</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"/></td>
+              <td class="mono">CR-2026-0040</td>
+              <td>Health claim violation — anxiety</td>
+              <td>Vermont Organics LLC</td>
+              <td><span class="pill pill-review">IN_REVIEW</span></td>
+              <td>0 pending / 1</td>
+              <td>May 18</td>
+              <td><span class="user-chip"><span class="avatar" style="width:18px;height:18px;font-size:8px">RM</span> Ronaldo</span></td>
+              <td>3h ago</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"/></td>
+              <td class="mono">CR-2026-0039</td>
+              <td>Expired hemp license</td>
+              <td>Vermont Organics LLC</td>
+              <td><span class="pill pill-disputed">DISPUTED</span></td>
+              <td>0 pending / 1</td>
+              <td>May 15</td>
+              <td><span class="user-chip"><span class="avatar" style="width:18px;height:18px;font-size:8px">RM</span> Ronaldo</span></td>
+              <td>5h ago</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- B.3 Internal case detail -->
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">B.3 · Internal Case Detail (processor view)</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">Click a case row → side panel with full detail. Three tabs: Items, Responses, Activity.</p>
+
+      <div class="case-detail">
+        <div class="case-main">
+          <div class="case-meta-row">
+            <span class="case-num">CR-2026-0042</span>
+            <span class="pill pill-open">OPEN</span>
+            <span class="pill pill-high">High Risk</span>
+          </div>
+          <h3 class="case-h">Expired COA on Tincture 1000mg</h3>
+          <div style="display:flex;gap:0;border-bottom:1px solid #E2E8F0;margin-bottom:16px">
+            <span style="padding:8px 14px;font-size:12px;color:#0F172A;border-bottom:2px solid #F05252;font-weight:600">Items (1)</span>
+            <span style="padding:8px 14px;font-size:12px;color:#64748B;cursor:pointer">Responses (0)</span>
+            <span style="padding:8px 14px;font-size:12px;color:#64748B;cursor:pointer">Activity (3)</span>
+          </div>
+          <div class="item-card active">
+            <div class="item-card-head">
+              <div>
+                <span class="item-type">COA_EXPIRED</span>
+                <h4 class="item-h">Tincture 1000mg Full Spectrum — replacement COA required</h4>
+              </div>
+              <span class="pill pill-pending">PENDING</span>
+            </div>
+            <p class="item-desc">The COA on file (<code class="mono">coa_8f3a2d</code>) expired on 2026-03-15. Δ9-THC and total cannabinoid content cannot be verified for this batch without a current Certificate of Analysis.</p>
+            <div class="item-resolution">
+              <div class="lbl">Requested Resolution Type · v1 fixed</div>
+              <div class="val">UPLOAD_REPLACEMENT_COA</div>
+              <div class="sub">Merchant uploads a current COA PDF. Future v2 will support multiple resolution paths per item type (QP-3593).</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:16px">
+            <button class="btn">Edit Case</button>
+            <button class="btn">Reassign</button>
+            <button class="btn ghost">Send Reminder</button>
+            <span class="spacer" style="flex:1"></span>
+            <button class="btn danger" disabled style="opacity:.5;cursor:not-allowed">Force Close <span class="defer" style="margin-left:4px">v2 · QP-3591</span></button>
+          </div>
+        </div>
+        <div class="case-side">
+          <h4>Merchant</h4>
+          <div class="field"><strong>Black Bear Wellness LLC</strong><br/><span style="font-size:11px;color:#64748B">contact@blackbearwellness.com</span></div>
+          <h4>SLA Deadline</h4>
+          <div class="field sla-warn">May 13, 2026 — 2 days remaining ⚠</div>
+          <h4>Source</h4>
+          <div class="field">Product Compliance · 2026-04-29</div>
+          <h4>Assigned</h4>
+          <div class="field">Joseph Floyd</div>
+          <h4>Portal Status</h4>
+          <div class="field"><span class="pill pill-low">Portal Active</span></div>
+          <div class="divider"></div>
+          <h4>Activity</h4>
+          <div style="font-size:11px;color:#475569;line-height:1.7">
+            <div><strong>2h ago</strong> · Case sent to merchant</div>
+            <div><strong>2h ago</strong> · Case opened (DRAFT → OPEN)</div>
+            <div><strong>2h ago</strong> · Case created from Product Compliance</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · QP-3584 · Internal Case Management Screen</span><pre>
+<span class="com">// Route: /qmonitor/cases (list) and /qmonitor/cases/:id (detail panel)</span>
+<span class="endpoint">GET /api/qmonitor/cases?status=ALL&merchantId=&assignedTo=</span>
+<span class="endpoint">GET /api/qmonitor/cases/:id</span>           <span class="com">→ full case incl. items[], responses[], activity[]</span>
+<span class="endpoint">PATCH /api/qmonitor/cases/:id</span>          <span class="com">→ status transitions, assignment, SLA edit</span>
+<span class="endpoint">POST /api/qmonitor/cases/:id/send</span>      <span class="com">→ DRAFT → OPEN</span>
+<span class="endpoint">POST /api/qmonitor/cases/:id/responses/:itemId/accept</span>  <span class="com">→ accept response, item RESOLVED</span>
+<span class="endpoint">POST /api/qmonitor/cases/:id/responses/:itemId/reject</span>  <span class="com">→ reject, item back to PENDING</span>
+
+<span class="com">// Tabs render: &lt;ItemsTab/&gt; &lt;ResponsesTab/&gt; &lt;ActivityTab/&gt;
+// State managed via &lt;CaseDetailContext&gt; — single fetch, tab switch is local
+// Force Close button is rendered DISABLED with v2 marker until QP-3591 ships</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION C — MERCHANT AUTH
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-c">
+    <div class="section-head">
+      <h2>C · Merchant Authentication & Onboarding <span class="qp">QP-3585</span></h2>
+      <div class="section-sub">Email invite → account creation → first portal login<br/>Triggered automatically on case Send if no portal account exists</div>
+    </div>
+    <div class="section-body">
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">C.1 · Invitation email</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Sent automatically by Q-Monitor when a case is sent to a merchant who has no portal account. Contains a one-time signed link to claim the account.</p>
+
+      <div class="stage">
+        <div class="stage-label">Email rendered in merchant inbox</div>
+        <div class="email-mock">
+          <div class="email-head">
+            <div><span class="from">FLEX Payment Solutions</span> &lt;compliance@qredible.com&gt;</div>
+            <div class="subj">FLEX Payment Solutions opened a compliance review requiring your attention</div>
+          </div>
+          <div class="email-body">
+            <h2>A compliance review is open for Black Bear Wellness LLC</h2>
+            <p>FLEX Payment Solutions has created a compliance case with <strong>1 item</strong> requiring your response by <strong>May 13, 2026</strong>.</p>
+            <div class="item-summary">
+              <strong>CR-2026-0042 · Expired COA on Tincture 1000mg</strong><br/>
+              The Certificate of Analysis on file expired 2026-03-15. Upload a current COA to resolve.
+            </div>
+            <p>Click below to access your secure compliance portal. The link will create your portal account automatically.</p>
+            <a href="#" class="cta-btn">Access Your Compliance Portal →</a>
+            <div class="small">This link is unique to your organization and expires in 14 days. If you did not request this, contact compliance@qredible.com.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · MerchantInviteEmail (transactional)</span><pre>
+<span class="endpoint">POST /api/qmonitor/cases/:id/send</span> <span class="com">→ side effect: enqueue email job</span>
+<span class="com">// MailType: QP_INVITE_COMPLIANCE_PORTAL  (already in V2 mockup)
+// Template variables:
+//   merchantName, processorName, caseNumber, caseTitle, itemCount, slaDeadline, magicLink
+//
+// Magic link shape:
+//   https://portal.qredible.com/redeem?token=&lt;jwt&gt;
+//   - JWT signed with PORTAL_SIGNUP_SECRET (Middleware env)
+//   - Claims: { merchantId, email, expiresAt: now+14d, caseId }
+//
+// Email send via existing transactional pipeline (whatever Qredible already uses)</span></pre>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">C.2 · Account creation</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Click the email link → land on signup form. Email + merchant name pre-filled (locked) from JWT. Merchant chooses password + agrees to terms.</p>
+
+      <div class="stage">
+        <div class="stage-label">Browser landing — portal.qredible.com/redeem?token=&hellip;</div>
+        <div class="signup-mock">
+          <h3>Welcome to your Compliance Portal</h3>
+          <p class="sub">Set a password to access cases from FLEX Payment Solutions.</p>
+          <div class="signup-field">
+            <label>Organization</label>
+            <input class="locked" value="Black Bear Wellness LLC" disabled/>
+          </div>
+          <div class="signup-field">
+            <label>Email</label>
+            <input class="locked" value="compliance@blackbearwellness.com" disabled/>
+          </div>
+          <div class="signup-field">
+            <label>Your Name</label>
+            <input placeholder="Jane Doe"/>
+          </div>
+          <div class="signup-field">
+            <label>Password</label>
+            <input type="password" placeholder="At least 12 characters"/>
+          </div>
+          <div class="signup-field" style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" style="width:14px;height:14px"/>
+            <label style="text-transform:none;letter-spacing:0;font-size:11px;color:#475569;font-weight:500;margin:0">I agree to the <a href="#" style="color:#1A202E;font-weight:700">Compliance Portal Terms</a></label>
+          </div>
+          <button class="submit">Create Account & View Case →</button>
+          <div class="legal">By continuing you confirm you are authorized to respond on behalf of this organization. SOC 2 Type II compliant.</div>
+        </div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · QP-3585 · Account creation</span><pre>
+<span class="endpoint">POST /api/merchant/portal/redeem</span> <span class="com">→ verify JWT, return prefilled fields</span>
+  <span class="com">Body: { token: string }
+  Response: { merchantId, email, organizationName, caseId }</span>
+
+<span class="endpoint">POST /api/merchant/portal/account</span>  <span class="com">→ create user + session</span>
+  <span class="com">Body: { token, name, password }
+  Response: { sessionToken, redirectTo: "/comply/cases/:caseId" }</span>
+
+<span class="com">// Auth strategy v1: email + password, session via httpOnly cookie
+// SSO / SAML deferred (not in any in-scope ticket)
+// Password rules: 12+ chars, no other complexity rules — keep it simple, lean on length</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION D — MERCHANT DASHBOARD
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-d">
+    <div class="section-head">
+      <h2>D · Merchant Compliance Portal Dashboard <span class="qp">QP-3586</span></h2>
+      <div class="section-sub">Modular widgets · what a merchant sees on login<br/>Per Joseph: dashboard serves multiple user types (Compliance, MyCOA, both)</div>
+    </div>
+    <div class="section-body flush">
+
+      <div style="padding:18px 22px 0">
+        <p style="font-size:12px;color:#64748B;margin-bottom:8px">Route: <code class="mono">/comply</code> (merchant-side, separate URL from /qmonitor). Layout is a 12-column grid of widgets. v1 ships these widgets; future-state per Joseph's walkthrough adds widgets for MyCOA-primary merchants without changing the shell.</p>
+      </div>
+
+      <div class="app-mock" style="margin:14px 22px">
+        <div class="app-topbar">
+          <span class="brand" style="color:#1A202E">Q</span>
+          <span class="brand" style="color:#0F172A">Black Bear Wellness</span>
+          <span class="crumb">/ Compliance Portal</span>
+          <span class="spacer"></span>
+          <span class="user-chip"><span class="avatar">JD</span> Jane Doe</span>
+        </div>
+        <div class="app-tabs">
+          <span class="app-tab active">Dashboard</span>
+          <span class="app-tab">Cases <span class="new-pill" style="background:#F05252">3</span></span>
+          <span class="app-tab">My COAs</span>
+          <span class="app-tab">Account</span>
+        </div>
+
+        <div class="widgets">
+
+          <!-- Welcome banner — full width -->
+          <div class="widget span-12" style="border:none;background:linear-gradient(90deg,#1A202E 0%,#334155 100%);color:#fff;padding:20px 24px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:20px">
+              <div>
+                <div style="font-size:11px;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Welcome back</div>
+                <h3 style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">Hi Jane — 1 case needs your response</h3>
+                <p style="font-size:12px;color:#CBD5E1">CR-2026-0042 · Expired COA on Tincture 1000mg · Due May 13 (2 days)</p>
+              </div>
+              <button class="btn primary" style="background:#F05252;border-color:#F05252">Resolve Case →</button>
+            </div>
+          </div>
+
+          <!-- Active cases — primary widget -->
+          <div class="widget span-8 urgent">
+            <div class="widget-head">
+              <div class="widget-title">📋 Active Compliance Cases</div>
+              <div class="widget-sub">3 open · 1 due in 2 days</div>
+            </div>
+            <div class="widget-list">
+              <div class="widget-list-item" style="border-left:3px solid #F05252">
+                <span class="ic high"></span>
+                <div class="lbl">
+                  <strong>CR-2026-0042</strong> — Expired COA on Tincture 1000mg<br/>
+                  <span style="font-size:10px;color:#64748B">From FLEX Payment Solutions · 1 item · <span style="color:#991B1B;font-weight:700">Due May 13 (2 days)</span></span>
+                </div>
+                <span class="pill pill-high">High Risk</span>
+                <span class="meta">›</span>
+              </div>
+              <div class="widget-list-item">
+                <span class="ic med"></span>
+                <div class="lbl">
+                  <strong>CR-2026-0038</strong> — Missing privacy policy<br/>
+                  <span style="font-size:10px;color:#64748B">From FLEX Payment Solutions · 1 item · Due May 22</span>
+                </div>
+                <span class="pill pill-medium">Medium</span>
+                <span class="meta">›</span>
+              </div>
+              <div class="widget-list-item">
+                <span class="ic low"></span>
+                <div class="lbl">
+                  <strong>CR-2026-0035</strong> — Updated COA needed for batch QC<br/>
+                  <span style="font-size:10px;color:#64748B">From FLEX Payment Solutions · 1 item · Due May 30</span>
+                </div>
+                <span class="pill pill-low">Low</span>
+                <span class="meta">›</span>
+              </div>
+            </div>
+            <a href="#sec-e" class="cta">View All Cases →</a>
+          </div>
+
+          <!-- SLA at a glance -->
+          <div class="widget span-4">
+            <div class="widget-head">
+              <div class="widget-title">⏱ SLA Overview</div>
+            </div>
+            <div class="widget-stat warn">2 <span class="s">days until next deadline</span></div>
+            <div style="font-size:11px;color:#64748B;line-height:1.6;margin-top:6px">
+              <div>• 1 case overdue: <strong style="color:#0F172A">0</strong></div>
+              <div>• Due this week: <strong style="color:#0F172A">1</strong></div>
+              <div>• Due this month: <strong style="color:#0F172A">2</strong></div>
+            </div>
+            <a href="#" class="cta" style="background:#1A202E">Request Extension</a>
+          </div>
+
+          <!-- MyCOA upsell / activity (modular - shown if merchant uses MyCOA) -->
+          <div class="widget span-6 upsell">
+            <div class="widget-head">
+              <div class="widget-title">📄 My COAs</div>
+              <div class="widget-sub">12 published · 1 expiring</div>
+            </div>
+            <div style="font-size:11px;color:#475569;line-height:1.6">Upload a replacement COA here and it'll be available across all your active cases automatically.</div>
+            <div class="widget-list">
+              <div class="widget-list-item">
+                <span class="ic med"></span>
+                <div class="lbl">Tincture 1000mg COA · expires <strong>2026-03-15</strong></div>
+                <span class="meta">›</span>
+              </div>
+            </div>
+            <a href="#" class="cta">Open MyCOA →</a>
+          </div>
+
+          <!-- Recent activity -->
+          <div class="widget span-6">
+            <div class="widget-head">
+              <div class="widget-title">🔔 Recent Activity</div>
+            </div>
+            <div style="font-size:11px;color:#475569;line-height:1.7">
+              <div style="padding:6px 0;border-bottom:1px solid #F1F5F9"><strong>2h ago</strong> · CR-2026-0042 sent to you by FLEX Payment Solutions</div>
+              <div style="padding:6px 0;border-bottom:1px solid #F1F5F9"><strong>1d ago</strong> · CR-2026-0038 was opened</div>
+              <div style="padding:6px 0"><strong>3d ago</strong> · MyCOA: published replacement for Capsules 50mg</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="padding:0 22px 22px">
+        <div class="annot note">
+          <span class="ic">i</span>
+          <div><strong>Modularity contract</strong> — per Joseph's walkthrough: widgets must be independently mountable so MyCOA-only merchants and Compliance-only merchants and combined merchants all see something useful. Implementation hint: each widget is its own component reading from its own query. The dashboard is a layout shell that conditionally renders based on merchant capabilities.</div>
+        </div>
+      </div>
+
+      <div class="eng" style="margin:0 22px 22px">
+        <span class="eng-label">Engineer · QP-3586 · Modular dashboard</span><pre>
+<span class="com">// Route: /comply (merchant-side base)</span>
+<span class="key">&lt;MerchantPortalShell&gt;</span>
+  <span class="key">&lt;DashboardGrid&gt;</span>
+    <span class="key">&lt;WelcomeBanner</span> <span class="key">caseCount=</span><span class="val">{cases.openCount}</span> <span class="key">/&gt;</span>           <span class="com">// span-12, always</span>
+    <span class="key">&lt;ActiveCasesWidget</span> <span class="key">cases=</span><span class="val">{cases.open}</span> <span class="key">/&gt;</span>             <span class="com">// span-8, if cases.openCount &gt; 0</span>
+    <span class="key">&lt;SLAOverviewWidget</span> <span class="key">slas=</span><span class="val">{cases.slas}</span> <span class="key">/&gt;</span>             <span class="com">// span-4, if cases.openCount &gt; 0</span>
+    <span class="key">&lt;MyCOAWidget</span> <span class="key">coas=</span><span class="val">{coas}</span> <span class="key">/&gt;</span>                          <span class="com">// span-6, if merchant.usesMyCOA</span>
+    <span class="key">&lt;RecentActivityWidget</span> <span class="key">events=</span><span class="val">{activity}</span> <span class="key">/&gt;</span>           <span class="com">// span-6, always</span>
+  <span class="key">&lt;/DashboardGrid&gt;</span>
+<span class="key">&lt;/MerchantPortalShell&gt;</span>
+
+<span class="endpoint">GET /api/merchant/dashboard</span>
+  <span class="com">Response shape:</span>
+{
+  <span class="key">"merchant"</span>: { <span class="key">"id"</span>, <span class="key">"name"</span>, <span class="key">"capabilities"</span>: [<span class="val">"COMPLIANCE"</span>, <span class="val">"MYCOA"</span>] },
+  <span class="key">"cases"</span>: { <span class="key">"open"</span>: [<span class="val">…</span>], <span class="key">"openCount"</span>: 3, <span class="key">"slas"</span>: { <span class="key">"nextDays"</span>: 2, <span class="key">"overdue"</span>: 0 } },
+  <span class="key">"coas"</span>: { <span class="key">"total"</span>: 12, <span class="key">"expiring"</span>: 1 },
+  <span class="key">"activity"</span>: [<span class="val">…</span>]
+}
+
+<span class="com">// Single endpoint, single fetch, widgets read from cached client store</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION E — MERCHANT RESPONSE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-e">
+    <div class="section-head">
+      <h2>E · Merchant Case Response Flow <span class="qp">QP-3590</span></h2>
+      <div class="section-sub">v1: ONE item, ONE resolution type<br/>Demo path: COA_EXPIRED → UPLOAD_REPLACEMENT_COA</div>
+    </div>
+    <div class="section-body">
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">E.1 · Case detail (merchant view)</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Merchant clicks the case from dashboard → lands here. Single page. v1 has 1 item per case so no item-paging required.</p>
+
+      <div class="app-mock">
+        <div class="app-topbar">
+          <span class="brand" style="color:#1A202E">Q</span><span class="brand" style="color:#0F172A">Black Bear Wellness</span>
+          <span class="crumb">/ Compliance Portal / Cases / CR-2026-0042</span>
+          <span class="spacer"></span>
+          <span class="user-chip"><span class="avatar">JD</span> Jane Doe</span>
+        </div>
+        <div class="app-tabs">
+          <span class="app-tab">Dashboard</span>
+          <span class="app-tab active">Cases <span class="new-pill" style="background:#F05252">3</span></span>
+          <span class="app-tab">My COAs</span>
+          <span class="app-tab">Account</span>
+        </div>
+        <div style="padding:20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <a href="#" style="font-size:11px;color:#64748B">← All cases</a>
+            <span style="color:#CBD5E1">/</span>
+            <span class="case-num">CR-2026-0042</span>
+            <span class="pill pill-open">OPEN</span>
+            <span class="pill pill-high">High Risk</span>
+            <span style="margin-left:auto;font-size:11px;color:#991B1B;font-weight:700">⚠ Due May 13 (2 days)</span>
+          </div>
+          <h2 style="font-size:20px;font-weight:700;color:#0F172A;margin:8px 0 6px">Expired COA on Tincture 1000mg</h2>
+          <p style="font-size:13px;color:#475569;margin-bottom:16px">From <strong>FLEX Payment Solutions</strong> · Compliance review opened 2026-04-29 · 1 item requires your response.</p>
+
+          <div class="item-card active">
+            <div class="item-card-head">
+              <div>
+                <span class="item-type">COA_EXPIRED</span>
+                <h4 class="item-h">Tincture 1000mg Full Spectrum</h4>
+                <span class="muted mono" style="font-size:11px">SKU: BBW-TINC-1000</span>
+              </div>
+              <span class="pill pill-pending">Awaiting your response</span>
+            </div>
+            <p class="item-desc">The Certificate of Analysis on file for this product expired on <strong>2026-03-15</strong>. A current COA is required so that Δ9-THC and total cannabinoid content can be verified for this batch.</p>
+            <div class="item-resolution">
+              <div class="lbl">What FLEX Payment Solutions needs from you</div>
+              <div class="val">Upload a replacement Certificate of Analysis</div>
+              <div class="sub">Current COA, dated within the last 12 months, in PDF format. Max 25MB.</div>
+            </div>
+
+            <div style="margin-top:16px">
+              <div class="upload">
+                <div class="ic">📄</div>
+                <div class="lbl">Drop replacement COA PDF here, or click to browse</div>
+                <div class="sub">PDF only · Max 25MB</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:16px;align-items:center;flex-wrap:wrap">
+              <button class="btn primary lg">Submit Response →</button>
+              <button class="btn">I need more time — Request Extension</button>
+              <span class="spacer" style="flex:1"></span>
+              <button class="btn ghost" style="color:#991B1B">This finding is incorrect — Dispute Finding</button>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;padding:14px;background:#F1F5F9;border-radius:8px;font-size:11px;color:#64748B">
+            <strong style="color:#0F172A">Working with MyCOA?</strong> If you publish COAs through MyCOA, you can <a href="#" style="color:#1A202E;font-weight:700">link an existing COA</a> instead of uploading. <span class="defer" style="background:#94A3B8;margin-left:4px">v2 · QP-3593</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">E.2 · After upload — confirmation state</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">File uploaded → preview + Submit. Item card switches to "ready to submit" visual.</p>
+
+      <div class="app-mock">
+        <div style="padding:20px">
+          <div class="item-card active">
+            <div class="item-card-head">
+              <div>
+                <span class="item-type">COA_EXPIRED</span>
+                <h4 class="item-h">Tincture 1000mg Full Spectrum</h4>
+              </div>
+              <span class="pill pill-pending">Awaiting your response</span>
+            </div>
+            <div class="upload has-file" style="margin-top:8px">
+              <div class="ic">✓</div>
+              <div class="lbl">tincture-1000mg-coa-2026-04-12.pdf</div>
+              <div class="sub">2.4 MB · PDF · Tested 2026-04-12 · <a href="#" style="color:#1A202E;font-weight:700">Replace</a> · <a href="#" style="color:#991B1B;font-weight:700">Remove</a></div>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;font-size:12px;color:#166534">
+              <strong>Looks good.</strong> Click Submit to send your response to FLEX Payment Solutions for review.
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <button class="btn primary lg">Submit Response →</button>
+              <button class="btn">Save Draft</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">E.3 · Submitted state</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Post-submit. Item moves to SUBMITTED. Merchant can no longer edit unless processor rejects.</p>
+
+      <div class="app-mock">
+        <div style="padding:20px">
+          <div class="item-card">
+            <div class="item-card-head">
+              <div>
+                <span class="item-type">COA_EXPIRED</span>
+                <h4 class="item-h">Tincture 1000mg Full Spectrum</h4>
+              </div>
+              <span class="pill pill-review">SUBMITTED — under review</span>
+            </div>
+            <p class="item-desc">Your response was submitted on <strong>2026-04-29 at 4:18pm</strong>. FLEX Payment Solutions will review and either accept it or request more information.</p>
+            <div style="background:#F8FAFC;border-radius:6px;padding:10px 14px;margin-top:10px;font-size:12px;color:#334155">
+              <strong>Submitted file:</strong> <a href="#" style="color:#1A202E;font-weight:700">tincture-1000mg-coa-2026-04-12.pdf</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annot success">
+        <span class="ic">✓</span>
+        <div><strong>Item state on submit</strong>: <code class="mono">PENDING → SUBMITTED</code>. Processor's Internal CM (Section B.3) shows the response in the Responses tab. Section F covers the loop closure when processor accepts.</div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · QP-3590 · Merchant response submission</span><pre>
+<span class="com">// File upload — chunked direct-to-S3 (or wherever Qredible stores docs)</span>
+<span class="endpoint">POST /api/merchant/cases/:caseId/items/:itemId/upload</span>      <span class="com">→ presigned URL</span>
+<span class="endpoint">PUT &lt;presignedUrl&gt;</span>                                        <span class="com">→ upload bytes</span>
+<span class="endpoint">POST /api/merchant/cases/:caseId/items/:itemId/responses</span>   <span class="com">→ submit</span>
+  <span class="com">Body:</span>
+  {
+    <span class="key">"resolutionType"</span>: <span class="val">"UPLOAD_REPLACEMENT_COA"</span>,    <span class="com">// v1: hardcoded per itemType</span>
+    <span class="key">"value"</span>: { <span class="key">"fileKey"</span>: <span class="val">"s3://&hellip;"</span>, <span class="key">"fileName"</span>: <span class="val">"&hellip;"</span>, <span class="key">"size"</span>: 2400000 }
+  }
+
+<span class="com">// State transitions:
+//   item.status: PENDING → SUBMITTED
+//   case.status: stays OPEN (processor must accept to flip RESOLVED)
+//
+// Disabled paths (rendered with v2 markers):
+//   - Dispute (UI present, button shows but submits to a stub endpoint that returns 501)
+//   - Extension (same — UI present, returns 501 for v1)</span></pre>
+      </div>
+
+      <div class="annot warn">
+        <span class="ic">!</span>
+        <div><strong>v1 button-stub policy</strong>: Dispute Finding and Request Extension buttons are visually present (so the path is discoverable) but route to a stub showing "Coming in next release — contact your processor directly for now." This avoids dead UI while keeping v1 implementation tight. Joseph confirms during QA.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION F — LOOP CLOSURE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-f">
+    <div class="section-head">
+      <h2>F · Loop Closure — back to processor side <span class="qp multi">QP-3580 · 3584 · 3586</span></h2>
+      <div class="section-sub">Processor accepts response → item RESOLVED → case RESOLVED<br/>Both sides see synchronized state</div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:#475569;margin-bottom:16px">Closing the loop is the v1 success criterion. After merchant submits, processor sees the response in Internal CM. v1 supports two processor actions: <strong>Accept</strong> (item resolved) or <strong>Reject — request more</strong> (item back to pending). Force Close, dispute adjudication, and reporting are deferred (Section H).</p>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">F.1 · Processor reviews response</h3>
+
+      <div class="app-mock">
+        <div class="app-topbar">
+          <span class="brand" style="color:#0F172A">Q-Monitor</span>
+          <span class="crumb">/ FLEX Payment Solutions / Cases / CR-2026-0042</span>
+          <span class="spacer"></span>
+          <span class="user-chip"><span class="avatar">JF</span> Joseph</span>
+        </div>
+        <div style="padding:20px">
+          <div class="case-meta-row">
+            <span class="case-num">CR-2026-0042</span>
+            <span class="pill pill-review">IN_REVIEW</span>
+            <span class="pill pill-high">High Risk</span>
+            <span style="margin-left:auto;font-size:11px;color:#475569"><strong>Merchant response received</strong> · 2 mins ago</span>
+          </div>
+          <h2 style="font-size:18px;font-weight:700;color:#0F172A;margin:8px 0 12px">Expired COA on Tincture 1000mg</h2>
+          <div style="display:flex;gap:0;border-bottom:1px solid #E2E8F0;margin-bottom:16px">
+            <span style="padding:8px 14px;font-size:12px;color:#64748B">Items (1)</span>
+            <span style="padding:8px 14px;font-size:12px;color:#0F172A;border-bottom:2px solid #F05252;font-weight:600">Responses (1) <span class="new-pill" style="background:#F05252">NEW</span></span>
+            <span style="padding:8px 14px;font-size:12px;color:#64748B">Activity (5)</span>
+          </div>
+          <div class="item-card">
+            <div class="item-card-head">
+              <div>
+                <span class="item-type">COA_EXPIRED</span>
+                <h4 class="item-h">Tincture 1000mg — Replacement COA submitted</h4>
+                <span class="muted" style="font-size:11px">Submitted 2026-04-29 4:18pm by Jane Doe</span>
+              </div>
+              <span class="pill pill-pending">Awaiting your review</span>
+            </div>
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:14px;margin-top:10px;display:flex;align-items:center;gap:14px">
+              <div style="font-size:36px">📄</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:700;color:#0F172A">tincture-1000mg-coa-2026-04-12.pdf</div>
+                <div style="font-size:11px;color:#64748B;margin-top:2px">2.4 MB · PDF · COA tested 2026-04-12 · within 12-month policy ✓</div>
+              </div>
+              <button class="btn">Open</button>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <button class="btn primary">✓ Accept Response — Mark Resolved</button>
+              <button class="btn">Request More Information</button>
+              <span class="spacer" style="flex:1"></span>
+              <button class="btn ghost" disabled style="opacity:.5;cursor:not-allowed">Adjudicate Dispute <span class="defer" style="margin-left:4px">v2</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">F.2 · After Accept — case RESOLVED on both sides</h3>
+
+      <div class="row" style="gap:16px;align-items:flex-start">
+        <div class="col" style="flex:1;min-width:280px">
+          <div style="font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Processor sees</div>
+          <div class="app-mock">
+            <div style="padding:16px">
+              <div class="case-meta-row">
+                <span class="case-num">CR-2026-0042</span>
+                <span class="pill pill-resolved">RESOLVED</span>
+              </div>
+              <h4 style="font-size:14px;font-weight:700;color:#0F172A;margin:6px 0">Expired COA on Tincture 1000mg</h4>
+              <div style="font-size:11px;color:#475569">Resolved 2026-04-29 by Joseph Floyd · 1/1 items accepted</div>
+            </div>
+          </div>
+        </div>
+        <div class="col" style="flex:1;min-width:280px">
+          <div style="font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Merchant sees</div>
+          <div class="app-mock">
+            <div style="padding:16px">
+              <div class="case-meta-row">
+                <span class="case-num">CR-2026-0042</span>
+                <span class="pill pill-resolved">RESOLVED ✓</span>
+              </div>
+              <h4 style="font-size:14px;font-weight:700;color:#0F172A;margin:6px 0">Expired COA on Tincture 1000mg</h4>
+              <div style="font-size:11px;color:#475569">FLEX Payment Solutions accepted your response · No further action required</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eng">
+        <span class="eng-label">Engineer · Loop closure state transitions</span><pre>
+<span class="com">// Processor "Accept Response":</span>
+<span class="endpoint">POST /api/qmonitor/cases/:id/responses/:itemId/accept</span>
+<span class="com">  Side effects (atomic):
+    1. response.status: SUBMITTED → ACCEPTED
+    2. item.status: SUBMITTED → RESOLVED
+    3. if all items.RESOLVED → case.status: IN_REVIEW → RESOLVED
+    4. emit ActivityEvent { type: "RESPONSE_ACCEPTED", caseId, itemId, ts }
+    5. emit ActivityEvent { type: "CASE_RESOLVED", caseId, ts }   // if case flipped
+    6. notify merchant (in-portal banner; email optional v2)</span>
+
+<span class="com">// Processor "Request More Information":</span>
+<span class="endpoint">POST /api/qmonitor/cases/:id/responses/:itemId/reject</span>
+<span class="com">  Body: { reason: string }
+  Side effects:
+    1. response.status: SUBMITTED → REJECTED
+    2. item.status: SUBMITTED → PENDING (back to merchant)
+    3. emit ActivityEvent { type: "RESPONSE_REJECTED", reason }
+    4. notify merchant in-portal</span>
+
+<span class="com">// v1 deliberately does NOT close case automatically on resolve.
+// Force Close (QP-3591) defers manual close to v2; v1 has explicit "Close Case" button on Items tab when all RESOLVED.</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION G — DATA MODEL
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-g">
+    <div class="section-head">
+      <h2>G · Data Model & State Machine <span class="qp multi">QP-3579 · 3580</span></h2>
+      <div class="section-sub">PlComplianceCase entity · CaseItem · Response<br/>Status machines · what v1 hardcodes</div>
+    </div>
+    <div class="section-body">
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">G.1 · Core entities (v1 shape)</h3>
+
+      <div class="shape">
+        <span class="shape-label">PlComplianceCase</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="key">id</span>: <span class="typ">string</span> <span class="com">// "CR-2026-0042"</span><br/>
+&nbsp;&nbsp;<span class="key">title</span>: <span class="typ">string</span><br/>
+&nbsp;&nbsp;<span class="key">merchantId</span>: <span class="typ">string</span><br/>
+&nbsp;&nbsp;<span class="key">processorOrgId</span>: <span class="typ">string</span> <span class="com">// "flex-payment-solutions"</span><br/>
+&nbsp;&nbsp;<span class="key">priority</span>: <span class="typ">"HIGH" | "MEDIUM" | "LOW"</span><br/>
+&nbsp;&nbsp;<span class="key">status</span>: <span class="typ">CaseStatus</span> <span class="com">// see G.2</span><br/>
+&nbsp;&nbsp;<span class="key">slaDeadline</span>: <span class="typ">ISO-8601</span><br/>
+&nbsp;&nbsp;<span class="key">assignedTo</span>: <span class="typ">UserId</span> <span class="com">// processor user</span><br/>
+&nbsp;&nbsp;<span class="key">source</span>: <span class="typ">"PRODUCT_COMPLIANCE" | "QSCANAI_FINDING" | "LICENSE_CHECK" | "MANUAL"</span><br/>
+&nbsp;&nbsp;<span class="key">items</span>: <span class="typ">CaseItem[]</span> <span class="com">// v1: length always 1</span><br/>
+&nbsp;&nbsp;<span class="key">createdAt</span>: <span class="typ">ISO-8601</span><br/>
+&nbsp;&nbsp;<span class="key">sentAt</span>: <span class="typ">ISO-8601 | null</span><br/>
+&nbsp;&nbsp;<span class="key">resolvedAt</span>: <span class="typ">ISO-8601 | null</span><br/>
+}
+      </div>
+
+      <div class="shape">
+        <span class="shape-label">CaseItem</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="key">id</span>: <span class="typ">string</span><br/>
+&nbsp;&nbsp;<span class="key">itemType</span>: <span class="typ">ItemType</span> <span class="com">// v1: always "COA_EXPIRED" for demo path</span><br/>
+&nbsp;&nbsp;<span class="key">resolutionType</span>: <span class="typ">ResolutionType</span> <span class="com">// v1: hardcoded per itemType — UPLOAD_REPLACEMENT_COA</span><br/>
+&nbsp;&nbsp;<span class="key">plProductId</span>: <span class="typ">string | null</span><br/>
+&nbsp;&nbsp;<span class="key">vaultCoaId</span>: <span class="typ">string | null</span> <span class="com">// the SPECIFIC COA flagged</span><br/>
+&nbsp;&nbsp;<span class="key">finding</span>: <span class="typ">string</span> <span class="com">// human-readable description</span><br/>
+&nbsp;&nbsp;<span class="key">severity</span>: <span class="typ">"HIGH" | "MEDIUM" | "LOW"</span> <span class="com">// rendered as "High Risk" / "Medium" / "Low"</span><br/>
+&nbsp;&nbsp;<span class="key">status</span>: <span class="typ">ItemStatus</span> <span class="com">// see G.2</span><br/>
+&nbsp;&nbsp;<span class="key">latestResponseId</span>: <span class="typ">string | null</span><br/>
+}
+      </div>
+
+      <div class="shape">
+        <span class="shape-label">Response</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="key">id</span>: <span class="typ">string</span><br/>
+&nbsp;&nbsp;<span class="key">caseItemId</span>: <span class="typ">string</span><br/>
+&nbsp;&nbsp;<span class="key">resolutionType</span>: <span class="typ">ResolutionType</span> <span class="com">// matches CaseItem.resolutionType</span><br/>
+&nbsp;&nbsp;<span class="key">value</span>: <span class="typ">ResolutionValue</span> <span class="com">// shape varies by resolutionType (v1: { fileKey, fileName, size })</span><br/>
+&nbsp;&nbsp;<span class="key">submittedBy</span>: <span class="typ">{ userId, name, email }</span><br/>
+&nbsp;&nbsp;<span class="key">submittedAt</span>: <span class="typ">ISO-8601</span><br/>
+&nbsp;&nbsp;<span class="key">status</span>: <span class="typ">"SUBMITTED" | "ACCEPTED" | "REJECTED"</span><br/>
+&nbsp;&nbsp;<span class="key">reviewedBy</span>: <span class="typ">UserId | null</span><br/>
+&nbsp;&nbsp;<span class="key">reviewedAt</span>: <span class="typ">ISO-8601 | null</span><br/>
+&nbsp;&nbsp;<span class="key">rejectionReason</span>: <span class="typ">string | null</span><br/>
+}
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">G.2 · State machines</h3>
+
+      <div style="font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Case status</div>
+      <div class="fsm">
+        <span class="state start">DRAFT</span>
+        <span class="arrow">→</span>
+        <span class="label">on Send</span>
+        <span class="arrow">→</span>
+        <span class="state">OPEN</span>
+        <span class="arrow">→</span>
+        <span class="label">on item submit</span>
+        <span class="arrow">→</span>
+        <span class="state">IN_REVIEW</span>
+        <span class="arrow">→</span>
+        <span class="label">all items accepted</span>
+        <span class="arrow">→</span>
+        <span class="state end">RESOLVED</span>
+        <span class="arrow">→</span>
+        <span class="label">manual close (v1) / auto-close 90d (v2)</span>
+        <span class="arrow">→</span>
+        <span class="state">CLOSED</span>
+      </div>
+
+      <div style="font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px">Item status</div>
+      <div class="fsm">
+        <span class="state start">PENDING</span>
+        <span class="arrow">→</span>
+        <span class="label">merchant submits</span>
+        <span class="arrow">→</span>
+        <span class="state">SUBMITTED</span>
+        <span class="arrow">→</span>
+        <span class="label">processor accepts</span>
+        <span class="arrow">→</span>
+        <span class="state end">RESOLVED</span>
+      </div>
+      <div class="fsm" style="margin-top:6px">
+        <span class="state">SUBMITTED</span>
+        <span class="arrow">→</span>
+        <span class="label">processor rejects</span>
+        <span class="arrow">→</span>
+        <span class="state start">PENDING</span>
+        <span class="label">(loops back; merchant re-submits)</span>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">G.3 · v1 hardcoding rules (what QP-3593 unlocks later)</h3>
+      <div class="shape">
+        <span class="shape-label">v1 itemType → resolutionType map</span><br/>
+        <span class="key">COA_EXPIRED</span> <span class="arrow">→</span> <span class="val">UPLOAD_REPLACEMENT_COA</span> <span class="com">// the demo path</span><br/>
+        <span class="key">PRODUCT_MISSING_COA</span> <span class="arrow">→</span> <span class="val">UPLOAD_REPLACEMENT_COA</span> <span class="com">// same handler — file upload</span><br/>
+        <span class="key">COMPLIANCE_FINDING</span> <span class="arrow">→</span> <span class="val">PROVIDE_URL</span> <span class="com">// stretch: a text input</span><br/>
+        <span class="key">LICENSE_ISSUE</span> <span class="arrow">→</span> <span class="val">UPLOAD_LICENSE</span> <span class="com">// stretch: file upload, different copy</span><br/>
+        <br/>
+        <span class="com">// v2 (QP-3593): per-item override + per-processor defaults config</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION H — V2 DEFERRED
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-h">
+    <div class="section-head">
+      <h2>H · v2 Deferred (placeholders) <span class="qp multi">QP-3591 · 3592 · 3593</span></h2>
+      <div class="section-sub">UI presence, behavior stubbed<br/>Reviewers confirm scope before next sprint</div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:#475569;margin-bottom:14px">These three tickets are <strong>not implemented in v1</strong>. The mockup shows where they'd appear so reviewers can confirm the deferral. Each gets a visible <span class="defer">v2 · QP-XXXX</span> marker in the actual UI.</p>
+
+      <table class="scope-table">
+        <thead><tr><th>Ticket</th><th>What it adds</th><th>Where it appears in v2</th><th>v1 stub behavior</th></tr></thead>
+        <tbody>
+          <tr><td class="scope-key">QP-3591</td><td>Closure Rules / Force-Close (90-day archive, permission-gated force close)</td><td>Internal Case Detail (B.3) — "Force Close" button enables; Cron job for 90d auto-archive</td><td>Button rendered DISABLED with <span class="defer">v2</span> marker</td></tr>
+          <tr><td class="scope-key">QP-3592</td><td>Compliance Case Reporting — SLA metrics, resolution rates, PDF/CSV export</td><td>New "Reports" tab in Internal CM (B.2) at /qmonitor/cases/reports</td><td>Tab not rendered in v1; processor uses raw case list</td></tr>
+          <tr><td class="scope-key">QP-3593</td><td>Configurable Resolution Types per Case Item (multi-resolutionType per itemType, processor overrides)</td><td>Case Draft Drawer (A.4) — per-item Advanced section; Settings page for processor defaults</td><td>v1 hardcodes one resolutionType per itemType (G.3)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="annot warn">
+        <span class="ic">!</span>
+        <div><strong>Confirm with Brian + Ronaldo before sprint kickoff</strong>: deferring QP-3593 means v1 only handles COA_EXPIRED end-to-end. Other itemTypes (Q-ScanAI findings, License issues) will create cases but their merchant-side response UI is the same UPLOAD form. Acceptable for a first vertical slice; revisit when QP-3593 ships.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION I — IMPLEMENTATION HANDOFF
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-i">
+    <div class="section-head">
+      <h2>I · Implementation Handoff Notes</h2>
+      <div class="section-sub">Joseph's first Qredible-codebase implementation<br/>Component / API / Middleware mapping per section</div>
+    </div>
+    <div class="section-body flush">
+      <table class="handoff">
+        <thead>
+          <tr><th>Section / Component</th><th>RTQ-Admin-UI (lives at)</th><th class="api">RTQ-Admin-API (endpoint)</th><th>Middleware (broker)</th><th class="note">Note for Joseph</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>A · CreateCaseAction</td>
+            <td>apps/qmonitor/components/cases/CreateCaseAction.tsx</td>
+            <td class="api">POST /qmonitor/cases</td>
+            <td>Maps source row → CaseDraft body</td>
+            <td class="note">Reuse from existing Action column patterns in product-compliance and findings tables.</td>
+          </tr>
+          <tr>
+            <td>A · CaseDraftDrawer</td>
+            <td>apps/qmonitor/components/cases/CaseDraftDrawer.tsx</td>
+            <td class="api">POST /qmonitor/cases<br/>POST /qmonitor/cases/:id/send</td>
+            <td>Validation, default SLA = +14d, default priority by severity</td>
+            <td class="note">Shared component — used by all 3 entry points (3581/3582/3610).</td>
+          </tr>
+          <tr>
+            <td>B.1 · CaseCountCell</td>
+            <td>apps/qmonitor/components/wemonitor/CaseCountCell.tsx</td>
+            <td class="api">GET /qmonitor/wemonitor (existing — add field)</td>
+            <td>Add activeCaseCount to row response</td>
+            <td class="note">Additive only — don't refactor WeMonitorTable, dev team is mid-flight on industry filter.</td>
+          </tr>
+          <tr>
+            <td>B.2 · CaseListScreen</td>
+            <td>apps/qmonitor/pages/cases/index.tsx</td>
+            <td class="api">GET /qmonitor/cases</td>
+            <td>Filter/sort/paging on top of CaseRepository</td>
+            <td class="note">New top-level route under Q-Monitor's existing horizontal nav.</td>
+          </tr>
+          <tr>
+            <td>B.3 · CaseDetailPanel</td>
+            <td>apps/qmonitor/components/cases/CaseDetailPanel.tsx</td>
+            <td class="api">GET /qmonitor/cases/:id<br/>PATCH /qmonitor/cases/:id<br/>POST /qmonitor/cases/:id/responses/:itemId/{accept,reject}</td>
+            <td>Atomic state-transition handler</td>
+            <td class="note">Side panel rendered over CaseListScreen on row click.</td>
+          </tr>
+          <tr>
+            <td>C.1 · MerchantInviteEmail</td>
+            <td>(transactional template — no UI route)</td>
+            <td class="api">internal job triggered by /cases/:id/send</td>
+            <td>Render template + sign JWT magic link</td>
+            <td class="note">MailType QP_INVITE_COMPLIANCE_PORTAL already named in V2 mockup. Confirm template engine (likely existing Qredible mail pipeline).</td>
+          </tr>
+          <tr>
+            <td>C.2 · MerchantSignup</td>
+            <td>apps/merchant-portal/pages/redeem.tsx</td>
+            <td class="api">POST /merchant/portal/redeem<br/>POST /merchant/portal/account</td>
+            <td>JWT verify + user create + session</td>
+            <td class="note">Separate app/route from /qmonitor — different auth boundary. /comply/* routes require merchant session, /qmonitor/* require processor session.</td>
+          </tr>
+          <tr>
+            <td>D · MerchantPortalShell + Widgets</td>
+            <td>apps/merchant-portal/components/dashboard/*</td>
+            <td class="api">GET /merchant/dashboard</td>
+            <td>Aggregates cases + coas + activity into one response</td>
+            <td class="note">Widgets independently mountable — design contract for v2 (MyCOA-only merchants etc).</td>
+          </tr>
+          <tr>
+            <td>E · MerchantCaseDetail</td>
+            <td>apps/merchant-portal/pages/cases/[caseId].tsx</td>
+            <td class="api">GET /merchant/cases/:id<br/>POST /merchant/cases/:id/items/:itemId/upload<br/>POST /merchant/cases/:id/items/:itemId/responses</td>
+            <td>Presigned-URL service for file upload</td>
+            <td class="note">Dispute / Extension buttons render but submit to a stub returning 501 — flag in QA.</td>
+          </tr>
+          <tr>
+            <td>G · CaseRepository</td>
+            <td>—</td>
+            <td class="api">all /api/qmonitor/cases/* and /api/merchant/cases/*</td>
+            <td>Ownership boundary: Middleware translates between processor / merchant views; Q-Monitor and Merchant Portal both go through it</td>
+            <td class="note">v1: same DB tables, different auth + projection. Merchant view filters by merchantId. Processor view filters by processorOrgId.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="padding:18px 22px">
+        <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:10px">Recording-friendly milestone breakdown</h4>
+        <p style="font-size:12px;color:#64748B;margin-bottom:10px">Per Ronaldo's instruction: Joseph records key dev sessions for the dev team. Suggested episode boundaries — each is a coherent vertical chunk that can be replicated:</p>
+        <ol style="margin-left:20px;font-size:12px;color:#334155;line-height:1.8">
+          <li><strong>Episode 1 — Local environment + data model</strong>: Q-Trust local up; PlComplianceCase migration; CaseRepository skeleton.</li>
+          <li><strong>Episode 2 — Create Case from Product Compliance</strong>: CreateCaseAction wired to /api/qmonitor/cases; CaseDraftDrawer; demo end-to-end up to DRAFT.</li>
+          <li><strong>Episode 3 — Internal Case Management screen</strong>: CaseListScreen + CaseDetailPanel; demo Send to Merchant transition.</li>
+          <li><strong>Episode 4 — Merchant invite + signup</strong>: Email template + JWT magic link + redeem flow; demo merchant lands on portal.</li>
+          <li><strong>Episode 5 — Merchant dashboard + case response</strong>: Dashboard widgets; CaseDetail upload flow; demo Submit Response.</li>
+          <li><strong>Episode 6 — Loop closure</strong>: Processor accepts response; both sides see RESOLVED. v1 vertical slice complete.</li>
+        </ol>
+      </div>
+
+      <div style="padding:0 22px 22px">
+        <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:10px">Unknowns Joseph should verify in real codebase</h4>
+        <ul style="margin-left:20px;font-size:12px;color:#334155;line-height:1.8">
+          <li><strong>Case ID generator</strong> — does Qredible already have a CR-YYYY-XXXX pattern, or is this new?</li>
+          <li><strong>Mail pipeline</strong> — confirm template engine + transactional sender (looks like SendGrid based on /raw artifacts; verify).</li>
+          <li><strong>File storage</strong> — where do COA PDFs live today (vault?)? Reuse the same bucket / signed-URL service.</li>
+          <li><strong>Auth boundary</strong> — confirm there's a clean way to issue merchant-portal sessions distinct from processor sessions; if not, that's a v0.5 prerequisite.</li>
+          <li><strong>Existing /qmonitor route layout</strong> — verify the horizontal nav can absorb a new "Cases" tab without disrupting WeMonitor industry-filter work in flight.</li>
+          <li><strong>MyCOA integration surface</strong> — D's MyCOA widget needs a query for COA list; is there a shared client or do we cross-call?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SECTION J — FUTURE-STATE REFERENCE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-j">
+    <div class="section-head">
+      <h2>J · Future-state reference</h2>
+      <div class="section-sub">Vertical-nav direction · what v1 deliberately defers</div>
+    </div>
+    <div class="section-body">
+      <div class="future">
+        <span class="ic">↗</span>
+        <div style="flex:1">
+          <h3>Joseph's Claude design — vertical-nav direction (not v1)</h3>
+          <p>Joseph designed a vertical-navigation rework of Q-Monitor in <a href="https://api.anthropic.com/v1/design/h/XhCgVWNPWlXIg2-53Nvecw?open_file=index.html" target="_blank">claude design XhCgVWNPWlXIg2-53Nvecw</a> that pulls We Monitor + Cases + Findings up one level so they're directly clickable from the app sidebar. v1 keeps the existing horizontal nav inside Q-Monitor — the rework is deferred to avoid disrupting the dev team's in-flight industry-filter work on We Monitor.</p>
+          <p style="margin-top:8px">The vertical-nav design is what gets built when this v1 vertical slice is shipped and stable, in tandem with QP-3593 (configurable resolution types) which makes the merchant response surface generalizable.</p>
+        </div>
+      </div>
+
+      <div class="annot warn" style="margin-top:14px">
+        <span class="ic">!</span>
+        <div><strong>Note on the design link</strong>: the claude design URL above is a viewer endpoint that requires Joseph's authenticated session to fetch — agent context (from a separate machine) returns 404/405 against api.anthropic.com directly. This mockup was synthesized from the V2 mockup (compliance-portal-v2.html) + Joseph's 2026-04-29 self-recorded walkthrough rather than from the design's HTML directly. If reviewers want side-by-side comparison Joseph can drop screenshots into the PR.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       FOOTNOTES
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="footnotes">
+    <h4>Sources synthesized for this mockup</h4>
+    <ol>
+      <li><strong>compliance-portal-v2.html</strong> — the V2 scope contract (data model, terminology, ticket coverage). All terminology and data shapes preserved.</li>
+      <li><strong>Fathom recording 142107972</strong> (Daily Standup, 2026-04-29 14:30) — Ronaldo confirmed Joseph builds the merchant portal himself using existing tickets; FlexPay June 2026 launch; record sessions for team training.</li>
+      <li><strong>Fathom recording 142133774</strong> (Joseph's self-walkthrough, 2026-04-29 15:03) — MVP redefined as Cases tab + Dashboard; severity = Low/Medium/High Risk text; vertical-nav deferred; do not disrupt We Monitor work.</li>
+      <li><strong>Joseph's mid-task scope corrections</strong> — Initially merchant-only slice; corrected to end-to-end vertical slice across 10 tickets with one item / one resolution for v1.</li>
+      <li><strong>Joseph's claude design</strong> — referenced in Section J; URL was unreachable from agent context (404/405 against api.anthropic.com without authenticated session).</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>
