@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QP-2878 — Q-Audit · MCC Codes</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:13px;line-height:1.5}
+
+/* TOP NAV */
+.nav{background:#0F172A;border-bottom:1px solid rgba(255,255,255,.08);padding:10px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.nav a{color:#93C5FD;text-decoration:none;font-size:12px;font-weight:600}
+.nav a:hover{color:#fff}
+.nav .sep{color:#334155}
+.nav .cur{color:#F8FAFC;font-size:12px;font-weight:600}
+.ticket-badge{background:#1E3A5F;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.02em;margin-left:auto}
+
+.page{max-width:1400px;margin:0 auto;padding:28px 24px 80px}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:24px;font-weight:700;color:#1E293B;margin-bottom:6px}
+.page-header p{color:#475569;font-size:14px;max-width:980px;line-height:1.6}
+.meta-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.meta-pill{background:#fff;border:1px solid #E2E8F0;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;color:#475569}
+.meta-pill.strong{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
+.meta-pill.scope{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.meta-pill.new{background:#DCFCE7;border-color:#86EFAC;color:#166534}
+
+/* SECTION CARDS */
+.section{background:#fff;border-radius:12px;border:1px solid #E2E8F0;margin-bottom:24px;overflow:hidden}
+.section-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #E2E8F0}
+.section-head h2{font-size:15px;font-weight:700;color:#1E293B}
+.section-sub{font-size:12px;color:#64748B;margin-left:auto}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#1E3A5F;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+.badge-new{background:#DCFCE7;color:#166534;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+.badge-existing{background:#F1F5F9;color:#475569;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+
+/* Q-AUDIT GLOBAL SETTINGS NAV */
+.qa-shell{background:#FCFDFE}
+.qa-topnav{background:#0F172A;padding:0 20px;display:flex;align-items:center;gap:0;height:40px}
+.qa-topnav .qa-logo{color:#fff;font-size:14px;font-weight:800;margin-right:24px;letter-spacing:-.01em}
+.qa-topnav .qa-nav-item{padding:0 16px;height:40px;display:flex;align-items:center;color:#94A3B8;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent}
+.qa-topnav .qa-nav-item.active{color:#fff;border-bottom-color:#F05252}
+.qa-topnav .qa-nav-item:hover{color:#CBD5E1}
+.qa-subnav{padding:0 20px;background:#fff;border-bottom:1px solid #E2E8F0;display:flex;gap:0;align-items:center;overflow-x:auto;flex-wrap:nowrap}
+.qa-subnav .qa-sub-item{padding:11px 14px;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent}
+.qa-subnav .qa-sub-item:hover{color:#0F172A}
+.qa-subnav .qa-sub-item.active{color:#0F172A;border-bottom-color:#1E3A5F}
+.qa-subnav .qa-sub-item.new-tab{position:relative;color:#166534;background:linear-gradient(180deg,#fff 0%,#F0FDF4 100%)}
+.qa-subnav .qa-sub-item.new-tab::after{content:'NEW';position:absolute;top:4px;right:2px;background:#16A34A;color:#fff;font-size:8px;font-weight:800;padding:1px 4px;border-radius:3px;letter-spacing:.04em}
+
+/* GLOBAL SETTINGS BREADCRUMB */
+.gs-bar{padding:14px 20px;background:#FCFDFE;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:10px}
+.gs-bar .gs-title{font-size:14px;font-weight:700;color:#0F172A}
+.gs-bar .gs-meta{font-size:11px;color:#64748B;margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* TOP IMPORT BAR */
+.import-bar{padding:12px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.import-bar .imp-fact{font-size:11px;color:#475569}
+.import-bar .imp-fact strong{color:#0F172A;font-weight:700}
+.import-bar .imp-mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0F172A;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #E2E8F0}
+.import-bar .spacer{flex:1}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #E2E8F0;background:#FCFDFE;flex-wrap:wrap}
+.search{padding:7px 12px 7px 32px;border:1px solid #CBD5E1;border-radius:8px;font-size:12px;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;width:240px}
+.dropdown{padding:7px 26px 7px 10px;border:1px solid #CBD5E1;border-radius:8px;font-size:12px;color:#0F172A;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 8px center;font-weight:600;font-family:inherit;cursor:pointer}
+.dropdown.has-sel{background-color:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
+.filter-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-left:4px}
+.spacer{flex:1}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #CBD5E1;background:#fff;color:#1E293B;font-family:inherit}
+.btn:hover{background:#F8FAFC}
+.btn.primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn.primary:hover{background:#0F172A}
+.btn.danger{color:#B91C1C;border-color:#FCA5A5}
+.btn.subtle{background:#F1F5F9;border-color:#E2E8F0;color:#334155}
+.btn.icon{width:28px;height:28px;padding:0;justify-content:center}
+.btn.sm{padding:5px 10px;font-size:11px}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;position:relative}
+table.qa-table{width:100%;border-collapse:collapse;font-size:12px}
+table.qa-table thead th{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:10px 12px;text-align:left;font-size:10px;font-weight:800;color:#64748B;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;position:sticky;top:0}
+table.qa-table thead th.sortable{cursor:pointer}
+table.qa-table thead th.sortable::after{content:' ↕';color:#CBD5E1;font-size:9px}
+table.qa-table thead th.sorted-asc::after{content:' ↑';color:#1E3A5F}
+table.qa-table tbody td{padding:11px 12px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
+table.qa-table tbody tr:hover{background:#F8FAFC}
+table.qa-table tbody tr.selected{background:#EFF6FF}
+.chk{width:14px;height:14px;accent-color:#1E3A5F;vertical-align:middle;cursor:pointer}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#0F172A;font-weight:600}
+.mono-sm{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#475569}
+
+.industry-pill{display:inline-flex;align-items:center;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;padding:2px 8px;border-radius:14px;font-size:10px;font-weight:700;margin:1px 3px 1px 0;white-space:nowrap}
+.industry-pill.cannabis{background:#FEE2E2;color:#991B1B;border-color:#FCA5A5}
+.industry-pill.hemp{background:#DCFCE7;color:#166534;border-color:#86EFAC}
+.industry-pill.tobacco{background:#FEF3C7;color:#92400E;border-color:#FDE68A}
+.industry-pill.firearms{background:#F3E8FF;color:#6B21A8;border-color:#D8B4FE}
+.industry-pill.more{background:#F1F5F9;color:#475569;border-color:#CBD5E1;cursor:pointer}
+.pill-cell{max-width:280px;line-height:1.7}
+
+.action-cell{display:flex;gap:4px}
+.icon-btn{width:26px;height:26px;border:1px solid #E2E8F0;border-radius:5px;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#64748B;cursor:pointer;font-size:12px}
+.icon-btn:hover{border-color:#94A3B8;color:#0F172A}
+.icon-btn.danger:hover{color:#B91C1C;border-color:#FCA5A5}
+
+.date-cell{font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace}
+
+/* BULK SELECT POPUP */
+.bulk-popup{margin:0 16px 0 16px;padding:12px 16px;background:#1A202E;border-radius:8px;display:flex;align-items:center;gap:14px;color:#fff;font-size:12px;font-weight:600}
+.bulk-popup .count{display:inline-flex;align-items:center;gap:8px}
+.bulk-popup .count .num{background:#F05252;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:800}
+.bulk-popup a{color:#93C5FD;cursor:pointer;text-decoration:underline;font-weight:600}
+.bulk-popup .spacer{flex:1}
+.bulk-popup .bulk-action-wrap{position:relative}
+.bulk-popup select{background:#fff;color:#0F172A;border:none;padding:6px 26px 6px 10px;border-radius:6px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 8px center}
+
+/* MODAL CARDS */
+.modal-stage{background:linear-gradient(180deg,#F7F5FF 0%, #EFEAFB 100%);padding:30px;border-radius:12px;border:1px solid #E9D5FF;margin-bottom:24px}
+.modal-stage-label{font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.modal-stage-label::before{content:'';width:8px;height:8px;border-radius:50%;background:#9333EA}
+
+.modal{background:#fff;border-radius:12px;border:1px solid #E2E8F0;box-shadow:0 4px 16px rgba(15,23,42,.08);max-width:580px;margin:0 auto;overflow:hidden}
+.modal.wide{max-width:680px}
+.modal-head{padding:18px 22px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:15px;font-weight:700;color:#0F172A}
+.modal-head .x{width:24px;height:24px;border:none;background:#F1F5F9;border-radius:6px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;font-size:14px}
+.modal-body{padding:20px 22px}
+.modal-body p{font-size:13px;color:#475569;line-height:1.6;margin-bottom:14px}
+.modal-foot{padding:14px 22px;background:#FCFDFE;border-top:1px solid #E2E8F0;display:flex;justify-content:flex-end;gap:8px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.field input[type=text],.field select{width:100%;padding:9px 12px;border:1px solid #CBD5E1;border-radius:8px;font-size:13px;color:#0F172A;font-family:inherit;background:#fff}
+.field input:focus,.field select:focus{outline:none;border-color:#1E3A5F;box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+.field input.readonly{background:#F8FAFC;color:#475569}
+.field .help{font-size:11px;color:#64748B;margin-top:4px}
+
+.multi-select-display{padding:8px 10px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;min-height:36px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.multi-select-display .placeholder{color:#94A3B8;font-size:12px}
+.multi-select-chip{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;padding:2px 7px 2px 9px;border-radius:14px;font-size:11px;font-weight:700}
+.multi-select-chip .x{cursor:pointer;color:#1D4ED8;font-weight:800;background:none;border:none;padding:0;font-size:14px;line-height:1}
+.multi-select-dropdown{margin-top:6px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;max-height:240px;overflow-y:auto;box-shadow:0 4px 16px rgba(15,23,42,.06)}
+.multi-select-dropdown .ms-search{padding:8px 10px;border-bottom:1px solid #F1F5F9}
+.multi-select-dropdown .ms-search input{width:100%;padding:6px 10px;font-size:12px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit}
+.multi-select-dropdown .ms-opt{padding:7px 12px;font-size:12px;color:#0F172A;cursor:pointer;display:flex;align-items:center;gap:8px}
+.multi-select-dropdown .ms-opt:hover{background:#F8FAFC}
+.multi-select-dropdown .ms-opt.selected{background:#EFF6FF;color:#1D4ED8}
+.multi-select-dropdown .ms-opt input{margin:0}
+
+/* MERCHANT FORM */
+.merchant-form{background:#fff;padding:20px 22px}
+.merchant-form .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.suggested-pane{margin-top:12px;padding:12px 14px;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;font-size:12px;color:#0C4A6E}
+.suggested-pane .lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#075985;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.suggested-pane .lbl::before{content:'✦';color:#0EA5E9}
+.suggested-pane .pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.suggested-pane .actions{display:flex;gap:8px;margin-top:8px}
+
+/* IMPORT PREVIEW TABLE */
+.import-preview-table{font-size:12px}
+.import-preview-table thead th{background:#F8FAFC;padding:8px 10px;font-size:10px;font-weight:800;color:#64748B;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid #E2E8F0}
+.import-preview-table tbody td{padding:9px 10px;border-bottom:1px solid #F1F5F9}
+.import-preview-table tbody tr.warn{background:#FFFBEB}
+.import-preview-table tbody tr.warn td{border-bottom:1px solid #FDE68A}
+.warn-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:#FEF3C7;color:#92400E;border-radius:12px;font-size:10px;font-weight:700;border:1px solid #FCD34D}
+.ok-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:#DCFCE7;color:#166534;border-radius:12px;font-size:10px;font-weight:700;border:1px solid #86EFAC}
+.add-master-link{font-size:11px;font-weight:700;color:#1D4ED8;cursor:pointer;text-decoration:underline}
+
+/* Q-CONFIG SOURCE TAGS */
+.src-tag{display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#94A3B8;background:#F8FAFC;border:1px dashed #CBD5E1;padding:1px 6px;border-radius:4px;letter-spacing:.02em;white-space:nowrap}
+.src-tag::before{content:'⌥';color:#94A3B8;font-size:10px}
+.src-row{padding:8px 16px;background:#FCFDFE;border-top:1px dashed #E2E8F0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.src-row .src-label{font-size:10px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-right:6px}
+.src-anchor{display:inline-block;margin-top:4px}
+
+/* AUDIT NOTE */
+.audit-callout{background:#F0F9FF;border:1px solid #BAE6FD;color:#0C4A6E;padding:12px 16px;border-radius:8px;font-size:12px;display:flex;gap:12px;align-items:flex-start;margin:14px 20px}
+.audit-callout .icn{flex-shrink:0;width:24px;height:24px;background:#BAE6FD;color:#0C4A6E;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+
+/* SOURCE FOOTER */
+.source-footer{background:#FCFDFE;border:1px solid #E2E8F0;border-radius:12px;padding:16px 20px;margin-top:24px}
+.source-footer h3{font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.source-footer ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:6px 20px}
+.source-footer li{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#475569;line-height:1.6}
+.source-footer li .nm{color:#1E3A5F;font-weight:600}
+.source-footer li .desc{color:#94A3B8}
+
+.cross-link{padding:14px 18px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;font-size:12px;color:#78350F;display:flex;gap:10px;align-items:center;margin-top:16px}
+.cross-link strong{color:#451A03}
+.cross-link a{color:#B45309;font-weight:700;text-decoration:underline}
+
+footer.foot{margin-top:40px;padding-top:18px;border-top:1px solid #E2E8F0;text-align:center;font-size:11px;color:#94A3B8}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="../index.html">Qredible Prototypes</a>
+  <span class="sep">/</span>
+  <a href="../index.html?filter=q-audit">Q-Audit</a>
+  <span class="sep">/</span>
+  <span class="cur">Global Settings · MCC Codes</span>
+  <span class="ticket-badge">QP-2878</span>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h1>Q-Audit · Global Settings — MCC Codes</h1>
+    <p>Adds a new <strong>MCC Codes</strong> lookup to Q-Audit Global Settings, sibling to Industry Types and Types of Company. Master list of 904 ISO/Mastercard MCCs is imported once and re-imported on demand. Each MCC can be associated with one or more Q-Audit Industry Types so the merchant onboarding form can auto-suggest the right classification when a merchant enters their MCC. Per-row Edit + bulk Assign Industry Type actions; deletion routes through the cross-cutting Delete + Reassign workflow (QP-3766).</p>
+    <div class="meta-row">
+      <span class="meta-pill strong">Q-Audit · Global Settings</span>
+      <span class="meta-pill new">New lookup</span>
+      <span class="meta-pill">904 master MCC rows</span>
+      <span class="meta-pill scope">Q-Config sources annotated</span>
+    </div>
+  </div>
+
+  <!-- 1. NAV STRIP -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">1</span>
+      <h2>Q-Audit Global Settings nav — MCC Codes added as new tab</h2>
+      <span class="badge-new">New entry</span>
+      <span class="section-sub">Sibling to Industry Types and Types of Company</span>
+    </div>
+
+    <div class="qa-shell">
+      <div class="qa-topnav">
+        <span class="qa-logo">Q-Audit</span>
+        <span class="qa-nav-item">Audit</span>
+        <span class="qa-nav-item active">Global Settings</span>
+        <span class="qa-nav-item">Paywall</span>
+        <span class="qa-nav-item">Import</span>
+        <span class="qa-nav-item">Finances</span>
+        <span class="qa-nav-item">Companies</span>
+        <span class="qa-nav-item">Prospects</span>
+        <span class="qa-nav-item">Sales</span>
+        <span class="qa-nav-item">Promotions</span>
+        <span class="qa-nav-item">Q-Comply</span>
+        <span class="qa-nav-item">Activity Log</span>
+        <span class="qa-nav-item">Q-M Settings</span>
+        <span class="qa-nav-item">Display Settings</span>
+      </div>
+
+      <div class="qa-subnav">
+        <span class="qa-sub-item">Industry Types</span>
+        <span class="qa-sub-item">Types of Company</span>
+        <span class="qa-sub-item">Product Classification</span>
+        <span class="qa-sub-item active new-tab">MCC Codes</span>
+        <span class="qa-sub-item">Subscription Plans</span>
+        <span class="qa-sub-item">Tags</span>
+        <span class="qa-sub-item">Compliance Cases</span>
+        <span class="qa-sub-item">Email Templates</span>
+        <span class="qa-sub-item">Lookup Tables</span>
+      </div>
+    </div>
+    <div class="src-row">
+      <span class="src-label">Source</span>
+      <span class="src-tag">qaudit_globalsettings_nav_mcc_tab</span>
+    </div>
+  </section>
+
+  <!-- 2. MCC CODES MODAL — PRIMARY TABLE WITH BULK SELECT STATE -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">2</span>
+      <h2>MCC Codes modal — primary view (with bulk-select state)</h2>
+      <span class="badge-new">Net new screen</span>
+      <span class="section-sub">Filterable, sortable, searchable · 4 of 904 rows selected</span>
+    </div>
+
+    <div class="qa-shell">
+      <div class="gs-bar">
+        <span class="gs-title">MCC Codes</span>
+        <span class="gs-meta">
+          <span>Lookup table</span>
+          <span>·</span>
+          <span class="mono-sm">qaudit.lookup.mcc_codes</span>
+        </span>
+      </div>
+
+      <!-- ADMIN IMPORT BAR -->
+      <div class="import-bar">
+        <span class="imp-fact">Last imported: <strong>2026-04-29 · 11:42 EDT</strong></span>
+        <span style="color:#CBD5E1">·</span>
+        <span class="imp-fact"><strong>904</strong> rows in master list</span>
+        <span style="color:#CBD5E1">·</span>
+        <span class="imp-fact">Source: <span class="imp-mono">iso-18245-2023</span></span>
+        <span class="spacer"></span>
+        <span class="src-tag">qaudit_mcc_reimport_admin_action</span>
+        <button class="btn sm">↻ Re-import master list</button>
+        <button class="btn primary sm">+ Add MCC</button>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <input class="search" type="text" placeholder="Search MCC or title…" value="" />
+        <span class="filter-label">Industry Sector</span>
+        <button class="dropdown has-sel">2 selected ▾</button>
+        <span class="filter-label">Industry Type</span>
+        <button class="dropdown has-sel">3 selected ▾</button>
+        <span class="filter-label">Assigned</span>
+        <button class="dropdown">Any ▾</button>
+        <span class="spacer"></span>
+        <button class="btn sm subtle">Clear filters</button>
+        <span class="src-tag src-anchor">qaudit_mcc_codes_filter_bar</span>
+      </div>
+
+      <!-- BULK POPUP -->
+      <div style="padding:14px 0 4px 0">
+        <div class="bulk-popup">
+          <span class="count"><span class="num">4</span> selected</span>
+          <span style="color:#94A3B8">·</span>
+          <a>Select all 28 matching filters</a>
+          <span class="spacer"></span>
+          <span style="color:#CBD5E1;font-size:11px">Bulk action:</span>
+          <select>
+            <option>Assign Industry Type</option>
+            <option>Remove Industry Type assignments</option>
+            <option>Export selected (CSV)</option>
+          </select>
+          <button class="btn primary sm" style="background:#fff;color:#0F172A;border-color:#fff">Apply</button>
+          <span class="src-tag" style="background:#1E293B;border-color:#334155;color:#94A3B8">qaudit_mcc_codes_bulk_select_popup</span>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table class="qa-table">
+          <thead>
+            <tr>
+              <th style="width:36px"><input type="checkbox" class="chk" checked/></th>
+              <th class="sortable sorted-asc" style="width:80px">MCC</th>
+              <th class="sortable" style="width:200px">Industry Sector</th>
+              <th class="sortable" style="min-width:280px">MCC Title</th>
+              <th style="min-width:280px">Associated Industry Types</th>
+              <th style="width:120px">Created</th>
+              <th style="width:140px">Last Modified</th>
+              <th style="width:90px;text-align:right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="selected">
+              <td><input type="checkbox" class="chk" checked/></td>
+              <td><span class="mono">5122</span></td>
+              <td>Pharmaceutical – Wholesale</td>
+              <td>Drugs Drug Proprietaries and Druggist Sundries</td>
+              <td class="pill-cell">
+                <span class="industry-pill cannabis">Cannabis / CBD</span>
+                <span class="industry-pill hemp">Hemp / CBD</span>
+                <span class="industry-pill">Nutraceuticals/Supplements</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn" title="Edit">✎</button>
+                  <button class="icon-btn danger" title="Delete">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">5310</span></td>
+              <td>General Merchandise – Retail</td>
+              <td>Discount Stores</td>
+              <td class="pill-cell">
+                <span class="industry-pill" style="color:#475569;background:#F1F5F9;border-color:#CBD5E1">Unassigned</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">5411</span></td>
+              <td>Food &amp; Grocery – Retail</td>
+              <td>Grocery Stores and Supermarkets</td>
+              <td class="pill-cell">
+                <span class="industry-pill">Functional Mushrooms</span>
+                <span class="industry-pill">Nutraceuticals/Supplements</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">5499</span></td>
+              <td>Food &amp; Grocery – Retail</td>
+              <td>Miscellaneous Food Stores – Convenience Stores and Specialty Markets</td>
+              <td class="pill-cell">
+                <span class="industry-pill cannabis">Cannabis / CBD</span>
+                <span class="industry-pill hemp">Hemp / CBD</span>
+                <span class="industry-pill tobacco">Smoke Shops (Vape, eCig)</span>
+                <span class="industry-pill more">+2 more</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr class="selected">
+              <td><input type="checkbox" class="chk" checked/></td>
+              <td><span class="mono">5723</span></td>
+              <td>Sporting Goods &amp; Firearms – Retail</td>
+              <td>Guns and Ammunition Shops</td>
+              <td class="pill-cell">
+                <span class="industry-pill firearms">Firearms - CNP B2B</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">5732</span></td>
+              <td>Electronics – Retail</td>
+              <td>Electronics Stores</td>
+              <td class="pill-cell">
+                <span class="industry-pill" style="color:#475569;background:#F1F5F9;border-color:#CBD5E1">Unassigned</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">5734</span></td>
+              <td>Technology – Retail</td>
+              <td>Computer Software Stores</td>
+              <td class="pill-cell">
+                <span class="industry-pill">Internet Provider</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr class="selected">
+              <td><input type="checkbox" class="chk" checked/></td>
+              <td><span class="mono">5912</span></td>
+              <td>Health &amp; Pharmacy – Retail</td>
+              <td>Drug Stores and Pharmacies</td>
+              <td class="pill-cell">
+                <span class="industry-pill cannabis">Cannabis / CBD</span>
+                <span class="industry-pill hemp">Hemp / CBD</span>
+                <span class="industry-pill">Nutraceuticals/Supplements</span>
+                <span class="industry-pill more">+1 more</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">5921</span></td>
+              <td>Beverage – Retail</td>
+              <td>Package Stores – Beer Wine and Liquor</td>
+              <td class="pill-cell">
+                <span class="industry-pill">Online Alcohol</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr class="selected">
+              <td><input type="checkbox" class="chk" checked/></td>
+              <td><span class="mono">5993</span></td>
+              <td>Tobacco – Retail</td>
+              <td>Cigar Stores and Stands</td>
+              <td class="pill-cell">
+                <span class="industry-pill tobacco">Online Tobacco</span>
+                <span class="industry-pill tobacco">Smoke Shops (Vape, eCig)</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">6012</span></td>
+              <td>Financial Services</td>
+              <td>Financial Institutions – Merchandise Services and Debt Repayment</td>
+              <td class="pill-cell">
+                <span class="industry-pill">Short Term Consumer Lending</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">6051</span></td>
+              <td>Financial Services</td>
+              <td>Non-Financial Institutions – Foreign Currency Liquid and Cryptocurrency Assets…</td>
+              <td class="pill-cell">
+                <span class="industry-pill" style="color:#475569;background:#F1F5F9;border-color:#CBD5E1">Unassigned</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">7298</span></td>
+              <td>Health &amp; Wellness</td>
+              <td>Health and Beauty Spas</td>
+              <td class="pill-cell">
+                <span class="industry-pill">Nutraceuticals/Supplements</span>
+                <span class="industry-pill">Functional Mushrooms</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">7372</span></td>
+              <td>Technology Services</td>
+              <td>Computer Programming Data Processing and Integrated Systems Design Services</td>
+              <td class="pill-cell">
+                <span class="industry-pill">Telemedicine</span>
+                <span class="industry-pill">Internet Provider</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"/></td>
+              <td><span class="mono">8011</span></td>
+              <td>Healthcare – Professional</td>
+              <td>Doctors and Physicians (Not Elsewhere Classified)</td>
+              <td class="pill-cell">
+                <span class="industry-pill">Telemedicine</span>
+              </td>
+              <td class="date-cell">2026-04-29</td>
+              <td class="date-cell">2026-04-29</td>
+              <td>
+                <div class="action-cell">
+                  <button class="icon-btn">✎</button>
+                  <button class="icon-btn danger">🗑</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="padding:12px 16px;background:#FCFDFE;border-top:1px solid #E2E8F0;display:flex;align-items:center;gap:10px;font-size:11px;color:#64748B">
+        <span>Showing 15 of 904 master MCCs · 28 match active filters</span>
+        <span style="flex:1"></span>
+        <button class="btn sm subtle">‹ Prev</button>
+        <button class="btn sm">1</button>
+        <button class="btn sm">2</button>
+        <button class="btn sm subtle">Next ›</button>
+      </div>
+    </div>
+
+    <div class="src-row">
+      <span class="src-label">Sources</span>
+      <span class="src-tag">qaudit_mcc_codes_modal</span>
+      <span class="src-tag">qaudit_mcc_codes_table_columns</span>
+      <span class="src-tag">qaudit_mcc_codes_associated_industry_pills</span>
+      <span class="src-tag">qaudit_mcc_codes_bulk_action_dropdown</span>
+    </div>
+  </section>
+
+  <!-- 3. BULK ASSIGN INDUSTRY TYPE MODAL -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">3</span>
+      <h2>Bulk Assign Industry Type modal</h2>
+      <span class="badge-new">Net new modal</span>
+      <span class="section-sub">Triggered from bulk-select popup → Apply</span>
+    </div>
+
+    <div class="modal-stage">
+      <div class="modal-stage-label">Modal · Bulk Assign Industry Type</div>
+      <div class="modal">
+        <div class="modal-head">
+          <h3>Assign Industry Type to 4 MCC codes</h3>
+          <button class="x">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Selected MCCs: <span class="mono-sm">5122 · 5723 · 5912 · 5993</span>. The Industry Types you pick below will be added (not replaced). Existing associations stay.</p>
+
+          <div class="field">
+            <label>Industry Types to assign</label>
+            <div class="multi-select-display">
+              <span class="multi-select-chip">Cannabis / CBD <button class="x">×</button></span>
+              <span class="multi-select-chip">Hemp / CBD <button class="x">×</button></span>
+            </div>
+          </div>
+
+          <div class="multi-select-dropdown">
+            <div class="ms-search"><input type="text" placeholder="Search Industry Types…"/></div>
+            <div class="ms-opt selected"><input type="checkbox" class="chk" checked/> Cannabis / CBD</div>
+            <div class="ms-opt selected"><input type="checkbox" class="chk" checked/> Hemp / CBD</div>
+            <div class="ms-opt"><input type="checkbox" class="chk"/> Cannabis / MJ Only</div>
+            <div class="ms-opt"><input type="checkbox" class="chk"/> Functional Mushrooms</div>
+            <div class="ms-opt"><input type="checkbox" class="chk"/> Nutraceuticals/Supplements</div>
+            <div class="ms-opt"><input type="checkbox" class="chk"/> Smoke Shops (Vape, eCig)</div>
+            <div class="ms-opt"><input type="checkbox" class="chk"/> Online Tobacco</div>
+            <div class="ms-opt"><input type="checkbox" class="chk"/> Online Alcohol</div>
+          </div>
+
+          <div style="margin-top:14px;font-size:11px;color:#64748B;padding:8px 10px;background:#F8FAFC;border-radius:6px;border:1px dashed #CBD5E1">
+            <strong style="color:#0F172A">Mode:</strong>&nbsp;Append (default) ·
+            <a href="#" style="color:#1D4ED8;font-weight:600;text-decoration:underline">switch to Replace</a> to overwrite existing assignments.
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn">Cancel</button>
+          <button class="btn primary">Assign to 4 MCCs</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;text-align:center"><span class="src-tag">qaudit_mcc_bulk_assign_industry_type_modal</span></div>
+    </div>
+  </section>
+
+  <!-- 4. EDIT MCC MODAL -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">4</span>
+      <h2>Edit MCC modal</h2>
+      <span class="badge-new">Net new modal</span>
+      <span class="section-sub">Per-row Edit · MCC + Sector + Title are read-only · only Industry Types are editable</span>
+    </div>
+
+    <div class="modal-stage">
+      <div class="modal-stage-label">Modal · Edit MCC</div>
+      <div class="modal">
+        <div class="modal-head">
+          <h3>Edit MCC <span class="mono" style="color:#64748B">5912</span></h3>
+          <button class="x">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label>MCC</label>
+            <input type="text" class="readonly" value="5912" readonly/>
+            <div class="help">Source: ISO-18245-2023 master list — read-only</div>
+          </div>
+          <div class="field">
+            <label>Industry Sector</label>
+            <input type="text" class="readonly" value="Health &amp; Pharmacy – Retail" readonly/>
+          </div>
+          <div class="field">
+            <label>MCC Title</label>
+            <input type="text" class="readonly" value="Drug Stores and Pharmacies" readonly/>
+          </div>
+
+          <div class="field">
+            <label>Associated Industry Types</label>
+            <div class="multi-select-display">
+              <span class="multi-select-chip">Cannabis / CBD <button class="x">×</button></span>
+              <span class="multi-select-chip">Hemp / CBD <button class="x">×</button></span>
+              <span class="multi-select-chip">Nutraceuticals/Supplements <button class="x">×</button></span>
+              <span class="multi-select-chip">Telemedicine <button class="x">×</button></span>
+            </div>
+            <div class="help">These are the Industry Types Q-Audit will auto-suggest when a merchant enters MCC 5912 on the company form.</div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn">Cancel</button>
+          <button class="btn primary">Save</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;text-align:center"><span class="src-tag">qaudit_mcc_edit_modal</span></div>
+    </div>
+  </section>
+
+  <!-- 5. RE-IMPORT CONFIRMATION MODAL -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">5</span>
+      <h2>Re-import master list — confirmation</h2>
+      <span class="badge-new">Net new modal</span>
+      <span class="section-sub">Idempotent upsert: existing associations preserved</span>
+    </div>
+
+    <div class="modal-stage">
+      <div class="modal-stage-label">Modal · Confirm re-import</div>
+      <div class="modal">
+        <div class="modal-head">
+          <h3>Re-import master MCC list?</h3>
+          <button class="x">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Q-Audit will pull the latest <span class="mono-sm">iso-18245-2024</span> master list and reconcile it against the current 904 rows.</p>
+          <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px;margin-bottom:12px">
+            <div style="font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">What changes</div>
+            <div style="font-size:12px;color:#334155;line-height:1.7">
+              <div>• <strong>New MCCs added</strong> — appear in the table with no Industry Type associations.</div>
+              <div>• <strong>Title or Sector changed</strong> — overwritten in place. Industry Type associations preserved.</div>
+              <div>• <strong>Removed from master</strong> — flagged as <span class="industry-pill" style="background:#FEE2E2;color:#991B1B;border-color:#FCA5A5">deprecated</span> but kept (if any company is still using it).</div>
+            </div>
+          </div>
+          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:10px 12px;font-size:11px;color:#075985">
+            ✓ Idempotent · Industry Type associations made by Q-Audit admins are <strong>not</strong> overwritten.
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn">Cancel</button>
+          <button class="btn primary">Re-import</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;text-align:center"><span class="src-tag">qaudit_mcc_reimport_confirmation_modal</span></div>
+    </div>
+  </section>
+
+  <!-- 6. COMPANY FORM — MCC FIELD WITH SUGGESTED INDUSTRY TYPES -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">6</span>
+      <h2>Company form — MCC field with suggested Industry Types</h2>
+      <span class="badge-new">New field</span>
+      <span class="section-sub">Merchant onboarding · MCC drives Industry Type auto-suggestion</span>
+    </div>
+
+    <div class="merchant-form">
+      <div style="font-size:11px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Section 3 of 7 · Classification</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Legal Name</label>
+          <input type="text" value="Greenleaf Botanicals LLC" />
+        </div>
+        <div class="field">
+          <label>DBA</label>
+          <input type="text" value="Greenleaf" />
+        </div>
+      </div>
+
+      <div class="field" style="position:relative">
+        <label>MCC <span style="color:#B91C1C">*</span></label>
+        <div style="position:relative">
+          <input type="text" placeholder="Search by MCC number or title…" value="5912 — Drug Stores and Pharmacies" style="padding-right:34px"/>
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:14px">🔍</span>
+        </div>
+        <div class="help">Search by 4-digit code or by title. Pulls from Q-Audit master list (904 entries).</div>
+
+        <div class="suggested-pane">
+          <div class="lbl">Suggested Industry Types based on this MCC</div>
+          <div class="pills">
+            <span class="industry-pill cannabis">Cannabis / CBD</span>
+            <span class="industry-pill hemp">Hemp / CBD</span>
+            <span class="industry-pill">Nutraceuticals/Supplements</span>
+            <span class="industry-pill">Telemedicine</span>
+          </div>
+          <div style="font-size:11px;color:#0C4A6E;line-height:1.55">Pre-fills the Industry Type field below. Merchant can override — admin sees the override flagged in the company record.</div>
+          <div class="actions">
+            <button class="btn sm primary">Accept all</button>
+            <button class="btn sm">Pick specific…</button>
+            <button class="btn sm subtle">Override manually</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top:14px">
+        <div class="field">
+          <label>Industry Type <span style="color:#B91C1C">*</span> <span style="color:#0EA5E9;font-size:10px;font-weight:700;margin-left:6px">✦ AUTO-SUGGESTED</span></label>
+          <div class="multi-select-display">
+            <span class="multi-select-chip">Cannabis / CBD <button class="x">×</button></span>
+            <span class="multi-select-chip">Hemp / CBD <button class="x">×</button></span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Type of Company</label>
+          <div class="multi-select-display">
+            <span class="placeholder">Pick one or more types of company…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="src-row">
+      <span class="src-label">Sources</span>
+      <span class="src-tag">company_form_mcc_searchable_dropdown</span>
+      <span class="src-tag">company_form_mcc_suggested_industry_types</span>
+    </div>
+  </section>
+
+  <!-- 7. BULK COMPANY IMPORT PREVIEW WITH UNKNOWN MCC WARNING -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">7</span>
+      <h2>Bulk Company Import — preview with unknown MCC warning</h2>
+      <span class="badge-new">New column &amp; warning row</span>
+      <span class="section-sub">Q-Audit · Companies → Bulk Import preview step</span>
+    </div>
+
+    <div class="qa-shell">
+      <div class="gs-bar">
+        <span class="gs-title">Bulk Company Import — Preview (Step 2 of 3)</span>
+        <span class="gs-meta"><span><strong style="color:#0F172A">214</strong> rows ready</span><span>·</span><span><strong style="color:#92400E">3</strong> warnings</span></span>
+      </div>
+
+      <div style="padding:12px 16px;background:#FFFBEB;border-bottom:1px solid #FDE68A;display:flex;align-items:center;gap:10px;font-size:12px;color:#78350F">
+        <span style="font-size:16px">⚠</span>
+        <span><strong>3 rows have MCC values not in the master list.</strong> They can still be imported, but won't auto-suggest Industry Types until added to the master list.</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="qa-table import-preview-table">
+          <thead>
+            <tr>
+              <th style="width:30px">#</th>
+              <th>Legal Name</th>
+              <th style="width:90px">MCC</th>
+              <th>Industry Sector</th>
+              <th>Suggested Industry Types</th>
+              <th style="width:140px">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Greenleaf Botanicals LLC</td>
+              <td><span class="mono">5912</span></td>
+              <td>Health &amp; Pharmacy – Retail</td>
+              <td>Cannabis / CBD, Hemp / CBD, +2</td>
+              <td><span class="ok-pill">✓ Ready</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Vapor Junction Co</td>
+              <td><span class="mono">5993</span></td>
+              <td>Tobacco – Retail</td>
+              <td>Online Tobacco, Smoke Shops</td>
+              <td><span class="ok-pill">✓ Ready</span></td>
+            </tr>
+            <tr class="warn">
+              <td>3</td>
+              <td>Mushroom Wellness Co.</td>
+              <td><span class="mono">9999</span></td>
+              <td style="color:#94A3B8;font-style:italic">— not in master list —</td>
+              <td style="color:#94A3B8;font-style:italic">— no suggestions —</td>
+              <td>
+                <span class="warn-pill">⚠ Unknown MCC</span>
+                <div style="margin-top:6px"><span class="add-master-link">+ Add to master list</span></div>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Telecare Direct Inc.</td>
+              <td><span class="mono">8011</span></td>
+              <td>Healthcare – Professional</td>
+              <td>Telemedicine</td>
+              <td><span class="ok-pill">✓ Ready</span></td>
+            </tr>
+            <tr class="warn">
+              <td>5</td>
+              <td>Outpost Smoke &amp; Glass</td>
+              <td><span class="mono">5999</span></td>
+              <td style="color:#94A3B8;font-style:italic">— not in master list —</td>
+              <td style="color:#94A3B8;font-style:italic">— no suggestions —</td>
+              <td>
+                <span class="warn-pill">⚠ Unknown MCC</span>
+                <div style="margin-top:6px"><span class="add-master-link">+ Add to master list</span></div>
+              </td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Liquor &amp; Co.</td>
+              <td><span class="mono">5921</span></td>
+              <td>Beverage – Retail</td>
+              <td>Online Alcohol</td>
+              <td><span class="ok-pill">✓ Ready</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="padding:14px 16px;background:#FCFDFE;border-top:1px solid #E2E8F0;display:flex;align-items:center;justify-content:flex-end;gap:8px">
+        <button class="btn">Back</button>
+        <button class="btn">Import 211 ready · skip 3 warnings</button>
+        <button class="btn primary">Import all 214</button>
+      </div>
+    </div>
+
+    <div class="src-row">
+      <span class="src-label">Sources</span>
+      <span class="src-tag">bulk_company_import_mcc_column</span>
+      <span class="src-tag">bulk_company_import_unknown_mcc_warning</span>
+    </div>
+  </section>
+
+  <!-- DELETION ROUTING NOTE -->
+  <div class="audit-callout">
+    <div class="icn">i</div>
+    <div>
+      <strong>Per-row Delete on this table</strong> routes through the cross-cutting <strong>Delete + Reassign</strong> workflow (QP-3766) when a merchant has any company referencing the MCC. Otherwise it falls through to the simple Delete confirmation.
+    </div>
+  </div>
+
+  <!-- CROSS LINK -->
+  <div class="cross-link">
+    <span style="font-size:18px">🔗</span>
+    <div>
+      <strong>Companion ticket:</strong> <a href="qaudit-lookup-delete-reassign.html">QP-3766 · Delete + Reassign workflow</a> — required to ship before this ticket so MCC deletions can safely route their dependents.
+    </div>
+  </div>
+
+  <!-- SOURCE FOOTER -->
+  <div class="source-footer">
+    <h3>Q-Config sources annotated on this mockup</h3>
+    <ul>
+      <li><span class="nm">qaudit_globalsettings_nav_mcc_tab</span><br/><span class="desc">New tab in Q-Audit Global Settings sub-nav</span></li>
+      <li><span class="nm">qaudit_mcc_codes_modal</span><br/><span class="desc">Primary MCC Codes lookup screen</span></li>
+      <li><span class="nm">qaudit_mcc_codes_filter_bar</span><br/><span class="desc">Search + Industry Sector + Industry Type + Assigned filter</span></li>
+      <li><span class="nm">qaudit_mcc_codes_table_columns</span><br/><span class="desc">MCC / Sector / Title / Associated Types / Created / Modified / Action</span></li>
+      <li><span class="nm">qaudit_mcc_codes_associated_industry_pills</span><br/><span class="desc">Multi-pill cell with +N more overflow</span></li>
+      <li><span class="nm">qaudit_mcc_codes_bulk_select_popup</span><br/><span class="desc">"N selected · Select all M matching filters" header bar</span></li>
+      <li><span class="nm">qaudit_mcc_codes_bulk_action_dropdown</span><br/><span class="desc">Bulk action select with Assign Industry Type, etc.</span></li>
+      <li><span class="nm">qaudit_mcc_bulk_assign_industry_type_modal</span><br/><span class="desc">Modal opened from bulk action with append/replace toggle</span></li>
+      <li><span class="nm">qaudit_mcc_edit_modal</span><br/><span class="desc">Per-row Edit modal — only Industry Types editable</span></li>
+      <li><span class="nm">qaudit_mcc_reimport_admin_action</span><br/><span class="desc">"Last imported / Re-import master list" admin bar</span></li>
+      <li><span class="nm">qaudit_mcc_reimport_confirmation_modal</span><br/><span class="desc">Idempotent upsert confirmation modal</span></li>
+      <li><span class="nm">company_form_mcc_searchable_dropdown</span><br/><span class="desc">MCC field on merchant onboarding form</span></li>
+      <li><span class="nm">company_form_mcc_suggested_industry_types</span><br/><span class="desc">Auto-suggestion pane that pre-fills Industry Type</span></li>
+      <li><span class="nm">bulk_company_import_mcc_column</span><br/><span class="desc">MCC column on bulk-import preview</span></li>
+      <li><span class="nm">bulk_company_import_unknown_mcc_warning</span><br/><span class="desc">Warning row + "Add to master list" inline action</span></li>
+    </ul>
+  </div>
+
+  <footer class="foot">QP-2878 · Q-Audit Global Settings · MCC Codes · 2026-04-29</footer>
+
+</div>
+
+</body>
+</html>
