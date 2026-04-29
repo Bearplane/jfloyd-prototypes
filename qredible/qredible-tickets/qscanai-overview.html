@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-ScanAI — Architecture Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1A202E;
+  --ink-2:#2D3748;
+  --muted:#64748B;
+  --muted-2:#94A3B8;
+  --line:#E2E8F0;
+  --line-soft:#EEF2F7;
+  --bg:#F1F5F9;
+  --surface:#fff;
+  --accent:#F05252;
+  --accent-soft:#FEE2E2;
+  --blue:#2563eb;
+  --blue-s:#DBEAFE;
+  --blue-d:#1E3A5F;
+  --green:#16A34A;
+  --green-bg:#DCFCE7;
+  --green-d:#14532D;
+  --wash:#F7F5FF;
+  --amber:#F59E0B;
+  --amber-bg:#FEF3C7;
+  --amber-d:#78350F;
+  --red:#991B1B;
+  --red-bg:#FEE2E2;
+  --red-d:#7F1D1D;
+  --purple:#7C3AED;
+  --purple-bg:#EDE9FE;
+}
+html{scroll-behavior:smooth;scroll-padding-top:104px}
+body{font-family:'Uber Move','Plus Jakarta Sans',-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;line-height:1.55}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+h1,h2,h3,h4{letter-spacing:-.2px}
+
+/* TOP NAV */
+.topnav{background:var(--ink);padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:200}
+.topnav a{color:#93C5FD}.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;margin-left:auto}
+
+/* ANCHOR NAV */
+.anchor-nav{position:sticky;top:46px;z-index:150;background:#fff;border-bottom:1px solid var(--line);padding:0 24px}
+.anchor-nav-inner{max-width:1320px;margin:0 auto;display:flex;gap:0;overflow-x:auto;align-items:stretch}
+.anchor-nav a{display:inline-flex;align-items:center;padding:12px 14px;color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none;transition:color .12s,border-color .12s}
+.anchor-nav a:hover{color:var(--ink);text-decoration:none}
+.anchor-nav .num{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;background:var(--line);color:var(--muted);border-radius:50%;font-size:10px;font-weight:700;margin-right:6px;font-family:'IBM Plex Mono',monospace}
+
+.page{max-width:1320px;margin:0 auto;padding:32px 24px 80px}
+
+/* HERO BAND */
+.hero{background:linear-gradient(135deg,#1A202E 0%,#2D3748 60%,#3B2A4A 100%);color:#fff;border-radius:14px;padding:36px 40px 32px;margin-bottom:32px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;right:-60px;top:-60px;width:300px;height:300px;border-radius:50%;background:rgba(240,82,82,.12)}
+.hero::before{content:'';position:absolute;left:-80px;bottom:-80px;width:240px;height:240px;border-radius:50%;background:rgba(124,58,237,.18)}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(240,82,82,.18);color:#FCA5A5;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;position:relative;z-index:1}
+.hero h1{font-size:30px;font-weight:800;letter-spacing:-.4px;margin-top:14px;position:relative;z-index:1;max-width:960px}
+.hero p.lede{color:#CBD5E1;font-size:15px;line-height:1.6;margin-top:14px;max-width:880px;position:relative;z-index:1}
+.hero-meta{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap;position:relative;z-index:1;font-size:12px;color:#94A3B8}
+.hero-meta .m{display:flex;align-items:center;gap:8px}
+.hero-meta .m b{color:#fff;font-weight:600}
+.hero-meta .m .dot{width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 0 4px rgba(16,185,129,.18)}
+
+/* GUARANTEE CARDS — 4 across */
+.guarantees{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;position:relative;z-index:1}
+.gcard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:16px 16px 18px;backdrop-filter:blur(4px)}
+.gcard .gn{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#FCA5A5;letter-spacing:.5px}
+.gcard .gt{font-size:14px;font-weight:700;color:#fff;margin-top:6px}
+.gcard .gd{font-size:12px;color:#CBD5E1;line-height:1.5;margin-top:6px}
+
+/* SECTION SCAFFOLD */
+.section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:32px 32px 36px;margin-bottom:24px}
+.section .sec-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--line-soft)}
+.section .sec-num{flex-shrink:0;background:var(--ink);color:#fff;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.section .sec-titles{flex:1}
+.section .sec-eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.7px;text-transform:uppercase}
+.section h2{font-size:22px;font-weight:700;color:var(--ink);margin-top:4px;letter-spacing:-.3px}
+.section .sec-sub{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.55;max-width:780px}
+
+/* SECTION 2 — 6 STEPS */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:8px}
+.step{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:18px 14px 16px;position:relative;transition:transform .12s,border-color .12s}
+.step:hover{border-color:var(--ink-2)}
+.step .si{font-size:24px;display:block;margin-bottom:8px}
+.step .sn{position:absolute;top:-10px;left:14px;background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace}
+.step .stt{font-size:13px;font-weight:700;color:var(--ink);margin-top:4px}
+.step .sst{font-size:11px;color:var(--muted);line-height:1.45;margin-top:6px}
+
+/* SECTION 3 — ARCHITECTURE DIAGRAM */
+.arch{background:#FAFBFC;border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:8px}
+.arch-row{margin-bottom:12px}
+.arch-row.last{margin-bottom:0}
+.arch-grid{display:grid;gap:10px}
+.arch-grid.c1{grid-template-columns:1fr}
+.arch-grid.c2{grid-template-columns:1fr 1fr}
+.arch-grid.c3{grid-template-columns:repeat(3,1fr)}
+.arch-grid.c4{grid-template-columns:repeat(4,1fr)}
+.mod{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;position:relative;display:flex;flex-direction:column;gap:4px;min-height:74px}
+.mod .mn{position:absolute;top:-8px;left:10px;background:var(--ink);color:#fff;width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace}
+.mod .mt{font-size:12px;font-weight:700;color:var(--ink);margin-top:6px}
+.mod .ms{font-size:10.5px;color:var(--muted);line-height:1.4}
+.mod.gw{background:linear-gradient(90deg,#1A202E,#2D3748);color:#fff}
+.mod.gw .mn{background:var(--accent)}
+.mod.gw .mt{color:#fff}
+.mod.gw .ms{color:#CBD5E1}
+.mod.eng{background:#FFF7ED;border-color:#FED7AA}
+.mod.eng .mn{background:var(--amber)}
+.mod.cross{background:#F0F9FF;border-color:#BAE6FD}
+.mod.cross .mn{background:var(--blue)}
+.mod.ctx{background:#F5F3FF;border-color:#DDD6FE}
+.mod.ctx .mn{background:var(--purple)}
+.arch-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;padding-left:2px}
+.arch-arrow{text-align:center;color:#94A3B8;font-size:14px;height:14px;line-height:1;margin:2px 0}
+
+/* SECTION 4 — TWO KINDS OF WORK */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+.kind{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:24px;position:relative;overflow:hidden}
+.kind.compliance{border-color:#BFDBFE}
+.kind.compliance::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--blue)}
+.kind.operational{border-color:#FED7AA}
+.kind.operational::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--amber)}
+.kind .ktag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.kind.compliance .ktag{background:var(--blue-s);color:var(--blue-d)}
+.kind.operational .ktag{background:var(--amber-bg);color:var(--amber-d)}
+.kind h3{font-size:18px;font-weight:700;color:var(--ink);margin-top:10px}
+.kind .kdesc{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
+.kind .kpurpose{display:flex;gap:14px;margin-top:14px;font-size:11px;color:var(--ink-2)}
+.kind .kpurpose b{display:block;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.kind .kex{margin-top:18px;background:var(--line-soft);border-left:3px solid var(--ink-2);padding:12px 14px;border-radius:0 6px 6px 0}
+.kind.compliance .kex{border-left-color:var(--blue)}
+.kind.operational .kex{border-left-color:var(--amber)}
+.kind .kex .l{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.kind .kex .ex{font-size:12px;color:var(--ink);margin-top:4px;font-style:italic;line-height:1.5}
+
+/* SECTION 5 — RULE LIFECYCLE */
+.lifecycle{background:#FAFBFC;border:1px solid var(--line);border-radius:12px;padding:24px;margin-top:8px}
+.lc-flow{display:grid;grid-template-columns:1fr 28px 1fr 28px 1fr 28px 1fr;gap:0;align-items:stretch;margin-bottom:18px}
+.lc-state{background:#fff;border:2px solid var(--line);border-radius:10px;padding:16px 14px}
+.lc-state .lc-name{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.lc-state .lc-title{font-size:14px;font-weight:700;color:var(--ink);margin-top:4px}
+.lc-state .lc-desc{font-size:11px;color:var(--muted);line-height:1.45;margin-top:6px}
+.lc-state.s-draft{border-color:#CBD5E1}
+.lc-state.s-test{border-color:var(--amber);background:#FFFBEB}
+.lc-state.s-active{border-color:var(--green);background:#F0FDF4}
+.lc-state.s-deprec{border-color:#94A3B8;background:#F8FAFC;opacity:.85}
+.lc-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#94A3B8;font-weight:700;font-size:16px}
+.lc-arrow .lab{writing-mode:horizontal-tb;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:2px}
+.gates{margin-top:14px;background:#fff;border:1px dashed var(--accent);border-radius:10px;padding:16px 18px}
+.gates h4{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.4px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:10px}
+.gates ol{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;list-style:none}
+.gates li{font-size:11.5px;color:var(--ink-2);line-height:1.5;padding-left:24px;position:relative}
+.gates li::before{content:counter(g);counter-increment:g;position:absolute;left:0;top:0;background:var(--accent);color:#fff;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace}
+.gates ol{counter-reset:g}
+.gates li.eyes b{color:var(--accent)}
+.eyes-banner{margin-top:12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--red-d)}
+.eyes-banner .ico{font-size:18px}
+
+/* SECTION 6 — FINDING LIFECYCLE */
+.find-wrap{display:grid;grid-template-columns:1fr 280px;gap:20px;margin-top:8px}
+.find-flow{background:#FAFBFC;border:1px solid var(--line);border-radius:12px;padding:24px}
+.find-states{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-items:stretch}
+.fs{background:#fff;border:2px solid var(--line);border-radius:10px;padding:14px 12px;text-align:center}
+.fs .fsn{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.5px}
+.fs .fsd{font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px}
+.fs.new{border-color:var(--accent);background:#FEF2F2}.fs.new .fsn{color:var(--red-d)}
+.fs.ongoing{border-color:var(--amber);background:#FFFBEB}.fs.ongoing .fsn{color:var(--amber-d)}
+.fs.resolved{border-color:var(--green);background:#F0FDF4}.fs.resolved .fsn{color:var(--green-d)}
+.fs.cleared{border-color:var(--blue);background:#EFF6FF}.fs.cleared .fsn{color:var(--blue-d)}
+.find-arrows{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;text-align:center;margin-top:8px;font-size:10.5px;color:var(--muted)}
+.find-arrows span{padding-top:2px}
+.find-reopen{margin-top:18px;background:#fff;border:1px dashed var(--blue);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ink-2)}
+.find-reopen b{color:var(--blue)}
+.immut{background:linear-gradient(135deg,#FEF2F2 0%,#FFF5F5 100%);border:2px solid var(--accent);border-radius:12px;padding:20px}
+.immut .il{display:inline-block;font-size:10px;font-weight:700;color:var(--red-d);letter-spacing:.5px;text-transform:uppercase;background:#fff;padding:3px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.immut h4{font-size:15px;font-weight:700;color:var(--red-d);margin-top:10px}
+.immut .ic{font-family:'IBM Plex Mono',monospace;font-size:11px;background:#fff;color:var(--red-d);padding:8px 10px;border-radius:6px;margin-top:10px;border:1px solid var(--accent)}
+.immut .id{font-size:12px;color:var(--ink-2);margin-top:10px;line-height:1.55}
+
+/* SECTION 7 — CBD WALKTHROUGH */
+.cbd-grid{display:grid;grid-template-columns:300px 1fr;gap:20px;margin-top:8px}
+.merch-card{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:18px;position:sticky;top:120px;align-self:start}
+.merch-card .ml{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.merch-card h3{font-size:18px;font-weight:700;color:var(--ink);margin-top:6px;letter-spacing:-.2px}
+.merch-card .mb{font-size:12px;color:var(--muted);margin-top:4px}
+.merch-card .mr{margin-top:14px;display:grid;gap:10px}
+.merch-card .mr-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--line-soft);border-radius:6px;font-size:11.5px}
+.merch-card .mr-row b{color:var(--muted);font-weight:600;font-size:10.5px}
+.merch-card .mr-row span{color:var(--ink);font-weight:700;font-family:'IBM Plex Mono',monospace}
+.merch-card .pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.cbd-checks{background:#FAFBFC;border:1px solid var(--line);border-radius:12px;padding:18px}
+.cbd-checks h4{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.cbd-checks h4 span{font-family:'IBM Plex Mono',monospace;color:var(--ink)}
+.checks{display:grid;gap:6px}
+.chk{display:grid;grid-template-columns:48px 1fr 110px 56px;gap:10px;align-items:center;padding:9px 10px;background:#fff;border:1px solid var(--line);border-radius:8px;font-size:12px}
+.chk .v{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.4px;text-align:center;padding:3px 0;border-radius:4px}
+.chk .v.pass{background:var(--green-bg);color:var(--green-d)}
+.chk .v.fail{background:var(--accent-soft);color:var(--red-d)}
+.chk .v.cache{background:var(--line-soft);color:var(--muted)}
+.chk .nm{color:var(--ink);font-weight:600}
+.chk .strat{font-size:10.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.chk .res{font-size:10.5px;color:var(--ink-2);font-weight:600;text-align:right}
+.actions-box{margin-top:14px;background:#fff;border:1.5px solid var(--accent);border-radius:10px;padding:14px}
+.actions-box h5{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.act{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line-soft);font-size:12px}
+.act:first-of-type{border-top:0}
+.act .ai{font-size:16px}
+.act .at b{display:block;color:var(--ink);font-weight:700;font-size:12.5px}
+.act .at span{color:var(--muted);font-size:11px}
+
+/* SECTION 8 — MULTI-TENANT */
+.tenant{background:#FAFBFC;border:1px solid var(--line);border-radius:12px;padding:28px;margin-top:8px}
+.tenant-tree{display:flex;flex-direction:column;align-items:center;gap:0}
+.proc{background:linear-gradient(135deg,#1A202E,#2D3748);color:#fff;padding:16px 24px;border-radius:10px;text-align:center;min-width:300px;position:relative}
+.proc .pl{font-size:10px;font-weight:700;color:#FCA5A5;letter-spacing:.5px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.proc h4{font-size:16px;font-weight:700;color:#fff;margin-top:4px}
+.proc .pp{font-size:11.5px;color:#CBD5E1;margin-top:6px}
+.tenant-line{width:2px;background:var(--ink);height:32px}
+.tenant-bar{width:80%;max-width:800px;height:2px;background:var(--ink);position:relative}
+.tenant-bar::before,.tenant-bar::after{content:'';position:absolute;top:0;width:2px;height:24px;background:var(--ink)}
+.tenant-bar::before{left:0;top:0;height:24px}
+.tenant-bar::after{right:0;top:0;height:24px}
+.tenant-children{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:80%;max-width:800px;margin-top:24px}
+.child{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:16px;position:relative}
+.child::before{content:'';position:absolute;top:-26px;left:50%;width:2px;height:26px;background:var(--ink);transform:translateX(-50%)}
+.child .cl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;display:inline-block;padding:3px 8px;border-radius:4px}
+.child.inherit .cl{background:var(--blue-s);color:var(--blue-d)}
+.child.override .cl{background:var(--purple-bg);color:var(--purple)}
+.child.exclude .cl{background:var(--amber-bg);color:var(--amber-d)}
+.child h5{font-size:13px;font-weight:700;color:var(--ink);margin-top:8px}
+.child .cd{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.child .cb{margin-top:10px;background:var(--line-soft);padding:8px 10px;border-radius:6px;font-size:11px;color:var(--ink-2);font-family:'IBM Plex Mono',monospace}
+.tenant-iso{margin-top:32px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.iso{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:11.5px}
+.iso b{display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.iso span{color:var(--muted);line-height:1.45;display:block}
+
+/* SECTION 9 — WESTTOWN INTEGRATION */
+.wt-wrap{margin-top:8px}
+.wt-flow{background:#FAFBFC;border:1px solid var(--line);border-radius:12px;padding:24px;overflow-x:auto}
+.wt-row{display:grid;grid-template-columns:200px 28px 240px 28px 220px 28px 220px;gap:0;align-items:center;min-width:1080px}
+.wt-box{background:#fff;border:2px solid var(--line);border-radius:10px;padding:14px}
+.wt-box .wt-l{font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.wt-box .wt-t{font-size:13px;font-weight:700;color:var(--ink);margin-top:4px}
+.wt-box .wt-d{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.wt-box.hyper{border-color:#A78BFA;background:#F5F3FF}.wt-box.hyper .wt-l{color:var(--purple)}
+.wt-box.signal{border-color:var(--accent);background:#FEF2F2}.wt-box.signal .wt-l{color:var(--red-d)}
+.wt-box.qsa{border-color:var(--ink);background:#1A202E;color:#fff}.wt-box.qsa .wt-l{color:#FCA5A5}.wt-box.qsa .wt-t{color:#fff}.wt-box.qsa .wt-d{color:#CBD5E1}
+.wt-box.policy{border-color:var(--green);background:#F0FDF4}.wt-box.policy .wt-l{color:var(--green-d)}
+.wt-arr{display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:18px;font-weight:700}
+.wt-payload{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px}
+.wt-payload h5{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+.wt-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wt-fld{background:var(--line-soft);border-radius:6px;padding:10px 12px}
+.wt-fld .fn{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:var(--ink-2)}
+.wt-fld .fd{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.45}
+.wt-fld .fe{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--purple);margin-top:6px}
+.wt-tier{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.wt-tier-card{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:16px}
+.wt-tier-card.early{border-left:4px solid var(--accent)}
+.wt-tier-card.later{border-left:4px solid var(--blue)}
+.wt-tier-card h5{font-size:13px;font-weight:700;color:var(--ink)}
+.wt-tier-card .ty{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;display:inline-block;padding:3px 8px;border-radius:4px}
+.wt-tier-card.early .ty{background:var(--accent-soft);color:var(--red-d)}
+.wt-tier-card.later .ty{background:var(--blue-s);color:var(--blue-d)}
+.wt-tier-card .twh{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.wt-tier-card .twh b{color:var(--ink-2)}
+
+/* SECTION 10 — SECURITY POSTURE */
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.sec-card{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:16px;display:flex;gap:14px}
+.sec-card .si{font-size:24px;flex-shrink:0;width:40px;height:40px;background:var(--line-soft);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.sec-card .sb{flex:1}
+.sec-card h4{font-size:13px;font-weight:700;color:var(--ink)}
+.sec-card .sd{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.55}
+.sec-card.append .si{background:#FEF2F2;color:var(--accent)}
+.sec-card.eyes .si{background:#F5F3FF;color:var(--purple)}
+.sec-card.cred .si{background:#FFFBEB;color:var(--amber)}
+.sec-card.soc .si{background:#F0FDF4;color:var(--green)}
+.sec-card.test .si{background:#EFF6FF;color:var(--blue)}
+.sec-card.chain .si{background:#FEF2F2;color:var(--accent)}
+.sec-card.delete .si{background:#F5F3FF;color:var(--purple)}
+.sec-card.api .si{background:#EFF6FF;color:var(--blue)}
+
+/* FOOTER */
+.foot{background:linear-gradient(135deg,#1A202E,#2D3748);color:#fff;border-radius:14px;padding:32px;margin-top:32px}
+.foot h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:8px}
+.foot p{font-size:13px;color:#CBD5E1;line-height:1.55;max-width:760px}
+.foot .docs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:18px}
+.foot .doc{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 14px;font-size:11.5px;color:#fff;display:flex;align-items:center;gap:10px}
+.foot .doc .di{color:#FCA5A5;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.4px}
+.foot .doc .dt{flex:1;color:#fff;font-weight:600}
+.foot .doc .dd{color:#94A3B8;font-size:10.5px;margin-top:2px;font-weight:400}
+.foot .doc .docbody{flex:1}
+.foot .open-q{margin-top:24px;padding:18px;background:rgba(245,158,11,.12);border:1px dashed var(--amber);border-radius:10px}
+.foot .open-q h4{font-size:12px;font-weight:700;color:var(--amber);letter-spacing:.5px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.foot .open-q ul{margin-top:10px;list-style:none;display:grid;gap:6px}
+.foot .open-q li{font-size:12px;color:#FDE68A;padding-left:18px;position:relative;line-height:1.5}
+.foot .open-q li::before{content:'?';position:absolute;left:0;top:0;color:var(--amber);font-weight:700;font-family:'IBM Plex Mono',monospace}
+
+/* GENERIC HELPERS */
+.tagrow{display:flex;gap:6px;flex-wrap:wrap}
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:.2px}
+.tag.b{background:var(--blue-s);color:var(--blue-d)}
+.tag.r{background:var(--accent-soft);color:var(--red-d)}
+.tag.g{background:var(--green-bg);color:var(--green-d)}
+.tag.a{background:var(--amber-bg);color:var(--amber-d)}
+.tag.p{background:var(--purple-bg);color:var(--purple)}
+.tag.gr{background:var(--line-soft);color:var(--muted)}
+
+/* PRINT */
+@media print{
+  body{background:#fff;font-size:11px}
+  .topnav,.anchor-nav{display:none}
+  .page{padding:0;max-width:none}
+  .section{break-inside:avoid;border:1px solid #ccc;box-shadow:none;margin-bottom:18px;padding:18px}
+  .hero{break-after:page;background:#1A202E !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hero::after,.hero::before{display:none}
+  .merch-card{position:static}
+  .arch,.lifecycle,.tenant,.wt-flow,.find-flow,.cbd-checks{break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .foot{break-before:page;background:#1A202E !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+}
+
+/* RESPONSIVE */
+@media (max-width:1100px){
+  .steps{grid-template-columns:repeat(3,1fr)}
+  .guarantees{grid-template-columns:repeat(2,1fr)}
+  .find-wrap{grid-template-columns:1fr}
+  .cbd-grid{grid-template-columns:1fr}
+  .merch-card{position:static}
+  .sec-grid{grid-template-columns:1fr}
+  .two-col{grid-template-columns:1fr}
+  .arch-grid.c4{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="../">jfloyd-qredible</a>
+  <span class="sep">/</span>
+  <a href="./">qredible-tickets</a>
+  <span class="sep">/</span>
+  <span class="title">Q-ScanAI &mdash; Architecture Overview</span>
+  <span class="badge">STAKEHOLDER</span>
+</div>
+
+<nav class="anchor-nav">
+  <div class="anchor-nav-inner">
+    <a href="#s1"><span class="num">1</span>Overview</a>
+    <a href="#s2"><span class="num">2</span>What it does</a>
+    <a href="#s3"><span class="num">3</span>Architecture</a>
+    <a href="#s4"><span class="num">4</span>Two kinds of work</a>
+    <a href="#s5"><span class="num">5</span>Rule lifecycle</a>
+    <a href="#s6"><span class="num">6</span>Finding memory</a>
+    <a href="#s7"><span class="num">7</span>Real scan</a>
+    <a href="#s8"><span class="num">8</span>Multi-tenant</a>
+    <a href="#s9"><span class="num">9</span>Q-Trust + Westtown</a>
+    <a href="#s10"><span class="num">10</span>Security posture</a>
+    <a href="#s11"><span class="num">11</span>Specs &amp; questions</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ===================== SECTION 1: HERO / EXEC SUMMARY ===================== -->
+  <section id="s1" class="hero">
+    <span class="hero-tag">Q-ScanAI &mdash; Compliance Engine</span>
+    <h1>One configuration-driven engine for every compliance scan, every operational workflow, every regulator-grade audit.</h1>
+    <p class="lede">Q-ScanAI replaces hard-coded scanner scripts with a versioned, configuration-driven compliance engine. Compliance teams &mdash; not engineers &mdash; change rules in a dashboard the same day regulation shifts, while every decision the system makes remains reproducible, isolated from production until approved, cryptographically audited, and persistent across years of scans.</p>
+    <div class="hero-meta">
+      <div class="m"><span class="dot"></span><b>15</b>&nbsp;modules</div>
+      <div class="m"><b>4</b>&nbsp;foundational guarantees</div>
+      <div class="m"><b>5</b>&nbsp;state machines</div>
+      <div class="m"><b>4</b>&nbsp;promotion gates</div>
+      <div class="m"><b>SOC 2-aligned</b>&nbsp;audit posture</div>
+    </div>
+    <div class="guarantees">
+      <div class="gcard">
+        <div class="gn">GUARANTEE 01</div>
+        <div class="gt">Reproducibility</div>
+        <div class="gd">A scan run today can be replayed tomorrow against the exact same rule versions and produce the exact same result. Nothing is lost or overwritten.</div>
+      </div>
+      <div class="gcard">
+        <div class="gn">GUARANTEE 02</div>
+        <div class="gt">Test &harr; Production Isolation</div>
+        <div class="gd">Test runs cannot mutate production findings, persistent memory, or first-detected timestamps. Separation is at the table level, not application logic.</div>
+      </div>
+      <div class="gcard">
+        <div class="gn">GUARANTEE 03</div>
+        <div class="gt">SOC 2-Aligned Audit</div>
+        <div class="gd">Every config change, every scan event, every action is recorded in an append-only, hash-chained audit log. Tampering &mdash; even by admins &mdash; is detectable.</div>
+      </div>
+      <div class="gcard">
+        <div class="gn">GUARANTEE 04</div>
+        <div class="gt">Persistent Finding Memory</div>
+        <div class="gd"><code>first_detected_at</code> is immutable. Status transitions (NEW &rarr; ONGOING &rarr; RESOLVED &rarr; CLEARED) follow deterministic rules a regulator can verify.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 2: WHAT IT DOES ===================== -->
+  <section id="s2" class="section">
+    <header class="sec-head">
+      <div class="sec-num">02</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">For every merchant assigned to it &mdash; six things, in order</div>
+        <h2>What Q-ScanAI does</h2>
+        <p class="sec-sub">A single engine performs all six steps for every merchant, every scan. Not six tools stitched together &mdash; one orchestrated pipeline with one audit trail and one governance process.</p>
+      </div>
+    </header>
+
+    <div class="steps">
+      <div class="step">
+        <span class="sn">1</span>
+        <span class="si">&#128269;</span>
+        <div class="stt">Discovers</div>
+        <div class="sst">Walks the website, document folder, license registry, or external API to find every page, file, or record to examine.</div>
+      </div>
+      <div class="step">
+        <span class="sn">2</span>
+        <span class="si">&#9989;</span>
+        <div class="stt">Applies</div>
+        <div class="sst">Runs every configured compliance check &mdash; FDA disclaimers, SSL certificates, contact info, COA directories, prohibited keywords &mdash; against the discovered content.</div>
+      </div>
+      <div class="step">
+        <span class="sn">3</span>
+        <span class="si">&#9878;&#65039;</span>
+        <div class="stt">Reaches a verdict</div>
+        <div class="sst">Returns <b>PASS / FAIL / N/A / ERROR</b> for every check, evaluated by a versioned rule engine against the policy output and item context.</div>
+      </div>
+      <div class="step">
+        <span class="sn">4</span>
+        <span class="si">&#129504;</span>
+        <div class="stt">Remembers</div>
+        <div class="sst">Updates the merchant's persistent compliance record &mdash; first-detected dates, ongoing status, recurrence counts &mdash; surviving across every future scan.</div>
+      </div>
+      <div class="step">
+        <span class="sn">5</span>
+        <span class="si">&#9889;</span>
+        <div class="stt">Acts</div>
+        <div class="sst">Fires configured follow-up actions: opens support tickets, emails the compliance team, pushes notifications, updates the merchant record.</div>
+      </div>
+      <div class="step">
+        <span class="sn">6</span>
+        <span class="si">&#128276;</span>
+        <div class="stt">Audits</div>
+        <div class="sst">Writes every event to an append-only, hash-chained log. Years later, the entire scan can be replayed and explained to a regulator.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 3: ARCHITECTURE ===================== -->
+  <section id="s3" class="section">
+    <header class="sec-head">
+      <div class="sec-num">03</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">15 modules &mdash; one NestJS process, one MySQL schema, one Redis cluster</div>
+        <h2>System architecture</h2>
+        <p class="sec-sub">Every module talks to its neighbors through declared TypeScript interfaces with schema validation at the boundary. The engine itself never branches on a check code &mdash; behavior loads from configuration.</p>
+      </div>
+    </header>
+
+    <div class="arch">
+      <!-- API GATEWAY (top, full width) -->
+      <div class="arch-row">
+        <div class="arch-label">External / API Surface</div>
+        <div class="arch-grid c1">
+          <div class="mod gw">
+            <span class="mn">15</span>
+            <div class="mt">API Gateway Layer</div>
+            <div class="ms">REST endpoints &middot; JWT auth &middot; per-merchant API keys &middot; rate limiting &middot; request/response schema validation. Surfaces every module to operators and the future Policy Configurator UI.</div>
+          </div>
+        </div>
+      </div>
+      <div class="arch-arrow">&darr;</div>
+
+      <!-- CONFIG + ASSIGNMENT -->
+      <div class="arch-row">
+        <div class="arch-label">Configuration Plane &mdash; Rules as Versioned Data</div>
+        <div class="arch-grid c2">
+          <div class="mod">
+            <span class="mn">1</span>
+            <div class="mt">Configuration Management</div>
+            <div class="ms">Versioning, lifecycle transitions, four-eyes promotion gate, config diff API, template &rarr; instance float-to-latest, regulatory-version linking.</div>
+          </div>
+          <div class="mod">
+            <span class="mn">2</span>
+            <div class="mt">Policy Assignment</div>
+            <div class="ms">Assign / override / exclude profiles &middot; inheritance resolver &middot; conflict detection &middot; bulk assignment confirmation gate &middot; effective-date windows.</div>
+          </div>
+        </div>
+      </div>
+      <div class="arch-arrow">&darr; snapshot &amp; resolved profiles &darr;</div>
+
+      <!-- ORCHESTRATION ENGINE (full width, highlighted) -->
+      <div class="arch-row">
+        <div class="arch-label">Runtime Plane &mdash; The Engine</div>
+        <div class="arch-grid c1">
+          <div class="mod eng">
+            <span class="mn">3</span>
+            <div class="mt">Workflow Orchestration Engine</div>
+            <div class="ms">Intake &rarr; Snapshot &rarr; DAG build &rarr; Tier scheduling &rarr; Cooperative concurrency &rarr; Checkpoints &rarr; Partial result publishing &rarr; Cancellation. The conductor.</div>
+          </div>
+        </div>
+      </div>
+      <div class="arch-arrow">&darr;</div>
+
+      <!-- 4 ENGINE CHILDREN -->
+      <div class="arch-row">
+        <div class="arch-grid c4">
+          <div class="mod">
+            <span class="mn">9</span>
+            <div class="mt">Page / File / Resource Discovery</div>
+            <div class="ms">Streams items into the pipeline. Handlers: WEBSITE_CRAWLER, COA_DOCUMENT_FETCHER, S3_FOLDER_LISTING, CANNASPY_LICENSE_FETCHER, &hellip;</div>
+          </div>
+          <div class="mod">
+            <span class="mn">4</span>
+            <div class="mt">Policy Execution Engine</div>
+            <div class="ms">Dispatches each policy by executing its action bindings (PRE / MAIN / POST / ON_FAIL / ON_SUCCESS) in topological order. No registered handler classes.</div>
+          </div>
+          <div class="mod">
+            <span class="mn">6</span>
+            <div class="mt">Rule Engine</div>
+            <div class="ms">json-rules-engine. Composite AND / OR / NOT &middot; equality, regex, fuzzy, page-section scoping, multi-method confidence aggregation, threshold counting.</div>
+          </div>
+          <div class="mod">
+            <span class="mn">5</span>
+            <div class="mt">Action Tree Executor</div>
+            <div class="ms">Hybrid sync + queue &middot; idempotency cache &middot; exponential backoff with jitter &middot; circuit breaker per endpoint &middot; DLQ routing &middot; conditional branching nodes.</div>
+          </div>
+        </div>
+      </div>
+      <div class="arch-arrow">&darr;</div>
+
+      <!-- CONTEXT (full width, purple) -->
+      <div class="arch-row">
+        <div class="arch-grid c1">
+          <div class="mod ctx">
+            <span class="mn">7</span>
+            <div class="mt">Context &amp; Data Flow Module</div>
+            <div class="ms">Typed shared store across 4 scopes (item / group / scan / merchant) &middot; provenance per entry &middot; inline-vs-blob threshold &middot; schema validation at read/write boundaries.</div>
+          </div>
+        </div>
+      </div>
+      <div class="arch-arrow">&darr;</div>
+
+      <!-- INPUT + CRED -->
+      <div class="arch-row">
+        <div class="arch-grid c2">
+          <div class="mod">
+            <span class="mn">8</span>
+            <div class="mt">Input Resolution</div>
+            <div class="ms">Resolves any input reference (inline / S3 / DB-KV / context lookup) into a runtime value. Validates against typed input schemas. Used for parameters and action arguments.</div>
+          </div>
+          <div class="mod">
+            <span class="mn">11</span>
+            <div class="mt">Credential &amp; Security</div>
+            <div class="ms">AWS Secrets Manager resolver &middot; per-tenant namespacing &middot; credential references in configs &middot; just-in-time injection at action execution &middot; rotation hook.</div>
+          </div>
+        </div>
+      </div>
+      <div class="arch-arrow">&darr; cross-cutting reporting &darr;</div>
+
+      <!-- CROSS-CUTTING -->
+      <div class="arch-row last">
+        <div class="arch-label">Cross-Cutting &mdash; Every Module Reports Here</div>
+        <div class="arch-grid c4">
+          <div class="mod cross">
+            <span class="mn">10</span>
+            <div class="mt">Audit &amp; Observability</div>
+            <div class="ms">Hash-chained append-only audit log &middot; OpenTelemetry distributed tracing (traceId = scanRunId) &middot; Pino structured logs &middot; action timeline reconstruction.</div>
+          </div>
+          <div class="mod cross">
+            <span class="mn">12</span>
+            <div class="mt">Notification Router</div>
+            <div class="ms">Severity-based routing: low &rarr; digest email, medium &rarr; Slack, high &rarr; PagerDuty / immediate webhook. DLQ-backed escalation.</div>
+          </div>
+          <div class="mod cross">
+            <span class="mn">13</span>
+            <div class="mt">Reporting &amp; Analytics</div>
+            <div class="ms">Typed rollup tables (counts, severity breakdowns, delta vs previous run, per-check-type breakdowns). Per-scan check-type aggregates without raw scans.</div>
+          </div>
+          <div class="mod cross">
+            <span class="mn">14</span>
+            <div class="mt">Content Fingerprint Service</div>
+            <div class="ms">SHA-256 normalization + storage. Skip-on-unchanged decision. Cache invalidation on policy version change. Force-scan override.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 4: TWO KINDS OF WORK ===================== -->
+  <section id="s4" class="section">
+    <header class="sec-head">
+      <div class="sec-num">04</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">Same engine, same audit trail, same governance &mdash; only the purpose differs</div>
+        <h2>Two kinds of work</h2>
+        <p class="sec-sub">Q-ScanAI runs both compliance checks (PASS / FAIL findings) and operational workflows (scheduled side effects). Because they share an engine, every operational job inherits the same audit trail, version control, and four-eyes governance.</p>
+      </div>
+    </header>
+
+    <div class="two-col">
+      <div class="kind compliance">
+        <span class="ktag">policy_kind = CHECK</span>
+        <h3>Compliance Check</h3>
+        <p class="kdesc">Determines whether a merchant meets a specific regulatory requirement. Verdict is recorded in persistent finding memory; first-detected date is immutable.</p>
+        <div class="kpurpose">
+          <div><b>Produces</b>PASS / FAIL / N/A findings</div>
+          <div><b>Persists in</b>qsa_compliance_finding</div>
+          <div><b>Mutating actions</b>Forbidden &mdash; gate at promotion</div>
+        </div>
+        <div class="kex">
+          <div class="l">EXAMPLE</div>
+          <div class="ex">"Does every page on the merchant's website contain a valid FDA disclaimer in the footer?"</div>
+        </div>
+      </div>
+
+      <div class="kind operational">
+        <span class="ktag">policy_kind = OPERATIONAL</span>
+        <h3>Operational Task</h3>
+        <p class="kdesc">Automates a scheduled workflow that has no PASS/FAIL outcome. The durable record is the action invocations &mdash; emails sent, fields updated, queues pushed.</p>
+        <div class="kpurpose">
+          <div><b>Produces</b>Side effects only</div>
+          <div><b>Persists in</b>qsa_action_invocation</div>
+          <div><b>Mutating actions</b>Required &mdash; whitelisted via is_mutating</div>
+        </div>
+        <div class="kex">
+          <div class="l">EXAMPLE</div>
+          <div class="ex">"Every Monday, query the Cannaspy license registry for each merchant. If a license is missing, email compliance and update the merchant's status field."</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 5: RULE LIFECYCLE ===================== -->
+  <section id="s5" class="section">
+    <header class="sec-head">
+      <div class="sec-num">05</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">No untested config reaches production &mdash; ever</div>
+        <h2>Rule lifecycle &amp; promotion gates</h2>
+        <p class="sec-sub">Every policy, rule, action, template, and profile passes through the same controlled promotion process. Every transition is audited; every rejected transition is also audited.</p>
+      </div>
+    </header>
+
+    <div class="lifecycle">
+      <div class="lc-flow">
+        <div class="lc-state s-draft">
+          <div class="lc-name">DRAFT</div>
+          <div class="lc-title">Author &amp; reviewers only</div>
+          <div class="lc-desc">Editable as new versions. Not used in any scan, production or test. Old versions immutable from creation.</div>
+        </div>
+        <div class="lc-arrow"><div class="lab">submit</div>&rarr;</div>
+        <div class="lc-state s-test">
+          <div class="lc-name">TESTABLE</div>
+          <div class="lc-title">Test environment only</div>
+          <div class="lc-desc">Visible in test mode. Test scans write to isolated <code>qsa_test_*</code> tables. Successful runs increment <code>successful_test_count</code>.</div>
+        </div>
+        <div class="lc-arrow"><div class="lab">activate</div>&rarr;</div>
+        <div class="lc-state s-active">
+          <div class="lc-name">ACTIVE</div>
+          <div class="lc-title">Production-visible</div>
+          <div class="lc-desc">Used by all production scans for assigned merchants. Cannot be edited &mdash; only superseded by a new version.</div>
+        </div>
+        <div class="lc-arrow"><div class="lab">supersede</div>&rarr;</div>
+        <div class="lc-state s-deprec">
+          <div class="lc-name">DEPRECATED</div>
+          <div class="lc-title">Read-only history</div>
+          <div class="lc-desc">Replaced by a newer active version. Past scans pinned to this version still resolve correctly. Rollback re-activates it.</div>
+        </div>
+      </div>
+
+      <div class="gates">
+        <h4>&#128274;&nbsp;Four promotion gates &mdash; all must clear before draft &rarr; testable &rarr; active</h4>
+        <ol>
+          <li><b>Schema validation</b><br>The rule's structure passes automatic validation: check-type contract, item-type compatibility, execution-pattern coherence.</li>
+          <li><b>Successful test run</b><br>At least one successful test scan completed in the isolated test environment against representative merchants.</li>
+          <li class="eyes"><b>Four-eyes approval</b><br>A <b>different person</b> from the author approves the activation. Enforced at API and database CHECK constraint &mdash; not just policy.</li>
+          <li><b>No circular dependencies</b><br>No cycle exists between this rule's prerequisites and any other rule it ultimately depends on.</li>
+        </ol>
+      </div>
+
+      <div class="eyes-banner">
+        <span class="ico">&#128065;</span>
+        <div><b>Four-eyes is enforced at the database layer.</b> The <code>chk_four_eyes</code> CHECK constraint refuses any active row where <code>approver_user_id = author_user_id</code>. The application-level guard is the second layer, not the only one.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 6: PERSISTENT FINDING MEMORY ===================== -->
+  <section id="s6" class="section">
+    <header class="sec-head">
+      <div class="sec-num">06</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">Living compliance memory &mdash; not one-shot audit reports</div>
+        <h2>Persistent finding memory</h2>
+        <p class="sec-sub">Each compliance issue carries a permanent record. The date it was first seen is stamped once and never changes &mdash; not even when the rule that detected it is updated. Status transitions are deterministic and regulator-verifiable.</p>
+      </div>
+    </header>
+
+    <div class="find-wrap">
+      <div class="find-flow">
+        <div class="find-states">
+          <div class="fs new">
+            <div class="fsn">NEW</div>
+            <div class="fsd">First time we've seen this finding for <code>(merchant, item, policy)</code>. Engine sets on first FAIL.</div>
+          </div>
+          <div class="fs ongoing">
+            <div class="fsn">ONGOING</div>
+            <div class="fsd">Already seen and still failing. Engine sets on subsequent FAIL.</div>
+          </div>
+          <div class="fs resolved">
+            <div class="fsn">RESOLVED</div>
+            <div class="fsd">Previously failed; the current scan PASSED. Engine sets on PASS after a prior FAIL.</div>
+          </div>
+          <div class="fs cleared">
+            <div class="fsn">ANALYST_CLEARED</div>
+            <div class="fsd">Compliance analyst reviewed and explicitly closed the finding with required notes.</div>
+          </div>
+        </div>
+        <div class="find-arrows">
+          <span>first FAIL &rarr;</span>
+          <span>still failing &rarr;</span>
+          <span>PASS &rarr;</span>
+          <span>analyst clears</span>
+        </div>
+
+        <div class="find-reopen">
+          <b>Reopen logic.</b> If a RESOLVED finding re-appears in a later scan, it auto-reopens to ONGOING with <code>previous_occurrences++</code>. If an ANALYST_CLEARED finding re-appears <i>and</i> the content hash or policy version has changed, it reopens. If both are unchanged, the analyst's clearance is respected.
+        </div>
+      </div>
+
+      <div class="immut">
+        <span class="il">SOC 2 INVARIANT</span>
+        <h4>first_detected_at is immutable.</h4>
+        <div class="ic">first_detected_at: 2025-08-14T09:13:22Z</div>
+        <div class="id">Set once, on the NEW transition. Never overwritten &mdash; not when a rule is updated, not when a finding is resolved and reopens, not when an analyst clears it. This is the regulatory guarantee that makes "ongoing for 247 days" mean what it says.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 7: REAL SCAN WALKTHROUGH ===================== -->
+  <section id="s7" class="section">
+    <header class="sec-head">
+      <div class="sec-num">07</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">CBD merchant scan &mdash; abbreviated walkthrough</div>
+        <h2>A real scan, end-to-end</h2>
+        <p class="sec-sub">A processor's CBD merchant inherits 16 active checks from the <i>CBD Standard v3</i> profile, with one local override and one excluded check. The engine runs them in DAG order, persists results, and fires the configured action tree.</p>
+      </div>
+    </header>
+
+    <div class="cbd-grid">
+      <aside class="merch-card">
+        <div class="ml">Merchant Under Scan</div>
+        <h3>Green Leaf Wellness</h3>
+        <div class="mb">CBD e-commerce shop &middot; processor: Acme Payments</div>
+        <div class="mr">
+          <div class="mr-row"><b>Profile</b><span>CBD Standard v3</span></div>
+          <div class="mr-row"><b>Active checks</b><span>16</span></div>
+          <div class="mr-row"><b>Local override</b><span>1 (PAY-METHODS)</span></div>
+          <div class="mr-row"><b>Local exclusion</b><span>0</span></div>
+          <div class="mr-row"><b>Last scan</b><span>14 days ago</span></div>
+          <div class="mr-row"><b>Run mode</b><span>PRODUCTION</span></div>
+        </div>
+        <div class="pills" style="margin-top:14px;">
+          <span class="tag b">Hemp / CBD</span>
+          <span class="tag a">MCC 5499</span>
+          <span class="tag p">Crawl + COA</span>
+        </div>
+      </aside>
+
+      <div>
+        <div class="cbd-checks">
+          <h4>Check execution &mdash; 16 of 16 dispatched <span>tier-ordered DAG</span></h4>
+          <div class="checks">
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">SSL Certificate</span><span class="strat">ONCE_PER_DOMAIN</span><span class="res">valid</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Age Verification Gate</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">homepage modal</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">FDA Disclaimer in Footer</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">footer detected</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Privacy Policy Link</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">/privacy</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Terms of Service Link</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">/terms</span></div>
+            <div class="chk"><span class="v fail">FAIL</span><span class="nm">Return Policy Link</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">not found</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Contact: Phone Number</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">+1 (555) 0188</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Contact: Email Address</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">support@</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Contact: Physical Address</span><span class="strat">FIRST_MATCH_WINS</span><span class="res">Boulder, CO</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">COA Lab Report Directory</span><span class="strat">AGGREGATE_ITEMS</span><span class="res">142 COAs indexed</span></div>
+            <div class="chk"><span class="v fail">FAIL</span><span class="nm">CBD Compliance Keywords</span><span class="strat">EVERY_ITEM</span><span class="res">2 pages flagged</span></div>
+            <div class="chk"><span class="v fail">FAIL</span><span class="nm">THC Compliance Keywords</span><span class="strat">EVERY_ITEM</span><span class="res">1 page flagged</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Payment Methods <small style="color:var(--purple);font-weight:600">(local override)</small></span><span class="strat">FIRST_MATCH_WINS</span><span class="res">3 methods listed</span></div>
+            <div class="chk"><span class="v cache">CACHED</span><span class="nm">Checkout Subscription Disclosure</span><span class="strat">EVERY_ITEM</span><span class="res">unchanged since v=14d</span></div>
+            <div class="chk"><span class="v pass">PASS</span><span class="nm">Legal &mdash; Parent Aggregate</span><span class="strat">PARENT</span><span class="res">3 of 3 children</span></div>
+            <div class="chk"><span class="v fail">FAIL</span><span class="nm">Contact &mdash; Parent Aggregate</span><span class="strat">PARENT</span><span class="res">return-policy missing</span></div>
+          </div>
+        </div>
+
+        <div class="actions-box">
+          <h5>&#9889;&nbsp;Action tree &mdash; what fired this run</h5>
+          <div class="act">
+            <span class="ai">&#127903;&#65039;</span>
+            <div class="at">
+              <b>CREATE_TICKET &mdash; CBD/THC Keyword Findings (NEW)</b>
+              <span>Support ticket #QP-29741 opened in Jira with 3 page URLs and matched-text snippets attached.</span>
+            </div>
+          </div>
+          <div class="act">
+            <span class="ai">&#128231;</span>
+            <div class="at">
+              <b>SEND_EMAIL &mdash; Compliance Team Summary</b>
+              <span>Summary email sent to compliance@acme-payments.com listing 3 failing checks &middot; 2 NEW findings &middot; 1 ONGOING.</span>
+            </div>
+          </div>
+          <div class="act">
+            <span class="ai">&#128279;</span>
+            <div class="at">
+              <b>SEND_WEBHOOK &mdash; Hyperdrive Status Update</b>
+              <span>Webhook fired to Hyperdrive with structured risk delta. Triggers Acme's downstream remediation workflow.</span>
+            </div>
+          </div>
+          <div class="act">
+            <span class="ai">&#128221;</span>
+            <div class="at">
+              <b>UPDATE_MERCHANT_FIELD &mdash; risk_status = YELLOW</b>
+              <span>Merchant record's <code>risk_status</code> downgraded from GREEN to YELLOW. Prior value retained in audit trail.</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div style="background:#fff;border:1.5px solid var(--accent);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--red-d);letter-spacing:.5px">FAILING CHECKS</div>
+            <div style="font-size:24px;font-weight:800;color:var(--accent);margin-top:4px">3</div>
+          </div>
+          <div style="background:#fff;border:1.5px solid var(--accent);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--red-d);letter-spacing:.5px">NEW FINDINGS</div>
+            <div style="font-size:24px;font-weight:800;color:var(--accent);margin-top:4px">2</div>
+          </div>
+          <div style="background:#fff;border:1.5px solid var(--amber);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--amber-d);letter-spacing:.5px">ONGOING</div>
+            <div style="font-size:24px;font-weight:800;color:var(--amber);margin-top:4px">1</div>
+          </div>
+          <div style="background:#fff;border:1.5px solid var(--green);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--green-d);letter-spacing:.5px">CACHED HITS</div>
+            <div style="font-size:24px;font-weight:800;color:var(--green);margin-top:4px">1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 8: MULTI-TENANT ===================== -->
+  <section id="s8" class="section">
+    <header class="sec-head">
+      <div class="sec-num">08</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">Strict isolation at every layer &mdash; database, storage, credentials</div>
+        <h2>Multi-tenant architecture</h2>
+        <p class="sec-sub">Processor profiles cascade to child merchants. Children can override or exclude inherited policies, but exclusions require a permanent written justification. There are no shared data paths between tenants.</p>
+      </div>
+    </header>
+
+    <div class="tenant">
+      <div class="tenant-tree">
+        <div class="proc">
+          <div class="pl">Payment Processor &mdash; Parent Tenant</div>
+          <h4>Acme Payments</h4>
+          <div class="pp">Profile assigned: <b>CBD Standard v3</b> &middot; effective Q2 2026</div>
+        </div>
+        <div class="tenant-line"></div>
+        <div class="tenant-bar"></div>
+
+        <div class="tenant-children">
+          <div class="child inherit">
+            <span class="cl">INHERITS</span>
+            <h5>Merchant A &mdash; Green Leaf Wellness</h5>
+            <div class="cd">Inherits the processor's CBD Standard v3 profile unchanged. All 16 checks apply.</div>
+            <div class="cb">profile_version_id = NULL &nbsp;&middot;&nbsp; floats to active</div>
+          </div>
+          <div class="child override">
+            <span class="cl">OVERRIDES</span>
+            <h5>Merchant B &mdash; Blue Ridge Hemp Co.</h5>
+            <div class="cd">Inherits the profile but pins a custom version of the Payment Methods check (uses ACH-only).</div>
+            <div class="cb">policy_version_id = pinned-v9</div>
+          </div>
+          <div class="child exclude">
+            <span class="cl">EXCLUDES</span>
+            <h5>Merchant C &mdash; Cascadia Cash &amp; Carry</h5>
+            <div class="cd">Inherits the profile but excludes the Age Verification Gate check &mdash; cash-only, no e-commerce surface.</div>
+            <div class="cb">justification_text = required &amp; recorded</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tenant-iso">
+        <div class="iso">
+          <b>&#128274; Findings &mdash; merchant-scoped</b>
+          <span>Compliance findings are owned by and visible only to the specific merchant. Cross-merchant queries are rejected at the repository layer.</span>
+        </div>
+        <div class="iso">
+          <b>&#128193; Evidence &mdash; merchant-prefix S3</b>
+          <span>Screenshots, files, and matched-text snippets stored under a merchant-scoped S3 prefix. Inaccessible to other tenants.</span>
+        </div>
+        <div class="iso">
+          <b>&#128273; Credentials &mdash; vault-scoped</b>
+          <span>API keys and secrets stored in AWS Secrets Manager namespaced per merchant. Cross-tenant credential access is impossible by construction.</span>
+        </div>
+        <div class="iso">
+          <b>&#9989; Justified exclusions only</b>
+          <span>Excluding an inherited check requires non-empty <code>justification_text</code> &mdash; recorded permanently and surfaced in audit reviews.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 9: Q-TRUST + WESTTOWN ===================== -->
+  <section id="s9" class="section">
+    <header class="sec-head">
+      <div class="sec-num">09</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">How Q-ScanAI plugs into Q-Trust + Hyperdrive</div>
+        <h2>Q-Trust &amp; Westtown integration</h2>
+        <p class="sec-sub">Q-ScanAI is the policy engine inside Q-Trust. For Westtown, it routes by a three-part signal &mdash; Hyperdrive status code + MCC + merchant descriptor. Status code says <i>which phase</i>; MCC and descriptor say <i>which policy</i>.</p>
+      </div>
+    </header>
+
+    <div class="wt-wrap">
+      <div class="wt-flow">
+        <div class="wt-row">
+          <div class="wt-box hyper">
+            <div class="wt-l">UPSTREAM</div>
+            <div class="wt-t">Hyperdrive</div>
+            <div class="wt-d">Dart Bank-developed middleware. Assigns a status code on every merchant record push.</div>
+          </div>
+          <div class="wt-arr">&rarr;</div>
+          <div class="wt-box signal">
+            <div class="wt-l">3-PART SIGNAL</div>
+            <div class="wt-t">Status code + MCC + Descriptor</div>
+            <div class="wt-d">Status = phase of entry. MCC + descriptor = policy axis. Together they fully determine routing.</div>
+          </div>
+          <div class="wt-arr">&rarr;</div>
+          <div class="wt-box qsa">
+            <div class="wt-l">Q-SCANAI</div>
+            <div class="wt-t">Policy Router</div>
+            <div class="wt-d">Looks up the matching profile in the configured policy matrix. No manual configuration per merchant.</div>
+          </div>
+          <div class="wt-arr">&rarr;</div>
+          <div class="wt-box policy">
+            <div class="wt-l">SELECTED</div>
+            <div class="wt-t">Scanning policy + service tier</div>
+            <div class="wt-d">CBD Standard, Hemp Pre-Vet, Vape Full UW, &hellip; Returns risk report or GREEN/YELLOW/RED + checklist.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wt-payload">
+        <h5>Inbound payload &mdash; what Hyperdrive sends per merchant push</h5>
+        <div class="wt-fields">
+          <div class="wt-fld">
+            <div class="fn">status_code</div>
+            <div class="fd">Workflow phase: pre-vet, MPA-submitted, full-underwriting, monitoring.</div>
+            <div class="fe">"PRE_VET" &middot; "FULL_UW"</div>
+          </div>
+          <div class="wt-fld">
+            <div class="fn">mcc_code</div>
+            <div class="fd">Westtown-standardized MCC per business type. Hemp = 5499.</div>
+            <div class="fe">"5499"</div>
+          </div>
+          <div class="wt-fld">
+            <div class="fn">descriptor_tag</div>
+            <div class="fd">Product class tag: Hemp, Peptides, Vape, Telemedicine, Parking, &hellip;</div>
+            <div class="fe">"HEMP" &middot; "PEPTIDES"</div>
+          </div>
+          <div class="wt-fld">
+            <div class="fn">website_url</div>
+            <div class="fd">Required at pre-vet for high-risk merchants. Card-present-only path uses upload endpoint instead.</div>
+            <div class="fe">"https://greenleaf.com"</div>
+          </div>
+          <div class="wt-fld">
+            <div class="fn">merchant_name</div>
+            <div class="fd">Used for evidence labeling, ticket subjects, and the Compliance tab in the JARUS / Dart 360 portal.</div>
+            <div class="fe">"Green Leaf Wellness"</div>
+          </div>
+          <div class="wt-fld">
+            <div class="fn">requested_volume</div>
+            <div class="fd">Monthly processing volume estimate. Used for tier and depth-of-scan decisions.</div>
+            <div class="fe">"$25k - $100k"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wt-tier">
+        <div class="wt-tier-card early">
+          <span class="ty">EARLY ENGAGEMENT &middot; PRE-VET</span>
+          <h5 style="margin-top:8px">High-risk merchant types</h5>
+          <div class="twh"><b>Applies to:</b> Peptides, Hemp/CBD, Vape/Nicotine, Telemedicine, Research Chemicals, and other card-brand-sensitive categories.</div>
+          <div class="twh"><b>What Q-ScanAI returns:</b> GREEN / YELLOW / RED + reason codes. For YELLOW, a merchant-specific document checklist is sent back to Hyperdrive automatically. RED terminates the record before any agent or underwriter time is invested.</div>
+        </div>
+        <div class="wt-tier-card later">
+          <span class="ty">LATER ENGAGEMENT &middot; FULL UNDERWRITING</span>
+          <h5 style="margin-top:8px">Standard merchant types</h5>
+          <div class="twh"><b>Applies to:</b> Lower-risk or established business types where basic eligibility is assumed.</div>
+          <div class="twh"><b>What Q-ScanAI returns:</b> A complete structured risk report &mdash; product findings by category, COA validation results, sanctioned-party screening, policy violations, recommended approval conditions. Sent to Hyperdrive as JSON; available human-readable for underwriter review.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;background:#fff;border:1.5px solid var(--blue);border-radius:10px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start">
+        <span style="font-size:20px">&#128274;</span>
+        <div style="font-size:12.5px;color:var(--ink-2);line-height:1.6">
+          <b style="color:var(--blue-d)">Compliance tab in JARUS / Dart 360.</b> The merchant-facing portal surfaces Q-ScanAI compliance status via SSO. Merchants see their open conditions, scan history, and remediation tasks. Agents see the same view inside their portal. Perpetual monitoring runs ongoing scans against the policy each merchant was approved under; new product categories or violations webhook into Hyperdrive automatically.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 10: SECURITY POSTURE ===================== -->
+  <section id="s10" class="section">
+    <header class="sec-head">
+      <div class="sec-num">10</div>
+      <div class="sec-titles">
+        <div class="sec-eyebrow">SOC 2 Type II posture &mdash; not bolted on, designed in</div>
+        <h2>Compliance, audit &amp; security posture</h2>
+        <p class="sec-sub">Every guarantee in section 1 traces back to a structural choice in this section. Defense in depth, multiple enforcement layers, and no human-removable bypass paths.</p>
+      </div>
+    </header>
+
+    <div class="sec-grid">
+      <div class="sec-card append">
+        <span class="si">&#128221;</span>
+        <div class="sb">
+          <h4>Append-only audit log</h4>
+          <div class="sd">Every event &mdash; configuration change, scan run, action invocation, finding lifecycle &mdash; is written once and never modified. Cryptographic hash chaining detects any tampering, including by database administrators.</div>
+        </div>
+      </div>
+      <div class="sec-card eyes">
+        <span class="si">&#128065;</span>
+        <div class="sb">
+          <h4>Four-eyes enforcement</h4>
+          <div class="sd">Activating any compliance rule requires a different approver from the author. Enforced at both the application layer (NestJS guard) and the database layer (CHECK constraint) &mdash; not just by policy.</div>
+        </div>
+      </div>
+      <div class="sec-card cred">
+        <span class="si">&#128273;</span>
+        <div class="sb">
+          <h4>Credential isolation</h4>
+          <div class="sd">All secrets stored in AWS Secrets Manager scoped per merchant. No credential is ever stored in the database or in application configuration. Just-in-time injection at action execution time only.</div>
+        </div>
+      </div>
+      <div class="sec-card soc">
+        <span class="si">&#127881;</span>
+        <div class="sb">
+          <h4>SOC 2 alignment</h4>
+          <div class="sd">The audit log schema, lifecycle controls, and access model are designed to satisfy SOC 2 Type II requirements. Designed in from day one &mdash; not retrofitted.</div>
+        </div>
+      </div>
+      <div class="sec-card test">
+        <span class="si">&#129514;</span>
+        <div class="sb">
+          <h4>Test &harr; production separation</h4>
+          <div class="sd">Test activity is physically isolated at the database level &mdash; separate <code>qsa_test_*</code> tables with no foreign keys to production. Side-effecting actions in test mode are dry-run, sandbox-routed, or blocked entirely.</div>
+        </div>
+      </div>
+      <div class="sec-card chain">
+        <span class="si">&#9881;&#65039;</span>
+        <div class="sb">
+          <h4>Hourly chain verification</h4>
+          <div class="sd">An automated process re-checks the entire audit log hash chain every hour and raises an alert on any discrepancy. A daily cron also re-verifies long-tail entries.</div>
+        </div>
+      </div>
+      <div class="sec-card delete">
+        <span class="si">&#9940;</span>
+        <div class="sb">
+          <h4>No DELETE paths</h4>
+          <div class="sd">Audit entries, finding records, and version history cannot be deleted by any user or system process. Soft-delete is only available where it preserves the row permanently with a tombstone flag.</div>
+        </div>
+      </div>
+      <div class="sec-card api">
+        <span class="si">&#128737;&#65039;</span>
+        <div class="sb">
+          <h4>OWASP-aligned API security</h4>
+          <div class="sd">JWT authentication, per-merchant API keys, rate limiting at the API Gateway. All credential references resolved through the Secrets layer &mdash; never passed directly through the API.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 11: FOOTER / SPECS ===================== -->
+  <section id="s11" class="foot">
+    <h3>Read the technical specs</h3>
+    <p>This page is the stakeholder summary. Architects, engineers, and technical reviewers should work from the eight source documents below, plus the data model DDL and ADR archive. Each document is the authoritative source for its domain &mdash; this page never duplicates detail.</p>
+
+    <div class="docs">
+      <div class="doc">
+        <span class="di">01</span>
+        <div class="docbody">
+          <div class="dt">design-overview.md</div>
+          <div class="dd">Plain-English overview &mdash; business context, the four guarantees, two kinds of work, glossary. Start here.</div>
+        </div>
+      </div>
+      <div class="doc">
+        <span class="di">02</span>
+        <div class="docbody">
+          <div class="dt">design-proposal.md</div>
+          <div class="dd">Master architecture &mdash; modules, principles, security model, technology stack, risks.</div>
+        </div>
+      </div>
+      <div class="doc">
+        <span class="di">03</span>
+        <div class="docbody">
+          <div class="dt">data-model.md</div>
+          <div class="dd">Full DDL for every table, every column, every index. JSON-justification per field.</div>
+        </div>
+      </div>
+      <div class="doc">
+        <span class="di">04</span>
+        <div class="docbody">
+          <div class="dt">execution-flow.md</div>
+          <div class="dd">Workflow engine internals: DAG construction, AI batching, action tree, checkpointing, force-scan.</div>
+        </div>
+      </div>
+      <div class="doc">
+        <span class="di">05</span>
+        <div class="docbody">
+          <div class="dt">lifecycle-and-state-transitions.md</div>
+          <div class="dd">Every state machine: configs, scan runs, findings, assignments, action invocations, credentials.</div>
+        </div>
+      </div>
+      <div class="doc">
+        <span class="di">06</span>
+        <div class="docbody">
+          <div class="dt">context-and-audit-overview.md</div>
+          <div class="dd">Runtime context store + audit log spec + tamper chain + OpenTelemetry tracing.</div>
+        </div>
+      </div>
+      <div class="doc">
+        <span class="di">07</span>
+        <div class="docbody">
+          <div class="dt">webscan-example.md</div>
+          <div class="dd">CBD merchant end-to-end concrete walkthrough with full configuration snapshots.</div>
+        </div>
+      </div>
+      <div class="doc">
+        <span class="di">08</span>
+        <div class="docbody">
+          <div class="dt">architectural-decision-records.md</div>
+          <div class="dd">ADR-001..N &mdash; every significant design decision with alternatives, rationale, consequences.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="open-q">
+      <h4>Open questions &mdash; what still needs decision (transparent)</h4>
+      <ul>
+        <li>Hyperdrive &harr; Q-ScanAI status code schema: jointly defined values, phases, and triggered policies. <i>Foundational API contract; must be agreed before integration build begins.</i></li>
+        <li>JARUS direct integration: can JARUS interface with Q-Trust directly, or must all flows route through Hyperdrive?</li>
+        <li>MCC + descriptor routing rules: which specific MCC codes and product class descriptors trigger pre-vet vs. full-UW engagement? <i>Westtown to provide list.</i></li>
+        <li>Pre-vet minimum payload: is website URL alone sufficient to return a meaningful GREEN/YELLOW/RED signal, or is more required?</li>
+        <li>Compliance tab SSO provider: which identity provider connects JARUS / Dart 360 to the Q-Trust compliance view?</li>
+        <li>Card-present workflow trigger: where does the agent initiate the upload workflow &mdash; from Dart 360 or a standalone Q-Trust link?</li>
+        <li>IRIS / NMI replacement timeline: confirmed before the June renewal deadline.</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
