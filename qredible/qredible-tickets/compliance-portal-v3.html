@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Compliance Portal v3.1 — End-to-End Vertical Slice — QP-3579–QP-3591, QP-3610</title>
+<title>Compliance Portal v3.2 — Q-Trust Unified Shell — QP-3579–QP-3591, QP-3610</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -427,6 +427,26 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 
 /* ─── FORCE CLOSE CONFIRM MODAL ─── */
 .fc-warn-icon{width:48px;height:48px;border-radius:50%;background:#FEE2E2;color:#991B1B;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin:0 auto 12px}
+
+/* ─── Q-CONFIG SOURCE TAG (engineer annotation, subtle) ─── */
+.src{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#94A3B8;background:#F8FAFC;border:1px solid #E2E8F0;padding:2px 6px;border-radius:3px;letter-spacing:.02em;font-weight:500;margin-left:6px;vertical-align:middle;white-space:nowrap}
+.src::before{content:'Source: ';opacity:.65;font-weight:400}
+.src.inline{margin-left:4px;font-size:8px;padding:1px 5px}
+.eng .src{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#94A3B8}
+
+/* ─── Q-TRUST PIVOT (v3.2) HERO ─── */
+.pivot-hero{background:linear-gradient(135deg,#1A202E 0%,#5B21B6 100%);color:#fff;padding:22px 26px;border-radius:12px;margin-bottom:24px;display:flex;gap:18px;align-items:flex-start}
+.pivot-hero .pv-ic{font-size:32px;flex-shrink:0;margin-top:2px}
+.pivot-hero h2{font-size:15px;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.pivot-hero h2 .pv-ver{background:#F05252;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:.06em}
+.pivot-hero p{font-size:13px;color:#CBD5E1;line-height:1.55;margin-bottom:8px}
+.pivot-hero p strong{color:#fff;font-weight:700}
+.pivot-hero .pv-decisions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pivot-hero .pv-decisions span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff;font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px}
+
+/* ─── ROUTE PILL ─── */
+.route-pill{display:inline-flex;align-items:center;gap:4px;background:#0F172A;color:#A7F3D0;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;letter-spacing:.02em}
+.route-pill::before{content:'⤷';color:#5B21B6;margin-right:2px;font-weight:800}
 </style>
 </head>
 <body>
@@ -437,7 +457,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 <nav class="nav">
   <a href="../">← All Mockups</a>
   <span class="sep">/</span>
-  <span class="cur">Compliance Portal v3.1 — End-to-End Vertical Slice</span>
+  <span class="cur">Compliance Portal v3.2 — Q-Trust Unified Shell</span>
   <span class="spec-badge">Engineer Spec</span>
   <span class="ticket-badge">QP-3579 · 3580 · 3581 · 3582 · 3583 · 3584 · 3585 · 3586 · 3590 · 3591 · 3610</span>
 </nav>
@@ -448,9 +468,9 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
        PAGE HEADER
        ═══════════════════════════════════════════════════════════════════ -->
   <div class="page-header">
-    <h1>Compliance Portal v3.1 — End-to-End Vertical Slice</h1>
+    <h1>Compliance Portal v3.2 — Q-Trust Unified Shell</h1>
     <p class="lede">
-      Joseph's v1 implementation slice: build the case-management loop end-to-end across Q-Monitor (processor side) and Merchant Portal (merchant side). Cases hold <strong>multiple items of multiple data types</strong> (license, website finding, product/COA, KYC); resolution form per item is hardcoded by <code class="mono">dataType</code> for v1. This mockup is an <strong>engineer-readable spec</strong> — Joseph implements in RTQ-Admin-UI / RTQ-Admin-API / Middleware. Every section calls out component boundaries, API endpoints, data shapes, and state transitions.
+      Joseph's v1 implementation slice: end-to-end case-management loop across Q-Monitor (processor) and merchant Q-Trust shell (merchant). Cases hold <strong>multiple items of multiple data types</strong>; resolution form per item is hardcoded by <code class="mono">dataType</code> for v1. <strong>v3.2 pivot:</strong> "Compliance Portal" is no longer a separate feature — it's <strong>Compliance Cases tabs/cards inside the Q-Trust shell</strong>. Single route convention <code class="mono">/cases</code> (server resolves role and renders processor vs merchant content). This mockup is an <strong>engineer-readable spec</strong> for Joseph's RTQ-Admin-UI / RTQ-Admin-API / Middleware implementation.
     </p>
     <div class="meta-row">
       <span class="meta-pill strong">v1 Vertical Slice · rev. 2026-04-29</span>
@@ -459,20 +479,41 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       <span class="meta-pill">11 tickets in scope · 2 deferred</span>
       <span class="meta-pill scope">Multi-item · per-dataType resolutionType</span>
       <span class="meta-pill" style="background:#16A34A;border-color:#16A34A;color:#fff">Mobile-friendly merchant UI</span>
+      <span class="meta-pill" style="background:#5B21B6;border-color:#5B21B6;color:#fff">Q-Config Sources annotated</span>
       <span class="meta-pill spec">Engineer Spec — not stakeholder marketing</span>
     </div>
   </div>
 
-  <!-- v3.1 + dual-flag revision banner (what changed from v3) -->
+  <!-- v3.2 Q-Trust unified shell pivot -->
+  <div class="pivot-hero">
+    <span class="pv-ic">⊞</span>
+    <div style="flex:1">
+      <h2>Q-Trust unified shell pivot <span class="pv-ver">v3.2</span></h2>
+      <p>The "Compliance Portal" feature dissolves into the existing <strong>Q-Trust shell</strong> as a <strong>Compliance Cases</strong> nav link. <strong>Single route convention <code class="mono" style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:3px">/cases</code></strong> — server resolves the user's role and renders processor or merchant content from the same URL. Different rendered content per audience, but one nav structure.</p>
+      <p style="margin-top:6px">For <strong>v1</strong>: processor side keeps the existing horizontal Q-Monitor nav and adds a Cases tab there (Joseph's Claude design has the processor side on a unified vertical nav too — that's <strong>deferred to v2</strong> to avoid disrupting the dev team's in-flight WeMonitor work). Merchant side already lives in the Q-Trust shell with vertical nav; the Compliance Cases item slots in alongside existing nav links. <strong>QP-3586 dashboard scope shrinks</strong>: it's no longer a redesign, just adding a COMPLIANCE CASES card to the existing merchant Q-Trust dashboard (per <code class="mono" style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:3px">merchant-dash-new.jpg</code> from Joseph's Claude design folder).</p>
+      <div class="pv-decisions">
+        <span>Compliance Portal → tab in Q-Trust</span>
+        <span>Single route /cases (role-branched)</span>
+        <span>Processor v1: horizontal Q-Monitor + Cases tab</span>
+        <span>Processor v2: unified vertical nav (deferred)</span>
+        <span>Merchant: existing Q-Trust vertical shell + new nav link</span>
+        <span>QP-3586 scope shrinks: card on existing dashboard</span>
+        <span>Every UI element annotated with Q-Config Source</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cumulative revision banner -->
   <div class="rev-banner">
     <span class="ic">↻</span>
     <div>
-      <strong>v3.1 + dual-flag (2026-04-29 PM)</strong> — Joseph resolved v3's open questions, then folded in the Focus Feature dual-flag architecture:
+      <strong>Cumulative revisions (v3 → v3.2)</strong> — six material decisions baked in:
       <span class="rev-pill">Multi-item</span>
       <span class="rev-pill">Polymorphic dataType</span>
       <span class="rev-pill">Force Close in v1</span>
       <span class="rev-pill">Merchant vertical-nav + mobile</span>
       <span class="rev-pill">Focus Feature dual-flag (Plan + Feature)</span>
+      <span class="rev-pill">Q-Trust unified shell + /cases route</span>
     </div>
   </div>
 
@@ -575,7 +616,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       <p style="font-size:13px;color:#475569;margin-bottom:16px">The "Create Case" action lives on three surfaces. Each surface auto-detects the <code class="mono">itemType</code> from the source row and pre-fills the case draft. v1 routes all three through one component (<code class="mono">CaseDraftDrawer</code>) — different entry, identical commit path.</p>
 
       <!-- A.2 — Product Compliance (THE v1 DEMO PATH) -->
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:18px 0 8px">A.1 · Product Compliance &nbsp;<span class="defer" style="background:#F05252">v1 demo path</span></h3>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:18px 0 8px">A.1 · Product Compliance &nbsp;<span class="defer" style="background:#F05252">v1 demo path</span> <span class="src">product_compliance_create_case_button</span></h3>
       <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3582. The path Joseph demos for v1: an expired COA on a product → "Create Case" → draft persists.</p>
 
       <div class="app-mock">
@@ -679,7 +720,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <!-- A.2 — Q-ScanAI Findings -->
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.2 · Q-ScanAI Findings</h3>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.2 · Q-ScanAI Findings <span class="src">qscanai_finding_create_case_button</span></h3>
       <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3581. Same pattern, different source row. dataType auto-detected as <code class="mono">WEBSITE_FINDING</code>.</p>
 
       <div class="app-mock">
@@ -732,7 +773,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <!-- A.3 — License Check -->
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.3 · License Check <span class="defer" style="background:#94A3B8">v1 stretch</span></h3>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.3 · License Check <span class="defer" style="background:#94A3B8">v1 stretch</span> <span class="src">license_check_create_case_button</span></h3>
       <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3610. Third entry point. Auto-detects <code class="mono">itemType=LICENSE_ISSUE</code>.</p>
 
       <div class="app-mock">
@@ -775,7 +816,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <!-- Shared Drawer -->
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.4 · Shared Case Draft Drawer — multi-item, heterogeneous</h3>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">A.4 · Shared Case Draft Drawer — multi-item, heterogeneous <span class="src">case_draft_drawer</span></h3>
       <p style="font-size:12px;color:#64748B;margin-bottom:10px">All three entry points open this same drawer. Items can be added from <em>any</em> source over the course of building the draft — a single case can mix license issues, website findings, and product/COA items. Save → DRAFT case persisted; Send → OPEN + invite email if merchant has no portal.</p>
 
       <div class="modal-wash">
@@ -901,13 +942,18 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
        ═══════════════════════════════════════════════════════════════════ -->
   <div class="section" id="sec-b">
     <div class="section-head">
-      <h2>B · Q-Monitor Surfaces (processor side) <span class="qp multi">QP-3583 · 3584</span></h2>
-      <div class="section-sub">Active Case Count column on We Monitor<br/>+ Internal Case Management screen</div>
+      <h2>B · Q-Monitor Surfaces (processor v1) <span class="qp multi">QP-3583 · 3584</span></h2>
+      <div class="section-sub">Active Case Count column on We Monitor<br/>+ Cases tab inside existing Q-Monitor horizontal nav</div>
     </div>
     <div class="section-body">
 
+      <div class="annot note">
+        <span class="ic">i</span>
+        <div><strong>v1 nav decision (Q-Trust pivot)</strong>: processor side stays in Q-Monitor's existing horizontal nav. The new Cases tab slots into the same horizontal tab strip alongside We Monitor / Findings / Product Compliance / Licenses. Joseph's Claude design has the processor on a unified vertical-nav shell (matching the merchant Q-Trust pattern); <strong>that's deferred to v2</strong> to avoid disrupting the dev team's in-flight WeMonitor industry-filter work. Long-term direction shown in Section J. v1 route: <span class="route-pill">/qmonitor/cases</span> &nbsp;→ &nbsp;v2 route: <span class="route-pill">/cases</span> (role-resolves to processor view).</div>
+      </div>
+
       <!-- B.1 -->
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">B.1 · We Monitor — Active Case Count column</h3>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">B.1 · We Monitor — Active Case Count column <span class="src">we_monitor_cases_column</span></h3>
       <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3583. New column on the existing We Monitor table. Click the count → side panel with the merchant's active cases. Aware that dev team is actively reworking We Monitor for industry filters; <strong>this column adds, never restructures</strong>.</p>
 
       <div class="app-mock">
@@ -981,8 +1027,8 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <!-- B.2 Internal Case Management list -->
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">B.2 · Internal Case Management — case list</h3>
-      <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3584. Route: <code class="mono">/qmonitor/cases</code>. The processor's home for cases. Filter tabs, bulk actions, side-panel detail.</p>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">B.2 · Internal Case Management — case list <span class="src">case_management_screen</span></h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">QP-3584. v1 route: <span class="route-pill">/qmonitor/cases</span> (lives inside Q-Monitor's existing horizontal nav). v2 route: <span class="route-pill">/cases</span> (role-resolved to processor view in unified Q-Trust shell). The processor's home for cases. Filter tabs, bulk actions, side-panel detail.</p>
 
       <div class="app-mock">
         <div class="app-topbar">
@@ -1062,7 +1108,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <!-- B.3 Internal case detail -->
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">B.3 · Internal Case Detail (processor view) — heterogeneous items</h3>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">B.3 · Internal Case Detail (processor view) — heterogeneous items <span class="src">case_detail_panel</span></h3>
       <p style="font-size:12px;color:#64748B;margin-bottom:10px">Click a case row → side panel with full detail. Three tabs: Items, Responses, Activity. Items list renders polymorphically by <code class="mono">dataType</code>.</p>
 
       <div class="case-detail">
@@ -1144,13 +1190,13 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
             </div>
           </div>
 
-          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
-            <button class="btn">Edit Case</button>
-            <button class="btn">+ Add Item</button>
-            <button class="btn">Reassign</button>
-            <button class="btn ghost">Send Reminder</button>
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:center">
+            <button class="btn">Edit Case</button><span class="src inline">case_edit_action</span>
+            <button class="btn">+ Add Item</button><span class="src inline">case_add_item_action</span>
+            <button class="btn">Reassign</button><span class="src inline">case_reassign_action</span>
+            <button class="btn ghost">Send Reminder</button><span class="src inline">case_send_reminder_action</span>
             <span class="spacer" style="flex:1"></span>
-            <button class="btn danger" onclick="document.getElementById('fc-modal').style.display='flex'">Force Close <span style="background:#fff;color:#991B1B;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:800;padding:2px 6px;border-radius:3px;margin-left:6px">QP-3591</span></button>
+            <button class="btn danger" onclick="document.getElementById('fc-modal').style.display='flex'">Force Close <span style="background:#fff;color:#991B1B;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:800;padding:2px 6px;border-radius:3px;margin-left:6px">QP-3591</span></button><span class="src inline">case_force_close_action</span>
           </div>
         </div>
         <div class="case-side">
@@ -1244,8 +1290,13 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
     </div>
     <div class="section-body">
 
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">C.1 · Invitation email</h3>
-      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Sent automatically by Q-Monitor when a case is sent to a merchant who has no portal account. Contains a one-time signed link to claim the account.</p>
+      <div class="annot note">
+        <span class="ic">i</span>
+        <div><strong>Landing experience (v3.2 pivot)</strong>: the merchant doesn't enter a separate "Compliance Portal" — they land in the <strong>existing Q-Trust shell</strong> with a new <strong>Compliance Cases</strong> link in the vertical nav. If the merchant doesn't have a Q-Trust account yet, the invite signup creates one. If they already have a Q-Trust account (e.g. they're a MyCOA user), the link just authenticates them and adds the Compliance Cases nav item. <strong>One shell, one auth, additive nav.</strong></div>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:14px 0 8px">C.1 · Invitation email <span class="src">merchant_invite_email_template</span></h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Sent automatically by Q-Monitor when a case is sent to a merchant who needs an account or hasn't accepted yet. Contains a one-time signed link.</p>
 
       <div class="stage">
         <div class="stage-label">Email rendered in merchant inbox</div>
@@ -1304,7 +1355,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
         <div><strong>Dual-flag architecture (Joseph's resolution):</strong> the focus feature lives on <em>both</em> the Feature and the Plan. <strong>Feature</strong> gets <code class="mono">canBeFocus: boolean</code> — only features admin-flagged eligible can ever be a focus feature. <strong>Plan</strong> gets <code class="mono">focusFeatureId</code> — picks one of the plan's bound features (filtered to those with <code class="mono">canBeFocus=true</code>). The invite link references the plan that opens the case → resolves to that plan's focus feature → drives the wizard + paywall filter.</div>
       </div>
 
-      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Pre-step (Q-Config admin) · Plan editor — set the plan's focus feature</h4>
+      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Pre-step (Q-Config admin) · Plan editor — set the plan's focus feature <span class="src">qconfig_plan_focus_feature_dropdown</span> <span class="src">qconfig_feature_can_be_focus_toggle</span></h4>
       <p style="font-size:12px;color:#64748B;margin-bottom:8px">Where this lives: <a href="qconfig-feature-limits-workflow.html" style="color:#1A202E;font-weight:700;text-decoration:underline">Q-Config Feature Limits</a> Plan editor. Admin picks one bound feature as the plan's focus. Dropdown is filtered to features with <code class="mono">canBeFocus=true</code> only. Compliance Portal invites generated against this plan use this focus feature as their context.</p>
 
       <div class="stage">
@@ -1355,7 +1406,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
         <div><strong>Two writes, two surfaces</strong>. <strong>Feature Builder · Details tab</strong> (Q-Config) is where admins flip <code class="mono">feature.canBeFocus</code> on or off per-feature. <strong>Plan editor</strong> (Q-Config) is where the plan picks its focus feature from its bound features (filtered to those flagged eligible). The Compliance Portal merchant invite never sees these directly — it sees a magic link → JWT claim → resolved focus feature → wizard + paywall behavior.</div>
       </div>
 
-      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 2 · Signup form</h4>
+      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 2 · Signup form <span class="src">merchant_signup_form</span></h4>
       <div class="stage">
         <div class="stage-label">Browser landing — portal.qredible.com/redeem?token=&hellip;&focus=COMPLIANCE_CASES</div>
         <div class="signup-mock">
@@ -1386,7 +1437,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
         </div>
       </div>
 
-      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 3 · MyCOA wizard (BEFORE paywall) — conditional <span class="defer" style="background:#94A3B8">QP ticket TBD</span></h4>
+      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 3 · MyCOA wizard (BEFORE paywall) — conditional <span class="defer" style="background:#94A3B8">QP ticket TBD</span> <span class="src">merchant_mycoa_wizard_step</span></h4>
       <p style="font-size:12px;color:#64748B;margin-bottom:8px"><strong>Conditional:</strong> only renders when the resolved focus feature is <code class="mono">MYCOA</code> (the plan's <code class="mono">focusFeatureId</code> resolves to the MyCOA feature). For other focus features (e.g. <code class="mono">COMPLIANCE_CASES</code> alone), this step is skipped and the merchant goes directly from signup to the filtered paywall. Same dual-flag invite link, different conditional path. Wizard itself is its own ticket (TBD).</p>
 
       <div class="stage">
@@ -1420,7 +1471,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
         </div>
       </div>
 
-      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 4 · Paywall — filtered by Focus Feature</h4>
+      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 4 · Paywall — filtered by Focus Feature <span class="src">merchant_paywall_filtered_by_focus_feature</span></h4>
       <p style="font-size:12px;color:#64748B;margin-bottom:8px">Default paywall shows all plans. Invite resolves to a focus feature (e.g. <code class="mono">COMPLIANCE_CASES</code>) → filter to plans where <code class="mono">plan.focusFeatureId</code> matches that feature. Plans that have a different focus feature, or none at all, render greyed out behind a "see all plans" toggle.</p>
 
       <div class="stage">
@@ -1528,23 +1579,29 @@ type Plan = {
        ═══════════════════════════════════════════════════════════════════ -->
   <div class="section" id="sec-d">
     <div class="section-head">
-      <h2>D · Merchant Compliance Portal Dashboard <span class="qp">QP-3586</span></h2>
-      <div class="section-sub">Vertical nav (merchant-only) · mobile-friendly<br/>Different navigation paradigm from the processor's Q-Monitor</div>
+      <h2>D · Merchant Q-Trust Dashboard — add Compliance Cases card <span class="qp">QP-3586</span></h2>
+      <div class="section-sub">SCOPE SHRUNK: extend existing dashboard, don't redesign<br/>New COMPLIANCE CASES card per Joseph's <code class="mono">merchant-dash-new.jpg</code></div>
     </div>
     <div class="section-body flush">
 
       <div style="padding:18px 22px 0">
-        <p style="font-size:12px;color:#64748B;margin-bottom:8px">Route: <code class="mono">/comply</code> (merchant-side, separate URL + auth boundary from /qmonitor). <strong>Vertical nav</strong> for merchant — different from processor's horizontal Q-Monitor. <strong>Mobile-responsive required</strong>: sidebar collapses to horizontal scroll on phones; widgets stack to single column under 760px; touch targets ≥44px. <span class="touch-note">Mobile-friendly</span></p>
+        <div class="annot warn" style="margin:0 0 12px">
+          <span class="ic">!</span>
+          <div><strong>v3.2 scope shrink</strong>: QP-3586 was originally "Merchant Compliance Portal Dashboard" (build new). It's now <strong>"extend existing merchant Q-Trust dashboard with a COMPLIANCE CASES card"</strong> — the merchant Q-Trust dashboard already exists and renders MyCOA / Q-Audit / etc. cards. v1 adds one new card (case visibility) per Joseph's <code class="mono">merchant-dash-new.jpg</code> design. <strong>Acceptance criteria are case visibility, not dashboard redesign.</strong> Incidental polish on the existing dashboard while-in-there is acceptable but explicitly out of acceptance criteria.</div>
+        </div>
+        <p style="font-size:12px;color:#64748B;margin-bottom:8px">Route: <span class="route-pill">/</span> (merchant Q-Trust dashboard home) — <strong>existing route, no new URL</strong>. Vertical nav already exists in Q-Trust shell; we add a Compliance Cases nav item to it. <strong>Mobile-responsive contract</strong> applies to the new card: stacks under 760px, ≥44px touch targets. <span class="touch-note">Mobile-friendly</span></p>
+        <p style="font-size:12px;color:#64748B;margin-bottom:14px">Below: the merchant Q-Trust shell with the existing dashboard surface, plus the new <strong>COMPLIANCE CASES</strong> card (3 active cases · 9 items pending) and the new <strong>Compliance Cases</strong> nav item in the sidebar.</p>
       </div>
 
       <div class="mp-shell" style="margin:14px 22px">
 
         <aside class="mp-sidebar">
-          <div class="mp-brand"><span class="logo">Q</span> Compliance Portal</div>
+          <div class="mp-brand"><span class="logo">Q</span> Q-Trust</div>
           <div class="mp-org">Black Bear Wellness</div>
           <div class="mp-nav-item active"><span class="mp-ic">◧</span> Dashboard</div>
-          <div class="mp-nav-item"><span class="mp-ic">⊞</span> Compliance Cases <span class="mp-count">3</span></div>
+          <div class="mp-nav-item"><span class="mp-ic">⊞</span> Compliance Cases <span class="mp-count">3</span> <span style="background:#F05252;color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px;margin-left:4px;letter-spacing:.04em">NEW</span></div>
           <div class="mp-nav-item"><span class="mp-ic">📄</span> My COAs</div>
+          <div class="mp-nav-item"><span class="mp-ic">📊</span> Q-Audit</div>
           <div class="mp-nav-item"><span class="mp-ic">⊙</span> Activity</div>
           <div class="mp-nav-item"><span class="mp-ic">⚙</span> Account</div>
           <div class="mp-spacer"></div>
@@ -1573,11 +1630,11 @@ type Plan = {
             </div>
           </div>
 
-          <!-- Active cases — primary widget -->
+          <!-- Active cases — primary widget (the new Compliance Cases card per merchant-dash-new.jpg) -->
           <div class="widget span-8 urgent">
             <div class="widget-head">
-              <div class="widget-title">📋 Active Compliance Cases</div>
-              <div class="widget-sub">3 open · 9 items pending</div>
+              <div class="widget-title">📋 COMPLIANCE CASES <span style="background:#F05252;color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px;margin-left:4px;letter-spacing:.04em">NEW</span></div>
+              <div class="widget-sub">3 open · 9 items pending <span class="src">merchant_dashboard_compliance_cases_card</span></div>
             </div>
             <div class="widget-list">
               <div class="widget-list-item" style="border-left:3px solid #F05252">
@@ -1611,10 +1668,11 @@ type Plan = {
             <a href="#sec-e" class="cta">View All Cases →</a>
           </div>
 
-          <!-- SLA at a glance -->
+          <!-- SLA at a glance (sub-widget of the Compliance Cases card) -->
           <div class="widget span-4">
             <div class="widget-head">
-              <div class="widget-title">⏱ SLA Overview</div>
+              <div class="widget-title">⏱ SLA Overview <span style="background:#F05252;color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px;margin-left:4px;letter-spacing:.04em">NEW</span></div>
+              <div class="widget-sub"><span class="src">merchant_dashboard_sla_overview_widget</span></div>
             </div>
             <div class="widget-stat warn">2 <span class="s">days until next deadline</span></div>
             <div style="font-size:11px;color:#64748B;line-height:1.6;margin-top:6px">
@@ -1625,11 +1683,11 @@ type Plan = {
             <a href="#" class="cta" style="background:#1A202E">Request Extension</a>
           </div>
 
-          <!-- MyCOA upsell / activity (modular - shown if merchant uses MyCOA) -->
+          <!-- MyCOA upsell / activity (existing dashboard widget, unchanged) -->
           <div class="widget span-6 upsell">
             <div class="widget-head">
               <div class="widget-title">📄 My COAs</div>
-              <div class="widget-sub">12 published · 1 expiring</div>
+              <div class="widget-sub">12 published · 1 expiring <span style="font-size:9px;color:#94A3B8;font-style:italic">existing widget — unchanged</span></div>
             </div>
             <div style="font-size:11px;color:#475569;line-height:1.6">Upload a replacement COA here and it'll be available across all your active cases automatically.</div>
             <div class="widget-list">
@@ -1716,12 +1774,12 @@ type Plan = {
     </div>
     <div class="section-body">
 
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">E.1 · Case detail (merchant view) — heterogeneous item list</h3>
-      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Merchant clicks a case from dashboard. Lands on case detail with the full item list. Each item is its own card with its own dataType-specific resolution form. Items are independently submittable — merchant can resolve them one at a time.</p>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">E.1 · Case detail (merchant view) — heterogeneous item list <span class="src">merchant_case_detail_screen</span></h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Route: <span class="route-pill">/cases/:caseId</span> (merchant Q-Trust shell, role-resolves to merchant content). v1: same route also lives at <span class="route-pill">/qmonitor/cases/:caseId</span> for processor (different rendered content). v2: collapse both to <span class="route-pill">/cases/:caseId</span> with role-branched render — single shell, single nav. Merchant clicks a case from the dashboard's COMPLIANCE CASES card or the Compliance Cases nav link → lands here. Each item is its own card with its own dataType-specific resolution form. Items are independently submittable.</p>
 
       <div class="mp-shell">
         <aside class="mp-sidebar">
-          <div class="mp-brand"><span class="logo">Q</span> Compliance Portal</div>
+          <div class="mp-brand"><span class="logo">Q</span> Q-Trust</div>
           <div class="mp-org">Black Bear Wellness</div>
           <div class="mp-nav-item"><span class="mp-ic">◧</span> Dashboard</div>
           <div class="mp-nav-item active"><span class="mp-ic">⊞</span> Compliance Cases <span class="mp-count">3</span></div>
@@ -1768,7 +1826,7 @@ type Plan = {
             <div class="item-card active" style="margin-bottom:14px">
               <div class="item-card-head">
                 <div>
-                  <span class="dtype license">LICENSE</span>
+                  <span class="dtype license">LICENSE</span> <span class="src">case_item_resolution_form_license</span>
                   <h4 class="item-h">Hemp Processor License — expired 2026-03-31</h4>
                   <span class="muted" style="font-size:11px">VT Agency of Agriculture</span>
                 </div>
@@ -1789,9 +1847,9 @@ type Plan = {
               </div>
               <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
                 <button class="btn primary">Submit License →</button>
-                <button class="btn">Request Extension</button>
+                <button class="btn">Request Extension</button><span class="src inline">case_item_request_extension_action</span>
                 <span class="spacer" style="flex:1"></span>
-                <button class="btn ghost" style="color:#991B1B">Dispute</button>
+                <button class="btn ghost" style="color:#991B1B">Dispute</button><span class="src inline">case_item_dispute_action</span>
               </div>
             </div>
 
@@ -1799,7 +1857,7 @@ type Plan = {
             <div class="item-card" style="margin-bottom:14px">
               <div class="item-card-head">
                 <div>
-                  <span class="dtype product-coa">PRODUCT_COA</span>
+                  <span class="dtype product-coa">PRODUCT_COA</span> <span class="src">case_item_resolution_form_product_coa</span>
                   <h4 class="item-h">Tincture 1000mg Full Spectrum — COA expired</h4>
                   <span class="muted mono" style="font-size:11px">SKU: BBW-TINC-1000</span>
                 </div>
@@ -1820,9 +1878,9 @@ type Plan = {
               </div>
               <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
                 <button class="btn primary">Submit COA →</button>
-                <button class="btn">Request Extension</button>
+                <button class="btn">Request Extension</button><span class="src inline">case_item_request_extension_action</span>
                 <span class="spacer" style="flex:1"></span>
-                <button class="btn ghost" style="color:#991B1B">Dispute</button>
+                <button class="btn ghost" style="color:#991B1B">Dispute</button><span class="src inline">case_item_dispute_action</span>
               </div>
             </div>
 
@@ -1830,7 +1888,7 @@ type Plan = {
             <div class="item-card" style="margin-bottom:14px">
               <div class="item-card-head">
                 <div>
-                  <span class="dtype website-finding">WEBSITE_FINDING</span>
+                  <span class="dtype website-finding">WEBSITE_FINDING</span> <span class="src">case_item_resolution_form_website_finding</span>
                   <h4 class="item-h">Missing privacy policy link</h4>
                   <span class="muted mono" style="font-size:11px">blackbearwellness.com/footer</span>
                 </div>
@@ -1848,9 +1906,9 @@ type Plan = {
               </div>
               <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
                 <button class="btn primary">Submit URL →</button>
-                <button class="btn">Request Extension</button>
+                <button class="btn">Request Extension</button><span class="src inline">case_item_request_extension_action</span>
                 <span class="spacer" style="flex:1"></span>
-                <button class="btn ghost" style="color:#991B1B">Dispute</button>
+                <button class="btn ghost" style="color:#991B1B">Dispute</button><span class="src inline">case_item_dispute_action</span>
               </div>
             </div>
 
@@ -1884,7 +1942,7 @@ type Plan = {
 
       <div class="mp-shell">
         <aside class="mp-sidebar">
-          <div class="mp-brand"><span class="logo">Q</span> Compliance Portal</div>
+          <div class="mp-brand"><span class="logo">Q</span> Q-Trust</div>
           <div class="mp-org">Black Bear Wellness</div>
           <div class="mp-nav-item"><span class="mp-ic">◧</span> Dashboard</div>
           <div class="mp-nav-item active"><span class="mp-ic">⊞</span> Compliance Cases <span class="mp-count">3</span></div>
@@ -2021,11 +2079,11 @@ type Plan = {
        ═══════════════════════════════════════════════════════════════════ -->
   <div class="section" id="sec-f">
     <div class="section-head">
-      <h2>F · Loop Closure + Force Close <span class="qp multi">QP-3580 · 3584 · 3586 · 3591</span></h2>
-      <div class="section-sub">Processor accepts response → item RESOLVED → case RESOLVED<br/>+ Force Close (QP-3591) for stuck cases · 90d auto-archive cron</div>
+      <h2>F · Loop Closure + Force Close + Reopen <span class="qp multi">QP-3580 · 3584 · 3586 · 3591</span></h2>
+      <div class="section-sub">Processor accepts response → item RESOLVED → case RESOLVED<br/>+ Force Close (QP-3591) for stuck cases · Reopen for closed cases · 90d auto-archive cron</div>
     </div>
     <div class="section-body">
-      <p style="font-size:13px;color:#475569;margin-bottom:16px">Closing the loop is the v1 success criterion. After merchant submits per item, processor sees responses in Internal CM. v1 supports three processor actions per response: <strong>Accept</strong> (item RESOLVED), <strong>Reject — request more</strong> (item back to PENDING), and <strong>Force Close</strong> (entire case CLOSED regardless of pending items, audit-logged, permission-gated). 90-day auto-archive runs as a cron behind the scenes.</p>
+      <p style="font-size:13px;color:#475569;margin-bottom:14px">Route: <span class="route-pill">/qmonitor/cases/:caseId</span> (v1) → v2 unified <span class="route-pill">/cases/:caseId</span>. Closing the loop is the v1 success criterion. v1 supports four processor actions: <strong>Accept</strong> (item RESOLVED), <strong>Reject — request more</strong> (item back to PENDING), <strong>Force Close</strong> (entire case CLOSED, audit-logged, permission-gated), and <strong>Reopen</strong> (resurrect a RESOLVED or CLOSED case if more info surfaces — also audit-logged). 90-day auto-archive runs as a cron behind the scenes.</p>
 
       <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">F.1 · Processor reviews per-item responses</h3>
 
@@ -2070,8 +2128,8 @@ type Plan = {
               <button class="btn">Open</button>
             </div>
             <div style="display:flex;gap:8px;margin-top:14px">
-              <button class="btn primary">✓ Accept — Mark Item Resolved</button>
-              <button class="btn">Request More Information</button>
+              <button class="btn primary">✓ Accept — Mark Item Resolved</button><span class="src inline">case_response_accept_action</span>
+              <button class="btn">Request More Information</button><span class="src inline">case_response_reject_action</span>
             </div>
           </div>
 
@@ -2093,16 +2151,16 @@ type Plan = {
               <button class="btn">Open</button>
             </div>
             <div style="display:flex;gap:8px;margin-top:14px">
-              <button class="btn primary">✓ Accept — Mark Item Resolved</button>
-              <button class="btn">Request More Information</button>
+              <button class="btn primary">✓ Accept — Mark Item Resolved</button><span class="src inline">case_response_accept_action</span>
+              <button class="btn">Request More Information</button><span class="src inline">case_response_reject_action</span>
             </div>
           </div>
 
-          <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
-            <button class="btn primary">✓ Accept All Pending Reviews (2)</button>
-            <button class="btn">Send Reminder for Outstanding (4)</button>
+          <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;align-items:center">
+            <button class="btn primary">✓ Accept All Pending Reviews (2)</button><span class="src inline">case_bulk_accept_responses_action</span>
+            <button class="btn">Send Reminder for Outstanding (4)</button><span class="src inline">case_send_reminder_action</span>
             <span class="spacer" style="flex:1"></span>
-            <button class="btn danger" onclick="document.getElementById('fc-modal-2').style.display='flex'">Force Close Entire Case <span style="background:#fff;color:#991B1B;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:800;padding:2px 6px;border-radius:3px;margin-left:6px">QP-3591</span></button>
+            <button class="btn danger" onclick="document.getElementById('fc-modal-2').style.display='flex'">Force Close Entire Case <span style="background:#fff;color:#991B1B;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:800;padding:2px 6px;border-radius:3px;margin-left:6px">QP-3591</span></button><span class="src inline">case_force_close_action</span>
           </div>
         </div>
       </div>
@@ -2139,7 +2197,7 @@ type Plan = {
         </div>
       </div>
 
-      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">F.3 · Force Close — when a case is stuck <span class="qp" style="background:#F05252">QP-3591 · v1 IN</span></h3>
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">F.3 · Force Close — when a case is stuck <span class="qp" style="background:#F05252">QP-3591 · v1 IN</span> <span class="src">case_force_close_action</span></h3>
       <p style="font-size:12px;color:#64748B;margin-bottom:14px">Permission-gated action for processor admins. Used when a merchant is unresponsive past SLA, has gone out of business, or any other operational reason a case can't reach RESOLVED through the normal flow. Audit-logged with required reason. Notifies the merchant in-portal + email.</p>
 
       <div class="modal-wash">
@@ -2166,6 +2224,28 @@ type Plan = {
         <div style="flex:1;font-size:12px;color:#78350F;line-height:1.55">
           <strong>90-day auto-archive</strong> — RESOLVED and CLOSED cases automatically flip to ARCHIVED 90 days after resolution. ARCHIVED cases are hidden from the default Internal CM list (filter toggle to show). Cron implementation in handoff Section I.
         </div>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">F.4 · Reopen — when more info surfaces after close <span class="src">case_reopen_action</span></h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Permission-gated processor action on RESOLVED or CLOSED cases. Use case: merchant submitted a COA, processor accepted, case closed — then a downstream check (Q-ScanAI re-scan, audit) surfaces the COA was tampered or the resolution was insufficient. Reopen flips status back to IN_REVIEW with all items reset to PENDING (or REJECTED if processor wants merchant to resubmit). Audit-logged with required reason. Merchant gets in-portal banner + email.</p>
+
+      <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px;margin-top:8px">
+        <div class="case-meta-row">
+          <span class="case-num">CR-2026-0042</span>
+          <span class="pill pill-resolved">RESOLVED</span>
+          <span style="margin-left:auto;font-size:11px;color:#64748B">Resolved 2026-04-29 · 14d ago</span>
+        </div>
+        <h4 style="font-size:14px;font-weight:700;color:#0F172A;margin:6px 0 10px">Q1 compliance review</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn">Open Audit Log</button>
+          <span class="spacer" style="flex:1"></span>
+          <button class="btn" style="border-color:#F05252;color:#F05252">↻ Reopen Case</button><span class="src inline">case_reopen_action</span>
+        </div>
+      </div>
+
+      <div class="annot warn" style="margin-top:14px">
+        <span class="ic">!</span>
+        <div><strong>Reopen vs. new case</strong>: if the new finding is genuinely independent of the closed case, file a new case. Reopen is for when the original resolution turns out to be wrong or insufficient, so the audit trail stays connected. Reason field captures which.</div>
       </div>
 
       <div class="eng">
@@ -2537,6 +2617,33 @@ type Plan = {
         </tbody>
       </table>
 
+      <div style="padding:18px 22px;border-top:3px solid #F05252;background:#FFFBEB">
+        <h4 style="font-size:13px;font-weight:800;color:#92400E;margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">Q-Config Sources — cross-cutting annotation contract</h4>
+        <p style="font-size:12px;color:#78350F;margin-bottom:8px;line-height:1.6">Every new UI element annotated with a small grey <span class="src">example_source_code</span> tag is the <strong>proposed Q-Config Source identifier the dev team would declare</strong> when implementing the ticket. Q-Config assigns the actual ID when registered. Joseph's framing:</p>
+        <blockquote style="margin:0 0 10px;padding:10px 14px;border-left:3px solid #F05252;background:#fff;font-size:12px;color:#475569;font-style:italic;line-height:1.6">"As we are adding new UI elements or removing/adjusting existing ones, we have each mapped as a 'Source' in Q-config which get combined into 'Features' and can be turned on/off in a subscription plan to show/hide certain columns or panels or buttons or even grey them out."<br/><br/>"Yes they sources get added by the dev team usually and then given an ID and then I can combine them into features that can then get added to plans"</blockquote>
+        <p style="font-size:12px;color:#78350F;margin-bottom:10px;line-height:1.6"><strong>Operational handoff:</strong> dev team declares the Source in code + registers it in Q-Config (gets an ID assigned). <strong>Joseph (PM)</strong> then composes <strong>Features</strong> from those Sources in the Q-Config UI — that composition is downstream PM work, <strong>not part of this ticket's scope</strong>. <strong>Joseph (PM)</strong> binds Features to <strong>Plans</strong> for subscription gating (show / hide / grey-out per plan). Same Sources will feed future <strong>Roles &amp; Permissions</strong> (<code class="mono">AR-76</code>, hardcoded today) as Action seeds — Sources become Actions → Rights → Roles. So Source codes are stable identifiers tied to UI elements; Features are PM-curated bundles that change over time.</p>
+        <p style="font-size:12px;color:#78350F;margin-bottom:10px;line-height:1.6"><strong>Cross-link:</strong> see the <a href="qconfig-feature-limits-workflow.html" style="color:#92400E;font-weight:700;text-decoration:underline">Q-Config Feature Limits Workflow</a> for the Variables / Limiting Factors / Triggers / Plans architecture this builds on. The <code class="mono">Feature.canBeFocus</code> + <code class="mono">Plan.focusFeatureId</code> dual-flag from Section C extends the same mockup.</p>
+        <p style="font-size:12px;color:#78350F;line-height:1.6"><strong>Open question:</strong> does the Q-Config UI today expose a Sources management surface where dev-team-registered Sources are visible/editable, or do registrations happen purely through code + a backend assignment? Joseph believes the architecture is in place but the surfacing UI may need a dedicated Sources tab — parallel ticket sent to the team. v1 implementation can proceed naming the Source codes (per the inventory below); registration follows the dev team's existing Q-Config flow.</p>
+        <details style="margin-top:12px">
+          <summary style="cursor:pointer;font-size:11px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.04em">Naming convention &amp; full Source inventory ▾</summary>
+          <div style="padding:10px 0 0;font-size:11px;color:#475569;line-height:1.7">
+            <p><strong>Naming:</strong> <code class="mono">&lt;area&gt;_&lt;element&gt;_&lt;type&gt;</code>. Lowercase snake_case. Area = surface (e.g. <code class="mono">we_monitor</code>, <code class="mono">case</code>, <code class="mono">merchant_dashboard</code>, <code class="mono">qconfig_plan</code>). Element = the specific component (e.g. <code class="mono">cases_column</code>, <code class="mono">force_close</code>). Type = the UI archetype (<code class="mono">column</code>, <code class="mono">action</code>, <code class="mono">card</code>, <code class="mono">widget</code>, <code class="mono">nav</code>, <code class="mono">form</code>, <code class="mono">screen</code>).</p>
+            <p style="margin-top:6px"><strong>Sources annotated in this mockup</strong> (search for <code class="mono">class="src"</code> in HTML for in-place references; full list in the per-PR diff summary report). Examples:</p>
+            <ul style="margin-left:18px;list-style:disc;line-height:1.8">
+              <li><code class="mono">we_monitor_cases_column</code> — Active Case Count column on We Monitor (B.1)</li>
+              <li><code class="mono">product_compliance_create_case_button</code> · <code class="mono">qscanai_finding_create_case_button</code> · <code class="mono">license_check_create_case_button</code> — Create Case actions (Section A)</li>
+              <li><code class="mono">case_draft_drawer</code> · <code class="mono">case_management_screen</code> · <code class="mono">case_detail_panel</code> — processor case structure (Section A/B)</li>
+              <li><code class="mono">case_force_close_action</code> · <code class="mono">case_reopen_action</code> · <code class="mono">case_response_accept_action</code> · <code class="mono">case_response_reject_action</code> — case-level processor actions (B/F)</li>
+              <li><code class="mono">case_item_resolution_form_license</code> · <code class="mono">_product_coa</code> · <code class="mono">_website_finding</code> · <code class="mono">_kyc_document</code> — per-dataType resolution forms (Section E)</li>
+              <li><code class="mono">case_item_request_extension_action</code> · <code class="mono">case_item_dispute_action</code> — per-item merchant actions (Section E)</li>
+              <li><code class="mono">merchant_qtrust_compliance_cases_nav</code> · <code class="mono">merchant_dashboard_compliance_cases_card</code> · <code class="mono">merchant_dashboard_sla_overview_widget</code> · <code class="mono">merchant_case_detail_screen</code> — merchant Q-Trust shell additions (Section D/E)</li>
+              <li><code class="mono">merchant_invite_email_template</code> · <code class="mono">merchant_signup_form</code> · <code class="mono">merchant_mycoa_wizard_step</code> · <code class="mono">merchant_paywall_filtered_by_focus_feature</code> — invite flow (Section C)</li>
+              <li><code class="mono">qconfig_plan_focus_feature_dropdown</code> · <code class="mono">qconfig_feature_can_be_focus_toggle</code> — Q-Config admin surfaces (Section C)</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
       <div style="padding:18px 22px">
         <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:10px">Recording the Claude Code workflow — one video, meta-level <span class="defer" style="background:#F05252">REVISED</span></h4>
         <p style="font-size:12px;color:#64748B;margin-bottom:10px">Joseph's revised approach: <strong>one good ~10-15 minute video</strong> documenting the Claude Code workflow pattern, not a 6-episode feature-by-feature series. Recorded with <strong>Zoom Clips</strong>. The video shows Joseph's repeatable process, not the implementation itself:</p>
@@ -2574,21 +2681,36 @@ type Plan = {
   <div class="section" id="sec-j">
     <div class="section-head">
       <h2>J · Future-state reference</h2>
-      <div class="section-sub">Vertical-nav direction · what v1 deliberately defers</div>
+      <div class="section-sub">v2 directions · what v1 deliberately defers</div>
     </div>
     <div class="section-body">
+
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:0 0 8px">J.1 · Processor unified vertical-nav shell (v2)</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:12px">Joseph's Claude design (in <code class="mono">~/Downloads/Compliance Portal/screenshots/processor-dash.jpg</code>) shows the processor side moved into the same vertical-nav shell as the merchant. Same nav, different content per role. <strong>Not v1</strong> — defers to avoid disrupting the dev team's in-flight WeMonitor industry-filter work. v1 processor stays in Q-Monitor's existing horizontal nav with a new Cases tab; v2 collapses both to the unified vertical shell at <code class="mono">/cases</code>.</p>
+
       <div class="future">
         <span class="ic">↗</span>
         <div style="flex:1">
-          <h3>Joseph's Claude design — vertical-nav direction (not v1)</h3>
-          <p>Joseph designed a vertical-navigation rework of Q-Monitor in <a href="https://api.anthropic.com/v1/design/h/XhCgVWNPWlXIg2-53Nvecw?open_file=index.html" target="_blank">claude design XhCgVWNPWlXIg2-53Nvecw</a> that pulls We Monitor + Cases + Findings up one level so they're directly clickable from the app sidebar. v1 keeps the existing horizontal nav inside Q-Monitor — the rework is deferred to avoid disrupting the dev team's in-flight industry-filter work on We Monitor.</p>
-          <p style="margin-top:8px">The vertical-nav design is what gets built when this v1 vertical slice is shipped and stable, in tandem with QP-3593 (configurable resolution types) which makes the merchant response surface generalizable.</p>
+          <h3>Processor unified vertical-nav (v2 — `processor-dash.jpg`)</h3>
+          <p>Same Q-Trust shell as the merchant view, role-resolved to processor content. Sidebar nav: We Monitor / Findings / Product Compliance / Licenses / <strong>Cases</strong> / Reports / Q-Config / Settings. Replaces the current Q-Monitor horizontal-nav-with-stacked-sub-navs structure that Joseph called out as "50% vertical space lost before you reach content" in his 2026-04-29 walkthrough.</p>
+          <p style="margin-top:8px">Single route convention <code class="mono">/cases</code> works for both audiences — server resolves role at the route level, renders processor list / detail / actions vs merchant list / detail / response forms. Different rendered content per audience; one nav structure to maintain.</p>
+          <p style="margin-top:8px">Likely lands alongside QP-3593 (configurable resolution types) so the rework + the multi-resolutionType backend land in the same release window.</p>
         </div>
       </div>
 
+      <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">J.2 · Joseph's Claude design source artifacts</h3>
+      <p style="font-size:12px;color:#64748B;margin-bottom:8px">The Claude design lives at <a href="https://api.anthropic.com/v1/design/h/XhCgVWNPWlXIg2-53Nvecw?open_file=index.html" target="_blank" style="color:#1A202E;font-weight:700">claude design XhCgVWNPWlXIg2-53Nvecw</a> (browser viewer; agent context returns 404 without authenticated session). Joseph downloaded the artifacts to <code class="mono">~/Downloads/Compliance Portal/</code> with these reference screenshots:</p>
+      <ul style="margin-left:20px;font-size:12px;color:#475569;line-height:1.8">
+        <li><code class="mono">screenshots/merchant-dash-new.jpg</code> — merchant Q-Trust dashboard with the new COMPLIANCE CASES card (drives Section D)</li>
+        <li><code class="mono">screenshots/merchant-portal.png</code> — merchant case detail view (informs Section E layout)</li>
+        <li><code class="mono">screenshots/merchant-invite.png</code> + <code class="mono">merchant-invite-2.png</code>/<code class="mono">3.png</code>/<code class="mono">4.png</code> — invite flow steps (informs Section C)</li>
+        <li><code class="mono">screenshots/01-processor-we-monitor.png</code> — processor We Monitor + Cases column (informs Section B.1)</li>
+        <li><code class="mono">screenshots/processor-dash.jpg</code> — <strong>v2 future state</strong>: processor on unified vertical-nav shell (this section J.1)</li>
+      </ul>
+
       <div class="annot warn" style="margin-top:14px">
         <span class="ic">!</span>
-        <div><strong>Note on the design link</strong>: the claude design URL above is a viewer endpoint that requires Joseph's authenticated session to fetch — agent context (from a separate machine) returns 404/405 against api.anthropic.com directly. This mockup was synthesized from the V2 mockup (compliance-portal-v2.html) + Joseph's 2026-04-29 self-recorded walkthrough rather than from the design's HTML directly. If reviewers want side-by-side comparison Joseph can drop screenshots into the PR.</div>
+        <div><strong>Note on the design URL</strong>: the claude design URL is a browser-viewer endpoint that requires Joseph's authenticated session — agent context returns 404/405. v3.2 synthesis pulled from the V2 mockup + Fathom transcripts + Joseph's directional decisions + the screenshot file inventory above. If reviewers want side-by-side comparison Joseph can drop the JPGs/PNGs into the PR comment thread.</div>
       </div>
     </div>
   </div>
@@ -2605,10 +2727,12 @@ type Plan = {
       <li><strong>Joseph's mid-task scope corrections (v3 build)</strong> — Initially merchant-only slice; corrected to end-to-end vertical slice across 10 tickets with one item / one resolution.</li>
       <li><strong>Joseph's resolution decisions (v3.1 revision, 2026-04-29 PM)</strong> — Resolved v3's open questions: multi-item + multi-dataType; merchant vertical nav + mobile; Force Close into v1; per-dataType resolution map (still hardcoded for v1); Focus Feature invite flow + MyCOA wizard; one meta-workflow video instead of 6 episodes.</li>
       <li><strong>Joseph's Focus Feature dual-flag clarification (same PM session)</strong> — Resolved data-model question with dual-flag architecture: <code class="mono">Feature.canBeFocus</code> (admin toggle on Feature Builder Details tab, default false) + <code class="mono">Plan.focusFeatureId</code> (FK to one of the plan's bound features, filtered to <code class="mono">canBeFocus=true</code>). Extends the Q-Config Feature Limits work shipped earlier; cross-linked to that mockup. New open question is migration cleanliness, not architecture.</li>
+      <li><strong>Q-Trust unified shell pivot (v3.2, same PM session)</strong> — "Compliance Portal" dissolves into the existing Q-Trust shell as Compliance Cases tabs/cards. Single route convention <code class="mono">/cases</code> (role-resolves on server). v1: processor stays in horizontal Q-Monitor with Cases tab; v2: processor moves to unified vertical-nav shell (per <code class="mono">processor-dash.jpg</code>). QP-3586 scope shrinks from "build new dashboard" to "add COMPLIANCE CASES card to existing Q-Trust dashboard" (per <code class="mono">merchant-dash-new.jpg</code>).</li>
+      <li><strong>Q-Config Sources annotation (v3.2)</strong> — Every UI element added or adjusted in v1 is annotated with a Q-Config Source code (small grey monospaced tags throughout). Sources roll up into Features (subscription gating now) + future Roles &amp; Permissions (AR-76, hardcoded today). Cross-links to <a href="qconfig-feature-limits-workflow.html" style="color:#0F172A;font-weight:700;text-decoration:underline">Q-Config Feature Limits Workflow</a> mockup throughout.</li>
       <li><strong>Joseph's claude design</strong> — referenced in Section J; URL unreachable from agent context (404/405 against api.anthropic.com without authenticated session).</li>
     </ol>
 
-    <h4 style="margin-top:14px">v3 → v3.1 changelog</h4>
+    <h4 style="margin-top:14px">v3 → v3.2 changelog</h4>
     <ul style="margin-left:18px;line-height:1.7">
       <li><strong>Scope</strong>: 10 → 11 tickets in v1; 3 → 2 deferred. QP-3591 (Force Close + 90d auto-archive) moved into v1.</li>
       <li><strong>Items</strong>: 1 item per case → multi-item, polymorphic by <code class="mono">dataType</code> (LICENSE, PRODUCT_COA, WEBSITE_FINDING, KYC_DOCUMENT).</li>
@@ -2616,8 +2740,11 @@ type Plan = {
       <li><strong>Merchant nav</strong>: shared horizontal tabs → vertical sidebar (different paradigm from processor's Q-Monitor).</li>
       <li><strong>Mobile</strong>: not specified → mandatory @media breakpoints under 760px on every merchant section. ≥44px touch targets.</li>
       <li><strong>Invite flow</strong>: signup → case → expanded to signup → (conditional) MyCOA wizard → focus-feature-filtered paywall → case. <strong>Dual-flag schema</strong>: <code class="mono">Feature.canBeFocus: boolean</code> (admin toggle, default false) + <code class="mono">Plan.focusFeatureId: FK</code> (filtered to plan's bound features with <code class="mono">canBeFocus=true</code>). Invite carries <code class="mono">planId</code>; server resolves to focus feature on /redeem. Cross-linked to <a href="qconfig-feature-limits-workflow.html" style="color:#1A202E;font-weight:700;text-decoration:underline">Q-Config Feature Limits Workflow</a>.</li>
-      <li><strong>Force Close</strong>: disabled stub with v2 marker → active permission-gated action, audit-logged, with confirm modal.</li>
+      <li><strong>Force Close</strong>: disabled stub with v2 marker → active permission-gated action, audit-logged, with confirm modal. (v3.2 adds Reopen as the inverse — see F.4.)</li>
       <li><strong>Recording</strong>: 6-episode breakdown → 1 meta-workflow video via Zoom Clips covering the Claude Code documentation → validate → proceed → repeat pattern.</li>
+      <li><strong>v3.2 — Q-Trust unified shell pivot</strong>: "Compliance Portal" dissolves into existing Q-Trust shell as a Compliance Cases nav link. Single route convention <code class="mono">/cases</code> (role-resolved). v1 processor stays in horizontal Q-Monitor with a Cases tab; v2 processor moves to unified vertical-nav shell (per <code class="mono">processor-dash.jpg</code>). QP-3586 scope shrinks: extend existing dashboard with COMPLIANCE CASES card, not redesign.</li>
+      <li><strong>v3.2 — F.4 Reopen action</strong>: new permission-gated action on RESOLVED/CLOSED cases. Audit-logged. Inverse of Force Close.</li>
+      <li><strong>v3.2 — Q-Config Sources annotation</strong>: every new UI element annotated with proposed Source code. Dev declares Source in code → Q-Config registers and assigns ID → Joseph (PM) composes Features from Sources → binds Features to Plans for subscription gating. Same Sources feed future Roles &amp; Permissions (AR-76) as Action seeds.</li>
     </ul>
   </div>
 
