@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Q-Config — Feature Limits Workflow (Variables / Limiting Factors / Triggers / Plans)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --font-ui:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --black:#1A202E;
+  --black-hover:#1F3569;
+  --link:#376fd0;
+  --action-blue:#2563eb;
+  --tab-indicator:#F05252;
+  --modal-wash:#F7F5FF;
+  --field-bg:#F8FBFD;
+  --input-border:#C5C5C5;
+  --grey-smoke:#F1F5F9;
+  --green:#00d581;
+  --green-hub:#48D188;
+  --red:#ff404a;
+  --red-light:#F05252;
+  --yellow:#FFDD50;
+  --yellow-hub:#E4AE3C;
+  --subtitle:#657496;
+  --grey:#A7B2C7;
+  --border:#E2E8F0;
+  --flat-shadow:0px 1px 2px 0px rgba(0,0,0,.05);
+  --card-shadow:rgba(50,50,93,.025) 0px 2px 5px -1px,rgba(0,0,0,.05) 0px 1px 3px -1px;
+}
+html,body{height:100%}
+body{font-family:var(--font-ui);background:#F1F5F9;color:#1A202E;font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased}
+code,.mono{font-family:var(--font-mono)}
+
+/* TOP NAV */
+.nav{background:#0F172A;border-bottom:1px solid rgba(255,255,255,.08);padding:10px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.nav a{color:#93C5FD;text-decoration:none;font-size:12px;font-weight:600}
+.nav a:hover{color:#fff}
+.nav .sep{color:#334155}
+.nav .cur{color:#F8FAFC;font-size:12px;font-weight:600}
+.nav .badge{background:#1E3A5F;color:#fff;font-family:var(--font-mono);font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.02em;margin-left:auto}
+
+.page{max-width:1280px;margin:0 auto;padding:28px 24px 80px}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:26px;font-weight:700;color:#1A202E;margin-bottom:8px;letter-spacing:-.01em}
+.page-header p{color:#475569;font-size:14px;max-width:920px;line-height:1.6}
+.meta-row{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.meta-pill{background:#fff;border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600;color:#475569}
+.meta-pill.strong{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
+.meta-pill.new{background:#DCFCE7;border-color:#86EFAC;color:#166534}
+.meta-pill.scope{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.meta-pill.product{background:#F3E8FF;border-color:#E9D5FF;color:#6B21A8}
+
+/* INFO ANNOTATION */
+.annotation{background:#FFFBEB;border:1.5px dashed #FCD34D;border-radius:10px;padding:14px 18px;font-size:12px;color:#78350F;line-height:1.65;margin-bottom:24px}
+.annotation .pill{display:inline-block;background:#F59E0B;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;margin-right:6px}
+.annotation strong{color:#92400E}
+.annotation code{background:#FEF3C7;padding:1px 5px;border-radius:3px;font-size:11px}
+.annotation ul{padding-left:18px;margin-top:6px}
+.annotation li{margin-bottom:3px}
+
+/* SECTION SHELL */
+.section{background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:32px;overflow:hidden;box-shadow:var(--flat-shadow)}
+.section-head{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--border)}
+.section-head .num{width:28px;height:28px;border-radius:8px;background:#1A202E;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono)}
+.section-head h2{font-size:16px;font-weight:700;color:#0F172A;letter-spacing:-.005em}
+.section-head .sub{font-size:12px;color:#64748B;margin-left:auto;font-weight:500}
+.section-body{padding:22px}
+
+/* ARCHITECTURE SUMMARY */
+.arch-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:6px}
+@media(max-width:980px){.arch-grid{grid-template-columns:repeat(2,1fr)}}
+.arch-card{border:1.5px solid var(--border);border-radius:10px;padding:16px 16px;background:#fff;position:relative}
+.arch-card .ic{font-size:18px;margin-bottom:8px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px}
+.arch-card.var .ic{background:#EDE9FE;color:#5B21B6}
+.arch-card.lf .ic{background:#FEE2E2;color:#991B1B}
+.arch-card.tr .ic{background:#FEF3C7;color:#92400E}
+.arch-card.pl .ic{background:#DBEAFE;color:#1E40AF}
+.arch-card h3{font-size:13px;font-weight:800;color:#0F172A;margin-bottom:4px}
+.arch-card .one-liner{font-size:11px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.arch-card p{font-size:12px;color:#334155;line-height:1.55}
+.arch-card .ex{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:11px;color:#475569}
+.arch-card .ex strong{color:#0F172A}
+.arch-card code{background:var(--grey-smoke);padding:1px 5px;border-radius:3px;font-size:10.5px;color:#0F172A}
+
+.arch-flow{margin-top:18px;padding:14px 16px;background:#FAFBFC;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#334155}
+.arch-flow .step{padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:8px;font-weight:600}
+.arch-flow .step.var{border-color:#A78BFA;color:#5B21B6;background:#F5F3FF}
+.arch-flow .step.lf{border-color:#FCA5A5;color:#991B1B;background:#FEF2F2}
+.arch-flow .step.tr{border-color:#FCD34D;color:#92400E;background:#FFFBEB}
+.arch-flow .step.pl{border-color:#93C5FD;color:#1E40AF;background:#EFF6FF}
+.arch-flow .arrow{color:#94A3B8;font-weight:700;font-size:14px}
+
+/* MODAL STAGE */
+.modal-stage{background:linear-gradient(180deg,#EEF2F7 0%,#DDE3EC 100%);padding:34px 24px;display:flex;justify-content:center}
+
+.fb-modal{background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(15,23,42,.18),0 4px 12px rgba(15,23,42,.08);max-width:880px;width:100%;overflow:hidden;border:1px solid var(--border)}
+.fb-head{padding:22px 26px 0;background:var(--modal-wash);position:relative}
+.fb-head .crumb{font-size:11px;color:#64748B;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.fb-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.fb-head h3{font-size:24px;font-weight:700;color:#1A202E;letter-spacing:-.01em}
+.fb-head .feature-pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #DDD6FE;color:#5B21B6;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-top:6px}
+.fb-head .feature-pill .dot{width:7px;height:7px;border-radius:50%;background:#8B5CF6}
+.fb-close{width:32px;height:32px;border:1px solid var(--border);background:#fff;border-radius:8px;color:#64748B;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;flex-shrink:0}
+
+.fb-tabs{display:flex;gap:0;padding:0 26px;background:var(--modal-wash);border-bottom:1px solid #E2E0EE}
+.fb-tab{padding:12px 18px;font-size:13px;font-weight:600;color:#64748B;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;letter-spacing:-.005em;display:flex;align-items:center;gap:8px}
+.fb-tab .tab-num{font-family:var(--font-mono);font-size:10px;color:#94A3B8;font-weight:600}
+.fb-tab.active{color:#1A202E;border-bottom-color:var(--tab-indicator);font-weight:700}
+.fb-tab.active .tab-num{color:var(--tab-indicator)}
+
+.fb-help{background:#FAFBFC;border-bottom:1px solid var(--border);padding:14px 26px;display:flex;gap:12px;align-items:flex-start}
+.fb-help .help-ic{width:24px;height:24px;border-radius:50%;background:#EDE9FE;color:#5B21B6;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;font-family:var(--font-mono)}
+.fb-help .help-body{font-size:12px;color:#475569;line-height:1.55}
+.fb-help .help-body strong{color:#0F172A;font-weight:700}
+.fb-help .help-body code{background:#fff;border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:11px;color:#5B21B6}
+
+.fb-body{padding:22px 26px}
+.fb-body .body-label{font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.fb-body .body-label .count{font-family:var(--font-mono);background:var(--grey-smoke);color:#475569;font-size:10px;padding:1px 7px;border-radius:10px;letter-spacing:0;text-transform:none;font-weight:600}
+
+/* TABLE for Variables/LF/Triggers */
+.fb-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}
+.fb-table-head{background:#FAFBFC;display:grid;padding:11px 16px;font-size:10px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+.fb-table-row{display:grid;padding:14px 16px;border-bottom:1px solid #F1F5F9;font-size:13px;color:#1A202E;align-items:center}
+.fb-table-row:last-child{border-bottom:none}
+.fb-table-row:hover{background:#FCFDFE}
+
+/* Variables table */
+.var-grid{grid-template-columns:1.2fr 2fr 0.8fr 0.7fr 60px}
+.var-name{font-weight:700;color:#0F172A;font-size:13px}
+.var-name .code{font-family:var(--font-mono);font-size:11px;color:#5B21B6;background:#F5F3FF;padding:1px 6px;border-radius:3px;display:inline-block;margin-top:3px}
+.var-desc{color:#475569;font-size:12px;line-height:1.5;padding-right:8px}
+.var-type{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#475569;background:var(--grey-smoke);padding:3px 9px;border-radius:6px;letter-spacing:0;text-transform:none}
+.var-type.number{background:#DBEAFE;color:#1E40AF}
+.var-type.boolean{background:#FCE7F3;color:#9D174D}
+.var-type.enum{background:#FEF3C7;color:#92400E}
+.var-default{font-family:var(--font-mono);font-size:11px;color:#0F172A}
+.var-default.empty{color:#94A3B8;font-style:italic;font-family:inherit;font-size:12px}
+.row-actions{display:flex;gap:4px;justify-content:flex-end}
+.icon-btn{width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:#fff;color:#64748B;display:inline-flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+.icon-btn:hover{border-color:#1A202E;color:#1A202E}
+.icon-btn.danger:hover{border-color:#EF4444;color:#EF4444}
+
+/* Limiting Factors table */
+.lf-grid{grid-template-columns:1fr 1.6fr 1fr 1.6fr 60px}
+.lf-name{font-weight:700;color:#0F172A;font-size:13px}
+.lf-name small{display:block;font-size:10px;color:#94A3B8;font-weight:500;margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.lf-desc{color:#475569;font-size:12px;line-height:1.5;padding-right:8px}
+.var-link{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11px;color:#5B21B6;background:#F5F3FF;border:1px solid #E9D5FF;padding:3px 8px;border-radius:6px}
+.var-link::before{content:'→';color:#A78BFA;font-family:var(--font-ui)}
+
+/* CAPACITY TIER CHIPS — the improved UI */
+.tier-strip{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tier-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #CBD5E1;color:#0F172A;font-size:12px;font-weight:700;padding:4px 10px 4px 10px;border-radius:6px;font-family:var(--font-mono);position:relative}
+.tier-chip:hover{border-color:#1A202E}
+.tier-chip .x{cursor:pointer;color:#94A3B8;font-size:13px;font-weight:600;line-height:1;font-family:var(--font-ui)}
+.tier-chip .x:hover{color:#EF4444}
+.tier-chip.unlimited{background:#1A202E;color:#fff;border-color:#1A202E;font-family:var(--font-ui);letter-spacing:0}
+.tier-chip.unlimited .x{color:#94A3B8}
+.tier-chip-add{display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1.5px dashed #CBD5E1;color:#64748B;font-size:14px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;letter-spacing:0;font-family:var(--font-ui)}
+.tier-chip-add:hover{border-color:#1A202E;color:#1A202E;border-style:solid}
+.tier-chip-add::before{content:'+';font-size:14px;font-weight:700;margin-right:3px}
+
+/* Triggers table */
+.tr-grid{grid-template-columns:1.2fr 1fr 1.2fr 1.5fr 60px}
+.tr-name{font-weight:700;color:#0F172A;font-size:13px}
+.tr-threshold{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:#92400E;background:#FFFBEB;border:1px solid #FDE68A;padding:3px 9px;border-radius:6px}
+.tr-copy{font-size:12px;color:#1A202E;background:#FAFBFC;border:1px dashed var(--border);padding:8px 11px;border-radius:6px;line-height:1.5;font-style:italic}
+.tr-copy strong{color:#0F172A;font-weight:700;font-style:normal}
+
+/* Add row */
+.add-row{display:flex;justify-content:center;padding:14px;border-top:1px solid var(--border);background:#FAFBFC}
+.add-row-btn{padding:8px 14px;border:1.5px dashed #CBD5E1;background:#fff;border-radius:8px;font-size:12px;font-weight:700;color:#475569;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.add-row-btn:hover{border-color:#1A202E;color:#1A202E;border-style:solid}
+.add-row-btn::before{content:'+';font-size:14px;font-weight:800}
+
+/* MODAL FOOTER */
+.fb-footer{padding:16px 26px;border-top:1px solid var(--border);background:#FAFBFC;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.fb-footer .footer-meta{font-size:11px;color:#64748B}
+.fb-footer .footer-meta strong{color:#0F172A;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 22px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid transparent;background:transparent;color:#1A202E;font-family:inherit;line-height:1;letter-spacing:0;text-transform:none}
+.btn.primary{background:#1A202E;color:#fff;border-color:#1A202E;filter:drop-shadow(0px 3px 6px rgba(0,0,0,.16))}
+.btn.primary:hover{background:#1F3569;border-color:#1F3569}
+.btn.ghost{background:#fff;color:#1A202E;border-color:var(--border)}
+.btn.ghost:hover{border-color:#1A202E}
+.btn.danger{background:#fff;color:#B91C1C;border-color:#FCA5A5}
+.btn.tertiary{background:transparent;color:#64748B;border-color:transparent}
+
+/* SECTION INTRO TEXT */
+.section-intro{padding:18px 22px;border-bottom:1px solid var(--border);background:#FAFBFC;display:flex;gap:14px;align-items:flex-start}
+.section-intro .num-tag{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--tab-indicator);background:#FEF2F2;padding:3px 9px;border-radius:6px;letter-spacing:.04em;flex-shrink:0;border:1px solid #FECACA}
+.section-intro .body{font-size:13px;color:#334155;line-height:1.6}
+.section-intro .body strong{color:#0F172A;font-weight:700}
+.section-intro .body code{background:var(--grey-smoke);padding:1px 6px;border-radius:3px;font-size:11px;color:#5B21B6;font-family:var(--font-mono)}
+
+/* PLAN EDITOR — section 4 */
+.plan-editor{background:#fff;display:grid;grid-template-columns:240px 1fr;min-height:560px}
+.pe-side{background:#FAFBFC;border-right:1px solid var(--border);padding:16px 0}
+.pe-side .pe-side-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:4px 20px 10px}
+.pe-side-item{padding:10px 20px;font-size:12px;color:#475569;font-weight:600;cursor:pointer;border-left:3px solid transparent}
+.pe-side-item.active{background:#fff;color:#1A202E;font-weight:700;border-left-color:var(--tab-indicator)}
+.pe-side-item.muted{color:#94A3B8}
+.pe-main{padding:24px 28px}
+.pe-crumb{font-size:11px;color:#94A3B8;margin-bottom:6px}
+.pe-crumb a{color:var(--link)}
+.pe-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.pe-head h2{font-size:20px;font-weight:700;color:#1A202E;letter-spacing:-.01em}
+.pe-head .pe-sub{font-size:12px;color:#64748B;margin-top:4px}
+.pe-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.field-grid.full-row{grid-template-columns:1fr}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--input-border);border-radius:5px;padding:8px 11px;font-size:13px;font-family:inherit;color:#1A202E;background:var(--field-bg);outline:none}
+.field textarea{min-height:60px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--action-blue);background:#fff;box-shadow:0 0 0 2px rgba(37,99,235,.12)}
+.field .helper{font-size:11px;color:#94A3B8;margin-top:4px;line-height:1.5}
+
+.pe-section-title{font-size:14px;font-weight:700;color:#0F172A;margin:22px 0 8px}
+.pe-section-help{font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.55}
+
+/* FEATURE LIMITS PANEL inside plan editor */
+.feature-card{border:1.5px solid #DDD6FE;background:#FAFAFF;border-radius:10px;padding:0;overflow:hidden;margin-bottom:14px}
+.feature-card .fc-head{padding:14px 16px;background:#F5F3FF;border-bottom:1px solid #E9D5FF;display:flex;align-items:center;gap:10px}
+.feature-card .fc-head .fc-pill{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #DDD6FE;color:#5B21B6;font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;letter-spacing:.04em;text-transform:uppercase}
+.feature-card .fc-name{font-size:14px;font-weight:700;color:#1A202E}
+.feature-card .fc-name small{font-family:var(--font-mono);font-size:11px;color:#5B21B6;font-weight:500;margin-left:6px}
+.feature-card .fc-spacer{flex:1}
+.feature-card .fc-toggle{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#166534}
+.toggle-pill{position:relative;display:inline-block;width:32px;height:18px}
+.toggle-pill input{opacity:0;width:0;height:0;position:absolute}
+.toggle-pill .slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#16A34A;border-radius:18px;cursor:pointer;transition:.2s}
+.toggle-pill .slider::before{content:'';position:absolute;height:14px;width:14px;left:16px;bottom:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+
+.feature-card .fc-body{padding:14px 16px}
+.lf-row{display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed var(--border)}
+.lf-row:last-child{border-bottom:none}
+.lf-row .lf-meta{font-size:12px}
+.lf-row .lf-meta-name{font-size:13px;font-weight:700;color:#0F172A}
+.lf-row .lf-meta-desc{font-size:11px;color:#64748B;margin-top:3px;line-height:1.5}
+.lf-row .lf-tier-picker{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tier-radio{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #CBD5E1;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;font-family:var(--font-mono)}
+.tier-radio:hover{border-color:#1A202E;color:#1A202E}
+.tier-radio.selected{border-color:var(--action-blue);background:#EFF6FF;color:#1E40AF}
+.tier-radio.selected::before{content:'●';color:var(--action-blue);margin-right:2px;font-size:10px}
+.tier-radio.unlimited{font-family:var(--font-ui);letter-spacing:0}
+
+/* MERCHANT PAYWALL FILTERING */
+.merchant-stage{background:linear-gradient(180deg,#F8FAFC 0%,#E2E8F0 100%);padding:0;display:block}
+.merchant-shell{max-width:1080px;margin:0 auto;padding:36px 24px}
+.merchant-card{background:#fff;border-radius:14px;border:1px solid var(--border);box-shadow:var(--card-shadow);overflow:hidden}
+.merchant-head{padding:22px 28px;border-bottom:1px solid var(--border);background:#FAFBFC}
+.merchant-head h3{font-size:18px;font-weight:700;color:#1A202E;margin-bottom:4px;letter-spacing:-.005em}
+.merchant-head p{font-size:12px;color:#64748B}
+.merchant-body{padding:24px 28px}
+
+.input-row{display:grid;grid-template-columns:1fr 200px;gap:14px;align-items:flex-end;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:18px;margin-bottom:24px}
+.input-row .label-block{font-size:13px;color:#1A202E;line-height:1.5}
+.input-row .label-block strong{font-weight:700}
+.input-row .label-block small{display:block;font-size:11px;color:#5B21B6;margin-top:4px;font-weight:600}
+.input-row input{width:100%;border:1.5px solid #DDD6FE;border-radius:6px;padding:9px 13px;font-size:18px;font-weight:700;font-family:var(--font-mono);color:#1A202E;background:#fff;outline:none;text-align:center}
+.input-row input:focus{border-color:var(--action-blue)}
+
+.filter-summary{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;margin-bottom:18px;font-size:12px;color:#78350F}
+.filter-summary .ic{width:20px;height:20px;border-radius:50%;background:#F59E0B;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.filter-summary strong{color:#92400E}
+
+.plans-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:880px){.plans-row{grid-template-columns:1fr}}
+.plan-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 18px;display:flex;flex-direction:column;gap:10px;transition:.15s}
+.plan-card.recommended{border:2px solid var(--action-blue);box-shadow:0 8px 24px rgba(37,99,235,.12);position:relative}
+.plan-card.recommended::before{content:'RECOMMENDED · MATCHES YOUR INVENTORY';position:absolute;top:-11px;left:14px;background:var(--action-blue);color:#fff;font-size:9px;font-weight:800;padding:3px 9px;border-radius:4px;letter-spacing:.06em}
+.plan-card .pn{font-size:16px;font-weight:700;color:#0F172A}
+.plan-card .pn small{display:block;font-size:11px;color:#64748B;font-weight:500;margin-top:2px}
+.plan-card .pp{font-size:24px;font-weight:800;color:#1A202E;letter-spacing:-.01em}
+.plan-card .pp small{font-size:12px;color:#64748B;font-weight:500}
+.plan-card .lim-strip{display:flex;flex-direction:column;gap:6px;padding:10px 0;margin:6px 0;border-top:1px dashed var(--border);border-bottom:1px dashed var(--border)}
+.plan-card .lim-row{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#475569}
+.plan-card .lim-row strong{color:#0F172A;font-family:var(--font-mono);font-weight:700}
+.plan-card .lim-row.match strong{color:#166534}
+.plan-card .lim-row.match::after{content:'✓';color:#16A34A;font-weight:800;margin-left:6px}
+.plan-card ul{list-style:none;padding:0;margin:0;flex:1}
+.plan-card ul li{padding:4px 0;font-size:12px;color:#334155;display:flex;gap:7px}
+.plan-card ul li::before{content:'✓';color:#16A34A;font-weight:800}
+.plan-card .pick{margin-top:auto}
+
+.hidden-row{background:#FAFBFC;border:1px dashed #CBD5E1;border-radius:10px;padding:14px 18px;margin-bottom:0}
+.hidden-row h4{font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.hidden-row h4::before{content:'';width:8px;height:8px;border-radius:50%;background:#CBD5E1}
+.hidden-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:700px){.hidden-list{grid-template-columns:1fr}}
+.hidden-plan{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;opacity:.7}
+.hidden-plan .hp-name{font-size:13px;font-weight:700;color:#475569}
+.hidden-plan .hp-name small{display:block;font-size:11px;color:#94A3B8;font-weight:500}
+.hidden-plan .hp-spacer{flex:1}
+.hidden-plan .hp-reason{font-size:11px;color:#B91C1C;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:3px 8px;font-weight:600;font-family:var(--font-mono)}
+
+/* Q-AUDIT FINANCES MONITORING */
+.qa-shell{background:#fff}
+.qa-bar{padding:14px 22px;background:#0F172A;color:#fff;display:flex;align-items:center;gap:14px;font-size:12px}
+.qa-bar .qa-app{font-weight:700;color:#fff;font-size:13px}
+.qa-bar .qa-crumb{color:#94A3B8;font-size:12px}
+.qa-bar .spacer{flex:1}
+.qa-bar .qa-merchant{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);padding:5px 10px;border-radius:6px;font-size:11px}
+.qa-bar .qa-merchant strong{color:#F8FAFC;font-weight:700}
+
+.qa-tabs{display:flex;gap:0;padding:0 22px;background:#FAFBFC;border-bottom:1px solid var(--border)}
+.qa-tab{padding:11px 16px;font-size:12px;font-weight:600;color:#64748B;border-bottom:2px solid transparent;margin-bottom:-1px}
+.qa-tab.active{color:#1A202E;border-bottom-color:var(--tab-indicator);font-weight:700}
+
+.qa-finances-body{padding:24px}
+.qa-summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+@media(max-width:980px){.qa-summary-row{grid-template-columns:repeat(2,1fr)}}
+.qa-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;box-shadow:var(--flat-shadow)}
+.qa-card .lbl{font-size:10px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.qa-card .val{font-size:18px;font-weight:700;color:#1A202E;letter-spacing:-.01em}
+.qa-card .val small{font-size:11px;color:#64748B;font-weight:500;margin-left:4px}
+.qa-card.plan{border-top:3px solid #5B21B6}
+.qa-card.product{border-top:3px solid #2563eb}
+.qa-card.scan{border-top:3px solid #16A34A}
+.qa-card.amount{border-top:3px solid #1A202E}
+
+.qa-section-h{font-size:14px;font-weight:700;color:#0F172A;margin:18px 0 12px}
+
+.usage-block{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:14px}
+.ub-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ub-head .ub-title{font-size:13px;font-weight:700;color:#0F172A}
+.ub-head .ub-title small{display:block;font-size:11px;color:#64748B;font-weight:500;margin-top:2px}
+.ub-head .ub-tier-badge{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;font-family:var(--font-mono)}
+
+.usage-bar{position:relative;height:10px;background:#F1F5F9;border-radius:10px;overflow:hidden;margin-bottom:8px}
+.usage-bar-fill{height:100%;background:linear-gradient(90deg,#16A34A,#22C55E);border-radius:10px;transition:width .3s}
+.usage-bar-fill.warn{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+.usage-bar-fill.over{background:linear-gradient(90deg,#DC2626,#EF4444)}
+.usage-meta{display:flex;justify-content:space-between;font-size:11px;color:#64748B;font-weight:600}
+.usage-meta strong{color:#0F172A;font-family:var(--font-mono);font-weight:700}
+.usage-detail{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:11px;color:#475569;line-height:1.55}
+.usage-detail code{background:var(--grey-smoke);padding:1px 5px;border-radius:3px;font-size:10.5px;color:#5B21B6;font-family:var(--font-mono)}
+.usage-detail .signal{display:inline-flex;align-items:center;gap:5px;background:#F0FDF4;border:1px solid #86EFAC;color:#166534;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:6px}
+.usage-detail .signal.warn{background:#FFFBEB;border-color:#FDE68A;color:#92400E}
+
+/* DATA MODEL CARD */
+.data-model{background:#0F172A;color:#fff;border-radius:14px;padding:28px 32px;margin-top:8px}
+.data-model h3{font-size:14px;font-weight:800;color:#fff;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.data-model .dm-sub{font-size:12px;color:#94A3B8;margin-bottom:20px}
+.data-model pre{background:#0A1020;border:1px solid #1E293B;border-radius:10px;padding:16px 18px;font-family:var(--font-mono);font-size:11.5px;line-height:1.65;color:#CBD5E1;overflow:auto}
+.data-model pre .k{color:#A78BFA}
+.data-model pre .s{color:#86EFAC}
+.data-model pre .n{color:#FBBF24}
+.data-model pre .c{color:#64748B;font-style:italic}
+.data-model pre .o{color:#94A3B8}
+
+/* SECTION DIVIDER LABEL */
+.divider-label{margin:32px 0 12px;text-align:center;color:#64748B;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:14px}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* SCOPE CHIPS in plan editor head */
+.scope-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.scope-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--border);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;color:#475569}
+.scope-chip.feat{background:#F5F3FF;border-color:#DDD6FE;color:#5B21B6}
+.scope-chip.feat::before{content:'⊕';color:#8B5CF6}
+.scope-chip.tier{background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF;font-family:var(--font-mono)}
+.scope-chip.tier::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--action-blue)}
+
+/* PROGRESS DOT BAR for arch flow */
+.section-jump{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:18px;border-top:1px dashed var(--border);padding-top:14px}
+.section-jump a{display:block;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;font-weight:600;color:#475569;text-decoration:none;text-align:center;transition:.15s}
+.section-jump a:hover{border-color:#1A202E;color:#1A202E}
+.section-jump a .sj-num{display:block;font-family:var(--font-mono);font-size:10px;color:#94A3B8;font-weight:700;margin-bottom:2px}
+@media(max-width:820px){.section-jump{grid-template-columns:repeat(2,1fr)}}
+
+/* CALLOUT */
+.callout{background:#EFF6FF;border:1px solid #BFDBFE;border-left:4px solid var(--action-blue);border-radius:8px;padding:14px 18px;font-size:12px;line-height:1.6;color:#1E40AF;margin:0 22px 22px}
+.callout strong{color:#1E3A8A;font-weight:700}
+.callout code{background:rgba(37,99,235,.1);padding:1px 5px;border-radius:3px;font-size:11px;color:#1E40AF;font-family:var(--font-mono)}
+.callout.amber{background:#FFFBEB;border-color:#FDE68A;border-left-color:#F59E0B;color:#78350F}
+.callout.amber strong{color:#92400E}
+.callout.amber code{background:rgba(245,158,11,.12);color:#92400E}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="../index.html">Qredible Prototypes</a>
+  <span class="sep">/</span>
+  <a href="../index.html?filter=q-config">Q-Config</a>
+  <span class="sep">/</span>
+  <span class="cur">Feature Limits Workflow</span>
+  <span class="badge">Spec mockup</span>
+</div>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Q-Config — Feature Limits Workflow</h1>
+    <p>End-to-end walkthrough of the <strong>Variables / Limiting Factors / Triggers / Plans</strong> model that drives MyCOA's Product Limit (and every other plan-tiered constraint going forward). Improves the existing Feature Builder placeholder UI so the model becomes legible and the four concepts read as deliberate, sibling building blocks.</p>
+    <div class="meta-row">
+      <span class="meta-pill strong">Q-Config · Feature Builder + Plan Builder</span>
+      <span class="meta-pill new">Improves existing placeholder UI</span>
+      <span class="meta-pill product">First consumer: MyCOA productLimit</span>
+      <span class="meta-pill scope">Initially paywall filtering only — no UI blocking</span>
+    </div>
+  </div>
+
+  <!-- TOP ANNOTATION -->
+  <div class="annotation">
+    <span class="pill">How to read this mockup</span>
+    Yellow dashed blocks are review notes — never rendered in-app. The <strong>Feature Builder</strong> modal already exists in placeholder form (<code>Details / Sources / Limiting Factors / Variables</code> tabs, capacity values rendered as <code>"5, 10, 25"</code> comma-strings). This mockup keeps that 4-tab shape but improves the editing affordance: capacity tiers become <strong>chips/pills</strong>, an explicit <strong>"Unlimited"</strong> chip captures the blank-means-unlimited semantic, the typo <em>"Limiting Fators"</em> is fixed, and the primary action button is corrected from green to <code>BLACK #1A202E</code> per the design system. Each tab gains a one-line help banner that explains what the tab captures and how it relates to the others.
+    <ul style="margin-top:10px">
+      <li><strong>Variables</strong> are <em>just field defs</em> on a Feature: title, description, code, type, default. They never enforce anything on their own — they're the lexicon a Feature exposes for its Limiting Factors and Triggers to consume.</li>
+      <li><strong>Limiting Factors</strong> are <em>enforcement</em>. A Limiting Factor wraps one Variable with a list of capacity tiers. Plans pick a tier; the system enforces (or — for MyCOA productLimit — filters paywall plans by) that tier.</li>
+      <li><strong>Triggers</strong> are <em>soft nudges</em>. Same architecture but the Variable powers a UI message ("you've used 80% of your weekly scans") instead of a hard limit.</li>
+      <li><strong>Plans</strong> reference Features and pick a capacity tier from each of that Feature's Limiting Factors. A Feature added to a plan with no tier picked = unlimited by default.</li>
+    </ul>
+  </div>
+
+  <!-- ARCHITECTURE SUMMARY -->
+  <section class="section" id="arch">
+    <div class="section-head">
+      <div class="num">A</div>
+      <h2>Architecture summary — four concepts, one workflow</h2>
+      <span class="sub">Read this first</span>
+    </div>
+    <div class="section-body">
+      <div class="arch-grid">
+        <div class="arch-card var">
+          <div class="ic">⌬</div>
+          <h3>Variable</h3>
+          <div class="one-liner">The "what"</div>
+          <p>A field a Feature exposes. Just a definition — title, description, code, data type, default value. Doesn't enforce anything by itself.</p>
+          <div class="ex"><strong>MyCOA examples:</strong> <code>productLimit</code>, <code>currentProductCount</code>, <code>maxScanCount</code>, <code>currentScanCount</code></div>
+        </div>
+        <div class="arch-card lf">
+          <div class="ic">⛔</div>
+          <h3>Limiting Factor</h3>
+          <div class="one-liner">The "enforcement"</div>
+          <p>Wraps a Variable with capacity tiers. Plans pick one tier; the system uses it to gate, filter, or count.</p>
+          <div class="ex"><strong>Product Limit:</strong> <code>productLimit</code> + tiers <code>[100, 250, 500, Unlimited]</code></div>
+        </div>
+        <div class="arch-card tr">
+          <div class="ic">⚡</div>
+          <h3>Trigger</h3>
+          <div class="one-liner">The "soft nudge"</div>
+          <p>Watches a Variable and fires a UI message at a threshold. No blocking — just upgrade prompts and warnings.</p>
+          <div class="ex"><strong>Scans nearing cap:</strong> watch <code>currentScanCount</code> ≥ 80% of <code>maxScanCount</code> → "consider upgrading"</div>
+        </div>
+        <div class="arch-card pl">
+          <div class="ic">▣</div>
+          <h3>Plan</h3>
+          <div class="one-liner">The "subscription"</div>
+          <p>References Features and picks one capacity tier from each Limiting Factor those Features expose. Drives paywall + monitoring.</p>
+          <div class="ex"><strong>MyCOA Pro:</strong> Feature = MyCOA, Product Limit tier = <code>250</code></div>
+        </div>
+      </div>
+
+      <div class="arch-flow">
+        <div class="step var">1. Define Variables on a Feature</div>
+        <span class="arrow">→</span>
+        <div class="step lf">2. Wrap Variables in Limiting Factors with tiers</div>
+        <span class="arrow">→</span>
+        <div class="step tr">2b. (Optional) Add Triggers for soft nudges</div>
+        <span class="arrow">→</span>
+        <div class="step pl">3. Add Feature to a Plan, pick tiers</div>
+        <span class="arrow">→</span>
+        <div class="step pl">4. Paywall filters / Q-Audit monitors</div>
+      </div>
+
+      <div class="section-jump">
+        <a href="#sec-1"><span class="sj-num">01</span>Variables</a>
+        <a href="#sec-2"><span class="sj-num">02</span>Limiting Factors</a>
+        <a href="#sec-3"><span class="sj-num">03</span>Triggers</a>
+        <a href="#sec-4"><span class="sj-num">04</span>Plan editor</a>
+        <a href="#sec-5"><span class="sj-num">05</span>Merchant paywall</a>
+        <a href="#sec-6"><span class="sj-num">06</span>Q-Audit monitor</a>
+        <a href="#sec-7"><span class="sj-num">07</span>Data model</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 1 — VARIABLES TAB                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="section" id="sec-1">
+    <div class="section-head">
+      <div class="num">1</div>
+      <h2>Variable Definition — Feature Builder · Variables tab</h2>
+      <span class="sub">Q-Config admin · MyCOA Feature</span>
+    </div>
+    <div class="section-intro">
+      <span class="num-tag">STEP 01</span>
+      <div class="body">An admin opens the <strong>Feature Builder</strong> for the <code>mycoa</code> Feature and lands on the <strong>Variables</strong> tab. They define the fields the Feature exposes — pure definitions, no enforcement. Each Variable has a <strong>title</strong> (human label), <strong>description</strong> (the contract), <strong>variable code</strong> (machine slug used in policy/feature config), <strong>data type</strong>, and an optional <strong>default value</strong>. Limiting Factors and Triggers downstream pick from this list.</div>
+    </div>
+
+    <div class="modal-stage">
+      <div class="fb-modal">
+
+        <!-- HEAD -->
+        <div class="fb-head">
+          <div class="crumb">Q-Config · Features · MyCOA</div>
+          <div class="fb-title-row">
+            <div>
+              <h3>Feature Builder</h3>
+              <span class="feature-pill"><span class="dot"></span>Editing feature: MyCOA · <code style="font-family:var(--font-mono);font-size:11px;color:#5B21B6">mycoa</code></span>
+            </div>
+            <button class="fb-close">×</button>
+          </div>
+          <!-- TABS -->
+          <div class="fb-tabs">
+            <div class="fb-tab"><span class="tab-num">01</span>Details</div>
+            <div class="fb-tab"><span class="tab-num">02</span>Sources</div>
+            <div class="fb-tab"><span class="tab-num">03</span>Limiting Factors</div>
+            <div class="fb-tab active"><span class="tab-num">04</span>Variables</div>
+          </div>
+        </div>
+
+        <!-- HELP BANNER -->
+        <div class="fb-help">
+          <div class="help-ic">⌬</div>
+          <div class="help-body">
+            <strong>Variables are field definitions.</strong> Each Variable is the lexicon for a single value the Feature tracks — like <code>productLimit</code> or <code>currentScanCount</code>. Defining a Variable here doesn't enforce anything; that happens in the <strong>Limiting Factors</strong> tab (hard caps) and through Triggers (soft nudges).
+          </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="fb-body">
+          <div class="body-label">
+            <span>Variables on this feature</span>
+            <span class="count">4 defined</span>
+          </div>
+
+          <div class="fb-table">
+            <div class="fb-table-head var-grid">
+              <div>Title / Code</div>
+              <div>Description</div>
+              <div>Data type</div>
+              <div>Default</div>
+              <div></div>
+            </div>
+
+            <div class="fb-table-row var-grid">
+              <div>
+                <div class="var-name">Product Limit</div>
+                <span class="code">productLimit</span>
+              </div>
+              <div class="var-desc">Max number of products a merchant can have on their MyCOA inventory under their current subscription. Consumed by the Product Limit Limiting Factor for paywall filtering.</div>
+              <div><span class="var-type number">number</span></div>
+              <div class="var-default empty">—</div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <div class="fb-table-row var-grid">
+              <div>
+                <div class="var-name">Current Product Count</div>
+                <span class="code">currentProductCount</span>
+              </div>
+              <div class="var-desc">Live count of how many products the merchant currently has in MyCOA. Read-only system value; updated whenever products are added/removed.</div>
+              <div><span class="var-type number">number</span></div>
+              <div class="var-default">0</div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <div class="fb-table-row var-grid">
+              <div>
+                <div class="var-name">Max Scan Count (weekly)</div>
+                <span class="code">maxScanCount</span>
+              </div>
+              <div class="var-desc">Max number of scans the user can conduct weekly per their subscription. Consumed by Weekly Scans Limiting Factor (hard cap) and the "scan ceiling nearing" Trigger (soft nudge).</div>
+              <div><span class="var-type number">number</span></div>
+              <div class="var-default empty">—</div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <div class="fb-table-row var-grid">
+              <div>
+                <div class="var-name">Current Scan Count (weekly)</div>
+                <span class="code">currentScanCount</span>
+              </div>
+              <div class="var-desc">Live count of scans the user has conducted this rolling week. Resets on the weekly window roll-over. Read-only system value.</div>
+              <div><span class="var-type number">number</span></div>
+              <div class="var-default">0</div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <div class="add-row">
+              <button class="add-row-btn">Add Variable</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Improvement vs. placeholder:</strong> placeholder UI showed only Title + Description columns. We add <code>variable code</code> (the machine slug — Limiting Factors and Triggers reference Variables by this), <code>data type</code> (number/boolean/enum — drives input controls downstream) and <code>default</code> (for live counters that start at 0). All three are needed to wire a Variable to a real Limiting Factor without ambiguity.
+        </div>
+
+        <div class="fb-footer">
+          <div class="footer-meta"><strong>4</strong> variables · last edited by joseph@qredible.com · 2 hours ago</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn primary">Update Feature</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 2 — LIMITING FACTORS TAB                                   -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="section" id="sec-2">
+    <div class="section-head">
+      <div class="num">2</div>
+      <h2>Limiting Factor Definition — Feature Builder · Limiting Factors tab</h2>
+      <span class="sub">Q-Config admin · MyCOA Feature</span>
+    </div>
+    <div class="section-intro">
+      <span class="num-tag">STEP 02</span>
+      <div class="body">Same Feature, the <strong>Limiting Factors</strong> tab. The admin creates a Limiting Factor by picking a Variable and adding capacity tiers as <strong>chips</strong>. Each chip is one selectable value a plan can choose. The special <strong>Unlimited</strong> chip is the explicit form of "blank/NULL means unlimited" — making the semantic visible instead of hidden in absence-of-value. The Product Limit Limiting Factor is the worked example: Variable = <code>productLimit</code>, tiers = <code>[100, 250, 500, Unlimited]</code>.</div>
+    </div>
+
+    <div class="modal-stage">
+      <div class="fb-modal">
+
+        <div class="fb-head">
+          <div class="crumb">Q-Config · Features · MyCOA</div>
+          <div class="fb-title-row">
+            <div>
+              <h3>Feature Builder</h3>
+              <span class="feature-pill"><span class="dot"></span>Editing feature: MyCOA · <code style="font-family:var(--font-mono);font-size:11px;color:#5B21B6">mycoa</code></span>
+            </div>
+            <button class="fb-close">×</button>
+          </div>
+          <div class="fb-tabs">
+            <div class="fb-tab"><span class="tab-num">01</span>Details</div>
+            <div class="fb-tab"><span class="tab-num">02</span>Sources</div>
+            <div class="fb-tab active"><span class="tab-num">03</span>Limiting Factors</div>
+            <div class="fb-tab"><span class="tab-num">04</span>Variables</div>
+          </div>
+        </div>
+
+        <div class="fb-help">
+          <div class="help-ic">⛔</div>
+          <div class="help-body">
+            <strong>Limiting Factors enforce capacity.</strong> Each one wraps a single <a href="#sec-1" style="color:#5B21B6;font-weight:700">Variable</a> with a list of <strong>capacity tiers</strong>. Plans pick one tier; the system enforces it (or for MyCOA Product Limit, uses it to filter paywall results). Add an <strong>Unlimited</strong> chip when "no cap" is a valid plan tier.
+          </div>
+        </div>
+
+        <div class="fb-body">
+          <div class="body-label">
+            <span>Limiting Factors on this feature</span>
+            <span class="count">2 defined</span>
+          </div>
+
+          <div class="fb-table">
+            <div class="fb-table-head lf-grid">
+              <div>Title</div>
+              <div>Description</div>
+              <div>Variable</div>
+              <div>Capacity tiers</div>
+              <div></div>
+            </div>
+
+            <!-- Product Limit (the worked example) -->
+            <div class="fb-table-row lf-grid" style="background:#FCFDFE">
+              <div>
+                <div class="lf-name">Product Limit<small>Worked example</small></div>
+              </div>
+              <div class="lf-desc">Maximum number of products a merchant may have in MyCOA. Used by the onboarding paywall to filter plans (a merchant with 200 products only sees plans with capacity ≥ 200).</div>
+              <div><span class="var-link">productLimit</span></div>
+              <div>
+                <div class="tier-strip">
+                  <span class="tier-chip">100<span class="x">×</span></span>
+                  <span class="tier-chip">250<span class="x">×</span></span>
+                  <span class="tier-chip">500<span class="x">×</span></span>
+                  <span class="tier-chip unlimited">∞ Unlimited<span class="x">×</span></span>
+                  <button class="tier-chip-add">tier</button>
+                </div>
+              </div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <!-- Weekly Scans (the original placeholder example, now with chip UI) -->
+            <div class="fb-table-row lf-grid">
+              <div>
+                <div class="lf-name">Weekly Scans<small>Hard cap</small></div>
+              </div>
+              <div class="lf-desc">Maximum number of scans the user may conduct in a rolling 7-day window. Enforced server-side; UI blocks scan attempts above the cap with an upgrade prompt.</div>
+              <div><span class="var-link">maxScanCount</span></div>
+              <div>
+                <div class="tier-strip">
+                  <span class="tier-chip">5<span class="x">×</span></span>
+                  <span class="tier-chip">10<span class="x">×</span></span>
+                  <span class="tier-chip">25<span class="x">×</span></span>
+                  <span class="tier-chip">100<span class="x">×</span></span>
+                  <span class="tier-chip unlimited">∞ Unlimited<span class="x">×</span></span>
+                  <button class="tier-chip-add">tier</button>
+                </div>
+              </div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <div class="add-row">
+              <button class="add-row-btn">Add Limiting Factor</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout amber">
+          <strong>Improvement vs. placeholder:</strong> the placeholder UI rendered capacity as a single comma-separated string (<code>"5, 10, 25"</code>) with weak edit affordance. Each tier is now a chip you can edit/remove individually, the <strong>Unlimited</strong> chip makes the blank-equals-unlimited semantic explicit, and a separate <strong>Variable</strong> column makes it visible which Variable the Limiting Factor consumes. Header typo "<em>Limiting Fators</em>" → "<strong>Limiting Factors</strong>".
+        </div>
+
+        <div class="fb-footer">
+          <div class="footer-meta"><strong>2</strong> limiting factors · 1 plan currently references Product Limit</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn primary">Update Feature</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 3 — TRIGGERS TAB                                           -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="section" id="sec-3">
+    <div class="section-head">
+      <div class="num">3</div>
+      <h2>Trigger Definition — Feature Builder · Triggers tab</h2>
+      <span class="sub">Q-Config admin · MyCOA Feature · sibling concept (soft nudges)</span>
+    </div>
+    <div class="section-intro">
+      <span class="num-tag">STEP 03</span>
+      <div class="body"><strong>Triggers</strong> are the soft-nudge cousin of Limiting Factors. Same wiring (a Trigger consumes a Variable) but instead of enforcing a hard cap, it fires a UI message when a threshold is reached. The placeholder Feature Builder doesn't have a Triggers tab yet — Joseph mentioned this as the natural other consumer of the Variables system. Adding it as a fifth tab keeps the architecture symmetric and gives the team a place to wire the "you've used X of Y" copy.</div>
+    </div>
+
+    <div class="modal-stage">
+      <div class="fb-modal">
+
+        <div class="fb-head">
+          <div class="crumb">Q-Config · Features · MyCOA</div>
+          <div class="fb-title-row">
+            <div>
+              <h3>Feature Builder</h3>
+              <span class="feature-pill"><span class="dot"></span>Editing feature: MyCOA · <code style="font-family:var(--font-mono);font-size:11px;color:#5B21B6">mycoa</code></span>
+            </div>
+            <button class="fb-close">×</button>
+          </div>
+          <div class="fb-tabs">
+            <div class="fb-tab"><span class="tab-num">01</span>Details</div>
+            <div class="fb-tab"><span class="tab-num">02</span>Sources</div>
+            <div class="fb-tab"><span class="tab-num">03</span>Limiting Factors</div>
+            <div class="fb-tab"><span class="tab-num">04</span>Variables</div>
+            <div class="fb-tab active"><span class="tab-num">05</span>Triggers <span style="background:#DCFCE7;color:#166534;font-size:9px;font-weight:800;padding:1px 6px;border-radius:10px;letter-spacing:.04em;margin-left:4px">NEW</span></div>
+          </div>
+        </div>
+
+        <div class="fb-help">
+          <div class="help-ic">⚡</div>
+          <div class="help-body">
+            <strong>Triggers fire UI nudges, not hard caps.</strong> A Trigger watches a <a href="#sec-1" style="color:#5B21B6;font-weight:700">Variable</a> and when it crosses a threshold (often expressed relative to a second Variable, e.g. 80% of <code>maxScanCount</code>), it surfaces a message in-app. Useful for <strong>upgrade prompts</strong>, <strong>capacity warnings</strong>, and <strong>re-engagement</strong>. Independent of Limiting Factors — you can have a Trigger without a hard cap, and vice-versa.
+          </div>
+        </div>
+
+        <div class="fb-body">
+          <div class="body-label">
+            <span>Triggers on this feature</span>
+            <span class="count">2 defined</span>
+          </div>
+
+          <div class="fb-table">
+            <div class="fb-table-head tr-grid">
+              <div>Title</div>
+              <div>Watches</div>
+              <div>Threshold</div>
+              <div>Surface message</div>
+              <div></div>
+            </div>
+
+            <div class="fb-table-row tr-grid">
+              <div>
+                <div class="tr-name">Scans nearing weekly cap</div>
+                <small style="display:block;font-size:10px;color:#94A3B8;font-weight:500;margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Soft nudge</small>
+              </div>
+              <div><span class="var-link">currentScanCount</span></div>
+              <div><span class="tr-threshold">≥ 80% of maxScanCount</span></div>
+              <div><div class="tr-copy">"You've used <strong>{{currentScanCount}}</strong> of <strong>{{maxScanCount}}</strong> weekly scans. Consider upgrading to keep scanning."</div></div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <div class="fb-table-row tr-grid">
+              <div>
+                <div class="tr-name">Inventory near product cap</div>
+                <small style="display:block;font-size:10px;color:#94A3B8;font-weight:500;margin-top:2px;text-transform:uppercase;letter-spacing:.04em">Soft nudge · post-launch</small>
+              </div>
+              <div><span class="var-link">currentProductCount</span></div>
+              <div><span class="tr-threshold">≥ 90% of productLimit</span></div>
+              <div><div class="tr-copy">"You're at <strong>{{currentProductCount}}</strong> of <strong>{{productLimit}}</strong> products. Upgrade to add more."</div></div>
+              <div class="row-actions"><button class="icon-btn">✎</button><button class="icon-btn danger">×</button></div>
+            </div>
+
+            <div class="add-row">
+              <button class="add-row-btn">Add Trigger</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Why a separate tab from Limiting Factors:</strong> the user-facing behavior is fundamentally different (warning vs. block) and Triggers don't need plan-by-plan tier picking — they're feature-wide rules. Keeping them on a sibling tab makes the Variables → {Limiting Factor, Trigger} fan-out visible and prevents Limiting Factor rows from accumulating "is this a hard cap or a nudge?" mode-switches.
+        </div>
+
+        <div class="fb-footer">
+          <div class="footer-meta"><strong>2</strong> triggers · "Inventory near product cap" deferred until paywall-only phase ends</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn primary">Update Feature</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 4 — PLAN EDITOR                                            -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="section" id="sec-4">
+    <div class="section-head">
+      <div class="num">4</div>
+      <h2>Plan Editor — adding MyCOA, picking capacity tiers</h2>
+      <span class="sub">Q-Config · Subscription Builder · MyCOA Pro plan</span>
+    </div>
+    <div class="section-intro">
+      <span class="num-tag">STEP 04</span>
+      <div class="body">An admin builds a Plan and adds the <strong>MyCOA</strong> Feature to it. As soon as a Feature is added, every <strong>Limiting Factor</strong> defined on that Feature surfaces as a tier picker. The admin picks one chip per Limiting Factor; that's how the Plan binds to capacity. For MyCOA Pro: <code>Product Limit = 250</code>, <code>Weekly Scans = 25</code>. No tier picked = unlimited (interpreted from the absence of a saved tier on the plan).</div>
+    </div>
+
+    <div class="plan-editor">
+      <!-- SIDE NAV -->
+      <div class="pe-side">
+        <div class="pe-side-title">Subscription Builder</div>
+        <div class="pe-side-item">All plans</div>
+        <div class="pe-side-item">Create plan</div>
+        <div class="pe-side-item active">Edit: MyCOA Pro</div>
+        <div class="pe-side-title" style="margin-top:14px">Configure</div>
+        <div class="pe-side-item muted">Features</div>
+        <div class="pe-side-item muted">Pricing</div>
+        <div class="pe-side-item muted">Paywall settings</div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="pe-main">
+        <div class="pe-crumb"><a href="#">Subscription Builder</a> / <a href="#">All plans</a> / Edit plan</div>
+        <div class="pe-head">
+          <div>
+            <h2>MyCOA Pro</h2>
+            <div class="pe-sub">Mid-tier MyCOA plan for cannabis merchants with 100–250 products</div>
+            <div class="pe-meta">
+              <span class="meta-pill" style="font-size:11px">$59/mo · annual</span>
+              <span class="meta-pill" style="font-size:11px">visible on paywall</span>
+              <span class="meta-pill new" style="font-size:11px">3 active subscribers</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost">Discard</button>
+            <button class="btn primary">Save Plan</button>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field"><label>Plan name</label><input value="MyCOA Pro"/></div>
+          <div class="field"><label>Plan slug</label><input value="mycoa-pro" style="font-family:var(--font-mono)"/></div>
+        </div>
+        <div class="field-grid full-row">
+          <div class="field">
+            <label>Description (paywall card)</label>
+            <textarea>For mid-volume cannabis merchants: up to 250 products on MyCOA, 25 scans/week, full COA workflow.</textarea>
+          </div>
+        </div>
+
+        <div class="pe-section-title">Features &amp; Limits</div>
+        <div class="pe-section-help">Features added to this plan are listed below. For each Feature's Limiting Factors, pick the capacity tier this plan exposes. Tiers come from the Feature Builder · Limiting Factors tab.</div>
+
+        <!-- MyCOA FEATURE CARD WITH LIMITING FACTORS -->
+        <div class="feature-card">
+          <div class="fc-head">
+            <span class="fc-pill">Feature</span>
+            <div class="fc-name">MyCOA <small>mycoa</small></div>
+            <div class="fc-spacer"></div>
+            <div class="fc-toggle"><span>Enabled</span><span class="toggle-pill"><input type="checkbox" checked/><span class="slider"></span></span></div>
+          </div>
+          <div class="fc-body">
+
+            <!-- LF row 1: Product Limit -->
+            <div class="lf-row">
+              <div class="lf-meta">
+                <div class="lf-meta-name">Product Limit</div>
+                <div class="lf-meta-desc">Max products on MyCOA. Used by paywall to filter plans by merchant inventory size.</div>
+              </div>
+              <div class="lf-tier-picker">
+                <span class="tier-radio">100</span>
+                <span class="tier-radio selected">250</span>
+                <span class="tier-radio">500</span>
+                <span class="tier-radio unlimited">∞ Unlimited</span>
+              </div>
+            </div>
+
+            <!-- LF row 2: Weekly Scans -->
+            <div class="lf-row">
+              <div class="lf-meta">
+                <div class="lf-meta-name">Weekly Scans</div>
+                <div class="lf-meta-desc">Max scans per rolling week. Hard-blocked at the cap with upgrade prompt.</div>
+              </div>
+              <div class="lf-tier-picker">
+                <span class="tier-radio">5</span>
+                <span class="tier-radio">10</span>
+                <span class="tier-radio selected">25</span>
+                <span class="tier-radio">100</span>
+                <span class="tier-radio unlimited">∞ Unlimited</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn ghost" style="margin-top:6px">+ Add Feature</button>
+
+        <div style="margin-top:18px;padding:12px 16px;background:#FAFBFC;border:1px dashed var(--border);border-radius:10px;font-size:12px;color:#64748B;line-height:1.6">
+          <strong style="color:#0F172A">Persisted shape:</strong> &nbsp;<code class="mono" style="background:#fff;padding:1px 6px;border-radius:3px;font-size:11px;color:#5B21B6;border:1px solid var(--border)">subscription_plans.feature_limits = { mycoa: { productLimit: 250, maxScanCount: 25 } }</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Why this beats the placeholder:</strong> the placeholder Subscription Builder lets admins type a number into a flat field per limit — no tie-back to which Variable / Limiting Factor it reflects, and no enforcement that the value matches an authored tier. Tier-radio chips constrain the admin to authored tiers (so paywall filtering is deterministic) and surface the Limiting Factor's description inline so the admin doesn't have to leave the plan editor to remember what the field means.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 5 — MERCHANT PAYWALL FILTERING                             -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="section" id="sec-5">
+    <div class="section-head">
+      <div class="num">5</div>
+      <h2>Merchant paywall — filtering by Product Limit at onboarding</h2>
+      <span class="sub">Onboarding wizard · merchant has 200 products</span>
+    </div>
+    <div class="section-intro">
+      <span class="num-tag">STEP 05</span>
+      <div class="body">A new merchant onboards with <strong>200 products</strong> they want to bring into MyCOA. The paywall reads the merchant's declared inventory size, queries every published plan's MyCOA <code>productLimit</code> tier, and <strong>hides</strong> plans whose tier is below 200. The merchant sees only the plans they could actually use, ordered cheapest-first. Their inventory size becomes a recommendation signal, not a friction point.</div>
+    </div>
+
+    <div class="merchant-stage">
+      <div class="merchant-shell">
+        <div class="merchant-card">
+          <div class="merchant-head">
+            <h3>Choose your MyCOA plan</h3>
+            <p>We've matched plans to your inventory size. You can always change later.</p>
+          </div>
+          <div class="merchant-body">
+
+            <!-- INPUT -->
+            <div class="input-row">
+              <div class="label-block">
+                <strong>How many products do you want to manage in MyCOA?</strong>
+                <small>This filters the plans below — only plans that fit your inventory are shown.</small>
+              </div>
+              <input value="200" type="number"/>
+            </div>
+
+            <!-- FILTER SUMMARY -->
+            <div class="filter-summary">
+              <div class="ic">i</div>
+              <div>
+                Showing <strong>3 of 5</strong> plans · <strong>2 hidden</strong> because their <code style="background:rgba(245,158,11,.18);padding:1px 5px;border-radius:3px;font-family:var(--font-mono);font-size:11px">productLimit</code> tier is below your 200-product inventory.
+              </div>
+            </div>
+
+            <!-- SURFACED PLANS -->
+            <div class="plans-row">
+              <!-- Pro -->
+              <div class="plan-card recommended">
+                <div class="pn">MyCOA Pro<small>For 100–250 product merchants</small></div>
+                <div class="pp">$59<small>/mo</small></div>
+                <div class="lim-strip">
+                  <div class="lim-row match"><span>Product Limit</span><strong>250</strong></div>
+                  <div class="lim-row match"><span>Weekly Scans</span><strong>25</strong></div>
+                </div>
+                <ul>
+                  <li>Full COA workflow</li>
+                  <li>Email + chat support</li>
+                  <li>Q-Audit access</li>
+                </ul>
+                <button class="btn primary pick" style="width:100%">Select MyCOA Pro</button>
+              </div>
+
+              <!-- Enterprise -->
+              <div class="plan-card">
+                <div class="pn">MyCOA Enterprise<small>250–500 products + bulk tools</small></div>
+                <div class="pp">$129<small>/mo</small></div>
+                <div class="lim-strip">
+                  <div class="lim-row match"><span>Product Limit</span><strong>500</strong></div>
+                  <div class="lim-row match"><span>Weekly Scans</span><strong>100</strong></div>
+                </div>
+                <ul>
+                  <li>Bulk COA assignment</li>
+                  <li>Priority support</li>
+                  <li>API access</li>
+                </ul>
+                <button class="btn ghost pick" style="width:100%">Select Enterprise</button>
+              </div>
+
+              <!-- Unlimited -->
+              <div class="plan-card">
+                <div class="pn">MyCOA Unlimited<small>For high-volume operators</small></div>
+                <div class="pp">$249<small>/mo</small></div>
+                <div class="lim-strip">
+                  <div class="lim-row match"><span>Product Limit</span><strong>∞</strong></div>
+                  <div class="lim-row match"><span>Weekly Scans</span><strong>∞</strong></div>
+                </div>
+                <ul>
+                  <li>Unlimited products</li>
+                  <li>Dedicated CSM</li>
+                  <li>Custom SLA</li>
+                </ul>
+                <button class="btn ghost pick" style="width:100%">Select Unlimited</button>
+              </div>
+            </div>
+
+            <!-- HIDDEN PLANS -->
+            <div class="hidden-row">
+              <h4>Hidden — your inventory exceeds these plans' Product Limit</h4>
+              <div class="hidden-list">
+                <div class="hidden-plan">
+                  <div class="hp-name">MyCOA Starter<small>$19/mo</small></div>
+                  <div class="hp-spacer"></div>
+                  <div class="hp-reason">productLimit = 100</div>
+                </div>
+                <div class="hidden-plan">
+                  <div class="hp-name">MyCOA Basic<small>$29/mo</small></div>
+                  <div class="hp-spacer"></div>
+                  <div class="hp-reason">productLimit = 50</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <strong>Initial behavior:</strong> filtering only — Joseph's launch scope is paywall filtering, not in-app blocking. A merchant who later exceeds their plan's Product Limit isn't blocked from the UI; the deviation is captured in Q-Audit Finances (next section) for manual outreach. Hard blocking can be turned on later by enabling the corresponding Trigger and/or wiring the Limiting Factor to a write gate.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 6 — Q-AUDIT FINANCES MONITORING                            -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="section" id="sec-6">
+    <div class="section-head">
+      <div class="num">6</div>
+      <h2>Q-Audit Finances — post-subscription monitoring</h2>
+      <span class="sub">Internal · per-merchant detail · Finances tab</span>
+    </div>
+    <div class="section-intro">
+      <span class="num-tag">STEP 06</span>
+      <div class="body">Once the merchant subscribes, an internal-facing <strong>capacity panel</strong> appears in their Q-Audit Finances tab. It shows the plan they're on and how their <strong>live counters</strong> (<code>currentProductCount</code>, <code>currentScanCount</code>) compare to the <strong>tier they're paying for</strong>. No UI blocking — purely monitoring data so the team can spot merchants outgrowing their tier and reach out manually.</div>
+    </div>
+
+    <div class="qa-shell">
+      <div class="qa-bar">
+        <span class="qa-app">Q-Audit</span>
+        <span class="qa-crumb">· Merchants · Greenleaf Cannabis Co.</span>
+        <div class="spacer"></div>
+        <div class="qa-merchant"><span style="width:8px;height:8px;border-radius:50%;background:#16A34A"></span><strong>Greenleaf Cannabis Co.</strong>&nbsp;<span style="color:#94A3B8">· merchant_id 39214</span></div>
+      </div>
+      <div class="qa-tabs">
+        <div class="qa-tab">Overview</div>
+        <div class="qa-tab">Compliance</div>
+        <div class="qa-tab">COAs</div>
+        <div class="qa-tab">Scans</div>
+        <div class="qa-tab active">Finances</div>
+        <div class="qa-tab">Activity log</div>
+      </div>
+      <div class="qa-finances-body">
+
+        <!-- SUMMARY ROW -->
+        <div class="qa-summary-row">
+          <div class="qa-card plan">
+            <div class="lbl">Active plan</div>
+            <div class="val">MyCOA Pro <small>· $59/mo</small></div>
+          </div>
+          <div class="qa-card product">
+            <div class="lbl">Product usage</div>
+            <div class="val">230 <small>/ 250</small></div>
+          </div>
+          <div class="qa-card scan">
+            <div class="lbl">Scans this week</div>
+            <div class="val">14 <small>/ 25</small></div>
+          </div>
+          <div class="qa-card amount">
+            <div class="lbl">Total billed (YTD)</div>
+            <div class="val">$236 <small>· 4 mo</small></div>
+          </div>
+        </div>
+
+        <div class="qa-section-h">Capacity vs. plan tier</div>
+
+        <!-- PRODUCT LIMIT USAGE -->
+        <div class="usage-block">
+          <div class="ub-head">
+            <div class="ub-title">Product Limit<small>productLimit · MyCOA Feature</small></div>
+            <div class="ub-tier-badge">Tier: 250</div>
+          </div>
+          <div class="usage-bar"><div class="usage-bar-fill warn" style="width:92%"></div></div>
+          <div class="usage-meta"><span><strong>230</strong> products in MyCOA</span><span>92% of <strong>250</strong> tier · 20 remaining</span></div>
+          <div class="usage-detail">
+            <span class="signal warn">⚠ 90% threshold crossed</span>
+            Subscribed at <code>productLimit = 250</code> on 2026-01-14 with 187 products. Currently at <strong>230</strong>. Approaching tier ceiling — <strong>flag for outreach</strong> before the merchant exceeds and we have to either back-fill an Enterprise upgrade conversation or absorb the overage.
+          </div>
+        </div>
+
+        <!-- WEEKLY SCAN USAGE -->
+        <div class="usage-block">
+          <div class="ub-head">
+            <div class="ub-title">Weekly Scans<small>maxScanCount · MyCOA Feature</small></div>
+            <div class="ub-tier-badge">Tier: 25/wk</div>
+          </div>
+          <div class="usage-bar"><div class="usage-bar-fill" style="width:56%"></div></div>
+          <div class="usage-meta"><span><strong>14</strong> scans this week</span><span>56% of <strong>25</strong> tier · resets Mon</span></div>
+          <div class="usage-detail">
+            <span class="signal">✓ Healthy usage</span>
+            7-day rolling average: 18 scans/wk. Comfortably within tier; no Trigger has fired this billing cycle.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>How this view is sourced:</strong> the panel reads the merchant's <code>subscription_plans.feature_limits.mycoa.productLimit</code> (the tier the plan binds to) and compares it to the live <code>currentProductCount</code> Variable. No new wiring at the merchant level — it's the same Variable/Limiting Factor relationship the plan editor and paywall use, just <strong>read for display</strong>. Adds a single new internal block to Finances; doesn't disturb the rest of the tab.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 7 — DATA MODEL                                             -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="section" id="sec-7">
+    <div class="section-head">
+      <div class="num">7</div>
+      <h2>Data model recap — what the dev team builds against</h2>
+      <span class="sub">For the eventual QP ticket</span>
+    </div>
+    <div class="section-body">
+      <div class="data-model">
+        <h3>Persisted shape (simplified)</h3>
+        <p class="dm-sub">Variables / Limiting Factors / Triggers live on a Feature. Plans bind to capacity through <code style="background:#0A1020;color:#A78BFA;padding:1px 5px;border-radius:3px;font-size:11px">feature_limits</code>.</p>
+<pre><span class="c">// features table — one row per Feature</span>
+{
+  <span class="k">slug</span>: <span class="s">"mycoa"</span>,
+  <span class="k">name</span>: <span class="s">"MyCOA"</span>,
+  <span class="k">variables</span>: [
+    { <span class="k">code</span>: <span class="s">"productLimit"</span>,        <span class="k">title</span>: <span class="s">"Product Limit"</span>,         <span class="k">type</span>: <span class="s">"number"</span>, <span class="k">default</span>: <span class="o">null</span> },
+    { <span class="k">code</span>: <span class="s">"currentProductCount"</span>, <span class="k">title</span>: <span class="s">"Current Product Count"</span>, <span class="k">type</span>: <span class="s">"number"</span>, <span class="k">default</span>: <span class="n">0</span>    },
+    { <span class="k">code</span>: <span class="s">"maxScanCount"</span>,        <span class="k">title</span>: <span class="s">"Max Scan Count"</span>,        <span class="k">type</span>: <span class="s">"number"</span>, <span class="k">default</span>: <span class="o">null</span> },
+    { <span class="k">code</span>: <span class="s">"currentScanCount"</span>,    <span class="k">title</span>: <span class="s">"Current Scan Count"</span>,    <span class="k">type</span>: <span class="s">"number"</span>, <span class="k">default</span>: <span class="n">0</span>    }
+  ],
+  <span class="k">limitingFactors</span>: [
+    {
+      <span class="k">title</span>: <span class="s">"Product Limit"</span>,
+      <span class="k">variable</span>: <span class="s">"productLimit"</span>,
+      <span class="k">capacityTiers</span>: [<span class="n">100</span>, <span class="n">250</span>, <span class="n">500</span>, <span class="o">null</span>]   <span class="c">// null === Unlimited</span>
+    },
+    {
+      <span class="k">title</span>: <span class="s">"Weekly Scans"</span>,
+      <span class="k">variable</span>: <span class="s">"maxScanCount"</span>,
+      <span class="k">capacityTiers</span>: [<span class="n">5</span>, <span class="n">10</span>, <span class="n">25</span>, <span class="n">100</span>, <span class="o">null</span>]
+    }
+  ],
+  <span class="k">triggers</span>: [
+    {
+      <span class="k">title</span>: <span class="s">"Scans nearing weekly cap"</span>,
+      <span class="k">watch</span>: <span class="s">"currentScanCount"</span>,
+      <span class="k">threshold</span>: <span class="s">"&gt;= 0.8 * maxScanCount"</span>,
+      <span class="k">message</span>: <span class="s">"You've used {{currentScanCount}} of {{maxScanCount}} weekly scans..."</span>
+    }
+  ]
+}
+
+<span class="c">// subscription_plans table — one row per Plan, references Features by slug</span>
+{
+  <span class="k">slug</span>: <span class="s">"mycoa-pro"</span>,
+  <span class="k">name</span>: <span class="s">"MyCOA Pro"</span>,
+  <span class="k">features</span>: [<span class="s">"mycoa"</span>],
+  <span class="k">feature_limits</span>: {
+    <span class="k">mycoa</span>: {
+      <span class="k">productLimit</span>: <span class="n">250</span>,        <span class="c">// must match an authored tier on the LF</span>
+      <span class="k">maxScanCount</span>: <span class="n">25</span>
+    }
+  }
+}
+
+<span class="c">// paywall filtering query (pseudocode)</span>
+plans
+  .filter(p =&gt; p.features.includes(<span class="s">"mycoa"</span>))
+  .filter(p =&gt; {
+    <span class="k">const</span> tier = p.feature_limits.mycoa.productLimit;
+    <span class="k">return</span> tier === <span class="o">null</span> || tier &gt;= merchant.declaredProductCount;
+  })
+  .sort((a,b) =&gt; a.price - b.price);</pre>
+      </div>
+
+      <div style="margin-top:18px;padding:14px 18px;background:#FAFBFC;border:1px solid var(--border);border-radius:10px">
+        <div style="font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Out of scope for MyCOA launch · noted for the followup ticket</div>
+        <ul style="list-style:none;padding:0;margin:0;font-size:12px;color:#334155;line-height:1.7">
+          <li>• <strong>Server-side enforcement</strong> of <code style="background:#fff;padding:1px 5px;border-radius:3px;font-size:11px;font-family:var(--font-mono);color:#5B21B6;border:1px solid var(--border)">productLimit</code> writes — initially soft. Per Q-Config truth doc: product/COA limits aren't reliably enforced server-side today, and middleware auto-create paths can bypass UI assumptions.</li>
+          <li>• <strong>Trigger delivery surface</strong> — where the message lands (in-app banner vs. email vs. push). Mockup shows the copy; the channel is a separate decision.</li>
+          <li>• <strong>Tier validation</strong> at plan-save time — the plan editor radio chips constrain admins, but a backend check should reject any <code style="background:#fff;padding:1px 5px;border-radius:3px;font-size:11px;font-family:var(--font-mono);color:#5B21B6;border:1px solid var(--border)">feature_limits</code> value that isn't an authored tier on the LF.</li>
+          <li>• <strong>Migration path</strong> from the existing flat <code style="background:#fff;padding:1px 5px;border-radius:3px;font-size:11px;font-family:var(--font-mono);color:#5B21B6;border:1px solid var(--border)">subscription_plans.metadata</code> limits onto the new <code style="background:#fff;padding:1px 5px;border-radius:3px;font-size:11px;font-family:var(--font-mono);color:#5B21B6;border:1px solid var(--border)">feature_limits</code> shape — one-time backfill.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
