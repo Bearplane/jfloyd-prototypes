@@ -463,16 +463,16 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
     </div>
   </div>
 
-  <!-- v3.1 revision banner (what changed from v3) -->
+  <!-- v3.1 + dual-flag revision banner (what changed from v3) -->
   <div class="rev-banner">
     <span class="ic">↻</span>
     <div>
-      <strong>v3.1 revisions (2026-04-29 PM)</strong> — Joseph resolved v3's open questions. Five material changes since v3 merged:
+      <strong>v3.1 + dual-flag (2026-04-29 PM)</strong> — Joseph resolved v3's open questions, then folded in the Focus Feature dual-flag architecture:
       <span class="rev-pill">Multi-item</span>
       <span class="rev-pill">Polymorphic dataType</span>
       <span class="rev-pill">Force Close in v1</span>
       <span class="rev-pill">Merchant vertical-nav + mobile</span>
-      <span class="rev-pill">Focus Feature invite flow</span>
+      <span class="rev-pill">Focus Feature dual-flag (Plan + Feature)</span>
     </div>
   </div>
 
@@ -1284,23 +1284,75 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <h3 style="font-size:14px;font-weight:700;color:#0F172A;margin:24px 0 8px">C.2 · Account creation → Focus Feature filter → MyCOA wizard → paywall</h3>
-      <p style="font-size:12px;color:#64748B;margin-bottom:14px">Click the email link → 4-step onboarding: signup, then a NEW flow Joseph flagged: the invite carries a <strong>Focus Feature</strong> tag (e.g. <code class="mono">COMPLIANCE_CASES</code>) that does two things on landing — runs the MyCOA setup wizard before the paywall, and filters the paywall to only show plans with that focus feature.</p>
+      <p style="font-size:12px;color:#64748B;margin-bottom:10px">Click the email link → 4-step onboarding. The invite carries a context that resolves to a <strong>plan's focus feature</strong>. That feature drives two things on landing: runs the MyCOA setup wizard <em>only if</em> the focus feature is MyCOA-related, and filters the paywall to plans whose focus feature matches.</p>
+      <p style="font-size:12px;color:#64748B;margin-bottom:14px">This extends the Q-Config Feature Limits architecture — see the <a href="qconfig-feature-limits-workflow.html" style="color:#1A202E;font-weight:700;text-decoration:underline">Q-Config Feature Limits Workflow mockup</a>. Two new schema additions: <code class="mono">Feature.canBeFocus</code> (admin toggle on the Feature Builder Details tab) and <code class="mono">Plan.focusFeatureId</code> (FK to a feature bound to the plan, filtered to <code class="mono">canBeFocus=true</code>).</p>
 
       <div class="flow-line">
         <span class="flow-step start"><span class="num">1</span> Click invite</span>
         <span class="flow-arr">→</span>
         <span class="flow-step"><span class="num">2</span> Signup form</span>
         <span class="flow-arr">→</span>
-        <span class="flow-step"><span class="num">3</span> MyCOA Wizard</span>
+        <span class="flow-step"><span class="num">3</span> MyCOA Wizard <span style="font-size:9px;background:#FEF3C7;color:#92400E;padding:1px 5px;border-radius:3px;margin-left:4px">if focus=MYCOA</span></span>
         <span class="flow-arr">→</span>
         <span class="flow-step"><span class="num">4</span> Filtered paywall</span>
         <span class="flow-arr">→</span>
         <span class="flow-step"><span class="num">5</span> Land on case</span>
       </div>
 
-      <div class="annot warn">
-        <span class="ic">!</span>
-        <div><strong>Open data-model question</strong> for Joseph's spawned research task: the <strong>Focus Feature</strong> field — does it live on the <code class="mono">SubscriptionPlan</code> entity (e.g. <code class="mono">plan.focusFeatures: string[]</code>), on the <code class="mono">Feature</code> itself (some boolean like <code class="mono">feature.eligibleAsFocus</code>), or as a separate <code class="mono">PlanFocusFeatureMap</code> join? The Q-Config Feature Limits work that shipped earlier may need extension. Decision needed before C.2 is implementable. <strong>Mockup assumes plan-level <code class="mono">focusFeatures: string[]</code></strong> below.</div>
+      <div class="annot note">
+        <span class="ic">i</span>
+        <div><strong>Dual-flag architecture (Joseph's resolution):</strong> the focus feature lives on <em>both</em> the Feature and the Plan. <strong>Feature</strong> gets <code class="mono">canBeFocus: boolean</code> — only features admin-flagged eligible can ever be a focus feature. <strong>Plan</strong> gets <code class="mono">focusFeatureId</code> — picks one of the plan's bound features (filtered to those with <code class="mono">canBeFocus=true</code>). The invite link references the plan that opens the case → resolves to that plan's focus feature → drives the wizard + paywall filter.</div>
+      </div>
+
+      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Pre-step (Q-Config admin) · Plan editor — set the plan's focus feature</h4>
+      <p style="font-size:12px;color:#64748B;margin-bottom:8px">Where this lives: <a href="qconfig-feature-limits-workflow.html" style="color:#1A202E;font-weight:700;text-decoration:underline">Q-Config Feature Limits</a> Plan editor. Admin picks one bound feature as the plan's focus. Dropdown is filtered to features with <code class="mono">canBeFocus=true</code> only. Compliance Portal invites generated against this plan use this focus feature as their context.</p>
+
+      <div class="stage">
+        <div class="stage-label">Q-Config · Plan editor — Compliance Pro plan</div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:24px;max-width:680px;margin:0 auto">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+            <div>
+              <h3 style="font-size:17px;font-weight:700;color:#0F172A;margin-bottom:4px">Compliance Pro</h3>
+              <span style="font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace">plan_compliance_pro · $149/mo</span>
+            </div>
+            <span class="touch-note" style="background:#5B21B6">Q-Config</span>
+          </div>
+
+          <div style="margin-bottom:18px">
+            <label style="display:block;font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Bound features (4)</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="background:#F1F5F9;border:1px solid #E2E8F0;color:#1E293B;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:4px">COMPLIANCE_CASES <span style="background:#16A34A;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:800;padding:1px 4px;border-radius:2px">canBeFocus ✓</span></span>
+              <span style="background:#F1F5F9;border:1px solid #E2E8F0;color:#1E293B;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:4px">MYCOA <span style="background:#16A34A;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:800;padding:1px 4px;border-radius:2px">canBeFocus ✓</span></span>
+              <span style="background:#F1F5F9;border:1px solid #E2E8F0;color:#94A3B8;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px">Q_AUDIT_FINANCES</span>
+              <span style="background:#F1F5F9;border:1px solid #E2E8F0;color:#94A3B8;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px">Q_TRUST_ACCESS</span>
+            </div>
+            <div style="font-size:11px;color:#64748B;margin-top:6px"><span style="background:#16A34A;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:800;padding:1px 4px;border-radius:2px">canBeFocus ✓</span> = feature admin has flagged as eligible to be a plan's focus.</div>
+          </div>
+
+          <div style="background:#F7F5FF;border:1px solid #DDD6FE;border-radius:10px;padding:14px 16px">
+            <label style="display:block;font-size:11px;font-weight:800;color:#5B21B6;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Focus feature <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;color:#7C3AED">Plan.focusFeatureId</span></label>
+            <div style="position:relative">
+              <select style="width:100%;padding:10px 12px;border:1px solid #5B21B6;border-radius:6px;font-size:13px;font-family:inherit;background:#fff;color:#0F172A;font-weight:600;min-height:44px">
+                <option selected>COMPLIANCE_CASES — Compliance case management</option>
+                <option>MYCOA — Certificate of Analysis publishing</option>
+              </select>
+            </div>
+            <div style="font-size:11px;color:#5B21B6;margin-top:8px;line-height:1.5">
+              Dropdown shows only the 2 of 4 bound features where <code class="mono">feature.canBeFocus = true</code>. <code class="mono">Q_AUDIT_FINANCES</code> and <code class="mono">Q_TRUST_ACCESS</code> aren't eligible to be a plan's focus.<br/>
+              When this plan is used in a Compliance Portal invite, this focus feature drives the merchant's onboarding wizard + paywall filter.
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn primary">Save Plan</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="annot note">
+        <span class="ic">i</span>
+        <div><strong>Two writes, two surfaces</strong>. <strong>Feature Builder · Details tab</strong> (Q-Config) is where admins flip <code class="mono">feature.canBeFocus</code> on or off per-feature. <strong>Plan editor</strong> (Q-Config) is where the plan picks its focus feature from its bound features (filtered to those flagged eligible). The Compliance Portal merchant invite never sees these directly — it sees a magic link → JWT claim → resolved focus feature → wizard + paywall behavior.</div>
       </div>
 
       <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 2 · Signup form</h4>
@@ -1334,8 +1386,8 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
         </div>
       </div>
 
-      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 3 · MyCOA wizard (BEFORE paywall) <span class="defer" style="background:#94A3B8">QP ticket TBD</span></h4>
-      <p style="font-size:12px;color:#64748B;margin-bottom:8px">Triggered by the Focus Feature on the invite. Sets up MyCOA workspace so the merchant can immediately publish replacement COAs while resolving the case. Wizard itself is its own ticket (TBD); shown here as placeholder so the integration point is visible.</p>
+      <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 3 · MyCOA wizard (BEFORE paywall) — conditional <span class="defer" style="background:#94A3B8">QP ticket TBD</span></h4>
+      <p style="font-size:12px;color:#64748B;margin-bottom:8px"><strong>Conditional:</strong> only renders when the resolved focus feature is <code class="mono">MYCOA</code> (the plan's <code class="mono">focusFeatureId</code> resolves to the MyCOA feature). For other focus features (e.g. <code class="mono">COMPLIANCE_CASES</code> alone), this step is skipped and the merchant goes directly from signup to the filtered paywall. Same dual-flag invite link, different conditional path. Wizard itself is its own ticket (TBD).</p>
 
       <div class="stage">
         <div class="stage-label">MyCOA setup wizard — embedded in onboarding flow</div>
@@ -1369,7 +1421,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin:18px 0 8px">Step 4 · Paywall — filtered by Focus Feature</h4>
-      <p style="font-size:12px;color:#64748B;margin-bottom:8px">Default paywall shows all 5 plans. Invite link with <code class="mono">focus=COMPLIANCE_CASES</code> → filter to plans whose <code class="mono">focusFeatures</code> include <code class="mono">COMPLIANCE_CASES</code>. Other plans render greyed out behind a "see all plans" toggle.</p>
+      <p style="font-size:12px;color:#64748B;margin-bottom:8px">Default paywall shows all plans. Invite resolves to a focus feature (e.g. <code class="mono">COMPLIANCE_CASES</code>) → filter to plans where <code class="mono">plan.focusFeatureId</code> matches that feature. Plans that have a different focus feature, or none at all, render greyed out behind a "see all plans" toggle.</p>
 
       <div class="stage">
         <div class="stage-label">Plan picker — filtered by focus feature</div>
@@ -1381,23 +1433,23 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
           <div class="plan-grid">
             <div class="plan-card recommended">
               <div class="pl-name">Compliance Pro</div>
-              <div style="font-size:11px;color:#64748B">Monthly</div>
+              <div style="font-size:11px;color:#64748B">Monthly · <code class="mono">focusFeatureId: COMPLIANCE_CASES</code></div>
               <div class="pl-price">$149<span style="font-size:11px;color:#64748B">/mo</span></div>
-              <div style="font-size:11px;color:#475569;line-height:1.5">Unlimited cases, MyCOA, priority response. Includes <code class="mono">COMPLIANCE_CASES</code> + <code class="mono">MYCOA</code>.</div>
+              <div style="font-size:11px;color:#475569;line-height:1.5">Unlimited cases, MyCOA, priority response. Bound features: <code class="mono">COMPLIANCE_CASES</code>, <code class="mono">MYCOA</code>, +2.</div>
               <button class="btn primary" style="width:100%;margin-top:12px">Choose</button>
             </div>
             <div class="plan-card">
               <div class="pl-name">Compliance Starter</div>
-              <div style="font-size:11px;color:#64748B">Monthly</div>
+              <div style="font-size:11px;color:#64748B">Monthly · <code class="mono">focusFeatureId: COMPLIANCE_CASES</code></div>
               <div class="pl-price">$49<span style="font-size:11px;color:#64748B">/mo</span></div>
-              <div style="font-size:11px;color:#475569;line-height:1.5">Up to 3 active cases, MyCOA basics. Includes <code class="mono">COMPLIANCE_CASES</code>.</div>
+              <div style="font-size:11px;color:#475569;line-height:1.5">Up to 3 active cases. Bound: <code class="mono">COMPLIANCE_CASES</code>.</div>
               <button class="btn" style="width:100%;margin-top:12px">Choose</button>
             </div>
             <div class="plan-card filtered-out">
               <div class="pl-name">MyCOA Only</div>
-              <div style="font-size:11px;color:#64748B">Monthly</div>
+              <div style="font-size:11px;color:#64748B">Monthly · <code class="mono">focusFeatureId: MYCOA</code></div>
               <div class="pl-price">$29<span style="font-size:11px;color:#64748B">/mo</span></div>
-              <div style="font-size:11px;color:#475569;line-height:1.5">Hidden — does not include <code class="mono">COMPLIANCE_CASES</code> focus.</div>
+              <div style="font-size:11px;color:#475569;line-height:1.5">Filtered out — focus feature doesn't match the invite's <code class="mono">COMPLIANCE_CASES</code>.</div>
             </div>
           </div>
           <div style="text-align:center;margin-top:14px"><a href="#" style="font-size:11px;color:#64748B">See all plans (including ones without your focus feature)</a></div>
@@ -1405,32 +1457,68 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <div class="eng">
-        <span class="eng-label">Engineer · QP-3585 · Account creation + Focus Feature paywall</span><pre>
-<span class="endpoint">POST /api/merchant/portal/redeem</span> <span class="com">→ verify JWT, return prefilled fields + focus feature</span>
+        <span class="eng-label">Engineer · QP-3585 · Dual-flag focus feature schema + invite resolution</span><pre>
+<span class="com">// SCHEMA — extends Q-Config Feature Limits architecture. Two new columns.</span>
+
+<span class="com">// 1. Feature gets a new admin-toggle flag:</span>
+ALTER TABLE pl_feature
+  ADD COLUMN can_be_focus BOOLEAN NOT NULL DEFAULT FALSE;
+
+<span class="com">// 2. Plan picks one of its bound features as the focus.
+//    The bound-features relation already exists in Q-Config (plan ↔ features many-to-many).
+//    The focusFeatureId is just an FK pointing into that set, constrained.</span>
+ALTER TABLE pl_plan
+  ADD COLUMN focus_feature_id UUID REFERENCES pl_feature(id);
+
+<span class="com">// Constraint: focus_feature_id must
+//   (a) be in the plan's bound features (enforce in app or via composite FK)
+//   (b) reference a feature where can_be_focus = TRUE (enforce in app + Plan editor UI)</span>
+
+<span class="com">// TypeScript shapes:</span>
+type Feature = {
+  id: string;
+  key: string;                    <span class="com">// "COMPLIANCE_CASES", "MYCOA", etc.</span>
+  name: string;
+  <span class="key">canBeFocus</span>: boolean;            <span class="com">// NEW — admin toggle on Feature Builder Details tab</span>
+  <span class="com">// ... existing limits, triggers, etc. from Q-Config Feature Limits work</span>
+};
+
+type Plan = {
+  id: string;
+  name: string;
+  boundFeatureIds: string[];      <span class="com">// existing — many-to-many with Feature</span>
+  <span class="key">focusFeatureId</span>: string | null;  <span class="com">// NEW — FK to one of boundFeatureIds, must be canBeFocus=true</span>
+  <span class="com">// ... existing price, tier, etc.</span>
+};
+
+<span class="com">// INVITE RESOLUTION — server-side, on /redeem:</span>
+<span class="endpoint">POST /api/merchant/portal/redeem</span> <span class="com">→ resolves invite to focus feature via plan</span>
   <span class="com">Body: { token: string }
-  Response: { merchantId, email, organizationName, caseId, focusFeature: "COMPLIANCE_CASES" }</span>
+  Server logic:
+    1. Verify JWT → { merchantId, planId, caseId, ... }
+    2. plan = Plan.get(planId)
+    3. focusFeature = plan.focusFeatureId ? Feature.get(plan.focusFeatureId) : null
+    4. Response: { merchantId, email, organizationName, caseId, focusFeatureKey: focusFeature?.key }</span>
 
 <span class="endpoint">POST /api/merchant/portal/account</span>  <span class="com">→ create user + session</span>
   <span class="com">Body: { token, name, password }
-  Response: { sessionToken, redirectTo: "/onboard/wizard?focus=COMPLIANCE_CASES" }</span>
+  Response.redirectTo:
+    if focusFeatureKey === "MYCOA"     → "/onboard/wizard?step=mycoa"  (conditional wizard)
+    else                                → "/onboard/plans?focus=" + focusFeatureKey  (skip wizard)</span>
 
 <span class="endpoint">GET /api/merchant/onboarding/plans?focus=COMPLIANCE_CASES</span>
-  <span class="com">Response: filters plans where plan.focusFeatures.includes(focus)
+  <span class="com">Response: filters plans where plan.focusFeatureId resolves to a Feature.key matching `focus`
             returns: { recommended: Plan[], hidden: Plan[] }   // hidden behind expand toggle</span>
 
-<span class="com">// Magic link payload now includes:
-//   token (signed JWT) — merchant identity, case ref
-//   focus     — drives the wizard + paywall filter (e.g. "COMPLIANCE_CASES")
-//
-// JWT additional claim: { focusFeature: string }
-//
-// SubscriptionPlan entity needs new field:
-//   focusFeatures: string[]   // OPEN QUESTION — see annotation above. Joseph's
-//                                separate research task should resolve where this lives.
-//
-// Mail template change check (in Joseph's separate research task):
-//   Existing QP_INVITE_COMPLIANCE_PORTAL template — does it support the focus
-//   query param + revised CTA copy? Or do we need a new template variant?</span></pre>
+<span class="com">// MAGIC LINK / JWT payload:
+//   { merchantId, planId (NOT focusFeatureKey), caseId, expiresAt }
+// Reason: focus feature is computed on the server from the plan, not embedded
+// in the JWT — that way if Q-Config admins re-point a plan's focus feature
+// after the invite is sent, the link still resolves correctly.
+
+// MAIL TEMPLATE — Joseph's parallel audit confirms whether existing
+// QP_INVITE_COMPLIANCE_PORTAL template handles the planId-driven flow,
+// or a new variant is needed.</span></pre>
       </div>
     </div>
   </div>
@@ -2200,6 +2288,37 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       </div>
 
       <div class="shape">
+        <span class="shape-label">Feature (Q-Config) — adds canBeFocus flag</span><br/>
+<span class="com">// Existing entity from Q-Config Feature Limits work — see qconfig-feature-limits-workflow.html</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="key">id</span>: <span class="typ">string</span>,<br/>
+&nbsp;&nbsp;<span class="key">key</span>: <span class="typ">string</span> <span class="com">// "COMPLIANCE_CASES", "MYCOA", "Q_AUDIT_FINANCES", ...</span>,<br/>
+&nbsp;&nbsp;<span class="key">name</span>: <span class="typ">string</span>,<br/>
+&nbsp;&nbsp;<span class="key">canBeFocus</span>: <span class="typ">boolean</span> <span class="com">// NEW · default false · admin toggle on Feature Builder Details tab</span>,<br/>
+&nbsp;&nbsp;<span class="com">// ... existing fields: limits, triggers, variables, etc.</span><br/>
+}<br/>
+<span class="com">// `canBeFocus` gates which features are eligible to be a Plan's focus feature.
+// Set per-feature in Q-Config Feature Builder. Default false — admin must
+// opt-in each feature that makes sense as a focus (e.g. MYCOA, COMPLIANCE_CASES).</span>
+      </div>
+
+      <div class="shape">
+        <span class="shape-label">Plan (Q-Config) — adds focusFeatureId FK</span><br/>
+<span class="com">// Existing entity from Q-Config Feature Limits work</span><br/>
+{<br/>
+&nbsp;&nbsp;<span class="key">id</span>: <span class="typ">string</span>,<br/>
+&nbsp;&nbsp;<span class="key">name</span>: <span class="typ">string</span> <span class="com">// "Compliance Pro", ...</span>,<br/>
+&nbsp;&nbsp;<span class="key">boundFeatureIds</span>: <span class="typ">string[]</span> <span class="com">// existing many-to-many with Feature</span>,<br/>
+&nbsp;&nbsp;<span class="key">focusFeatureId</span>: <span class="typ">string | null</span> <span class="com">// NEW · FK to a feature in boundFeatureIds where canBeFocus=true</span>,<br/>
+&nbsp;&nbsp;<span class="com">// ... existing: price, tier, etc.</span><br/>
+}<br/>
+<span class="com">// Two constraints (enforced in app + Plan editor UI):
+//   1. focusFeatureId must be in boundFeatureIds (the plan's bound features)
+//   2. The referenced Feature must have canBeFocus = true
+// Compliance Portal invite resolves: invite.planId → plan.focusFeatureId → Feature.key</span>
+      </div>
+
+      <div class="shape">
         <span class="shape-label">AuditLog (Force Close, QP-3591)</span><br/>
 {<br/>
 &nbsp;&nbsp;<span class="key">id</span>: <span class="typ">string</span>,<br/>
@@ -2434,8 +2553,8 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
         <h4 style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:10px">Unknowns Joseph should verify in real codebase</h4>
         <ul style="margin-left:20px;font-size:12px;color:#334155;line-height:1.8">
           <li><strong>Case ID generator</strong> — does Qredible already have a CR-YYYY-XXXX pattern, or is this new?</li>
-          <li><strong>Mail pipeline + invite template</strong> — Joseph's separate research task verifying existing <code class="mono">QP_INVITE_COMPLIANCE_PORTAL</code> template can be reused with the new focus-feature query param, or a new variant is needed.</li>
-          <li><strong>SubscriptionPlan focusFeatures field</strong> — does it live on the plan, on the feature, or as a separate join? May need extension to the Q-Config Feature Limits work that shipped earlier. <strong>Blocker for Section C.4 paywall implementation.</strong></li>
+          <li><strong>Mail pipeline + invite template</strong> — Joseph's separate research task verifying existing <code class="mono">QP_INVITE_COMPLIANCE_PORTAL</code> template can be reused with the new planId-driven invite, or a new variant is needed.</li>
+          <li><strong>Q-Config schema absorption — dual-flag</strong> — does the existing Plan/Feature schema absorb <code class="mono">Plan.focusFeatureId</code> + <code class="mono">Feature.canBeFocus</code> cleanly, or do they collide with existing fields/migrations? Joseph's <strong>parallel audit task</strong> against <a href="qconfig-feature-limits-workflow.html" style="color:#1A202E;font-weight:700;text-decoration:underline">Q-Config Feature Limits Workflow</a> reports back. Architecture is decided (dual-flag); only the migration-cleanliness question is open.</li>
           <li><strong>File storage</strong> — where do COA PDFs live today (vault?)? Reuse the same bucket + presigned-URL service for license, KYC docs.</li>
           <li><strong>Permission system</strong> — does Qredible already have role-based perms (for <code class="mono">cases.force_close</code>)? If not, that's a v0.5 prerequisite for QP-3591.</li>
           <li><strong>AuditLog</strong> — is there an existing append-only audit table to reuse, or does Force Close need a new one?</li>
@@ -2485,6 +2604,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       <li><strong>Fathom recording 142133774</strong> (Joseph's self-walkthrough, 2026-04-29 15:03) — MVP redefined as Cases tab + Dashboard; severity = Low/Medium/High Risk text; do not disrupt We Monitor work.</li>
       <li><strong>Joseph's mid-task scope corrections (v3 build)</strong> — Initially merchant-only slice; corrected to end-to-end vertical slice across 10 tickets with one item / one resolution.</li>
       <li><strong>Joseph's resolution decisions (v3.1 revision, 2026-04-29 PM)</strong> — Resolved v3's open questions: multi-item + multi-dataType; merchant vertical nav + mobile; Force Close into v1; per-dataType resolution map (still hardcoded for v1); Focus Feature invite flow + MyCOA wizard; one meta-workflow video instead of 6 episodes.</li>
+      <li><strong>Joseph's Focus Feature dual-flag clarification (same PM session)</strong> — Resolved data-model question with dual-flag architecture: <code class="mono">Feature.canBeFocus</code> (admin toggle on Feature Builder Details tab, default false) + <code class="mono">Plan.focusFeatureId</code> (FK to one of the plan's bound features, filtered to <code class="mono">canBeFocus=true</code>). Extends the Q-Config Feature Limits work shipped earlier; cross-linked to that mockup. New open question is migration cleanliness, not architecture.</li>
       <li><strong>Joseph's claude design</strong> — referenced in Section J; URL unreachable from agent context (404/405 against api.anthropic.com without authenticated session).</li>
     </ol>
 
@@ -2495,7 +2615,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
       <li><strong>Resolution</strong>: 1 hardcoded resolutionType → 1 hardcoded resolutionType <em>per dataType</em> (still v1, QP-3593 still v2).</li>
       <li><strong>Merchant nav</strong>: shared horizontal tabs → vertical sidebar (different paradigm from processor's Q-Monitor).</li>
       <li><strong>Mobile</strong>: not specified → mandatory @media breakpoints under 760px on every merchant section. ≥44px touch targets.</li>
-      <li><strong>Invite flow</strong>: signup → case → expanded to signup → MyCOA wizard → focus-feature-filtered paywall → case. Adds <code class="mono">SubscriptionPlan.focusFeatures: string[]</code> field (open question on data model location).</li>
+      <li><strong>Invite flow</strong>: signup → case → expanded to signup → (conditional) MyCOA wizard → focus-feature-filtered paywall → case. <strong>Dual-flag schema</strong>: <code class="mono">Feature.canBeFocus: boolean</code> (admin toggle, default false) + <code class="mono">Plan.focusFeatureId: FK</code> (filtered to plan's bound features with <code class="mono">canBeFocus=true</code>). Invite carries <code class="mono">planId</code>; server resolves to focus feature on /redeem. Cross-linked to <a href="qconfig-feature-limits-workflow.html" style="color:#1A202E;font-weight:700;text-decoration:underline">Q-Config Feature Limits Workflow</a>.</li>
       <li><strong>Force Close</strong>: disabled stub with v2 marker → active permission-gated action, audit-logged, with confirm modal.</li>
       <li><strong>Recording</strong>: 6-episode breakdown → 1 meta-workflow video via Zoom Clips covering the Claude Code documentation → validate → proceed → repeat pattern.</li>
     </ul>
