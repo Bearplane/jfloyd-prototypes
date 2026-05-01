@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-ScanAI — Per-Company Resolved Config + Override</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px;line-height:1.5}
+a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
+code{font-family:'IBM Plex Mono',monospace;font-size:12px}
+
+.topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:50}
+.topnav a{color:#93C5FD}
+.topnav .sep{color:#475569}
+.topnav .current{color:#fff;font-weight:600}
+.topnav .badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;margin-left:8px}
+
+.proto-banner{background:#FFFBEB;border-bottom:1px solid #FDE68A;padding:8px 24px;font-size:12px;color:#78350F;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.proto-banner strong{color:#92400E}
+.proto-banner code{background:#FDE68A;padding:1px 5px;border-radius:3px;color:#78350F}
+
+.page{max-width:1180px;margin:0 auto;padding:28px 24px 60px}
+.page-title{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
+.page-sub{color:#64748B;font-size:13px;margin-bottom:20px;max-width:920px}
+
+/* CHAIN STRIP */
+.layered-strip{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.layered-strip .ls-title{font-size:11px;font-weight:700;color:#64748B;letter-spacing:.5px;text-transform:uppercase;margin-right:4px}
+.lay{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid}
+.lay.active{outline:2px solid #FBBF24;outline-offset:2px}
+.lay-global{background:#F1F5F9;color:#475569;border-color:#CBD5E1}
+.lay-pair{background:#F0FDF4;color:#166534;border-color:#BBF7D0}
+.lay-signal{background:#F5F3FF;color:#5B21B6;border-color:#DDD6FE}
+.lay-override{background:#EFF6FF;color:#1E40AF;border-color:#BFDBFE}
+.lay-arrow{color:#94A3B8;font-size:13px}
+
+.section{margin-bottom:32px}
+.section-num{display:inline-block;background:#1E3A5F;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 8px;border-radius:4px;margin-right:8px;font-weight:600}
+.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.section-sub{color:#64748B;font-size:13px;margin-bottom:14px;max-width:900px}
+
+/* MODAL SHELL (matches scanner-industry-config style) */
+.modal-wrap{background:#fff;border-radius:12px;border:1px solid #E2E8F0;box-shadow:0 4px 20px rgba(0,0,0,.08);overflow:hidden}
+.modal-header{background:#F7F5FF;padding:18px 22px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #E9D5FF}
+.modal-header .mh-icon{font-size:30px}
+.modal-header .mh-text{flex:1}
+.modal-header h2{font-size:18px;font-weight:700;color:#111827;margin-bottom:3px}
+.modal-header .mh-sub{font-size:13px;color:#4b5563}
+.modal-header .x{color:#94A3B8;font-size:18px;cursor:pointer}
+
+/* COMPANY BAR */
+.company-bar{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:11px 22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.company-bar .company-name{font-weight:700;color:#1E293B}
+.company-bar .arrow-sep{color:#94A3B8}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px}
+.pill-green{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.pill-blue{background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE}
+.pill-purple{background:#EDE9FE;color:#5B21B6;border:1px solid #DDD6FE}
+.pill-info{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
+.pill-success{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+
+/* INHERITANCE BREADCRUMB */
+.inherit-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;flex-wrap:wrap}
+.inherit-row .lbl{font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
+.inherit-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #E2E8F0;padding:3px 9px;border-radius:14px;font-weight:600}
+.inherit-chip.pair{background:#F0FDF4;border-color:#BBF7D0;color:#166534}
+.inherit-chip.signal{background:#F5F3FF;border-color:#DDD6FE;color:#5B21B6}
+.inherit-chip.override{background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF}
+.inherit-chip code{font-size:10px;color:inherit}
+.plus{color:#94A3B8;font-weight:700}
+
+.modal-body{padding:22px}
+
+/* RESOLVED HEADER ALERT */
+.resolved-alert{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:#78350F;margin-bottom:18px;flex-wrap:wrap}
+.resolved-alert .ra-text strong{color:#92400E}
+
+/* SOURCE LEGEND */
+.legend{display:flex;gap:14px;font-size:11px;color:#475569;align-items:center;margin-bottom:14px;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;flex-wrap:wrap}
+.legend .lg-title{font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;font-size:10px;margin-right:4px}
+.lg-item{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.lg-dot{width:9px;height:9px;border-radius:50%}
+.lg-pair .lg-dot{background:#16A34A}
+.lg-signal .lg-dot{background:#7C3AED}
+.lg-override .lg-dot{background:#3B82F6}
+.lg-global .lg-dot{background:#94A3B8}
+
+/* CHECK GRID */
+.checks-wrap{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.checks-col-header{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;padding:6px 0;border-bottom:1px solid #E2E8F0;margin-bottom:6px}
+
+.row{display:flex;align-items:center;gap:10px;padding:8px 8px;border-radius:6px;margin-bottom:2px}
+.row:hover{background:#FAFAFA}
+.row.ovr{background:#EFF6FF;border:1px solid #BFDBFE}
+.row.ovr-off{background:#FEF2F2;border:1px solid #FECACA}
+.row .toggle{width:30px;height:18px;border-radius:10px;flex-shrink:0;position:relative;cursor:pointer;background:#16A34A}
+.row .toggle::after{content:'';position:absolute;top:2px;left:14px;width:14px;height:14px;background:#fff;border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.row.off .toggle{background:#CBD5E1}
+.row.off .toggle::after{left:2px}
+.row.ovr-off .toggle{background:#DC2626}
+.row .check-name{font-size:13px;color:#1E293B;flex:1;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.row .check-name strong{font-weight:700}
+.row .check-name code{font-size:10px;color:#94A3B8;font-weight:500}
+
+.src-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;flex-shrink:0;letter-spacing:.2px}
+.src-pair{background:#DCFCE7;color:#166534}
+.src-signal{background:#EDE9FE;color:#5B21B6}
+.src-override{background:#DBEAFE;color:#1E40AF}
+.src-global{background:#F1F5F9;color:#475569}
+
+.row .reset{font-size:10px;color:#3B82F6;font-weight:700;background:transparent;border:1px solid #BFDBFE;border-radius:4px;padding:1px 6px;cursor:pointer;flex-shrink:0}
+.row .reset:hover{background:#EFF6FF}
+.row .reset.disabled{color:#CBD5E1;border-color:#E2E8F0;cursor:default}
+
+/* GROUP HEADER */
+.grp{margin-top:18px}
+.grp:first-child{margin-top:0}
+.grp-head{display:flex;align-items:center;gap:8px;margin:14px 0 8px;padding-bottom:6px;border-bottom:2px solid #F1F5F9}
+.grp-head .grp-emoji{font-size:14px}
+.grp-head .grp-title{font-size:12px;font-weight:700;color:#1E3A5F;text-transform:uppercase;letter-spacing:.4px}
+.grp-head .grp-meta{font-size:11px;color:#94A3B8;font-weight:500;font-family:'IBM Plex Mono',monospace;margin-left:auto}
+
+/* KEYWORD MERGE */
+.kw-section{background:#FAFAFA;border:1px solid #E2E8F0;border-radius:8px;padding:14px 16px;margin-top:14px}
+.kw-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap}
+.kw-row:last-child{margin-bottom:0}
+.kw-row .kw-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;width:120px;padding-top:5px;flex-shrink:0}
+.kw-pills{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.kw{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:14px;border:1px solid}
+.kw .kw-src{font-size:9px;font-weight:700;letter-spacing:.2px}
+.kw-pair{background:#DCFCE7;color:#166534;border-color:#BBF7D0}
+.kw-signal{background:#EDE9FE;color:#5B21B6;border-color:#DDD6FE}
+.kw-override{background:#DBEAFE;color:#1E40AF;border-color:#BFDBFE}
+.kw-supp{background:#FEF2F2;color:#991B1B;border-color:#FECACA;text-decoration:line-through}
+
+/* SCALAR ROWS */
+.scalar-table{margin-top:14px;width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}
+.scalar-table th{background:#F8FAFC;color:#374151;text-align:left;padding:9px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;border-bottom:1px solid #E2E8F0}
+.scalar-table td{padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
+.scalar-table tr:last-child td{border-bottom:none}
+.scalar-table .nm{font-weight:600;color:#1E293B}
+.scalar-table .val{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#1E3A5F}
+.scalar-table .strike{text-decoration:line-through;color:#94A3B8;font-weight:500;margin-right:6px}
+
+/* AUDIT LOG */
+.audit-section{margin-top:20px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}
+.audit-head{padding:11px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.4px;display:flex;justify-content:space-between;align-items:center}
+.audit-list{padding:6px 0}
+.audit-item{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:12px;color:#475569;border-bottom:1px solid #F8FAFC}
+.audit-item:last-child{border-bottom:none}
+.audit-item .when{font-family:'IBM Plex Mono',monospace;color:#94A3B8;width:90px;flex-shrink:0;font-size:11px}
+.audit-item .who{font-weight:600;color:#1E3A5F;width:170px;flex-shrink:0}
+.audit-item .what{flex:1}
+.audit-item .what code{background:#F1F5F9;padding:1px 5px;border-radius:3px;color:#1E40AF;font-size:11px}
+.audit-item .badge-act{font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;flex-shrink:0;letter-spacing:.2px}
+.act-add{background:#DCFCE7;color:#166534}
+.act-rm{background:#FEE2E2;color:#991B1B}
+.act-upd{background:#DBEAFE;color:#1E40AF}
+
+/* MODAL FOOTER */
+.modal-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:6px;padding:8px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.btn-primary{background:#1A202E;color:#fff}
+.btn-primary:hover{background:#2D3748}
+.btn-secondary{background:#fff;color:#374151;border:1px solid #CBD5E1}
+.btn-secondary:hover{background:#F8FAFC}
+.btn-danger{background:#fff;color:#DC2626;border:1px solid #FECACA}
+.btn-danger:hover{background:#FEF2F2}
+
+.foot-nav{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:18px;border-top:1px solid #E2E8F0;font-size:12px;color:#64748B;flex-wrap:wrap;gap:8px}
+
+@media(max-width:880px){.checks-wrap{grid-template-columns:1fr}.kw-row .kw-label{width:auto}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span>← <a href="https://jfloyd-qredible.netlify.app/">All Mockups</a></span>
+  <span class="sep">/</span>
+  <span class="current">Q-ScanAI · Per-Company Config + Override</span>
+  <span class="badge">SCAN-CFG · §3</span>
+</nav>
+
+<div class="proto-banner">
+  <strong>Mockup — not production code.</strong>
+  <span>Reference: <code>scan-config-layered-resolution-2026-05-01</code></span>
+  <span style="color:#94A3B8">·</span>
+  <span>Layer 4 of the resolution chain. Sits on top of <a href="multi-industry-type.html"><code>multi-industry-type</code></a> + <a href="scanner-industry-config.html"><code>scanner-industry-config</code></a>.</span>
+</div>
+
+<div class="page">
+
+  <div class="page-title">Per-Company Resolved Scan Config</div>
+  <p class="page-sub">For a single company, see what Q-ScanAI will scan for, where each setting came from, and override individual elements with one click. Resolution chain: <strong>Global default</strong> → <strong>Industry-pair template(s)</strong> (unioned) → <strong>Product signals</strong> (additive) → <strong>Per-company override</strong> (always wins). The override layer is the analyst's escape hatch for the rare case where the inherited config doesn't match reality.</p>
+
+  <div class="layered-strip">
+    <span class="ls-title">Resolution chain · this screen authors layer</span>
+    <span class="lay lay-global">1. Global default</span>
+    <span class="lay-arrow">›</span>
+    <span class="lay lay-pair">2. Industry-pair template</span>
+    <span class="lay-arrow">›</span>
+    <span class="lay lay-signal">3. Product signals</span>
+    <span class="lay-arrow">›</span>
+    <span class="lay lay-override active">4. Per-company override ←</span>
+  </div>
+
+  <!-- §A — RESOLVED VIEW -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">§A</span>Resolved view · 3rd Coast Blends</div>
+    <p class="section-sub">Opens from the company profile or directly from <a href="scanner-industry-config.html">Q-ScanAI</a>. Header shows the inheritance breadcrumb so the analyst can see at a glance where the resolved config came from. Body lists every signal with a colored source badge and a <strong>Reset</strong> control that only activates when an override is in play.</p>
+
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <span class="mh-icon">🧠</span>
+        <div class="mh-text">
+          <h2>Q-ScanAI — Scan Configuration · 3rd Coast Blends, LLC</h2>
+          <div class="mh-sub">Resolved from 2 industry pairs + 17 products + 3 manual overrides · v3.2 · last scan 2026-04-29</div>
+        </div>
+        <span class="x">✕</span>
+      </div>
+
+      <div class="company-bar">
+        <span class="company-name">3rd Coast Blends, LLC</span>
+        <span class="arrow-sep">·</span>
+        <span class="pill pill-green">Cannabis × Cultivator</span>
+        <span class="pill pill-green">Hemp / CBD × Manufacturer</span>
+        <span class="arrow-sep">·</span>
+        <span class="pill pill-info">Houston, TX</span>
+        <span style="flex:1;min-width:14px"></span>
+        <span class="pill" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">⚠ 1 conflict resolved</span>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- INHERITANCE -->
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 16px;margin-bottom:16px">
+          <div class="inherit-row" style="margin-bottom:6px">
+            <span class="lbl">Inherited from</span>
+            <span class="inherit-chip pair">📋 Cannabis × Cultivator <code>v3.2</code></span>
+            <span class="plus">+</span>
+            <span class="inherit-chip pair">📋 Hemp / CBD × Manufacturer <code>v2.5</code></span>
+            <span class="plus">+</span>
+            <span class="inherit-chip signal">🧪 17 product signals</span>
+            <span class="plus">+</span>
+            <span class="inherit-chip override">👤 3 overrides</span>
+          </div>
+          <div style="font-size:12px;color:#64748B;line-height:1.55">
+            <strong style="color:#374151">Net resolved:</strong> 38 / 47 compliance signals on, 11 / 14 analyst checks on, 87 keywords across 5 sets, 1 scalar conflict resolved (stricter wins).
+          </div>
+        </div>
+
+        <!-- RESOLVED ALERT -->
+        <div class="resolved-alert">
+          <span class="ra-text">⚠ <strong>1 scalar conflict</strong> between Cannabis (180d) and Hemp (365d) for <code style="background:#FEF3C7;padding:1px 4px;border-radius:3px">coa_max_age_days</code>. Auto-resolved to stricter value (180d). <strong>Override</strong> if this company should follow Hemp's looser rule.</span>
+          <button class="btn btn-secondary" style="font-size:11px;padding:5px 10px">View / Override</button>
+        </div>
+
+        <!-- LEGEND -->
+        <div class="legend">
+          <span class="lg-title">Source</span>
+          <span class="lg-item lg-pair"><span class="lg-dot"></span> Industry-pair template</span>
+          <span class="lg-item lg-signal"><span class="lg-dot"></span> Product signal</span>
+          <span class="lg-item lg-override"><span class="lg-dot"></span> Per-company override</span>
+          <span class="lg-item lg-global"><span class="lg-dot"></span> Global default</span>
+        </div>
+
+        <!-- CHECKS GRID -->
+        <div class="checks-wrap">
+
+          <!-- LEFT: COMPLIANCE -->
+          <div>
+            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
+
+            <div class="grp-head">
+              <span class="grp-emoji">📋</span>
+              <span class="grp-title">Site documents</span>
+              <span class="grp-meta">7/7</span>
+            </div>
+
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">FDA Disclaimer present <code>CANNABIS-DOC-FDA001</code></span>
+              <span class="src-badge src-pair">📋 2 pairs</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Privacy Policy linked</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Terms of Use linked</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">SSL / TLS active 🔒</span>
+              <span class="src-badge src-global">🌐 Global</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Contact &amp; address visible</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+
+            <div class="grp-head">
+              <span class="grp-emoji">🔐</span>
+              <span class="grp-title">Access &amp; claims</span>
+              <span class="grp-meta">5/7 · 1 override</span>
+            </div>
+
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">21+ age gate <code>CANNABIS-ACCESS-AGE21</code></span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">State license # surfaced</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">No interstate-shipping claims</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row ovr-off">
+              <span class="toggle"></span>
+              <span class="check-name"><strong>No medical-claim language</strong> <code>CANNABIS-CLAIM-MED</code></span>
+              <span class="src-badge src-override">👤 Override OFF</span>
+              <button class="reset">↺ Reset</button>
+            </div>
+
+            <div class="grp-head">
+              <span class="grp-emoji">🧪</span>
+              <span class="grp-title">Product / COA</span>
+              <span class="grp-meta">5/9 · 2 from products</span>
+            </div>
+
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Δ9-THC % within state limit</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">COA per batch / lot #</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Δ8 / HHC isomer flag <code>CANNABIS-COA-ISO</code></span>
+              <span class="src-badge src-signal">🧪 Product signal</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Beverage-format COA per batch</span>
+              <span class="src-badge src-signal">🧪 Product signal</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row off">
+              <span class="toggle"></span>
+              <span class="check-name" style="color:#94A3B8">CBD-only product flag</span>
+              <span class="src-badge src-pair">📋 Pair (off)</span>
+              <button class="reset disabled">↺</button>
+            </div>
+
+          </div>
+
+          <!-- RIGHT: ANALYST -->
+          <div>
+            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
+
+            <div class="grp-head">
+              <span class="grp-emoji">🧑‍🔬</span>
+              <span class="grp-title">Pair-driven analyst checks</span>
+              <span class="grp-meta">8/14</span>
+            </div>
+
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">GMP certificate visible</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Strain / cultivar list parses</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">Lab / COA pictogram present</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+            <div class="row">
+              <span class="toggle"></span>
+              <span class="check-name">License # validated against state registry</span>
+              <span class="src-badge src-pair">📋 Pair</span>
+              <button class="reset disabled">↺</button>
+            </div>
+
+            <div class="grp-head">
+              <span class="grp-emoji">👤</span>
+              <span class="grp-title">Analyst overrides on this company</span>
+              <span class="grp-meta">2 added · 1 turned off</span>
+            </div>
+
+            <div class="row ovr">
+              <span class="toggle"></span>
+              <span class="check-name"><strong>Track interstate-shipping claims</strong></span>
+              <span class="src-badge src-override">👤 Override ON</span>
+              <button class="reset">↺ Reset</button>
+            </div>
+            <div class="row ovr">
+              <span class="toggle"></span>
+              <span class="check-name"><strong>Verify operator-attestation page</strong></span>
+              <span class="src-badge src-override">👤 Override ON</span>
+              <button class="reset">↺ Reset</button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- KEYWORDS -->
+        <div class="kw-section">
+          <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Resolved keyword sets · union of pair templates + product signals</div>
+
+          <div class="kw-row">
+            <div class="kw-label">Flag</div>
+            <div class="kw-pills">
+              <span class="kw kw-pair">cures cancer <span class="kw-src">📋 Cannabis</span></span>
+              <span class="kw kw-pair">treats anxiety <span class="kw-src">📋 Cannabis</span></span>
+              <span class="kw kw-pair">FDA approved <span class="kw-src">📋 Cannabis + Hemp</span></span>
+              <span class="kw kw-pair">prescription <span class="kw-src">📋 Cannabis</span></span>
+              <span class="kw kw-pair">guaranteed dosage <span class="kw-src">📋 Hemp</span></span>
+              <span class="kw kw-pair">+ 28 more</span>
+            </div>
+          </div>
+
+          <div class="kw-row">
+            <div class="kw-label">Watch</div>
+            <div class="kw-pills">
+              <span class="kw kw-pair">delta-8 <span class="kw-src">📋 2 pairs</span></span>
+              <span class="kw kw-pair">delta-10 <span class="kw-src">📋 Cannabis</span></span>
+              <span class="kw kw-pair">HHC <span class="kw-src">📋 Cannabis</span></span>
+              <span class="kw kw-pair">THC-O <span class="kw-src">📋 Cannabis</span></span>
+              <span class="kw kw-signal">CBN gummy <span class="kw-src">🧪 Signal</span></span>
+              <span class="kw kw-signal">syrup beverage <span class="kw-src">🧪 Signal</span></span>
+              <span class="kw kw-override">interstate ship <span class="kw-src">👤 Override</span></span>
+              <span class="kw kw-pair">+ 14 more</span>
+            </div>
+          </div>
+
+          <div class="kw-row">
+            <div class="kw-label">Allow</div>
+            <div class="kw-pills">
+              <span class="kw kw-pair">state-licensed <span class="kw-src">📋 Pair</span></span>
+              <span class="kw kw-pair">METRC tracked <span class="kw-src">📋 Pair</span></span>
+              <span class="kw kw-pair">21+ verified <span class="kw-src">📋 Pair</span></span>
+              <span class="kw kw-supp">in-state delivery only <span class="kw-src">👤 Suppressed</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCALARS -->
+        <table class="scalar-table">
+          <thead>
+            <tr>
+              <th style="width:30%">Scalar setting</th>
+              <th style="width:35%">Resolved value</th>
+              <th style="width:25%">Source</th>
+              <th style="width:10%;text-align:right">&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="nm">COA max age</td>
+              <td class="val"><span class="strike">365 days</span> 180 days <span style="font-size:11px;font-weight:500;color:#16A34A">(stricter wins)</span></td>
+              <td><span class="src-badge src-pair">📋 Cannabis pair</span></td>
+              <td style="text-align:right"><button class="reset disabled">↺</button></td>
+            </tr>
+            <tr>
+              <td class="nm">Scan cadence</td>
+              <td class="val"><span class="strike">30 days</span> 14 days</td>
+              <td><span class="src-badge src-override">👤 Override</span></td>
+              <td style="text-align:right"><button class="reset">↺ Reset</button></td>
+            </tr>
+            <tr>
+              <td class="nm">Min compliance score for green</td>
+              <td class="val">85 / 100</td>
+              <td><span class="src-badge src-global">🌐 Global</span></td>
+              <td style="text-align:right"><button class="reset disabled">↺</button></td>
+            </tr>
+            <tr>
+              <td class="nm">License-registry source</td>
+              <td class="val">TX-DSHS &nbsp;<span style="font-size:11px;font-weight:500;color:#64748B">(state inferred from address)</span></td>
+              <td><span class="src-badge src-pair">📋 Pair</span></td>
+              <td style="text-align:right"><button class="reset disabled">↺</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- AUDIT -->
+        <div class="audit-section">
+          <div class="audit-head">
+            <span>Override audit log</span>
+            <a href="#" style="font-size:11px;font-weight:600;color:#3B82F6">View full history (14 events) →</a>
+          </div>
+          <div class="audit-list">
+            <div class="audit-item">
+              <span class="when">2026-04-29</span>
+              <span class="who">jane.miller@flexpay.com</span>
+              <span class="what">Set <code>scan_cadence_days</code> from <code>30</code> to <code>14</code></span>
+              <span class="badge-act act-upd">UPDATE</span>
+            </div>
+            <div class="audit-item">
+              <span class="when">2026-04-22</span>
+              <span class="who">jane.miller@flexpay.com</span>
+              <span class="what">Added override: <code>track_interstate_shipping_claims</code> = ON</span>
+              <span class="badge-act act-add">ADD</span>
+            </div>
+            <div class="audit-item">
+              <span class="when">2026-04-22</span>
+              <span class="who">jane.miller@flexpay.com</span>
+              <span class="what">Added override: <code>verify_operator_attestation_page</code> = ON</span>
+              <span class="badge-act act-add">ADD</span>
+            </div>
+            <div class="audit-item">
+              <span class="when">2026-03-15</span>
+              <span class="who">m.estrada@flexpay.com</span>
+              <span class="what">Override: <code>no_medical_claim_language</code> set to OFF (ticket: legal review #4421)</span>
+              <span class="badge-act act-upd">UPDATE</span>
+            </div>
+            <div class="audit-item">
+              <span class="when">2026-03-12</span>
+              <span class="who">system</span>
+              <span class="what">Hemp / CBD × Manufacturer pair added → 11 new signals inherited automatically</span>
+              <span class="badge-act act-add">INHERIT</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-danger">↺ Reset all overrides</button>
+          <span style="font-size:11px;color:#94A3B8">Removes 3 overrides; resolved config falls back to pair templates + signals.</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Save Overrides &amp; Re-scan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- §B — INDIVIDUAL OVERRIDE CTA -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">§B</span>Per-element override · inline interaction</div>
+    <p class="section-sub">Hovering a pair-driven row reveals an "Override" CTA. One click flips the row into Override mode (background turns blue), and the row gets a Reset control that returns the value to the pair-template default. Resetting all overrides at once is also available in the footer.</p>
+
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Default · pair-driven</div>
+        <div class="row">
+          <span class="toggle"></span>
+          <span class="check-name">No medical-claim language <code>CANNABIS-CLAIM-MED</code></span>
+          <span class="src-badge src-pair">📋 Pair</span>
+          <button class="reset disabled">↺</button>
+        </div>
+        <div style="font-size:11px;color:#94A3B8;margin-top:6px">Mouse over → reveals "Override" CTA on the right.</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">After clicking Override · turned OFF</div>
+        <div class="row ovr-off">
+          <span class="toggle"></span>
+          <span class="check-name"><strong>No medical-claim language</strong> <code>CANNABIS-CLAIM-MED</code></span>
+          <span class="src-badge src-override">👤 Override OFF</span>
+          <button class="reset">↺ Reset</button>
+        </div>
+        <div style="font-size:11px;color:#7C3AED;margin-top:6px">Override now flagged in the audit log. <a href="#">Add reason →</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <span>Prev: <a href="scanner-industry-config.html"><strong>← Industry-pair scanner config</strong></a></span>
+    <span>Next: <a href="q-scanai-bulk-apply.html"><strong>Bulk apply pair template →</strong></a></span>
+  </div>
+
+</div>
+
+</body>
+</html>
