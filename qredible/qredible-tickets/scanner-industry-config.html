@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Policy-Driven Scanner Configuration — Qredible Ticket</title>
+<title>Q-ScanAI — Industry-Pair Scanner Configuration</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -130,22 +130,22 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 <nav class="topnav">
   <a href="https://jfloyd-qredible.netlify.app/">← All Mockups</a>
   <span class="sep">/</span>
-  <span class="title">Policy-Driven Scanner Configuration</span>
+  <span class="title">Q-ScanAI — Industry-Pair Scanner Configuration</span>
   <span class="sep">/</span>
-  <span class="ticket-badge">QP-3649 (rescoped)</span>
+  <span class="ticket-badge">QP-3649</span>
 </nav>
 
-<!-- POLICY-FIRST RESTRUCTURE BANNER -->
+<!-- LAYERED SCAN-CONFIG CONTEXT BANNER -->
 <div style="background:#EFF6FF;border-bottom:3px solid #3B82F6;padding:14px 24px;font-size:13px;color:#1E3A5F;line-height:1.5">
-  <strong style="color:#1E3A5F">Policy-First Restructure (April 2026) —</strong>
-  This ticket has been rescoped from <em>industry-aware scanner config</em> to <em>policy-driven scanner config</em>. The UI scaffolding is ~80% reusable; only the data source for signal defaults changes. Q-ScanAI now reads <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">policy.checklist[]</code> from the active policy(s) on the merchant at scan time, rather than loading a static industry profile. Per-company overrides remain. See the Architecture Audit doc for full context.
+  <strong style="color:#1E3A5F">Layer 2 of the scan-config resolution chain —</strong>
+  This screen authors the <em>Industry Pair scan-config template</em> — what Q-ScanAI looks for on a website when a company has the <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">(Industry Type, Type of Company)</code> pair attached. Templates feed defaults into every linked company's resolved scan config (boolean union, keyword append-dedupe, scalar stricter-wins). Per-company overrides sit on top. Multi-pair assignment lives in <a href="multi-industry-type.html" style="color:#1E40AF;font-weight:600">QP-3646</a>. Resolution: 1. Global default → <strong>2. Industry-pair template (this screen)</strong> → 3. Product signals → 4. Per-company override. Reference: <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">scan-config-layered-resolution-2026-05-01</code>.
 </div>
 
 <!-- PAGE -->
 <div class="page">
   <div class="page-header">
-    <h1>Q-ScanAI — Policy-Driven Scanner Configuration</h1>
-    <p>Feature mockup: Scanner Configuration modal that auto-loads signals from the active policy(s) attached to the merchant, with per-company analyst overrides.</p>
+    <h1>Q-ScanAI — Industry-Pair Scanner Configuration</h1>
+    <p>Feature mockup: the Q-ScanAI Scanner Configuration modal, opened against an Industry Pair (e.g., Hemp / CBD × Retailer). Signals load from the pair template; analysts see exactly which checks are pair defaults, which are universal, and which are per-company overrides.</p>
   </div>
 
   <!-- ══════════════════════════════════════════
@@ -220,12 +220,12 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
        SECTION 2 — AFTER (Hemp/CBD)
   ══════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label label-after">② After — Policy-Driven Scanner Configuration</div>
-    <div class="section-title">Hemp / CBD Retailer — Signals Auto-Loaded From Active Policy</div>
+    <div class="section-label label-after">② After — Industry-Pair Scanner Configuration</div>
+    <div class="section-title">Hemp / CBD × Retailer — Signals Auto-Loaded From Pair Template</div>
 
     <div class="modal-wrap">
       <div class="modal-header">
-        <h2>Q-ScanAI — Policy-Driven Configuration</h2>
+        <h2>Q-ScanAI — Industry-Pair Configuration</h2>
         <span class="close-btn">✕</span>
       </div>
 
@@ -233,31 +233,31 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
       <div class="company-bar">
         <span class="company-name">3rd Coast Blends</span>
         <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Policy: hemp-cbd-v3</span>
+        <span class="pill pill-green">Industry: Hemp / CBD</span>
         <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Tier: Retailer</span>
+        <span class="pill pill-green">Type: Retailer</span>
         <span style="flex:1"></span>
-        <span class="pill pill-success">✓ Policy signals loaded</span>
+        <span class="pill pill-success">✓ Pair template loaded</span>
       </div>
 
       <div class="modal-body">
 
-        <!-- Active Policy Selector -->
+        <!-- Active Industry Pair Selector -->
         <div class="profile-selector">
           <div class="profile-selector-top">
-            <span style="font-size:14px">📜</span>
+            <span style="font-size:14px">📋</span>
             <div class="profile-select-mock" style="background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#166534;flex:1">
-              Active Policy: hemp-cbd-v3.0 (published Apr 1, 2026) &nbsp;▾
+              Active Pair: Hemp / CBD × Retailer · v5.0 (published Apr 1, 2026) &nbsp;▾
             </div>
-            <span class="new-tag">POLICY</span>
+            <span class="new-tag">PAIR</span>
           </div>
-          <div class="profile-badge-row">✓ Loaded 42 scanner signals, 12 MRI checks, 159 keywords from policy.checklist[]</div>
+          <div class="profile-badge-row">✓ Loaded 42 scanner signals, 12 MRI checks, 159 keywords from pair_template.signals[]</div>
           <div class="profile-links">
-            <a href="https://jfloyd-qredible.netlify.app/">↺ Revert to Policy Defaults</a>
+            <a href="https://jfloyd-qredible.netlify.app/">↺ Revert to Pair Defaults</a>
             <span style="color:#D1FAE5">|</span>
             <a href="https://jfloyd-qredible.netlify.app/">⊕ Save as Per-Company Override</a>
             <span style="color:#D1FAE5">|</span>
-            <a href="https://jfloyd-qredible.netlify.app/">📄 View Policy Document</a>
+            <a href="https://jfloyd-qredible.netlify.app/">📄 View Pair Template Spec</a>
           </div>
         </div>
 
@@ -273,27 +273,27 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">FDA Disclaimer</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Terms of Use</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Privacy Policy</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Return/Refund Policy</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Contact &amp; Business Info</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
@@ -303,7 +303,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Age &amp; Access Controls</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
@@ -316,12 +316,12 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">THC Disclaimer</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Prohibited Products Search</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
@@ -373,49 +373,49 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     </div>
 
     <div class="annotation green">
-      <strong>After:</strong> Signals loaded automatically from the active policy attached to the company. Operators see which checks came from the policy, which are universal, and which are per-company overrides. Source badges are traceable back to the exact policy version.
+      <strong>After:</strong> Signals loaded automatically from the Industry Pair template attached to the company. Analysts see which checks came from the pair template, which are universal, and which are per-company overrides. Source badges are traceable back to the exact pair-template version.
     </div>
   </div>
 
   <div class="divider"></div>
 
   <!-- ══════════════════════════════════════════
-       SECTION 3 — ONLINE LENDING (different policy)
+       SECTION 3 — TOBACCO / VAPE (different Industry Pair)
   ══════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label label-lending">③ Different Policy — Online Lending</div>
-    <div class="section-title">Online Lending — Different Policy, Same Modal Shell</div>
+    <div class="section-label label-lending">③ Different Industry Pair — Tobacco / Vape × Retailer</div>
+    <div class="section-title">Tobacco / Vape × Retailer — Different Pair Template, Same Modal Shell</div>
 
     <div class="modal-wrap">
       <div class="modal-header">
-        <h2>Q-ScanAI — Policy-Driven Configuration</h2>
+        <h2>Q-ScanAI — Industry-Pair Configuration</h2>
         <span class="close-btn">✕</span>
       </div>
 
       <!-- Company bar -->
       <div class="company-bar">
-        <span class="company-name">FastCash Financial</span>
+        <span class="company-name">Lone Star Vape Co.</span>
         <span class="arrow-sep">·</span>
-        <span class="pill pill-blue">Policy: online-lending-v1</span>
+        <span class="pill pill-blue">Industry: Tobacco / Vape</span>
         <span class="arrow-sep">·</span>
-        <span class="pill pill-blue">Tier: Lender</span>
+        <span class="pill pill-blue">Type: Retailer</span>
         <span style="flex:1"></span>
-        <span class="pill pill-info">✓ Policy signals loaded</span>
+        <span class="pill pill-info">✓ Pair template loaded</span>
       </div>
 
       <div class="modal-body">
 
-        <!-- Active Policy Selector -->
+        <!-- Active Industry Pair Selector -->
         <div class="profile-selector" style="background:#EFF6FF;border-color:#BFDBFE">
           <div class="profile-selector-top">
-            <span style="font-size:14px">📜</span>
+            <span style="font-size:14px">📋</span>
             <div class="profile-select-mock" style="background:#fff;border:1px solid #BFDBFE;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#1E40AF;flex:1">
-              Active Policy: online-lending-v1 (Lender tier) &nbsp;▾
+              Active Pair: Tobacco / Vape × Retailer · v3.0 (draft) &nbsp;▾
             </div>
           </div>
-          <div class="profile-badge-row" style="color:#3B82F6">✓ Loaded 9 scanner signals, 88 keywords from policy.checklist[]</div>
+          <div class="profile-badge-row" style="color:#3B82F6">✓ Loaded 19 scanner signals, 7 MRI checks, 64 keywords from pair_template.signals[]</div>
           <div class="profile-links">
-            <a href="https://jfloyd-qredible.netlify.app/">↺ Revert to Policy Defaults</a>
+            <a href="https://jfloyd-qredible.netlify.app/">↺ Revert to Pair Defaults</a>
             <span style="color:#BFDBFE">|</span>
             <a href="https://jfloyd-qredible.netlify.app/">⊕ Save as Per-Company Override</a>
           </div>
@@ -423,7 +423,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
         <div class="form-group">
           <label class="form-label">Website URL</label>
-          <input class="form-input" type="text" value="https://fastcashfinancial.com" readonly>
+          <input class="form-input" type="text" value="https://lonestarvape.com" readonly>
         </div>
 
         <div class="checks-grid">
@@ -432,18 +432,18 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
-              <span class="check-label">APR Disclosure</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="check-label">21+ Age Gate (T21)</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Terms of Use</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Privacy Policy</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
@@ -453,19 +453,19 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Contact &amp; Business Info</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
-              <span class="check-label muted">FDA Disclaimer</span>
+              <span class="check-label muted">FDA Disclaimer (CBD-style)</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
-              <span class="check-label muted">Age &amp; Access Controls</span>
+              <span class="check-label muted">Δ9-THC ≤ 0.3% notice</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
-              <span class="check-label muted">Return/Refund Policy</span>
+              <span class="check-label muted">GMP Certificate</span>
             </div>
           </div>
           <!-- RIGHT: Analyst -->
@@ -473,35 +473,35 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
-              <span class="check-label">MLA Reference</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="check-label">FDA-ENDS PMTA marketing-order letter on file</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
-              <span class="check-label">ECOA / Regulation B</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="check-label">No flavor claims in restricted states</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
-              <span class="check-label">Right to Rescind</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="check-label">Synthetic-nicotine notice present</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
-              <span class="check-label">State License Disclosure</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="check-label">State tobacco-license # surfaced</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
-              <span class="check-label muted">THC Disclaimer</span>
+              <span class="check-label muted">THC Disclaimer (cannabis)</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
-              <span class="check-label muted">GMP Certificate</span>
+              <span class="check-label muted">Strain / cultivar list parses</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
-              <span class="check-label muted">Prohibited Products Search</span>
+              <span class="check-label muted">COA per batch</span>
             </div>
           </div>
         </div>
@@ -510,9 +510,9 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
         <div class="keyword-sets">
           <label class="keyword-sets-label">Active Compliance Element Sets</label>
           <div class="keyword-pills">
-            <span class="kw-pill kw-blue">Prohibited Approval Language — 45 keywords <span class="kw-src">📜</span></span>
-            <span class="kw-pill kw-blue">Deceptive Cost Language — 31 keywords <span class="kw-src">📜</span></span>
-            <span class="kw-pill kw-blue">Restricted State Compliance — 12 keywords <span class="kw-src">📜</span></span>
+            <span class="kw-pill kw-blue">FDA-ENDS Prohibited Claims — 38 keywords <span class="kw-src">📋</span></span>
+            <span class="kw-pill kw-blue">Synthetic-Nicotine Watch List — 14 keywords <span class="kw-src">📋</span></span>
+            <span class="kw-pill kw-blue">Restricted-Flavor State List — 12 keywords <span class="kw-src">📋</span></span>
             <span class="kw-pill kw-add">+ Add Keyword Set</span>
           </div>
         </div>
@@ -534,7 +534,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     </div>
 
     <div class="annotation blue">
-      <strong>Same modal, completely different configuration</strong> based on the active policy. Lending-specific signals (APR disclosure, MLA, ECOA, Right to Rescind) load automatically from online-lending-v1.checklist[] — hemp-specific signals (FDA Disclaimer, THC, GMP) aren't in this policy and don't appear.
+      <strong>Same modal, completely different configuration</strong> based on the Industry Pair. Tobacco / Vape × Retailer signals (T21, FDA-ENDS PMTA, synthetic-nicotine, restricted-state flavor) load from <code>tobacco-vape-retailer.signals[]</code> — hemp-specific signals (FDA Disclaimer, THC, GMP) aren't in this pair and don't appear. The same modal shell handles every Industry Pair without UI branching.
     </div>
   </div>
 
@@ -549,7 +549,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
     <div class="modal-wrap">
       <div class="modal-header">
-        <h2>Q-ScanAI — Policy-Driven Configuration</h2>
+        <h2>Q-ScanAI — Industry-Pair Configuration</h2>
         <span class="close-btn">✕</span>
       </div>
 
@@ -557,9 +557,9 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
       <div class="company-bar">
         <span class="company-name">3rd Coast Blends</span>
         <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Policy: hemp-cbd-v3</span>
+        <span class="pill pill-green">Industry: Hemp / CBD</span>
         <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Tier: Retailer</span>
+        <span class="pill pill-green">Type: Retailer</span>
         <span style="flex:1"></span>
         <span class="pill" style="background:#EDE9FE;color:#4C1D95;border:1px solid #DDD6FE">👤 2 overrides active</span>
       </div>
@@ -568,23 +568,23 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
         <!-- Override badge bar -->
         <div class="override-badge-bar">
-          <span>👤 <strong>2 per-company overrides</strong> active — these differ from the published policy</span>
-          <button class="btn btn-danger" style="padding:4px 12px;font-size:12px">↺ Revert to Policy Defaults</button>
+          <span>👤 <strong>2 per-company overrides</strong> active — these differ from the Hemp / CBD × Retailer pair template</span>
+          <button class="btn btn-danger" style="padding:4px 12px;font-size:12px">↺ Reset All to Pair Defaults</button>
         </div>
 
-        <!-- Active Policy Selector -->
+        <!-- Active Industry Pair Selector -->
         <div class="profile-selector" style="background:#F5F3FF;border-color:#DDD6FE">
           <div class="profile-selector-top">
-            <span style="font-size:14px">📜</span>
+            <span style="font-size:14px">📋</span>
             <div style="background:#fff;border:1px solid #DDD6FE;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#4C1D95;flex:1">
-              Active Policy: hemp-cbd-v3 (with 2 overrides) &nbsp;▾
+              Active Pair: Hemp / CBD × Retailer · v5.0 (with 2 overrides) &nbsp;▾
             </div>
           </div>
-          <div class="profile-badge-row" style="color:#7C3AED">⚠ Per-company overrides are active — scan behavior differs from the published policy</div>
+          <div class="profile-badge-row" style="color:#7C3AED">⚠ Per-company overrides are active — scan behavior differs from the published pair template</div>
           <div class="profile-links">
-            <a href="https://jfloyd-qredible.netlify.app/">↺ Reset to Defaults</a>
+            <a href="q-scanai-config-override.html">↺ Reset to Pair Defaults</a>
             <span style="color:#DDD6FE">|</span>
-            <a href="https://jfloyd-qredible.netlify.app/">⊕ Save as Company Override</a>
+            <a href="q-scanai-config-override.html">⊕ Save as Company Override</a>
           </div>
         </div>
 
@@ -600,27 +600,27 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">FDA Disclaimer</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Terms of Use</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Privacy Policy</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Return/Refund Policy</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Contact &amp; Business Info</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
@@ -630,7 +630,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Age &amp; Access Controls</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" disabled>
@@ -643,12 +643,12 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">THC Disclaimer</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <div class="check-item">
               <input type="checkbox" checked disabled>
               <span class="check-label">Prohibited Products Search</span>
-              <span class="source-badge src-industry">📜 Policy</span>
+              <span class="source-badge src-industry">📋 Pair Template</span>
             </div>
             <!-- COMPANY OVERRIDES -->
             <div class="check-item override-highlight">
@@ -704,7 +704,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     </div>
 
     <div class="annotation purple">
-      <strong>Per-company overrides</strong> are the operator's final say. The published policy provides the starting point — operators can add, remove, or adjust signals per company. Overrides are preserved even when the underlying policy is updated to a new version. The operator's choices take precedence. <strong>Blue highlighted rows</strong> indicate signals that differ from the policy default.
+      <strong>Per-company overrides</strong> are the analyst's final say. The pair template provides the starting point — analysts can add, remove, or adjust signals per company. Overrides are preserved even when the pair template is published to a new version. The override always wins. <strong>Blue highlighted rows</strong> indicate signals that differ from the pair-template default. See <a href="q-scanai-config-override.html">per-company resolved view</a> for the full source-trace UI.
     </div>
   </div>
 
@@ -718,27 +718,27 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     <div class="flow-steps">
       <div class="flow-step">
         <div class="step-num">Step 1</div>
-        Policy(s) assigned<br>to the company
+        Industry pair(s)<br>assigned to company
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="step-num">Step 2</div>
-        policy.checklist[]<br>loaded as defaults
+        pair_template.signals[]<br>loaded as defaults
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="step-num">Step 3</div>
-        Operator overrides<br>per company if needed
+        Product signals<br>add additively
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="step-num">Step 4</div>
-        Configuration + policy<br>version stamped on scan
+        Per-company override<br>wins where set
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="step-num">Step 5</div>
-        Scan runs with<br>final signal set
+        Scan runs · pair version<br>stamped on result
       </div>
     </div>
   </div>
