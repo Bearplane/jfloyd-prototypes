@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Case-First UX — Targeting Picker · Exploration</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #1E293B; color: #1A202E; }
+
+/* Proto nav */
+.proto-nav { background: #0F172A; color: #CBD5E1; display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; position: sticky; top: 0; z-index: 1000; font-size: 13px; gap: 16px; }
+.proto-nav a { color: #94A3B8; text-decoration: none; }
+.proto-nav a:hover { color: white; }
+.proto-nav .proto-center { color: #E2E8F0; font-weight: 500; flex: 1; text-align: center; }
+.proto-pill { background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.proto-nav-link { background: #1E3A5F; color: #CBD5E1; border: 1px solid #334155; border-radius: 5px; padding: 4px 10px; font-size: 12px; text-decoration: none; }
+
+/* Annotation bar */
+.annot-bar { background: #F0FFF4; border-bottom: 2px solid #BBF7D0; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; }
+.annot-pill { background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.annot-text { color: #166534; font-weight: 500; }
+.annot-meta { font-size: 11px; color: #6B7280; }
+
+/* Picker as full-bleed surface */
+.picker-page { background: #f8fafc; min-height: calc(100vh - 80px); padding: 16px 16px 80px 16px; }
+.picker-shell {
+  background: white; border: 1px solid #E5E7EB; border-radius: 14px; box-shadow: 0 8px 32px rgba(15,23,42,0.08);
+  max-width: 1380px; margin: 0 auto; overflow: hidden; min-height: calc(100vh - 130px); display: flex; flex-direction: column;
+}
+
+/* Picker header */
+.picker-head { background: #F7F5FF; padding: 18px 24px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 14px; }
+.picker-head .breadcrumb { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.picker-head .breadcrumb a { color: #2563eb; text-decoration: none; }
+.picker-head h2 { font-size: 17px; font-weight: 700; color: #1A202E; }
+.picker-head h2 .merch { color: #475569; font-weight: 500; }
+.picker-head .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.picker-head .right .case-chip {
+  background: white; border: 1px solid #E5E7EB; border-radius: 999px; padding: 4px 12px;
+  font-size: 12px; color: #1A202E; display: inline-flex; align-items: center; gap: 8px;
+}
+.picker-head .right .case-chip .lbl { color: #6B7280; font-size: 11px; }
+.picker-head .right .case-chip .val { font-weight: 600; }
+.picker-close { background: none; border: none; cursor: pointer; font-size: 22px; color: #6B7280; line-height: 1; padding: 4px 6px; }
+.picker-close:hover { color: #1A202E; }
+
+/* Two-column body */
+.picker-body { flex: 1; display: grid; grid-template-columns: 280px 1fr; min-height: 0; }
+@media (max-width: 920px) { .picker-body { grid-template-columns: 1fr; } }
+
+/* Left rail — source categories */
+.rail { background: #FCFDFE; border-right: 1px solid #E5E7EB; padding: 18px 14px; overflow-y: auto; }
+.rail-h { font-size: 10px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 6px 8px 6px; }
+.rail-item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 10px; border-radius: 8px;
+  cursor: pointer; margin-bottom: 4px; border: 1px solid transparent;
+}
+.rail-item:hover { background: #F1F5F9; }
+.rail-item.active { background: #EFF6FF; border-color: #BFDBFE; }
+.rail-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 700; }
+.rail-icon.red { background: #FEE2E2; color: #991B1B; }
+.rail-icon.amber { background: #FEF3C7; color: #92400E; }
+.rail-icon.purple { background: #EDE9FE; color: #5B21B6; }
+.rail-icon.blue { background: #DBEAFE; color: #1E40AF; }
+.rail-icon.gray { background: #F1F5F9; color: #6B7280; }
+.rail-body { flex: 1; min-width: 0; }
+.rail-title { font-size: 13px; font-weight: 600; color: #1A202E; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rail-count { font-size: 11px; font-weight: 700; color: #1A202E; background: #F1F5F9; padding: 1px 7px; border-radius: 999px; }
+.rail-item.active .rail-count { background: #BFDBFE; color: #1E40AF; }
+.rail-sub { font-size: 11px; color: #6B7280; margin-top: 3px; line-height: 1.4; }
+.rail-sel-badge { background: #16a34a; color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px; margin-left: 6px; }
+
+.rail-divider { height: 1px; background: #E5E7EB; margin: 12px 6px; }
+.rail-section { font-size: 10px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 6px 6px 6px; }
+
+/* Main pane */
+.pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: white; }
+.pane-head { padding: 16px 20px 12px 20px; border-bottom: 1px solid #E5E7EB; }
+.pane-title-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.pane-title { font-size: 16px; font-weight: 700; color: #1A202E; }
+.pane-meta { font-size: 12px; color: #6B7280; }
+.pane-meta strong { color: #1A202E; }
+
+/* Filter row */
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.search-box { position: relative; flex: 1; min-width: 220px; max-width: 320px; }
+.search-box input {
+  width: 100%; padding: 8px 12px 8px 32px; border: 1px solid #E5E7EB; border-radius: 6px;
+  font-size: 13px; font-family: inherit; color: #1A202E;
+}
+.search-box input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+.search-box .icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9CA3AF; font-size: 13px; }
+.filter-chip { background: white; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 12px; font-size: 12px; color: #374151; cursor: pointer; }
+.filter-chip:hover { background: #F8FAFC; }
+.filter-chip.active { background: #1A202E; color: white; border-color: #1A202E; }
+.filter-chip .ct { font-size: 10px; opacity: 0.7; margin-left: 4px; }
+.filter-spacer { flex: 1; }
+.filter-meta { font-size: 11px; color: #6B7280; }
+
+/* Items table */
+.items-wrap { flex: 1; overflow-y: auto; }
+.items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.items-table thead th {
+  position: sticky; top: 0; background: #F8FAFC; z-index: 1;
+  padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #475569;
+  border-bottom: 1px solid #E5E7EB; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.items-table thead th:first-child { padding-left: 20px; width: 36px; }
+.items-table tbody td { padding: 12px 14px; border-bottom: 1px solid #F1F5F9; vertical-align: top; color: #374151; }
+.items-table tbody td:first-child { padding-left: 20px; padding-top: 14px; }
+.items-table tbody tr.selected { background: #EFF6FF; }
+.items-table tbody tr:hover { background: #FAFBFC; }
+.items-table tbody tr.selected:hover { background: #DBEAFE; }
+.items-table .product-cell { display: flex; flex-direction: column; gap: 2px; }
+.items-table .product-name { font-weight: 600; color: #1A202E; }
+.items-table .product-sku { font-family: monospace; font-size: 11px; color: #6B7280; }
+.items-table .coa-info { font-size: 11px; color: #6B7280; margin-top: 4px; }
+.items-table .coa-info code { font-family: monospace; background: #F1F5F9; padding: 1px 5px; border-radius: 3px; }
+.items-table .severity { display: inline-flex; align-items: center; gap: 6px; }
+.items-table .sev-dot { width: 8px; height: 8px; border-radius: 50%; }
+.items-table .sev-dot.high { background: #EF4444; }
+.items-table .sev-dot.med { background: #F59E0B; }
+.items-table .sev-dot.low { background: #10B981; }
+
+.pill { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 700; display: inline-block; white-space: nowrap; }
+.pill-red { background: #FEE2E2; color: #991B1B; }
+.pill-amber { background: #FEF3C7; color: #92400E; }
+.pill-green { background: #DCFCE7; color: #166534; }
+.pill-purple { background: #EDE9FE; color: #5B21B6; }
+.pill-gray { background: #F3F4F6; color: #6B7280; }
+.pill-blue { background: #DBEAFE; color: #1E40AF; }
+
+/* Resolution preview */
+.res-chip {
+  display: inline-flex; align-items: center; gap: 5px; background: #EFF6FF; color: #1E40AF;
+  border: 1px solid #BFDBFE; border-radius: 999px; padding: 3px 9px; font-size: 11px; font-weight: 600;
+}
+.res-chip .ico { font-size: 10px; }
+
+/* Custom checkbox */
+.cbx { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #CBD5E1; background: white; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.cbx.checked { background: #2563eb; border-color: #2563eb; color: white; font-size: 12px; }
+.cbx.indet { background: #2563eb; border-color: #2563eb; color: white; font-size: 14px; line-height: 1; }
+.cbx.indet::after { content: '−'; }
+
+/* Group divider row in items table */
+.items-table tr.group-row td {
+  background: #F8FAFC; padding: 6px 14px; padding-left: 20px;
+  font-size: 10px; font-weight: 700; color: #475569;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+/* Selection footer */
+.sel-footer {
+  border-top: 1px solid #E5E7EB; background: white; padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px; position: sticky; bottom: 0;
+}
+.sel-summary { font-size: 13px; color: #1A202E; flex: 1; }
+.sel-summary strong { color: #16a34a; font-weight: 700; }
+.sel-tags { display: inline-flex; gap: 6px; margin-left: 8px; }
+.sel-tags .tag { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+
+.btn { background: #1A202E; color: white; border: none; border-radius: 6px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.btn:hover { background: #0F172A; }
+.btn.secondary { background: white; color: #374151; border: 1px solid #E5E7EB; font-weight: 500; }
+.btn.secondary:hover { background: #F8FAFC; }
+.btn.green { background: #16a34a; }
+.btn.green:hover { background: #15803d; }
+.btn.disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.with-count { display: inline-flex; align-items: center; gap: 8px; }
+.btn.with-count .ct { background: rgba(255,255,255,0.18); padding: 1px 7px; border-radius: 999px; font-size: 11px; }
+
+/* Notes */
+.notes-block { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 22px 26px; margin: 22px auto 0 auto; max-width: 1380px; }
+.notes-block h3 { font-size: 14px; font-weight: 700; color: #1A202E; margin-bottom: 12px; }
+.notes-block .nb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+@media (max-width: 980px) { .notes-block .nb-grid { grid-template-columns: 1fr; } }
+.notes-block .nb-card { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 8px; padding: 14px; }
+.notes-block .nb-h { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.notes-block .nb-h .dot { width: 8px; height: 8px; border-radius: 50%; }
+.notes-block .nb-card p { font-size: 12px; color: #475569; line-height: 1.6; }
+.notes-block .nb-card p + p { margin-top: 8px; }
+.notes-block code { font-family: monospace; font-size: 11px; background: white; padding: 1px 5px; border-radius: 3px; border: 1px solid #E5E7EB; color: #1A202E; }
+
+/* Footer ribbon */
+.footer-cta { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 22px; margin: 18px auto 0 auto; max-width: 1380px; display: flex; gap: 14px; align-items: center; }
+.footer-cta .lbl { font-size: 12px; color: #6B7280; flex: 1; }
+.footer-cta .btn-link { background: #1A202E; color: white; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; }
+.footer-cta .btn-link:hover { background: #0F172A; }
+.footer-cta .btn-ghost { background: white; color: #1A202E; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; border: 1px solid #E5E7EB; }
+.footer-cta .btn-ghost:hover { background: #F8FAFC; }
+</style>
+</head>
+<body>
+<nav class="proto-nav">
+  <a href="../index.html" style="white-space:nowrap;">← All Mockups</a>
+  <div class="proto-center">Case-First UX Exploration · 3 / 4 — Targeting Picker</div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="proto-pill">EXPLORATION</span>
+    <a class="proto-nav-link" href="compliance-case-blank-canvas.html">← Blank Canvas</a>
+    <a class="proto-nav-link" href="compliance-case-quick-add-modal.html">Quick-Add →</a>
+  </div>
+</nav>
+
+<div class="annot-bar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="annot-pill">EXPLORATION</span>
+    <span class="annot-text">After clicking a quick-add card on the blank canvas — target violative findings across the merchant's data</span>
+    <span class="annot-meta">Source: <strong>Products with violative COAs (3)</strong> selected</span>
+  </div>
+  <span class="annot-meta">Multi-select per source · suggested resolution per item · live "Add N" CTA</span>
+</div>
+
+<div class="picker-page">
+  <div class="picker-shell">
+
+    <!-- HEADER -->
+    <div class="picker-head">
+      <div>
+        <div class="breadcrumb">
+          <a href="compliance-case-blank-canvas.html">← Untitled case</a> · Add items
+        </div>
+        <h2>Target violative findings <span class="merch">· Black Bear Wellness LLC</span></h2>
+      </div>
+      <div class="right">
+        <div class="case-chip">
+          <span class="ico">📋</span>
+          <span class="lbl">Adding to:</span>
+          <span class="val">Untitled case · Black Bear</span>
+          <span class="lbl">·</span>
+          <span class="lbl">SLA</span>
+          <span class="val">7d</span>
+        </div>
+        <button class="picker-close" onclick="window.history.back()">×</button>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="picker-body">
+
+      <!-- LEFT RAIL -->
+      <aside class="rail">
+        <div class="rail-h">Sources</div>
+
+        <div class="rail-item active">
+          <div class="rail-icon red">🧪</div>
+          <div class="rail-body">
+            <div class="rail-title">
+              <span>Violative COAs</span>
+              <span class="rail-count">3</span>
+            </div>
+            <div class="rail-sub">Δ-9 over · expired · unverified <span class="rail-sel-badge">3 selected</span></div>
+          </div>
+        </div>
+
+        <div class="rail-item">
+          <div class="rail-icon amber">📄</div>
+          <div class="rail-body">
+            <div class="rail-title">
+              <span>Missing COAs</span>
+              <span class="rail-count">5</span>
+            </div>
+            <div class="rail-sub">Required by policy · no COA</div>
+          </div>
+        </div>
+
+        <div class="rail-item">
+          <div class="rail-icon purple">🤖</div>
+          <div class="rail-body">
+            <div class="rail-title">
+              <span>Q-ScanAI findings</span>
+              <span class="rail-count">8</span>
+            </div>
+            <div class="rail-sub">5 high · 3 medium · 30d <span class="rail-sel-badge">1 selected</span></div>
+          </div>
+        </div>
+
+        <div class="rail-item">
+          <div class="rail-icon blue">🪪</div>
+          <div class="rail-body">
+            <div class="rail-title">
+              <span>License / OFAC</span>
+              <span class="rail-count">0</span>
+            </div>
+            <div class="rail-sub">No flags · skip</div>
+          </div>
+        </div>
+
+        <div class="rail-divider"></div>
+        <div class="rail-section">Other</div>
+
+        <div class="rail-item">
+          <div class="rail-icon gray">🛒</div>
+          <div class="rail-body">
+            <div class="rail-title">
+              <span>All products</span>
+              <span class="rail-count">12</span>
+            </div>
+            <div class="rail-sub">Browse the full catalog</div>
+          </div>
+        </div>
+
+        <div class="rail-item">
+          <div class="rail-icon gray">📑</div>
+          <div class="rail-body">
+            <div class="rail-title">
+              <span>Audit history</span>
+              <span class="rail-count">14</span>
+            </div>
+            <div class="rail-sub">Past resolved findings</div>
+          </div>
+        </div>
+
+        <div class="rail-item">
+          <div class="rail-icon gray">+</div>
+          <div class="rail-body">
+            <div class="rail-title"><span>Add manually</span></div>
+            <div class="rail-sub">Custom item not in system</div>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;padding:14px 6px 4px 6px;font-size:11px;color:#9CA3AF;line-height:1.5;">
+          <strong style="color:#475569;">Tip:</strong> rail counts are scoped to <strong style="color:#1A202E;">Black Bear</strong>. Switch merchants in the case header to widen scope.
+        </div>
+      </aside>
+
+      <!-- MAIN PANE -->
+      <main class="pane">
+        <div class="pane-head">
+          <div class="pane-title-row">
+            <span class="pane-title">Products with violative COAs</span>
+            <span class="pane-meta">·</span>
+            <span class="pane-meta"><strong>3</strong> items · 3 selected</span>
+          </div>
+          <div class="filter-row">
+            <div class="search-box">
+              <span class="icon">🔍</span>
+              <input placeholder="Search by SKU, COA, or keyword in this source…">
+            </div>
+            <button class="filter-chip active">All<span class="ct">3</span></button>
+            <button class="filter-chip">Δ-9 over limit<span class="ct">2</span></button>
+            <button class="filter-chip">Expired<span class="ct">1</span></button>
+            <button class="filter-chip">Last 30 days<span class="ct">3</span></button>
+            <button class="filter-chip">High severity<span class="ct">2</span></button>
+            <span class="filter-spacer"></span>
+            <span class="filter-meta">Sort: <strong style="color:#1A202E;">Severity ↓</strong></span>
+          </div>
+        </div>
+
+        <div class="items-wrap">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th><span class="cbx indet"></span></th>
+                <th>Product / COA</th>
+                <th style="width:130px;">Issue</th>
+                <th style="width:90px;">Severity</th>
+                <th style="width:240px;">Suggested resolution <span style="color:#9CA3AF;font-weight:500;text-transform:none;letter-spacing:0;">(default)</span></th>
+                <th style="width:80px;">Detected</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr class="group-row"><td colspan="6">High-severity · 2 items</td></tr>
+
+              <tr class="selected">
+                <td><span class="cbx checked">✓</span></td>
+                <td>
+                  <div class="product-cell">
+                    <span class="product-name">Gummy Bears 500mg</span>
+                    <span class="product-sku">SKU: GB-500 · Hemp/CBD</span>
+                    <div class="coa-info">COA <code>#VCO-2104</code> · CannTest Labs · uploaded Mar 12, 2026</div>
+                  </div>
+                </td>
+                <td><span class="pill pill-red">Δ-9 over limit</span><div style="font-size:11px;color:#6B7280;margin-top:4px;">0.42% (limit 0.30%)</div></td>
+                <td><span class="severity"><span class="sev-dot high"></span><strong style="color:#991B1B;font-size:12px;">High</strong></span></td>
+                <td>
+                  <span class="res-chip"><span class="ico">🧪</span> Replace COA + reformulate</span>
+                  <div style="font-size:11px;color:#6B7280;margin-top:4px;">Editable per item · or change after add</div>
+                </td>
+                <td style="font-size:11px;color:#6B7280;">2d ago</td>
+              </tr>
+
+              <tr class="selected">
+                <td><span class="cbx checked">✓</span></td>
+                <td>
+                  <div class="product-cell">
+                    <span class="product-name">Tincture 1000mg</span>
+                    <span class="product-sku">SKU: TIN-1000 · Hemp/CBD</span>
+                    <div class="coa-info">COA <code>#VCO-2098</code> · GreenLeaf Labs · expired Apr 30, 2026</div>
+                  </div>
+                </td>
+                <td><span class="pill pill-amber">COA expired</span><div style="font-size:11px;color:#6B7280;margin-top:4px;">Expired 2 days ago</div></td>
+                <td><span class="severity"><span class="sev-dot high"></span><strong style="color:#991B1B;font-size:12px;">High</strong></span></td>
+                <td>
+                  <span class="res-chip"><span class="ico">📤</span> Upload replacement COA</span>
+                </td>
+                <td style="font-size:11px;color:#6B7280;">Today</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="6">Medium-severity · 1 item</td></tr>
+
+              <tr class="selected">
+                <td><span class="cbx checked">✓</span></td>
+                <td>
+                  <div class="product-cell">
+                    <span class="product-name">Capsules 25mg (Sleep)</span>
+                    <span class="product-sku">SKU: CAP-25-SL · Hemp/CBD</span>
+                    <div class="coa-info">COA <code>#VCO-2087</code> · Unknown Lab — not in approved list</div>
+                  </div>
+                </td>
+                <td><span class="pill pill-purple">Unverified lab</span><div style="font-size:11px;color:#6B7280;margin-top:4px;">Lab not in approved registry</div></td>
+                <td><span class="severity"><span class="sev-dot med"></span><strong style="color:#92400E;font-size:12px;">Medium</strong></span></td>
+                <td>
+                  <span class="res-chip"><span class="ico">🧪</span> Replace with approved-lab COA</span>
+                </td>
+                <td style="font-size:11px;color:#6B7280;">5d ago</td>
+              </tr>
+
+              <!-- spillover preview from another source (Q-ScanAI), to show the "Show items from other sources" affordance -->
+              <tr class="group-row" style="background:#F5F3FF;color:#5B21B6;"><td colspan="6">+ 1 selected from Q-ScanAI · click rail to view</td></tr>
+
+              <tr class="selected" style="opacity:0.85;">
+                <td><span class="cbx checked">✓</span></td>
+                <td>
+                  <div class="product-cell">
+                    <span class="product-name">Website finding · Privacy Policy missing</span>
+                    <span class="product-sku">F-2849 · blackbeardispens.com/privacy</span>
+                    <div class="coa-info">Q-ScanAI · last scan May 1, 2026</div>
+                  </div>
+                </td>
+                <td><span class="pill pill-purple">Required content</span></td>
+                <td><span class="severity"><span class="sev-dot high"></span><strong style="color:#991B1B;font-size:12px;">High</strong></span></td>
+                <td>
+                  <span class="res-chip"><span class="ico">✏️</span> Provide corrected URL</span>
+                </td>
+                <td style="font-size:11px;color:#6B7280;">1d ago</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SELECTION FOOTER -->
+        <div class="sel-footer">
+          <div class="sel-summary">
+            <strong>4 items selected</strong> across 2 sources
+            <span class="sel-tags">
+              <span class="tag">Violative COAs · 3</span>
+              <span class="tag">Q-ScanAI · 1</span>
+            </span>
+          </div>
+          <button class="btn secondary">Clear</button>
+          <button class="btn secondary" onclick="window.location.href='compliance-case-blank-canvas.html'">Cancel</button>
+          <button class="btn green with-count" onclick="window.location.href='compliance-case-blank-canvas.html'">
+            Add to case <span class="ct">4</span>
+          </button>
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Notes block -->
+<div class="notes-block">
+  <h3>Designer notes — How targeting works</h3>
+  <div class="nb-grid">
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#2563eb;"></span>Sources are the spine</div>
+      <p>The left rail organizes findings by <em>source category</em> rather than by severity or date. This matches the analyst's mental model: "I want to handle the violative COAs first, then the Q-ScanAI stuff."</p>
+      <p>Each rail item shows the <strong>scoped count</strong> (filtered to the case's merchant) and a <strong>selection badge</strong> when items from that source are picked. Switching sources <em>preserves selections</em> across the picker.</p>
+    </div>
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#16a34a;"></span>Resolution previewed up front</div>
+      <p>Each row shows the <strong>default resolution</strong> the system would apply if added — a <code>resolution-chip</code>. The analyst sees "Replace COA + reformulate" before adding, instead of after.</p>
+      <p>Defaults derive from <code>itemType</code> per QP-3593: <code>COA_VIOLATIVE → Replace COA</code>, <code>COA_EXPIRED → Upload replacement</code>, <code>PRODUCT_MISSING_COA → Upload to MyCOA</code>, <code>COMPLIANCE_FINDING → Provide corrected URL</code>. Editable per-item after add (see drawer in mockup 2).</p>
+    </div>
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#F05252;"></span>Multi-source workflow</div>
+      <p>Selections accrue across sources. The footer is always visible with a <strong>live count</strong>, source-tagged chips, and the green "Add N" CTA. No "Apply" trap — you can switch sources, refine filters, and the selection persists.</p>
+      <p>The footer count syncs back to the blank canvas's <code>Case Items (N)</code> on close.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer-cta">
+  <span class="lbl">After "Add to case" → analyst returns to the canvas with items attached:</span>
+  <a class="btn-link" href="compliance-case-blank-canvas.html">2 / Blank Canvas (now populated)</a>
+  <a class="btn-ghost" href="compliance-case-quick-add-modal.html">4 / Quick-Add Modal →</a>
+  <a class="btn-ghost" href="compliance-case-create-blank.html">1 / Entry Points</a>
+</div>
+
+</body>
+</html>

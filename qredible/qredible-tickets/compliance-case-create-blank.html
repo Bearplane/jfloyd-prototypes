@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Case-First UX — Entry Points · Exploration</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #0F172A; color: #1A202E; }
+
+/* Proto nav */
+.proto-nav { background: #0F172A; color: #CBD5E1; display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; position: sticky; top: 0; z-index: 1000; font-size: 13px; gap: 16px; border-bottom: 1px solid #1E293B; }
+.proto-nav a { color: #94A3B8; text-decoration: none; }
+.proto-nav a:hover { color: white; }
+.proto-nav .proto-center { color: #E2E8F0; font-weight: 500; flex: 1; text-align: center; }
+.proto-nav .proto-right { font-size: 12px; color: #64748B; }
+.proto-pill { background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+
+/* Page chrome */
+.page { max-width: 1480px; margin: 0 auto; padding: 28px 24px 80px; background: #F8FAFC; min-height: calc(100vh - 40px); }
+.intro { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 22px 26px; margin-bottom: 22px; }
+.intro h1 { font-size: 22px; font-weight: 700; color: #1A202E; margin-bottom: 6px; }
+.intro .lede { font-size: 13px; color: #475569; line-height: 1.6; max-width: 920px; }
+.intro .meta { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.meta-pill { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.meta-pill.amber { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+.meta-pill.green { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
+.meta-pill.gray { background: #F1F5F9; color: #475569; border-color: #E2E8F0; }
+
+/* Section header */
+.section-h { font-size: 13px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; margin: 24px 0 12px 4px; }
+
+/* Tile grid */
+.tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 1100px) { .tile-grid { grid-template-columns: 1fr; } }
+.tile { background: white; border: 1px solid #E5E7EB; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.tile-head { padding: 14px 18px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 10px; background: #FAFBFC; }
+.tile-num { width: 24px; height: 24px; border-radius: 6px; background: #1A202E; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.tile-title { font-size: 14px; font-weight: 700; color: #1A202E; }
+.tile-sub { font-size: 12px; color: #6B7280; margin-left: auto; }
+.tile-body { padding: 0; background: white; }
+.faux { background: #F8FAFC; }
+
+/* Faux app chrome (compact) */
+.faux-top { background: white; border-bottom: 1px solid #E5E7EB; padding: 0 18px; height: 38px; display: flex; align-items: center; gap: 14px; }
+.faux-brand { font-size: 12px; font-weight: 700; color: #1A202E; }
+.faux-nav { display: flex; gap: 12px; font-size: 11px; color: #6B7280; }
+.faux-nav .active { color: #2563eb; font-weight: 500; }
+.faux-tabs { background: white; border-bottom: 1px solid #E5E7EB; padding: 0 18px; display: flex; gap: 0; height: 32px; align-items: stretch; }
+.faux-tab { padding: 0 12px; font-size: 11px; color: #6B7280; display: flex; align-items: center; border-bottom: 2px solid transparent; }
+.faux-tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 500; }
+.faux-page { padding: 16px 18px; min-height: 280px; }
+.faux-page-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.faux-h1 { font-size: 16px; font-weight: 700; color: #1A202E; }
+.faux-h1-sub { font-size: 11px; color: #6B7280; margin-top: 2px; }
+
+/* CTA + spotlight */
+.cta-new-case { background: #16a34a; color: white; border: none; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); white-space: nowrap; }
+.cta-new-case .plus { font-size: 13px; line-height: 1; }
+.spotlight { position: relative; }
+.spotlight::after {
+  content: ''; position: absolute; inset: -6px; border: 2px dashed #F05252; border-radius: 10px;
+  animation: pulse 2.4s ease-in-out infinite; pointer-events: none;
+}
+.spotlight-tag { position: absolute; top: -10px; right: -8px; background: #F05252; color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.55; transform: scale(1.025); } }
+
+/* Faux mini-table */
+.faux-table { font-size: 11px; width: 100%; border-collapse: collapse; }
+.faux-table th { text-align: left; background: #F1F5F9; color: #475569; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; padding: 7px 10px; border-bottom: 1px solid #E5E7EB; }
+.faux-table td { padding: 8px 10px; border-bottom: 1px solid #F1F5F9; color: #374151; }
+.faux-table tr.active td { background: #EFF6FF; }
+.pill { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 600; display: inline-block; }
+.pill-red { background: #FEE2E2; color: #991B1B; }
+.pill-amber { background: #FEF3C7; color: #92400E; }
+.pill-green { background: #DCFCE7; color: #166534; }
+.pill-blue { background: #DBEAFE; color: #1E40AF; }
+.pill-gray { background: #F3F4F6; color: #6B7280; }
+
+/* Subtabs in faux page */
+.faux-subtabs { display: flex; gap: 0; border-bottom: 1px solid #E5E7EB; margin-bottom: 12px; }
+.faux-subtab { padding: 7px 12px; font-size: 11px; color: #6B7280; border-bottom: 2px solid transparent; }
+.faux-subtab.active { color: #1A202E; border-bottom-color: #1A202E; font-weight: 500; }
+
+/* Side panel mock */
+.faux-side { display: grid; grid-template-columns: 1fr 280px; gap: 0; min-height: 280px; }
+.faux-side-list { padding: 14px 18px; }
+.faux-side-panel { background: white; border-left: 1px solid #E5E7EB; padding: 0; display: flex; flex-direction: column; }
+.faux-side-head { background: #F7F5FF; padding: 12px 14px; border-bottom: 1px solid #E5E7EB; }
+.faux-side-title { font-size: 12px; font-weight: 700; color: #1A202E; }
+.faux-side-meta { font-size: 10px; color: #6B7280; margin-top: 2px; }
+.faux-side-tabs { display: flex; gap: 0; border-bottom: 1px solid #E5E7EB; padding: 0 12px; background: white; }
+.faux-side-tab { padding: 8px 10px; font-size: 11px; color: #6B7280; border-bottom: 2px solid transparent; }
+.faux-side-tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 500; }
+.faux-side-body { flex: 1; padding: 12px 14px; }
+.case-row-mini { font-size: 11px; padding: 8px 10px; border: 1px solid #E5E7EB; border-radius: 6px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+.case-row-mini .num { font-family: monospace; font-size: 10px; color: #6B7280; }
+.case-row-mini .ttl { color: #1A202E; font-weight: 500; }
+.faux-side-foot { border-top: 1px solid #E5E7EB; padding: 10px 14px; background: white; display: flex; gap: 6px; }
+
+/* Annotation strip */
+.note { background: #FFFBEB; border: 1px dashed #FCD34D; color: #92400E; padding: 10px 14px; border-radius: 8px; font-size: 12px; line-height: 1.55; margin: 12px 18px 18px 18px; }
+.note strong { color: #78350F; }
+
+/* Caption / footer */
+.tile-caption { padding: 12px 18px 16px 18px; border-top: 1px solid #F1F5F9; background: #FAFBFC; }
+.tile-caption-h { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.tile-caption-b { font-size: 12px; color: #475569; line-height: 1.55; }
+.tile-caption-b code { font-family: monospace; background: #F1F5F9; padding: 1px 5px; border-radius: 3px; font-size: 11px; color: #1A202E; }
+
+/* Bulk bar */
+.faux-bulk { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; font-size: 11px; color: #1E40AF; margin-bottom: 12px; }
+
+/* Decision matrix */
+.matrix { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 22px 26px; margin-top: 28px; }
+.matrix h3 { font-size: 14px; font-weight: 700; color: #1A202E; margin-bottom: 12px; }
+.matrix table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.matrix th { text-align: left; padding: 9px 12px; font-size: 11px; font-weight: 700; color: #475569; background: #F8FAFC; border-bottom: 1px solid #E5E7EB; text-transform: uppercase; letter-spacing: 0.04em; }
+.matrix td { padding: 11px 12px; border-bottom: 1px solid #F1F5F9; color: #374151; line-height: 1.5; vertical-align: top; }
+.matrix td strong { color: #1A202E; }
+.matrix .where { font-weight: 600; color: #1A202E; white-space: nowrap; }
+
+/* Footer ribbon */
+.footer-cta { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 18px 22px; margin-top: 22px; display: flex; gap: 14px; align-items: center; }
+.footer-cta .lbl { font-size: 12px; color: #6B7280; }
+.footer-cta .btn-link { background: #1A202E; color: white; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.footer-cta .btn-link:hover { background: #0F172A; }
+.footer-cta .btn-ghost { background: white; color: #1A202E; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; border: 1px solid #E5E7EB; }
+.footer-cta .btn-ghost:hover { background: #F8FAFC; }
+
+/* utility */
+.row { display: flex; align-items: center; gap: 8px; }
+.muted { color: #9CA3AF; }
+</style>
+</head>
+<body>
+<nav class="proto-nav">
+  <a href="../index.html" style="white-space:nowrap;">← All Mockups</a>
+  <div class="proto-center">Case-First UX Exploration · 1 / 4 — Entry Points</div>
+  <div class="proto-right" style="display:flex;align-items:center;gap:10px;">
+    <span class="proto-pill">EXPLORATION</span>
+    <a href="compliance-case-blank-canvas.html" style="background:#1E3A5F;color:#CBD5E1;border:1px solid #334155;border-radius:5px;padding:4px 10px;font-size:12px;text-decoration:none;">Next: Blank Canvas →</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="intro">
+    <h1>Where does <span style="color:#16a34a;">+ New Case</span> live?</h1>
+    <p class="lede">Today, every compliance case is born from items: an analyst selects products / findings, then clicks <em>"Add to case."</em> This exploration flips that — start from a blank case, then target violative findings across the merchant. To make that flow viable, the <strong>+ New Case</strong> CTA must be visible from anywhere a case might be conceived. This page maps the four entry points.</p>
+    <div class="meta">
+      <span class="meta-pill">Item-first ↔ Case-first</span>
+      <span class="meta-pill amber">Pre-ticket exploration</span>
+      <span class="meta-pill green">Visual lang: compliance-portal-v2</span>
+      <span class="meta-pill gray">Companion: QP-3583 / QP-3584</span>
+    </div>
+  </div>
+
+  <div class="section-h">Four entry points · highlighted in red</div>
+
+  <div class="tile-grid">
+
+    <!-- ──────────────── 1. Q-MONITOR CASES TAB ──────────────── -->
+    <div class="tile">
+      <div class="tile-head">
+        <div class="tile-num">1</div>
+        <div class="tile-title">Q-Monitor → Cases tab</div>
+        <div class="tile-sub">Primary entry · "I'm starting fresh"</div>
+      </div>
+      <div class="tile-body faux">
+        <div class="faux-top">
+          <span class="faux-brand">Qredibility</span>
+          <div class="faux-nav">
+            <span class="active">Q-Monitor</span><span>Report</span><span>Q-Vault ▾</span><span>MyCOA</span>
+          </div>
+        </div>
+        <div class="faux-tabs">
+          <span class="faux-tab">Pipeline</span>
+          <span class="faux-tab">Findings</span>
+          <span class="faux-tab">Product Compliance</span>
+          <span class="faux-tab">We Monitor</span>
+          <span class="faux-tab active">Cases</span>
+          <span class="faux-tab">Documents</span>
+        </div>
+        <div class="faux-page">
+          <div class="faux-page-h">
+            <div>
+              <div class="faux-h1">Cases</div>
+              <div class="faux-h1-sub">Compliance resolution cases — findings sent to merchants with response tracking</div>
+            </div>
+            <div class="spotlight">
+              <span class="spotlight-tag">CTA #1</span>
+              <button class="cta-new-case"><span class="plus">+</span> New Case</button>
+            </div>
+          </div>
+          <div class="faux-subtabs">
+            <span class="faux-subtab active">All · 47</span>
+            <span class="faux-subtab">Open · 23</span>
+            <span class="faux-subtab">Disputed · 4</span>
+            <span class="faux-subtab">Drafts · 8</span>
+            <span class="faux-subtab">Resolved</span>
+            <span class="faux-subtab">Closed</span>
+          </div>
+          <table class="faux-table">
+            <thead>
+              <tr><th>Case</th><th>Merchant</th><th>Status</th><th>Items</th><th>SLA</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CASE-2156<br><span class="muted" style="font-size:10px;">Black Bear — Q1 audit</span></td><td>Black Bear Wellness</td><td><span class="pill pill-blue">Open</span></td><td>3 of 7 responded</td><td><span class="pill pill-amber">3d</span></td></tr>
+              <tr><td>CASE-2155<br><span class="muted" style="font-size:10px;">Texas Canna — COA refresh</span></td><td>AG Living Solutions</td><td><span class="pill pill-amber">Awaiting</span></td><td>0 of 4</td><td><span class="pill pill-red">Overdue</span></td></tr>
+              <tr><td>CASE-2154<br><span class="muted" style="font-size:10px;">Hempire — Q-ScanAI</span></td><td>Hempire Co</td><td><span class="pill pill-green">Resolved</span></td><td>5 of 5</td><td><span class="muted">—</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tile-caption">
+        <div class="tile-caption-h">Why here</div>
+        <div class="tile-caption-b">The dedicated cases page is where analysts already go to triage existing cases — surfacing the create CTA in the page header is the most discoverable spot for case-first creation. The merchant <em>isn't</em> pre-selected, so the blank canvas asks for it first.</div>
+      </div>
+    </div>
+
+    <!-- ──────────────── 2. COMPANY PROFILE ──────────────── -->
+    <div class="tile">
+      <div class="tile-head">
+        <div class="tile-num">2</div>
+        <div class="tile-title">Company profile · We Monitor row drawer</div>
+        <div class="tile-sub">Contextual entry · merchant pre-filled</div>
+      </div>
+      <div class="tile-body faux">
+        <div class="faux-top">
+          <span class="faux-brand">Qredibility</span>
+          <div class="faux-nav">
+            <span class="active">Q-Monitor</span><span>Report</span><span>Q-Vault ▾</span><span>MyCOA</span>
+          </div>
+        </div>
+        <div class="faux-page" style="background:white;">
+          <div style="font-size:10px;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">We Monitor / Black Bear Wellness LLC</div>
+          <div class="faux-page-h">
+            <div>
+              <div class="faux-h1">Black Bear Wellness LLC</div>
+              <div class="faux-h1-sub">
+                <span class="pill pill-blue" style="font-size:9px;">CO</span>
+                <span class="pill pill-green" style="font-size:9px;">Hemp/CBD</span>
+                <span class="pill pill-amber" style="font-size:9px;">Retailer</span>
+                · 12 products · 8 active findings · 3 active cases
+              </div>
+            </div>
+            <div class="spotlight">
+              <span class="spotlight-tag">CTA #2</span>
+              <button class="cta-new-case"><span class="plus">+</span> New Case for this Merchant</button>
+            </div>
+          </div>
+          <div class="faux-subtabs">
+            <span class="faux-subtab active">Overview</span>
+            <span class="faux-subtab">Products · 12</span>
+            <span class="faux-subtab">Findings · 8</span>
+            <span class="faux-subtab">Cases · 3</span>
+            <span class="faux-subtab">Documents</span>
+            <span class="faux-subtab">Activity</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:6px;">
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:10px;">
+              <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;">Products</div>
+              <div style="font-size:18px;font-weight:700;color:#1A202E;margin-top:3px;">12</div>
+              <div style="font-size:10px;color:#991B1B;margin-top:2px;">3 violative · 5 missing COA</div>
+            </div>
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:10px;">
+              <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;">Q-ScanAI</div>
+              <div style="font-size:18px;font-weight:700;color:#1A202E;margin-top:3px;">8</div>
+              <div style="font-size:10px;color:#991B1B;margin-top:2px;">5 high · 3 medium</div>
+            </div>
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:10px;">
+              <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;">Cases</div>
+              <div style="font-size:18px;font-weight:700;color:#1A202E;margin-top:3px;">3</div>
+              <div style="font-size:10px;color:#1E40AF;margin-top:2px;">2 open · 1 awaiting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tile-caption">
+        <div class="tile-caption-h">Why here</div>
+        <div class="tile-caption-b">The richest context: an analyst is already inside the merchant's profile and can see violative product / finding counts in the overview cards. Clicking "+ New Case for this Merchant" pre-fills <code>merchantId</code> and the targeting picker auto-scopes to this merchant's data.</div>
+      </div>
+    </div>
+
+    <!-- ──────────────── 3. CASES SIDE PANEL ──────────────── -->
+    <div class="tile">
+      <div class="tile-head">
+        <div class="tile-num">3</div>
+        <div class="tile-title">Cases mini-panel · header CTA</div>
+        <div class="tile-sub">Inline entry from We Monitor row · QP-3583</div>
+      </div>
+      <div class="tile-body faux">
+        <div class="faux-top">
+          <span class="faux-brand">Qredibility</span>
+          <div class="faux-nav">
+            <span class="active">Q-Monitor</span><span>Report</span><span>Q-Vault ▾</span><span>MyCOA</span>
+          </div>
+        </div>
+        <div class="faux-tabs">
+          <span class="faux-tab">Pipeline</span>
+          <span class="faux-tab">Findings</span>
+          <span class="faux-tab">Product Compliance</span>
+          <span class="faux-tab active">We Monitor</span>
+          <span class="faux-tab">Documents</span>
+        </div>
+        <div class="faux-side">
+          <div class="faux-side-list">
+            <table class="faux-table">
+              <thead><tr><th>Legal Name</th><th>License</th><th>Findings</th><th>Cases</th></tr></thead>
+              <tbody>
+                <tr><td>AG Living Solutions</td><td><span class="pill pill-green">Active</span></td><td>31</td><td><span class="muted">—</span></td></tr>
+                <tr class="active"><td><strong>Black Bear Wellness</strong></td><td><span class="pill pill-green">Active</span></td><td>8</td><td><span class="pill pill-red">3</span></td></tr>
+                <tr><td>Hempire Co</td><td><span class="pill pill-amber">Renewing</span></td><td>2</td><td><span class="pill pill-amber">1</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="faux-side-panel">
+            <div class="faux-side-head" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+              <div style="flex:1;min-width:0;">
+                <div class="faux-side-title">Black Bear Wellness</div>
+                <div class="faux-side-meta">3 active · 1 draft</div>
+              </div>
+              <div class="spotlight">
+                <span class="spotlight-tag">CTA #3</span>
+                <button class="cta-new-case" style="padding:5px 10px;font-size:11px;"><span class="plus">+</span> New Case</button>
+              </div>
+            </div>
+            <div class="faux-side-tabs">
+              <span class="faux-side-tab active">Active · 3</span>
+              <span class="faux-side-tab">Drafts · 1</span>
+            </div>
+            <div class="faux-side-body">
+              <div class="case-row-mini">
+                <div><div class="num">CASE-2156</div><div class="ttl">Q1 audit</div></div>
+                <span class="pill pill-blue">Open</span>
+              </div>
+              <div class="case-row-mini">
+                <div><div class="num">CASE-2151</div><div class="ttl">Website fixes</div></div>
+                <span class="pill pill-amber">Awaiting</span>
+              </div>
+              <div class="case-row-mini">
+                <div><div class="num">CASE-2148</div><div class="ttl">COA refresh</div></div>
+                <span class="pill pill-blue">Open</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tile-caption">
+        <div class="tile-caption-h">Why here</div>
+        <div class="tile-caption-b">The cases mini-panel already exists in the QP-3583 spec (Phase 2 footer mentions "Create New Case (opens existing case-create flow with merchant pre-filled)"). Promoting the CTA from the footer to the header makes it the panel's first and most prominent action — analysts seeing 3 cases here often want to file #4, not just review.</div>
+      </div>
+    </div>
+
+    <!-- ──────────────── 4. BULK ACTION BAR ──────────────── -->
+    <div class="tile">
+      <div class="tile-head">
+        <div class="tile-num">4</div>
+        <div class="tile-title">Bulk action bar · multi-merchant case</div>
+        <div class="tile-sub">Power entry · sweep multiple merchants</div>
+      </div>
+      <div class="tile-body faux">
+        <div class="faux-top">
+          <span class="faux-brand">Qredibility</span>
+          <div class="faux-nav">
+            <span class="active">Q-Monitor</span><span>Report</span><span>Q-Vault ▾</span><span>MyCOA</span>
+          </div>
+        </div>
+        <div class="faux-tabs">
+          <span class="faux-tab">Pipeline</span>
+          <span class="faux-tab">Findings</span>
+          <span class="faux-tab">Product Compliance</span>
+          <span class="faux-tab active">We Monitor</span>
+          <span class="faux-tab">Documents</span>
+        </div>
+        <div class="faux-page">
+          <div class="faux-bulk">
+            <span style="font-weight:600;flex:1;">3 merchants selected</span>
+            <div class="spotlight">
+              <span class="spotlight-tag">CTA #4</span>
+              <button class="cta-new-case" style="padding:5px 10px;font-size:11px;"><span class="plus">+</span> New Cases (3)</button>
+            </div>
+            <button style="background:white;border:1px solid #E5E7EB;color:#374151;padding:5px 10px;font-size:11px;border-radius:5px;">Send All Drafts</button>
+            <span class="muted" style="font-size:11px;">Clear ✕</span>
+          </div>
+          <table class="faux-table">
+            <thead><tr><th style="width:24px;">☐</th><th>Legal Name</th><th>License</th><th>Findings</th><th>Cases</th></tr></thead>
+            <tbody>
+              <tr class="active"><td>☑</td><td><strong>AG Living Solutions</strong></td><td><span class="pill pill-green">Active</span></td><td>31</td><td><span class="muted">—</span></td></tr>
+              <tr class="active"><td>☑</td><td><strong>Black Bear Wellness</strong></td><td><span class="pill pill-green">Active</span></td><td>8</td><td><span class="pill pill-red">3</span></td></tr>
+              <tr class="active"><td>☑</td><td><strong>Hempire Co</strong></td><td><span class="pill pill-amber">Renewing</span></td><td>2</td><td><span class="pill pill-amber">1</span></td></tr>
+              <tr><td>☐</td><td>Texas Canna RN</td><td><span class="pill pill-green">Active</span></td><td>0</td><td><span class="muted">—</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tile-caption">
+        <div class="tile-caption-h">Why here</div>
+        <div class="tile-caption-b">Already specced in QP-3583 Phase 2 ("Create Case (N merchants)"). The case-first blank canvas changes what happens after click: instead of opening N drawers sequentially, we open <strong>one targeting picker scoped to all N merchants</strong> — the analyst sees their 3 merchants' findings in one consolidated view.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Decision matrix -->
+  <div class="matrix">
+    <h3>Entry-point decision matrix</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%;">Where</th>
+          <th style="width:24%;">Who clicks</th>
+          <th style="width:30%;">Pre-fills</th>
+          <th>Lands on</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="where">1 · Cases page header</td>
+          <td>Analyst doing scheduled triage / starting their day</td>
+          <td>Nothing (merchant chosen in canvas)</td>
+          <td>Blank canvas with <strong>merchant picker focused</strong></td>
+        </tr>
+        <tr>
+          <td class="where">2 · Company profile</td>
+          <td>Analyst reviewing one merchant in depth</td>
+          <td><code>merchantId</code> + summary stats inform suggestions</td>
+          <td>Blank canvas, <strong>merchant locked</strong>, targeting picker primed with this merchant's findings</td>
+        </tr>
+        <tr>
+          <td class="where">3 · Cases mini-panel</td>
+          <td>Analyst surfaced via "3" badge on We Monitor row</td>
+          <td><code>merchantId</code> from row context</td>
+          <td>Same as #2 — merchant locked</td>
+        </tr>
+        <tr>
+          <td class="where">4 · Bulk action bar</td>
+          <td>Analyst sweeping multiple flagged merchants</td>
+          <td><code>merchantId[]</code> array</td>
+          <td>Multi-merchant variant of targeting picker, grouped by merchant</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-cta">
+    <span class="lbl">All four CTAs land on the same blank canvas →</span>
+    <a class="btn-link" href="compliance-case-blank-canvas.html">2 / Blank Canvas →</a>
+    <a class="btn-ghost" href="compliance-case-target-findings.html">3 / Targeting Picker</a>
+    <a class="btn-ghost" href="compliance-case-quick-add-modal.html">4 / Quick-Add</a>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Case-First UX — Quick-Add Modal · Exploration</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #0F172A; color: #1A202E; }
+
+/* Proto nav */
+.proto-nav { background: #0F172A; color: #CBD5E1; display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; position: sticky; top: 0; z-index: 1000; font-size: 13px; gap: 16px; }
+.proto-nav a { color: #94A3B8; text-decoration: none; }
+.proto-nav a:hover { color: white; }
+.proto-nav .proto-center { color: #E2E8F0; font-weight: 500; flex: 1; text-align: center; }
+.proto-pill { background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.proto-nav-link { background: #1E3A5F; color: #CBD5E1; border: 1px solid #334155; border-radius: 5px; padding: 4px 10px; font-size: 12px; text-decoration: none; }
+
+/* Annotation bar */
+.annot-bar { background: #F0FFF4; border-bottom: 2px solid #BBF7D0; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; }
+.annot-pill { background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.annot-text { color: #166534; font-weight: 500; }
+.annot-meta { font-size: 11px; color: #6B7280; }
+
+/* Page */
+.page { background: #1E293B; min-height: calc(100vh - 80px); position: relative; padding: 0; }
+
+/* Dimmed app preview behind */
+.dimmed { opacity: 0.45; pointer-events: none; }
+.app-top-bar { background: white; border-bottom: 1px solid #E5E7EB; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; gap: 16px; }
+.app-top-left { display: flex; align-items: center; gap: 20px; }
+.app-brand { font-weight: 700; font-size: 15px; color: #1A202E; }
+.app-nav-links { display: flex; gap: 16px; }
+.app-nav-link { font-size: 13px; color: #6B7280; padding-bottom: 2px; }
+.app-nav-link.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 500; }
+.wordmark { font-weight: 800; font-size: 15px; color: #2563eb; }
+.app-top-right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #374151; }
+.company-selector { background: #f8fafc; border: 1px solid #E5E7EB; border-radius: 6px; padding: 5px 10px; font-size: 13px; }
+
+.bg-canvas { background: #f8fafc; min-height: calc(100vh - 132px); }
+
+/* Faux blank case drawer behind */
+.faux-drawer-bg {
+  position: fixed; top: 132px; right: 0; width: min(840px, 64vw); bottom: 0;
+  background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.12); z-index: 50;
+}
+.faux-drawer-bg .drawer-head-bg { background: #F7F5FF; padding: 18px 22px; border-bottom: 1px solid #E5E7EB; }
+.faux-drawer-bg .eyebrow { font-size: 11px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.faux-drawer-bg .ttl { font-size: 17px; font-weight: 700; color: #1A202E; }
+.faux-drawer-bg .merch { font-size: 12px; color: #6B7280; margin-top: 6px; }
+.faux-drawer-bg .body-bg { padding: 20px 22px; }
+
+/* Modal overlay (full) */
+.modal-overlay {
+  position: fixed; top: 80px; left: 0; right: 0; bottom: 0;
+  background: rgba(15,23,42,0.55); backdrop-filter: blur(2px);
+  z-index: 200; display: flex; align-items: flex-start; justify-content: center;
+  padding: 64px 20px 20px 20px;
+}
+
+/* Modal */
+.modal {
+  background: white; border-radius: 14px; box-shadow: 0 24px 60px rgba(0,0,0,0.32);
+  width: 100%; max-width: 720px; overflow: hidden; display: flex; flex-direction: column;
+  max-height: calc(100vh - 220px);
+}
+.modal-head { background: #F7F5FF; padding: 12px 18px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 10px; }
+.modal-head .ico { width: 28px; height: 28px; background: #1A202E; color: white; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.modal-head h3 { font-size: 13px; font-weight: 700; color: #1A202E; }
+.modal-head .case-ref { font-size: 11px; color: #6B7280; margin-top: 2px; }
+.modal-head .case-ref strong { color: #1A202E; }
+.modal-close { margin-left: auto; background: none; border: none; cursor: pointer; font-size: 18px; color: #6B7280; line-height: 1; }
+.modal-close:hover { color: #1A202E; }
+
+/* Search bar */
+.search-row { padding: 14px 18px; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; gap: 10px; }
+.search-row .icon { color: #9CA3AF; font-size: 16px; }
+.search-row input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 18px; font-family: inherit; color: #1A202E; font-weight: 500;
+}
+.search-row input::placeholder { color: #9CA3AF; font-weight: 400; }
+.search-row .kbd { font-family: monospace; font-size: 10px; background: #F1F5F9; color: #475569; padding: 3px 7px; border-radius: 4px; border: 1px solid #E5E7EB; }
+
+/* Active query pill row */
+.q-row { padding: 8px 18px; display: flex; align-items: center; gap: 8px; background: #FAFBFC; border-bottom: 1px solid #F1F5F9; font-size: 11px; color: #6B7280; }
+.q-row strong { color: #1A202E; font-weight: 600; }
+.q-row .matches { background: #DCFCE7; color: #166534; padding: 2px 7px; border-radius: 999px; font-weight: 700; font-size: 10px; }
+.q-row .scope-pill { background: white; border: 1px solid #E5E7EB; border-radius: 999px; padding: 2px 8px; font-size: 11px; color: #1A202E; font-weight: 500; }
+.q-row .spacer { flex: 1; }
+
+/* Results body */
+.results { flex: 1; overflow-y: auto; padding: 4px 0 0 0; }
+.section-h { display: flex; align-items: center; gap: 8px; padding: 10px 18px 6px 18px; font-size: 10px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.07em; }
+.section-h .badge { background: #F1F5F9; color: #475569; padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+.section-h .badge.red { background: #FEE2E2; color: #991B1B; }
+.section-h .badge.amber { background: #FEF3C7; color: #92400E; }
+.section-h .badge.purple { background: #EDE9FE; color: #5B21B6; }
+.section-h .more { margin-left: auto; font-size: 10px; color: #2563eb; cursor: pointer; font-weight: 600; }
+.section-h .more:hover { text-decoration: underline; }
+
+/* Result row */
+.result {
+  display: flex; align-items: center; gap: 12px; padding: 10px 18px; border: none; cursor: pointer;
+  border-left: 3px solid transparent;
+}
+.result:hover { background: #FAFBFC; }
+.result.focused { background: #EFF6FF; border-left-color: #2563eb; }
+.result.added { background: #F0FDF4; }
+.result.added .res-status { color: #166534; font-weight: 700; }
+.result-cbx { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #CBD5E1; background: white; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.result-cbx.checked { background: #16a34a; border-color: #16a34a; color: white; font-size: 12px; }
+.result-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.result-icon.red { background: #FEE2E2; color: #991B1B; }
+.result-icon.amber { background: #FEF3C7; color: #92400E; }
+.result-icon.purple { background: #EDE9FE; color: #5B21B6; }
+.result-icon.blue { background: #DBEAFE; color: #1E40AF; }
+.result-body { flex: 1; min-width: 0; }
+.result-title { font-size: 13px; color: #1A202E; font-weight: 500; }
+.result-title strong { font-weight: 700; }
+.result-title .hl { background: #FEF08A; padding: 0 2px; border-radius: 2px; }
+.result-sub { font-size: 11px; color: #6B7280; margin-top: 2px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.result-sub code { font-family: monospace; background: #F1F5F9; padding: 1px 5px; border-radius: 3px; color: #1A202E; }
+.result-meta { font-size: 11px; color: #9CA3AF; flex-shrink: 0; text-align: right; }
+.result-action { font-size: 11px; color: #9CA3AF; flex-shrink: 0; padding-left: 8px; min-width: 50px; text-align: right; }
+.result-action .kbd { font-family: monospace; font-size: 10px; background: #F1F5F9; color: #475569; padding: 2px 5px; border-radius: 3px; border: 1px solid #E5E7EB; }
+.result.focused .result-action .kbd { background: white; border-color: #BFDBFE; color: #1E40AF; }
+
+.res-chip {
+  display: inline-flex; align-items: center; gap: 4px; background: #EFF6FF; color: #1E40AF;
+  border: 1px solid #BFDBFE; border-radius: 999px; padding: 1px 7px; font-size: 10px; font-weight: 600;
+}
+
+/* Empty state inside modal */
+.empty-state { padding: 36px 24px; text-align: center; color: #6B7280; }
+.empty-state h4 { font-size: 13px; color: #1A202E; margin-bottom: 6px; }
+.empty-state .ex-list { display: flex; flex-direction: column; gap: 6px; align-items: center; margin-top: 14px; font-size: 11px; }
+.empty-state .ex-list code { font-family: monospace; background: #F1F5F9; padding: 1px 6px; border-radius: 3px; color: #1A202E; }
+
+/* Modal footer (helper bar) */
+.modal-foot {
+  border-top: 1px solid #F1F5F9; padding: 10px 18px; display: flex; align-items: center; gap: 14px;
+  background: #FAFBFC; font-size: 11px; color: #6B7280;
+}
+.modal-foot .left { display: flex; align-items: center; gap: 14px; flex: 1; }
+.modal-foot .key-tip { display: inline-flex; align-items: center; gap: 4px; }
+.modal-foot .kbd { font-family: monospace; font-size: 10px; background: white; color: #475569; padding: 2px 6px; border-radius: 3px; border: 1px solid #E5E7EB; font-weight: 600; }
+.modal-foot .summary { color: #16a34a; font-weight: 700; }
+.modal-foot .btn-bar { display: flex; gap: 8px; }
+.modal-foot button {
+  border: none; border-radius: 5px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.btn-done { background: #16a34a; color: white; }
+.btn-done:hover { background: #15803d; }
+.btn-done.disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-add-another { background: white; color: #1A202E; border: 1px solid #E5E7EB !important; }
+.btn-add-another:hover { background: #F1F5F9; }
+
+/* Notes block */
+.notes-block { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 22px 26px; margin: 22px auto 0 auto; max-width: 1380px; }
+.notes-block h3 { font-size: 14px; font-weight: 700; color: #1A202E; margin-bottom: 12px; }
+.notes-block .nb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+@media (max-width: 980px) { .notes-block .nb-grid { grid-template-columns: 1fr; } }
+.notes-block .nb-card { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 8px; padding: 14px; }
+.notes-block .nb-h { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.notes-block .nb-h .dot { width: 8px; height: 8px; border-radius: 50%; }
+.notes-block .nb-card p { font-size: 12px; color: #475569; line-height: 1.6; }
+.notes-block .nb-card p + p { margin-top: 8px; }
+.notes-block code { font-family: monospace; font-size: 11px; background: white; padding: 1px 5px; border-radius: 3px; border: 1px solid #E5E7EB; color: #1A202E; }
+
+/* Footer ribbon */
+.footer-cta { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 22px; margin: 18px auto 22px auto; max-width: 1380px; display: flex; gap: 14px; align-items: center; }
+.footer-cta .lbl { font-size: 12px; color: #6B7280; flex: 1; }
+.footer-cta .btn-link { background: #1A202E; color: white; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; }
+.footer-cta .btn-link:hover { background: #0F172A; }
+.footer-cta .btn-ghost { background: white; color: #1A202E; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; text-decoration: none; border: 1px solid #E5E7EB; }
+.footer-cta .btn-ghost:hover { background: #F8FAFC; }
+</style>
+</head>
+<body>
+<nav class="proto-nav">
+  <a href="../index.html" style="white-space:nowrap;">← All Mockups</a>
+  <div class="proto-center">Case-First UX Exploration · 4 / 4 — Quick-Add Modal</div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="proto-pill">EXPLORATION</span>
+    <a class="proto-nav-link" href="compliance-case-target-findings.html">← Targeting Picker</a>
+    <a class="proto-nav-link" href="compliance-case-create-blank.html">↺ Entry Points</a>
+  </div>
+</nav>
+
+<div class="annot-bar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="annot-pill">EXPLORATION</span>
+    <span class="annot-text">For analysts who already know what they want — type-to-suggest, ↩ to add</span>
+    <span class="annot-meta">Triggered by ⌘K from blank canvas, or smart-add bar input</span>
+  </div>
+  <span class="annot-meta">Variant: command-palette pattern · Linear / GitHub / Notion-style</span>
+</div>
+
+<div class="page">
+
+  <!-- Dimmed background app -->
+  <div class="dimmed">
+    <div class="app-top-bar">
+      <div class="app-top-left">
+        <span class="app-brand">Qredibility</span>
+        <nav class="app-nav-links">
+          <a class="app-nav-link active">Q-Monitor</a>
+          <a class="app-nav-link">Report</a>
+          <a class="app-nav-link">Q-Vault ▾</a>
+          <a class="app-nav-link">MyCOA</a>
+        </nav>
+      </div>
+      <div class="app-top-right">
+        <div class="company-selector">FLEX Payment Solutions ▾</div>
+        <span style="font-size:13px;">JF Joseph Floyd ▾</span>
+        <div class="wordmark">Qredible</div>
+      </div>
+    </div>
+    <div class="bg-canvas"></div>
+  </div>
+
+  <!-- Faux drawer behind modal -->
+  <div class="faux-drawer-bg dimmed">
+    <div class="drawer-head-bg">
+      <div class="eyebrow">📋 New Compliance Case · Draft</div>
+      <div class="ttl">Untitled case</div>
+      <div class="merch">Black Bear Wellness LLC · CO · Hemp/CBD</div>
+    </div>
+    <div class="body-bg">
+      <div style="font-size:11px;color:#9CA3AF;">Case Items (0)</div>
+    </div>
+  </div>
+
+  <!-- Modal overlay -->
+  <div class="modal-overlay">
+    <div class="modal">
+
+      <div class="modal-head">
+        <div class="ico">⌘</div>
+        <div>
+          <h3>Quick-add to case</h3>
+          <div class="case-ref"><strong>Untitled case</strong> · Black Bear Wellness · 0 items</div>
+        </div>
+        <button class="modal-close" onclick="window.history.back()">×</button>
+      </div>
+
+      <div class="search-row">
+        <span class="icon">🔍</span>
+        <input value="gummy" placeholder="Type SKU, finding ID, COA #, or keyword…" autofocus>
+        <span class="kbd">esc</span>
+      </div>
+
+      <div class="q-row">
+        <span>Searching for <strong>"gummy"</strong> across</span>
+        <span class="scope-pill">Black Bear Wellness</span>
+        <span>·</span>
+        <span class="matches">7 matches</span>
+        <span class="spacer"></span>
+        <span>↑↓ to navigate · ↩ to add · ⇧↩ to add &amp; keep open</span>
+      </div>
+
+      <div class="results">
+
+        <!-- Section: Violative COAs -->
+        <div class="section-h">
+          <span>Products with violative COAs</span>
+          <span class="badge red">2 matches</span>
+          <span class="more">View all in source →</span>
+        </div>
+
+        <button class="result focused">
+          <span class="result-cbx checked">✓</span>
+          <span class="result-icon red">🧪</span>
+          <span class="result-body">
+            <span class="result-title"><span class="hl">Gummy</span> Bears 500mg <span style="color:#9CA3AF;font-weight:400;">— Δ-9 over limit (0.42%)</span></span>
+            <span class="result-sub">
+              <code>GB-500</code>
+              <span>·</span>
+              COA <code>#VCO-2104</code>
+              <span>·</span>
+              <span class="res-chip">🧪 Replace COA + reformulate</span>
+            </span>
+          </span>
+          <span class="result-meta">High · 2d ago</span>
+          <span class="result-action"><span class="kbd">↩ add</span></span>
+        </button>
+
+        <button class="result">
+          <span class="result-cbx"></span>
+          <span class="result-icon amber">📄</span>
+          <span class="result-body">
+            <span class="result-title"><span class="hl">Gummy</span> Bears 250mg <span style="color:#9CA3AF;font-weight:400;">— No COA on file (required)</span></span>
+            <span class="result-sub">
+              <code>GB-250</code>
+              <span>·</span>
+              <span>Hemp/CBD · launched Apr 2026</span>
+              <span>·</span>
+              <span class="res-chip">📤 Upload to MyCOA</span>
+            </span>
+          </span>
+          <span class="result-meta">High · since launch</span>
+          <span class="result-action"><span class="kbd">↩</span></span>
+        </button>
+
+        <!-- Section: Missing COAs -->
+        <div class="section-h">
+          <span>Products with missing COAs</span>
+          <span class="badge amber">1 match</span>
+          <span class="more">View all in source →</span>
+        </div>
+
+        <button class="result">
+          <span class="result-cbx"></span>
+          <span class="result-icon amber">📄</span>
+          <span class="result-body">
+            <span class="result-title">Sour <span class="hl">Gummy</span> Worms 100mg <span style="color:#9CA3AF;font-weight:400;">— No COA on file</span></span>
+            <span class="result-sub">
+              <code>SGW-100</code>
+              <span>·</span>
+              <span>Hemp/CBD · 14 days unflagged</span>
+              <span>·</span>
+              <span class="res-chip">📤 Upload to MyCOA</span>
+            </span>
+          </span>
+          <span class="result-meta">Medium</span>
+          <span class="result-action"><span class="kbd">↩</span></span>
+        </button>
+
+        <!-- Section: Q-ScanAI findings -->
+        <div class="section-h">
+          <span>Violative Q-ScanAI findings</span>
+          <span class="badge purple">3 matches</span>
+          <span class="more">View all in source →</span>
+        </div>
+
+        <button class="result">
+          <span class="result-cbx"></span>
+          <span class="result-icon purple">🤖</span>
+          <span class="result-body">
+            <span class="result-title">Q-ScanAI: <span class="hl">"Gummy"</span> product page missing dosage warning</span>
+            <span class="result-sub">
+              <code>F-2851</code>
+              <span>·</span>
+              <span>blackbeardispens.com/gummy-bears-500</span>
+              <span>·</span>
+              <span class="res-chip">✏️ Add required disclosure</span>
+            </span>
+          </span>
+          <span class="result-meta">High · 1d ago</span>
+          <span class="result-action"><span class="kbd">↩</span></span>
+        </button>
+
+        <button class="result">
+          <span class="result-cbx"></span>
+          <span class="result-icon purple">🤖</span>
+          <span class="result-body">
+            <span class="result-title">Q-ScanAI: <span class="hl">"Gummy"</span> in meta description but not in title (SEO mismatch)</span>
+            <span class="result-sub">
+              <code>F-2843</code>
+              <span>·</span>
+              <span>blackbeardispens.com/gummy-bears-500</span>
+              <span>·</span>
+              <span class="res-chip">✏️ Update page metadata</span>
+            </span>
+          </span>
+          <span class="result-meta">Low · 4d ago</span>
+          <span class="result-action"><span class="kbd">↩</span></span>
+        </button>
+
+        <button class="result">
+          <span class="result-cbx"></span>
+          <span class="result-icon purple">🤖</span>
+          <span class="result-body">
+            <span class="result-title">Q-ScanAI: <span class="hl">"Gummy"</span> recipe blog post — unverified claims</span>
+            <span class="result-sub">
+              <code>F-2837</code>
+              <span>·</span>
+              <span>blackbeardispens.com/blog/cbd-gummy-recipe</span>
+              <span>·</span>
+              <span class="res-chip">✏️ Provide corrected URL</span>
+            </span>
+          </span>
+          <span class="result-meta">Medium · 6d ago</span>
+          <span class="result-action"><span class="kbd">↩</span></span>
+        </button>
+
+        <!-- Section: Past audit history (suggests "this came up before") -->
+        <div class="section-h">
+          <span>Past audit history (resolved · for context)</span>
+          <span class="badge">1 match</span>
+        </div>
+
+        <button class="result" style="opacity:0.65;">
+          <span class="result-cbx"></span>
+          <span class="result-icon blue">📑</span>
+          <span class="result-body">
+            <span class="result-title">CASE-1980 · <span class="hl">Gummy</span> Bears 500mg — COA replaced (resolved Jan 2026)</span>
+            <span class="result-sub">
+              <span>For reference · re-add only if recurring</span>
+            </span>
+          </span>
+          <span class="result-meta">Resolved</span>
+          <span class="result-action"><span class="kbd">↩</span></span>
+        </button>
+
+      </div>
+
+      <div class="modal-foot">
+        <div class="left">
+          <span class="key-tip"><span class="kbd">↑↓</span> nav</span>
+          <span class="key-tip"><span class="kbd">↩</span> add</span>
+          <span class="key-tip"><span class="kbd">⇧↩</span> add + keep open</span>
+          <span class="key-tip"><span class="kbd">⇥</span> jump section</span>
+          <span class="key-tip"><span class="kbd">esc</span> close</span>
+        </div>
+        <div class="summary">1 added</div>
+        <div class="btn-bar">
+          <button class="btn-add-another">Add another</button>
+          <button class="btn-done" onclick="window.location.href='compliance-case-blank-canvas.html'">Done</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Notes block -->
+<div class="notes-block">
+  <h3>Designer notes — Quick-add as a power-user shortcut</h3>
+  <div class="nb-grid">
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#1A202E;"></span>Command-palette pattern</div>
+      <p>Familiar shape: <strong>⌘K</strong> opens, type to filter, <strong>↩</strong> to add. Linear / GitHub / Notion users will recognize it instantly.</p>
+      <p>Triggered from the blank canvas in 3 ways: clicking the inline smart-add bar, ⌘K anywhere in the case, or the "Quick-add for power users" link in the empty zone.</p>
+    </div>
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#16a34a;"></span>Grouped, scoped, ranked</div>
+      <p>Results are <strong>grouped by source</strong> (same vocabulary as the targeting picker) so the analyst's mental model carries across both flows.</p>
+      <p>Default scope is <strong>this merchant</strong> (badge: "Black Bear Wellness"). Click the scope pill to widen — useful when the analyst remembers a SKU but not which merchant.</p>
+      <p>The "Past audit history" section quietly surfaces resolved cases — useful pattern detection ("this is the third time this gummy line failed") without forcing the analyst to leave.</p>
+    </div>
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#F05252;"></span>Stay-and-add UX</div>
+      <p><strong>⇧↩ = add and keep modal open</strong> — for the analyst stamping out 5 items in a row. The footer count goes up, the input is cleared, focus stays.</p>
+      <p>Plain <strong>↩</strong> adds and closes for the one-shot case. The "Add another" button is for users who don't know the keyboard shortcut.</p>
+      <p><strong>Resolution chip</strong> shows in each row so adding is never a leap of faith — the analyst sees the default action that will be requested of the merchant before clicking.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer-cta">
+  <span class="lbl">Done? Return to the populated canvas:</span>
+  <a class="btn-link" href="compliance-case-blank-canvas.html">2 / Blank Canvas</a>
+  <a class="btn-ghost" href="compliance-case-target-findings.html">3 / Targeting Picker (browse)</a>
+  <a class="btn-ghost" href="compliance-case-create-blank.html">1 / Entry Points</a>
+</div>
+
+</body>
+</html>
