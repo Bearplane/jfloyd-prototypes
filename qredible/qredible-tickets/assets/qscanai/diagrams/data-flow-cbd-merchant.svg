@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1100" width="1500" height="1100" role="img" aria-label="Sequence diagram: CBD merchant scan from POST /scans through five tiers to action tree">
+  <title>Q-ScanAI — CBD Merchant Scan Sequence</title>
+  <desc>End-to-end data flow through five execution tiers, showing where qsa_scan_run, qsa_policy_execution_result, qsa_compliance_finding, qsa_action_invocation, and qsa_audit_log rows are written.</desc>
+
+  <defs>
+    <style>
+      .heading { font-family: "Poppins", "Inter", "Arial", sans-serif; font-weight: 600; fill: #141413; }
+      .subheading { font-family: "Poppins", "Inter", "Arial", sans-serif; font-weight: 500; fill: #141413; }
+      .body { font-family: "Inter", "Lora", "Georgia", sans-serif; fill: #141413; }
+      .light { fill: #faf9f5; }
+      .mute { fill: #5a5a5a; font-family: "Inter", sans-serif; }
+      .lane-label { font-family: "Poppins", "Inter", "Arial", sans-serif; font-weight: 600; fill: #faf9f5; }
+      .layer-label { font-family: "Poppins", "Inter", "Arial", sans-serif; font-weight: 600; letter-spacing: 0.06em; fill: #b0aea5; text-transform: uppercase; }
+      .write-tag { font-family: "Inter", monospace; fill: #788c5d; font-weight: 600; }
+    </style>
+    <marker id="arrs" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#5a5a5a"/>
+    </marker>
+    <marker id="arrs-resp" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#788c5d"/>
+    </marker>
+    <linearGradient id="bg4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#faf9f5"/>
+      <stop offset="1" stop-color="#f3f1e8"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1500" height="1100" fill="url(#bg4)"/>
+
+  <!-- Title -->
+  <text x="40" y="50" class="heading" font-size="28">CBD Merchant Scan — Sequence</text>
+  <text x="40" y="76" class="body" font-size="14" fill="#5a5a5a">Green Leaf Wellness · 16 policies · 5 tiers · ~10 items. Green tags mark each persistent write. Source: 07-webscan-example.md</text>
+
+  <!-- Lane headers -->
+  <!-- Lane positions (x-centers): API=120, Orchestrator=350, Discovery=560, Policy Exec=770, Rule=970, Action=1170, Audit/Findings=1380 -->
+  <g>
+    <!-- bands -->
+    <rect x="40"   y="100" width="160" height="44" rx="6" fill="#1f3a5f"/>
+    <rect x="220"  y="100" width="200" height="44" rx="6" fill="#2c5282"/>
+    <rect x="440"  y="100" width="180" height="44" rx="6" fill="#3d6b9c"/>
+    <rect x="640"  y="100" width="190" height="44" rx="6" fill="#3d6b9c"/>
+    <rect x="850"  y="100" width="170" height="44" rx="6" fill="#3d6b9c"/>
+    <rect x="1040" y="100" width="190" height="44" rx="6" fill="#3d6b9c"/>
+    <rect x="1250" y="100" width="220" height="44" rx="6" fill="#788c5d"/>
+
+    <text x="120"  y="128" class="lane-label" font-size="13" text-anchor="middle">API Gateway</text>
+    <text x="320"  y="128" class="lane-label" font-size="13" text-anchor="middle">Orchestrator</text>
+    <text x="530"  y="128" class="lane-label" font-size="13" text-anchor="middle">Discovery</text>
+    <text x="735"  y="128" class="lane-label" font-size="13" text-anchor="middle">Policy Exec</text>
+    <text x="935"  y="128" class="lane-label" font-size="13" text-anchor="middle">Rule Engine</text>
+    <text x="1135" y="128" class="lane-label" font-size="13" text-anchor="middle">Action Tree</text>
+    <text x="1360" y="128" class="lane-label" font-size="13" text-anchor="middle">Persistence + Audit</text>
+  </g>
+
+  <!-- Lane lifelines -->
+  <g stroke="#b0aea5" stroke-width="1" stroke-dasharray="4,4">
+    <line x1="120" y1="148" x2="120" y2="1060"/>
+    <line x1="320" y1="148" x2="320" y2="1060"/>
+    <line x1="530" y1="148" x2="530" y2="1060"/>
+    <line x1="735" y1="148" x2="735" y2="1060"/>
+    <line x1="935" y1="148" x2="935" y2="1060"/>
+    <line x1="1135" y1="148" x2="1135" y2="1060"/>
+    <line x1="1360" y1="148" x2="1360" y2="1060"/>
+  </g>
+
+  <!-- Phase 1 — Intake -->
+  <g>
+    <rect x="40" y="160" width="1430" height="20" fill="#e8e6dc" stroke="#b0aea5"/>
+    <text x="50" y="174" class="layer-label" font-size="10">Phase 1 · Intake (synchronous, before BullMQ)</text>
+  </g>
+
+  <!-- Step: client → API -->
+  <g>
+    <line x1="40"  y1="198" x2="120" y2="198" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="50" y="192" class="body" font-size="11">POST /scans { merchantId: 99, scanInputSpec, mode: PRODUCTION }</text>
+  </g>
+
+  <!-- API → Orchestrator -->
+  <g>
+    <line x1="120" y1="222" x2="320" y2="222" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="220" y="216" class="body" font-size="11" text-anchor="middle">submitScan()</text>
+  </g>
+  <!-- snapshot writes -->
+  <g>
+    <text x="320" y="248" class="body" font-size="11" fill="#3a3a3a">resolve effective profile, snapshot active versions, validate cycle, SSL probe</text>
+    <line x1="320" y1="268" x2="1360" y2="268" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="272" class="write-tag" font-size="10.5">qsa_scan_run · qsa_scan_run_pinned_version · qsa_audit_log</text>
+  </g>
+  <g>
+    <line x1="320" y1="296" x2="120" y2="296" stroke="#788c5d" stroke-width="1.5" marker-end="url(#arrs-resp)"/>
+    <text x="220" y="290" class="body" font-size="11" text-anchor="middle" fill="#5a5a5a">202 Accepted { scanRunId }</text>
+  </g>
+
+  <!-- Phase 2 — Discovery -->
+  <g>
+    <rect x="40" y="316" width="1430" height="20" fill="#e8e6dc" stroke="#b0aea5"/>
+    <text x="50" y="330" class="layer-label" font-size="10">Phase 2 · Discovery (status: DISCOVERING → EXECUTING)</text>
+  </g>
+  <g>
+    <line x1="320" y1="354" x2="530" y2="354" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="425" y="348" class="body" font-size="11" text-anchor="middle">discovery.open(WEBSITE_CRAWLER)</text>
+  </g>
+  <g>
+    <line x1="530" y1="378" x2="1360" y2="378" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="382" class="write-tag" font-size="10.5">qsa_scan_run_item × ~10  +  item_content (HTML / RENDERED_TEXT / SCREENSHOT)</text>
+  </g>
+  <text x="540" y="402" class="body" font-size="11" fill="#3a3a3a">virtual WEB_DOMAIN + virtual MERCHANT items emitted first; then homepage; then bucketed (contact, legal, COA, generic).</text>
+
+  <!-- Phase 3 — Tier 1: SSL -->
+  <g>
+    <rect x="40" y="430" width="1430" height="20" fill="#e8e6dc" stroke="#b0aea5"/>
+    <text x="50" y="444" class="layer-label" font-size="10">Tier 1 · CBD-INFRA-SSL  (ONCE_PER_GROUP, INFRA_PROBE — already ran during pre-flight; result row written)</text>
+  </g>
+  <g>
+    <line x1="320" y1="468" x2="735" y2="468" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="525" y="462" class="body" font-size="11" text-anchor="middle">runOne(virtual WEB_DOMAIN)</text>
+    <line x1="735" y1="492" x2="1360" y2="492" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="496" class="write-tag" font-size="10.5">qsa_policy_execution_result (PASS, INFRA_PROBE, RESOURCE_GROUP)</text>
+  </g>
+
+  <!-- Phase 4 — Tier 2: Age verification -->
+  <g>
+    <rect x="40" y="510" width="1430" height="20" fill="#e8e6dc" stroke="#b0aea5"/>
+    <text x="50" y="524" class="layer-label" font-size="10">Tier 2 · CBD-AGE-VERIFICATION  (FIRST_MATCH_WINS, INTERACTIVE_GATE_DETECTION)</text>
+  </g>
+  <g>
+    <line x1="320" y1="548" x2="735" y2="548" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="525" y="542" class="body" font-size="11" text-anchor="middle">runOne(homepage)</text>
+    <line x1="735" y1="568" x2="935" y2="568" stroke="#5a5a5a" stroke-width="1.4" marker-end="url(#arrs)"/>
+    <text x="835" y="562" class="body" font-size="11" text-anchor="middle">PROBE_AGE_MODAL (DOM)</text>
+    <line x1="935" y1="588" x2="735" y2="588" stroke="#788c5d" stroke-width="1.4" marker-end="url(#arrs-resp)"/>
+    <text x="835" y="582" class="body" font-size="10.5" text-anchor="middle" fill="#5a5a5a">found=true → ASK_AI fallback skipped</text>
+    <line x1="735" y1="608" x2="1360" y2="608" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="612" class="write-tag" font-size="10.5">qsa_policy_execution_result (PASS, ~80 ms — no AI call)</text>
+  </g>
+
+  <!-- Phase 5 — Tier 3: Per-page batch (the meaty one) -->
+  <g>
+    <rect x="40" y="628" width="1430" height="20" fill="#1f3a5f"/>
+    <text x="50" y="642" class="lane-label" font-size="10">Tier 3 · 11 policies × N items · unified AI batch (the dense step)</text>
+  </g>
+  <g>
+    <text x="50" y="668" class="body" font-size="11" fill="#3a3a3a">step 3: fingerprint check — 4 policies CACHED for unchanged homepage; 3 policies N_A (target other pages); 4 policies cache miss.</text>
+    <line x1="320" y1="688" x2="1360" y2="688" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="692" class="write-tag" font-size="10.5">qsa_policy_execution_result × 4 (CACHED, copied from prior)</text>
+
+    <line x1="320" y1="712" x2="735" y2="712" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="525" y="706" class="body" font-size="11" text-anchor="middle">step 4: DOM pre-filter (1.2 MB → 14 KB)</text>
+
+    <line x1="735" y1="734" x2="935" y2="734" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="835" y="728" class="body" font-size="11" text-anchor="middle">step 5: ASK_AI (unified, 4 policies, 1 batch)</text>
+    <text x="835" y="744" class="mute" font-size="10" text-anchor="middle">~5,300 tokens · idempotency-keyed</text>
+
+    <line x1="935" y1="766" x2="735" y2="766" stroke="#788c5d" stroke-width="1.4" marker-end="url(#arrs-resp)"/>
+    <text x="835" y="760" class="body" font-size="11" text-anchor="middle" fill="#5a5a5a">JSON keyed by policy code, schema-validated per policy</text>
+
+    <line x1="735" y1="788" x2="935" y2="788" stroke="#5a5a5a" stroke-width="1.4" marker-end="url(#arrs)"/>
+    <text x="835" y="782" class="body" font-size="11" text-anchor="middle">step 6: rule eval per policy</text>
+    <line x1="935" y1="810" x2="735" y2="810" stroke="#788c5d" stroke-width="1.4" marker-end="url(#arrs-resp)"/>
+    <text x="835" y="804" class="body" font-size="11" text-anchor="middle" fill="#5a5a5a">CBD-COMPL-KEYWORDS-CBD = FAIL  ·  others = PASS</text>
+
+    <line x1="735" y1="834" x2="1360" y2="834" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="838" class="write-tag" font-size="10.5">qsa_policy_execution_result × 4 + qsa_action_invocation (ASK_AI)</text>
+  </g>
+
+  <!-- Phase 6 — Tier 5 + Action tree on FAIL -->
+  <g>
+    <rect x="40" y="858" width="1430" height="20" fill="#e8e6dc" stroke="#b0aea5"/>
+    <text x="50" y="872" class="layer-label" font-size="10">Tiers 4–5 · Conditional checkout policy + parent aggregations + action tree on every FAIL</text>
+  </g>
+  <g>
+    <line x1="735" y1="896" x2="1135" y2="896" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#arrs)"/>
+    <text x="935" y="890" class="body" font-size="11" text-anchor="middle">ON_FAIL chain: CREATE_TICKET → SEND_EMAIL → SEND_WEBHOOK</text>
+    <text x="935" y="910" class="mute" font-size="10" text-anchor="middle">credentials JIT-resolved · idempotency-keyed · circuit-breaker per endpoint</text>
+
+    <line x1="1135" y1="930" x2="1360" y2="930" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="934" class="write-tag" font-size="10.5">qsa_action_invocation × 3 + qsa_audit_log × 6 (action.invoked + action.completed)</text>
+  </g>
+
+  <!-- Phase 7 — Finalize / findings -->
+  <g>
+    <rect x="40" y="950" width="1430" height="20" fill="#e8e6dc" stroke="#b0aea5"/>
+    <text x="50" y="964" class="layer-label" font-size="10">Finalize · status flips to COMPLETED · finding deltas + summary</text>
+  </g>
+  <g>
+    <line x1="320" y1="990" x2="1360" y2="990" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="994" class="write-tag" font-size="10.5">qsa_compliance_finding upserts: NEW × 1 · ONGOING × 2 · RESOLVED × 1 · REOPENED × 1</text>
+
+    <line x1="320" y1="1014" x2="1360" y2="1014" stroke="#788c5d" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="1370" y="1018" class="write-tag" font-size="10.5">qsa_scan_run_summary + qsa_scan_run_check_type_summary + final qsa_audit_log</text>
+
+    <line x1="320" y1="1040" x2="120" y2="1040" stroke="#788c5d" stroke-width="1.6" marker-end="url(#arrs-resp)"/>
+    <text x="220" y="1034" class="body" font-size="11" text-anchor="middle" fill="#5a5a5a">QMonitor pub/sub: { status: COMPLETED, summary }</text>
+  </g>
+</svg>
