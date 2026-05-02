@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Case-First UX — Blank Canvas · Exploration</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #1E293B; color: #1A202E; }
+
+/* Proto nav */
+.proto-nav { background: #0F172A; color: #CBD5E1; display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; position: sticky; top: 0; z-index: 1000; font-size: 13px; gap: 16px; }
+.proto-nav a { color: #94A3B8; text-decoration: none; }
+.proto-nav a:hover { color: white; }
+.proto-nav .proto-center { color: #E2E8F0; font-weight: 500; flex: 1; text-align: center; }
+.proto-pill { background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.proto-nav-link { background: #1E3A5F; color: #CBD5E1; border: 1px solid #334155; border-radius: 5px; padding: 4px 10px; font-size: 12px; text-decoration: none; }
+
+/* App chrome (dimmed background) */
+.app-chrome { background: #f8fafc; min-height: calc(100vh - 40px); position: relative; }
+.app-top-bar { background: white; border-bottom: 1px solid #E5E7EB; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; gap: 16px; }
+.app-top-left { display: flex; align-items: center; gap: 20px; }
+.app-brand { font-weight: 700; font-size: 15px; color: #1A202E; }
+.app-nav-links { display: flex; gap: 16px; }
+.app-nav-link { font-size: 13px; color: #6B7280; padding-bottom: 2px; }
+.app-nav-link.active { color: #2563eb; border-bottom: 2px solid #2563eb; font-weight: 500; }
+.app-top-right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #374151; }
+.company-selector { background: #f8fafc; border: 1px solid #E5E7EB; border-radius: 6px; padding: 5px 10px; font-size: 13px; }
+.user-btn { font-size: 13px; }
+.wordmark { font-weight: 800; font-size: 15px; color: #2563eb; }
+.app-tabs { background: white; border-bottom: 1px solid #E5E7EB; padding: 0 24px; display: flex; gap: 0; overflow-x: auto; }
+.app-tab { padding: 12px 16px; font-size: 14px; color: #6B7280; border-bottom: 2px solid transparent; white-space: nowrap; }
+.app-tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 500; }
+
+.dimmed { opacity: 0.45; pointer-events: none; }
+.page-content { padding: 24px; max-width: 1400px; margin: 0 auto; }
+.page-title { font-size: 20px; font-weight: 700; color: #1A202E; }
+.page-subtitle { font-size: 13px; color: #6B7280; margin-top: 4px; }
+
+/* Faux background table */
+.faux-table { width: 100%; background: white; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; margin-top: 16px; }
+.faux-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.faux-table th { background: #F1F5F9; padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #1A202E; border-bottom: 1px solid #E5E7EB; }
+.faux-table td { padding: 11px 12px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E7EB; }
+.faux-table tr:last-child td { border-bottom: none; }
+
+/* Annotation bar above app chrome */
+.annot-bar { background: #F0FFF4; border-bottom: 2px solid #BBF7D0; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; }
+.annot-pill { background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.annot-text { color: #166534; font-weight: 500; }
+.annot-meta { font-size: 11px; color: #6B7280; }
+
+/* Drawer overlay */
+.drawer-overlay { position: fixed; top: 40px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.32); z-index: 100; }
+
+/* Case drawer */
+.case-drawer { position: fixed; top: 40px; right: 0; width: min(840px, 64vw); height: calc(100vh - 40px); background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.18); z-index: 200; display: flex; flex-direction: column; overflow: hidden; }
+.drawer-header { background: #F7F5FF; padding: 18px 22px; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.drawer-header-left { flex: 1; min-width: 0; }
+.drawer-header-eyebrow { font-size: 11px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.drawer-header-title { font-size: 17px; font-weight: 700; color: #1A202E; }
+.drawer-header-merchant { font-size: 12px; color: #6B7280; margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.merchant-chip { display: inline-flex; align-items: center; gap: 6px; background: white; border: 1px solid #E5E7EB; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 500; color: #1A202E; }
+.merchant-chip .lock { color: #9CA3AF; font-size: 11px; }
+.merchant-chip.changeable { cursor: pointer; }
+.merchant-chip.changeable:hover { background: #F1F5F9; }
+.drawer-close { background: none; border: none; cursor: pointer; font-size: 22px; color: #6B7280; line-height: 1; }
+.drawer-close:hover { color: #1A202E; }
+
+/* Drawer body */
+.drawer-body { padding: 20px 22px; flex: 1; overflow-y: auto; }
+.drawer-section { margin-bottom: 20px; }
+.drawer-label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.drawer-label .req { color: #DC2626; }
+.drawer-label .hint { color: #9CA3AF; font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 11px; }
+.drawer-input { width: 100%; border: 1px solid #E5E7EB; border-radius: 6px; padding: 9px 12px; font-size: 13px; color: #1A202E; background: white; font-family: inherit; }
+.drawer-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+.drawer-input::placeholder { color: #9CA3AF; }
+
+.suggested-line { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: #6B7280; flex-wrap: wrap; }
+.suggested-chip { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 500; cursor: pointer; }
+.suggested-chip:hover { background: #DBEAFE; }
+
+/* Inline rows */
+.row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.priority-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.priority-opt { flex: 1; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; min-width: 80px; }
+.priority-opt input { cursor: pointer; }
+.priority-opt.selected { border-color: #2563eb; background: #EFF6FF; }
+.priority-opt.high.selected { border-color: #DC2626; background: #FEF2F2; }
+.priority-opt.high .dot { color: #991B1B; }
+.priority-opt.med .dot { color: #92400E; }
+.priority-opt.low .dot { color: #166534; }
+.priority-opt .dot { font-size: 14px; line-height: 1; }
+.priority-opt .label { font-weight: 600; color: #1A202E; }
+.priority-opt .sla { color: #6B7280; font-size: 11px; margin-left: auto; }
+
+/* Empty items zone */
+.items-empty {
+  border: 2px dashed #BFDBFE;
+  background: linear-gradient(135deg, #F0F9FF 0%, #FFFFFF 50%, #F5F3FF 100%);
+  border-radius: 12px;
+  padding: 26px 22px;
+  margin-top: 6px;
+}
+.items-empty-h { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.items-empty-h .icon { width: 32px; height: 32px; background: #2563eb; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+.items-empty-title { font-size: 15px; font-weight: 700; color: #1A202E; }
+.items-empty-sub { font-size: 12px; color: #475569; line-height: 1.55; margin-bottom: 16px; max-width: 540px; }
+
+.quick-add-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+@media (max-width: 720px) { .quick-add-grid { grid-template-columns: 1fr; } }
+.quick-add-card {
+  background: white; border: 1px solid #E5E7EB; border-radius: 10px;
+  padding: 12px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 12px;
+  transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+  text-align: left; font-family: inherit; width: 100%;
+}
+.quick-add-card:hover { border-color: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.08); }
+.qac-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.qac-icon.red { background: #FEE2E2; color: #991B1B; }
+.qac-icon.amber { background: #FEF3C7; color: #92400E; }
+.qac-icon.purple { background: #EDE9FE; color: #5B21B6; }
+.qac-icon.blue { background: #DBEAFE; color: #1E40AF; }
+.qac-icon.gray { background: #F1F5F9; color: #475569; }
+.qac-body { flex: 1; min-width: 0; }
+.qac-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.qac-title { font-size: 13px; font-weight: 600; color: #1A202E; }
+.qac-count { font-size: 12px; font-weight: 700; color: #1A202E; background: #F1F5F9; padding: 1px 7px; border-radius: 999px; }
+.qac-sub { font-size: 11px; color: #6B7280; margin-top: 3px; line-height: 1.5; }
+.qac-arrow { color: #9CA3AF; align-self: center; font-size: 14px; }
+
+.divider-or {
+  display: flex; align-items: center; gap: 12px; margin: 14px 0;
+  font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+
+.smart-add-bar {
+  display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #E5E7EB; border-radius: 10px;
+  padding: 10px 14px;
+}
+.smart-add-bar .kbd { font-family: monospace; font-size: 10px; background: #F1F5F9; color: #475569; padding: 2px 6px; border-radius: 4px; border: 1px solid #E5E7EB; }
+.smart-add-bar input { flex: 1; border: none; outline: none; font-size: 13px; color: #1A202E; background: transparent; font-family: inherit; }
+.smart-add-bar input::placeholder { color: #9CA3AF; }
+.smart-add-bar .icon { color: #9CA3AF; font-size: 14px; }
+
+.empty-tip { font-size: 11px; color: #6B7280; margin-top: 10px; text-align: center; }
+.empty-tip a { color: #2563eb; text-decoration: none; font-weight: 500; }
+
+/* Drawer footer */
+.drawer-footer { padding: 14px 22px; border-top: 1px solid #E5E7EB; display: flex; gap: 8px; background: white; align-items: center; }
+.drawer-footer .helper { font-size: 12px; color: #6B7280; flex: 1; }
+.drawer-footer .helper strong { color: #1A202E; }
+.btn { background: #1A202E; color: white; border: none; border-radius: 6px; padding: 9px 16px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+.btn:hover { background: #0F172A; }
+.btn.secondary { background: white; color: #374151; border: 1px solid #E5E7EB; }
+.btn.secondary:hover { background: #F8FAFC; }
+.btn.green { background: #16a34a; }
+.btn.green:hover { background: #15803d; }
+.btn.disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.disabled:hover { background: #1A202E; }
+
+/* Annotation panel below */
+.exploration-notes {
+  position: relative;
+  z-index: 250;
+  margin: -100vh 22px 22px 22px;
+  padding-top: calc(100vh - 40px);
+  pointer-events: none;
+}
+/* Skip the trick and just add notes inside the body — do at bottom of page instead */
+
+/* Inline annotations on right side of drawer — actually we'll use floating callout */
+.callout-side {
+  position: fixed; top: 80px; right: calc(min(840px, 64vw) + 30px); width: 280px; max-width: 30vw;
+  background: white; border: 1px solid #E5E7EB; border-left: 4px solid #16a34a; border-radius: 10px;
+  padding: 14px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 300;
+  font-size: 12px; color: #1A202E; line-height: 1.55;
+}
+.callout-side h4 { font-size: 11px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.callout-side p + p { margin-top: 8px; }
+.callout-side .key { font-weight: 600; color: #1A202E; }
+.callout-side .ref { font-size: 11px; color: #6B7280; margin-top: 8px; padding-top: 8px; border-top: 1px solid #F1F5F9; }
+@media (max-width: 1280px) { .callout-side { display: none; } }
+
+/* Mobile-friendly: stash notes under page */
+.notes-block {
+  background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 22px 26px;
+  margin: 320px 22px 22px 22px; position: relative; z-index: 50;
+  max-width: 1200px;
+}
+.notes-block h3 { font-size: 14px; font-weight: 700; color: #1A202E; margin-bottom: 12px; }
+.notes-block .nb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+@media (max-width: 980px) { .notes-block .nb-grid { grid-template-columns: 1fr; } }
+.notes-block .nb-card { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 8px; padding: 14px; }
+.notes-block .nb-h { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.notes-block .nb-h .dot { width: 8px; height: 8px; border-radius: 50%; }
+.notes-block .nb-card p { font-size: 12px; color: #475569; line-height: 1.6; }
+.notes-block .nb-card p + p { margin-top: 8px; }
+.notes-block code { font-family: monospace; font-size: 11px; background: white; padding: 1px 5px; border-radius: 3px; border: 1px solid #E5E7EB; color: #1A202E; }
+
+.next-up { display: flex; gap: 10px; align-items: center; padding: 14px 22px; background: white; border-top: 1px solid #E5E7EB; }
+.next-up .label { font-size: 12px; color: #6B7280; flex: 1; }
+.next-up a { background: #1A202E; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; }
+.next-up a.ghost { background: white; color: #1A202E; border: 1px solid #E5E7EB; font-weight: 500; }
+</style>
+</head>
+<body>
+<nav class="proto-nav">
+  <a href="../index.html" style="white-space:nowrap;">← All Mockups</a>
+  <div class="proto-center">Case-First UX Exploration · 2 / 4 — Blank Canvas</div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="proto-pill">EXPLORATION</span>
+    <a class="proto-nav-link" href="compliance-case-create-blank.html">← Entry Points</a>
+    <a class="proto-nav-link" href="compliance-case-target-findings.html">Targeting Picker →</a>
+  </div>
+</nav>
+
+<!-- Annotation bar above app chrome -->
+<div class="annot-bar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="annot-pill">EXPLORATION</span>
+    <span class="annot-text">Blank case after click-create — what does empty look like?</span>
+    <span class="annot-meta">Entered from: <strong>Cases mini-panel · Black Bear Wellness</strong></span>
+  </div>
+  <span class="annot-meta">Drawer reuses CaseDraftDrawer chrome · empty-items zone is new</span>
+</div>
+
+<div class="app-chrome">
+  <!-- Dimmed background app -->
+  <div class="dimmed">
+    <div class="app-top-bar">
+      <div class="app-top-left">
+        <span class="app-brand">Qredibility</span>
+        <nav class="app-nav-links">
+          <a class="app-nav-link active">Q-Monitor</a>
+          <a class="app-nav-link">Report</a>
+          <a class="app-nav-link">Q-Vault ▾</a>
+          <a class="app-nav-link">MyCOA</a>
+        </nav>
+      </div>
+      <div class="app-top-right">
+        <div class="company-selector">FLEX Payment Solutions ▾</div>
+        <div class="user-btn">JF Joseph Floyd ▾</div>
+        <span style="font-size:16px;">🔔</span>
+        <div class="wordmark">Qredible</div>
+      </div>
+    </div>
+    <div class="app-tabs">
+      <div class="app-tab">Pipeline</div>
+      <div class="app-tab">Findings</div>
+      <div class="app-tab">Product Compliance</div>
+      <div class="app-tab active">We Monitor</div>
+      <div class="app-tab">Cases</div>
+      <div class="app-tab">Documents</div>
+    </div>
+    <div class="page-content">
+      <div class="page-title">FLEX Payment Solutions Monitors</div>
+      <div class="page-subtitle">Search a Company that you are monitoring</div>
+      <div class="faux-table">
+        <table>
+          <thead><tr><th>Legal Name</th><th>License</th><th>Findings</th><th>Cases</th></tr></thead>
+          <tbody>
+            <tr><td>AG Living Solutions LLC</td><td>✓ Active</td><td>31 (7 high)</td><td>—</td></tr>
+            <tr><td><strong>Black Bear Wellness LLC</strong></td><td>✓ Active</td><td>8 (5 high)</td><td>3 active · 1 draft</td></tr>
+            <tr><td>Hempire Co</td><td>Renewing</td><td>2</td><td>1 awaiting</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer overlay -->
+  <div class="drawer-overlay"></div>
+
+  <!-- Floating callout (desktop only) -->
+  <div class="callout-side">
+    <h4>Why this empty state matters</h4>
+    <p>The existing CaseDraftDrawer always opens with items already attached — there is no <span class="key">empty</span> path today. This view is the missing one.</p>
+    <p>Goal: feel <span class="key">inviting</span>, not bureaucratic. The page should <em>pull</em> the analyst into adding items, not list 14 form fields.</p>
+    <div class="ref">Variants explored:<br>· 4-card quick-add grid (shown)<br>· Single big targeting button<br>· Smart-search-first (see mockup 4)</div>
+  </div>
+
+  <!-- The blank case drawer -->
+  <div class="case-drawer">
+    <div class="drawer-header">
+      <div class="drawer-header-left">
+        <div class="drawer-header-eyebrow">📋 New Compliance Case · Draft</div>
+        <div class="drawer-header-title">Untitled case</div>
+        <div class="drawer-header-merchant">
+          <span class="merchant-chip">
+            <span style="color:#16a34a;">●</span>
+            Black Bear Wellness LLC
+            <span class="lock">🔒</span>
+          </span>
+          <span style="color:#9CA3AF;">·</span>
+          <span style="color:#6B7280;">CO · Hemp/CBD · 12 products · 8 findings</span>
+        </div>
+      </div>
+      <button class="drawer-close" onclick="window.history.back()">×</button>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- Case Title -->
+      <div class="drawer-section">
+        <div class="drawer-label">
+          Case Title <span class="req">*</span>
+          <span class="hint" style="margin-left:auto;">Optional — auto-generated when sent</span>
+        </div>
+        <input class="drawer-input" placeholder="e.g. Black Bear Wellness — Q1 COA Refresh" autofocus>
+        <div class="suggested-line">
+          <span>Suggestions:</span>
+          <span class="suggested-chip">📅 Q1 Audit — May 2026</span>
+          <span class="suggested-chip">🧪 COA Refresh</span>
+          <span class="suggested-chip">🤖 Q-ScanAI Findings Sweep</span>
+          <span class="suggested-chip">🛒 Product Compliance</span>
+        </div>
+      </div>
+
+      <!-- Priority + SLA -->
+      <div class="row-2col">
+        <div class="drawer-section">
+          <div class="drawer-label">Priority</div>
+          <div class="priority-row">
+            <label class="priority-opt high">
+              <input type="radio" name="pri">
+              <span class="dot">●</span>
+              <span class="label">High</span>
+              <span class="sla">3-day SLA</span>
+            </label>
+            <label class="priority-opt med selected">
+              <input type="radio" name="pri" checked>
+              <span class="dot">●</span>
+              <span class="label">Medium</span>
+              <span class="sla">7-day SLA</span>
+            </label>
+            <label class="priority-opt low">
+              <input type="radio" name="pri">
+              <span class="dot">●</span>
+              <span class="label">Low</span>
+              <span class="sla">14-day SLA</span>
+            </label>
+          </div>
+        </div>
+        <div class="drawer-section">
+          <div class="drawer-label">SLA Deadline <span class="hint" style="margin-left:auto;">Auto from priority</span></div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="background:#F1F5F9;border:1px solid #E5E7EB;border-radius:6px;padding:9px 14px;font-size:13px;color:#1A202E;font-weight:500;">📅 May 9, 2026</span>
+            <span style="font-size:12px;color:#6B7280;">(7 days from today)</span>
+            <button class="btn secondary" style="padding:5px 10px;font-size:11px;margin-left:auto;">Customize</button>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #E5E7EB;margin:8px 0 20px 0;">
+
+      <!-- EMPTY ITEMS ZONE -->
+      <div class="drawer-label" style="margin-bottom:8px;">Case Items <span class="hint" style="margin-left:6px;">at least 1 item required</span></div>
+
+      <div class="items-empty">
+        <div class="items-empty-h">
+          <div class="icon">+</div>
+          <div>
+            <div class="items-empty-title">Add items to this case</div>
+            <div style="font-size:11px;color:#6B7280;">Black Bear Wellness has <strong style="color:#991B1B;">3 violative products</strong>, <strong style="color:#92400E;">5 missing COAs</strong>, and <strong style="color:#5B21B6;">8 Q-ScanAI findings</strong> ready to target.</div>
+          </div>
+        </div>
+        <div class="items-empty-sub" style="margin-top:14px;">Pick a source to browse this merchant's flagged items, or paste a SKU / finding ID to add inline.</div>
+
+        <div class="quick-add-grid">
+          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
+            <div class="qac-icon red">🧪</div>
+            <div class="qac-body">
+              <div class="qac-title-row">
+                <div class="qac-title">Products with violative COAs</div>
+                <span class="qac-count">3</span>
+              </div>
+              <div class="qac-sub">Δ-9 THC over limit · expired · unverified lab</div>
+            </div>
+            <div class="qac-arrow">→</div>
+          </button>
+
+          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
+            <div class="qac-icon amber">📄</div>
+            <div class="qac-body">
+              <div class="qac-title-row">
+                <div class="qac-title">Products with missing COAs</div>
+                <span class="qac-count">5</span>
+              </div>
+              <div class="qac-sub">Required by policy · no COA on file</div>
+            </div>
+            <div class="qac-arrow">→</div>
+          </button>
+
+          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
+            <div class="qac-icon purple">🤖</div>
+            <div class="qac-body">
+              <div class="qac-title-row">
+                <div class="qac-title">Violative Q-ScanAI findings</div>
+                <span class="qac-count">8</span>
+              </div>
+              <div class="qac-sub">5 high · 3 medium · website scrape · last 30 days</div>
+            </div>
+            <div class="qac-arrow">→</div>
+          </button>
+
+          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
+            <div class="qac-icon blue">🪪</div>
+            <div class="qac-body">
+              <div class="qac-title-row">
+                <div class="qac-title">License / OFAC issues</div>
+                <span class="qac-count">0</span>
+              </div>
+              <div class="qac-sub">No flags · skip or check anyway</div>
+            </div>
+            <div class="qac-arrow">→</div>
+          </button>
+        </div>
+
+        <div class="divider-or">or</div>
+
+        <div class="smart-add-bar" onclick="window.location.href='compliance-case-quick-add-modal.html';">
+          <span class="icon">🔍</span>
+          <input placeholder="Type SKU, finding ID, or keyword to add inline (e.g. GB-500, F-2849, 'gummy')">
+          <span class="kbd">⌘K</span>
+        </div>
+
+        <div class="empty-tip">
+          <a href="compliance-case-target-findings.html">Browse all flagged items →</a>
+          <span style="margin: 0 10px; color: #D1D5DB;">·</span>
+          <a href="compliance-case-quick-add-modal.html">Quick-add for power users →</a>
+          <span style="margin: 0 10px; color: #D1D5DB;">·</span>
+          <a href="#">+ Add manually</a>
+        </div>
+      </div>
+
+      <!-- Note (collapsed by default in empty state) -->
+      <div class="drawer-section" style="margin-top:24px;">
+        <div class="drawer-label">
+          Note to Merchant <span class="hint" style="margin-left:auto;">Optional · prepended to email</span>
+        </div>
+        <div style="font-size:12px;color:#9CA3AF;background:#F8FAFC;border:1px dashed #E5E7EB;border-radius:6px;padding:10px 14px;">
+          + Add a note (default applies if blank: "Please review and respond to each compliance item below…")
+        </div>
+      </div>
+
+    </div>
+
+    <div class="drawer-footer">
+      <span class="helper">
+        <strong>0 items added</strong> · Save Draft enabled · Send disabled until ≥ 1 item
+      </span>
+      <button class="btn secondary">Save Draft</button>
+      <button class="btn green disabled">Send to Merchant →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Notes block below the drawer (mobile-friendly fallback for the floating callout) -->
+<div class="notes-block">
+  <h3>Designer notes — Why empty looks like this</h3>
+  <div class="nb-grid">
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#16a34a;"></span>Encouraging, not intimidating</div>
+      <p>The empty zone uses a subtle violet→blue gradient and an avatar-sized "+" rather than a generic dashed rectangle. The headline counts the merchant's flagged items — this is the cue that "you have stuff to find here, it's not a blank page."</p>
+      <p>Quick-add cards mirror the source categories the targeting picker will use, so the analyst's mental model carries forward.</p>
+    </div>
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#2563eb;"></span>Three ways forward</div>
+      <p><code>Browse</code> — click a quick-add card → opens targeting picker scoped to that source.</p>
+      <p><code>Inline</code> — paste a SKU/finding ID into the smart-add bar, hit ↩ to add (no full picker).</p>
+      <p><code>Manual</code> — small link for one-off items not yet captured by the system.</p>
+    </div>
+    <div class="nb-card">
+      <div class="nb-h"><span class="dot" style="background:#F05252;"></span>Defaults that matter</div>
+      <p><code>Priority</code> defaults to <strong>Medium</strong>, SLA auto-fills to 7 days. High = 3d, Low = 14d (matches existing convention).</p>
+      <p><code>Title</code> is optional in the empty state — auto-generated on send if left blank ("[Merchant] — [Date]").</p>
+      <p><code>Send</code> button stays disabled until ≥ 1 item; <code>Save Draft</code> works at zero items so the analyst can come back later.</p>
+    </div>
+  </div>
+</div>
+
+<div class="next-up">
+  <span class="label">When the analyst clicks a quick-add card →</span>
+  <a href="compliance-case-target-findings.html">3 / Targeting Picker →</a>
+  <a class="ghost" href="compliance-case-quick-add-modal.html">4 / Quick-Add Modal</a>
+</div>
+
+</body>
+</html>
