@@ -3,526 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q-ScanAI — Bulk Apply Pair Template</title>
+<title>Q-ScanAI Scanner Config — Bulk Apply</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px;line-height:1.5}
 a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
-code{font-family:'IBM Plex Mono',monospace;font-size:12px}
 
-.topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:50}
-.topnav a{color:#93C5FD}
-.topnav .sep{color:#475569}
-.topnav .current{color:#fff;font-weight:600}
-.topnav .badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;margin-left:8px}
+/* NAV */
+.topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8}
+.topnav a{color:#93C5FD}.topnav .sep{color:#475569}
+.topnav .ticket-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.topnav .title{color:#fff;font-weight:600}
 
-.proto-banner{background:#FFFBEB;border-bottom:1px solid #FDE68A;padding:8px 24px;font-size:12px;color:#78350F;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.proto-banner strong{color:#92400E}
-.proto-banner code{background:#FDE68A;padding:1px 5px;border-radius:3px;color:#78350F}
+/* PAGE */
+.page{max-width:960px;margin:0 auto;padding:32px 24px}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
+.page-header p{color:#64748B;font-size:13px}
 
-.page{max-width:1280px;margin:0 auto;padding:28px 24px 60px}
-.page-title{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
-.page-sub{color:#64748B;font-size:13px;margin-bottom:20px;max-width:920px}
+/* SECTION */
+.section{margin-bottom:36px}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.4px;text-transform:uppercase;background:#DBEAFE;color:#1E40AF}
+.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:14px}
 
-.layered-strip{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.layered-strip .ls-title{font-size:11px;font-weight:700;color:#64748B;letter-spacing:.5px;text-transform:uppercase;margin-right:4px}
-.lay{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid}
-.lay.active{outline:2px solid #FBBF24;outline-offset:2px}
-.lay-global{background:#F1F5F9;color:#475569;border-color:#CBD5E1}
-.lay-pair{background:#F0FDF4;color:#166534;border-color:#BBF7D0}
-.lay-signal{background:#F5F3FF;color:#5B21B6;border-color:#DDD6FE}
-.lay-override{background:#EFF6FF;color:#1E40AF;border-color:#BFDBFE}
-.lay-arrow{color:#94A3B8;font-size:13px}
+/* ANNOTATION */
+.annotation{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:14px;line-height:1.6}
+.annotation.green{background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D}
+.annotation.blue{background:#EFF6FF;border-color:#BFDBFE;border-left-color:#3B82F6;color:#1E40AF}
 
-.section{margin-bottom:32px}
-.section-num{display:inline-block;background:#1E3A5F;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 8px;border-radius:4px;margin-right:8px;font-weight:600}
-.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.section-sub{color:#64748B;font-size:13px;margin-bottom:14px;max-width:920px}
+/* MODAL */
+.modal-wrap{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);overflow:hidden;border:1px solid #E2E8F0;margin-bottom:14px}
+.modal-header{background:#1E3A5F;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{color:#fff;font-size:15px;font-weight:700}
+.modal-header .close-btn{color:#94A3B8;font-size:18px;cursor:pointer;line-height:1}
+.modal-body{padding:20px}
 
-/* TWO-PANE LAYOUT */
-.two-pane{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+/* SCOPE BAR */
+.scope-bar{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.scope-bar .scope-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px}
+.pill-green{background:#DCFCE7;color:#166534}
+.pill-orange{background:#FEF3C7;color:#92400E}
+.pill-blue{background:#DBEAFE;color:#1E40AF}
 
-.pane{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
-.pane-head{background:#1E3A5F;color:#fff;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700}
-.pane-head .pn-meta{font-weight:500;color:#93C5FD;font-size:11px}
-.pane-body{padding:0;flex:1}
+/* FILTER ROW */
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search-input{flex:1;min-width:240px;border:1px solid #CBD5E1;border-radius:6px;padding:8px 12px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:#fff}
+.filter-dd{display:flex;align-items:center;gap:6px;border:1px solid #CBD5E1;border-radius:6px;padding:7px 12px;font-size:13px;background:#fff;color:#1E293B;cursor:pointer}
+.filter-dd .dd-arrow{color:#94A3B8;font-size:11px}
+.select-all-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#1E293B;padding:8px 4px}
+.select-all-row input[type=checkbox]{accent-color:#3B82F6}
 
 /* COMPANY LIST */
-.list-toolbar{padding:12px 16px;border-bottom:1px solid #E2E8F0;background:#F8FAFC;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.search-box{flex:1;min-width:160px;display:flex;align-items:center;gap:6px;padding:6px 10px;background:#fff;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;color:#94A3B8}
-.search-box input{border:none;background:transparent;outline:none;flex:1;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#1E293B}
-.filter-pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #CBD5E1;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:#374151;cursor:pointer}
-.filter-pill.active{background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF}
+.company-list{border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:14px}
+.company-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #E2E8F0}
+.company-row:last-child{border-bottom:none}
+.company-row input[type=checkbox]{accent-color:#3B82F6;flex-shrink:0}
+.company-row.skipped{background:#FFFBEB}
+.company-row.matches{background:#F8FAFC}
+.company-row .row-name{font-weight:600;color:#1E293B;font-size:13px;min-width:200px}
+.row-tags{display:flex;gap:6px;flex:1}
+.row-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;flex-shrink:0}
+.status-will{background:#F0FDF4;color:#166534}
+.status-skip{background:#FEF3C7;color:#92400E}
+.status-match{background:#EFF6FF;color:#1E40AF}
 
-.co-list{display:flex;flex-direction:column}
-.co-row{display:grid;grid-template-columns:24px 1fr 110px 120px;gap:10px;align-items:center;padding:11px 16px;border-bottom:1px solid #F1F5F9;cursor:pointer;font-size:12px}
-.co-row:hover{background:#FAFAFA}
-.co-row.selected{background:#EFF6FF}
-.co-row.selected:hover{background:#DBEAFE}
-.cb{width:18px;height:18px;border:1.5px solid #CBD5E1;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#fff;font-size:11px;flex-shrink:0}
-.cb.checked{background:#1A202E;border-color:#1A202E}
-.cb.checked::after{content:'✓'}
-.cb.indeterminate{background:#3B82F6;border-color:#3B82F6}
-.cb.indeterminate::after{content:'—';font-weight:700}
-.co-name{font-weight:700;color:#1E293B;display:flex;flex-direction:column;gap:2px;min-width:0}
-.co-name .nm{display:flex;align-items:center;gap:6px}
-.co-name .nm-pairs{font-size:10px;color:#64748B;font-weight:500;display:flex;gap:4px;flex-wrap:wrap}
-.pair-tag{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;padding:0 6px;border-radius:8px;font-weight:600}
-.pair-tag.hemp{background:#F0FDF4}
-.pair-tag.mush{background:#FEF3C7;color:#92400E;border-color:#FDE68A}
-.co-current{font-size:11px;font-family:'IBM Plex Mono',monospace;color:#475569;background:#F1F5F9;padding:2px 7px;border-radius:5px;text-align:center;font-weight:600}
-.co-cur-on{color:#166534;background:#DCFCE7}
-.co-cur-off{color:#475569;background:#F1F5F9}
-.co-overrides{font-size:10px;color:#64748B;text-align:right;font-weight:500}
-.co-overrides strong{color:#5B21B6;font-weight:700}
+/* SUMMARY */
+.summary-line{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px;font-size:13px;color:#475569;margin-bottom:12px}
+.summary-line strong{color:#1E3A5F}
+.opt-in{background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:10px 14px;display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#78350F;margin-bottom:14px}
+.opt-in input[type=checkbox]{accent-color:#F59E0B;margin-top:3px}
 
-/* PANE B — TARGET PICKER */
-.target-card{padding:18px}
-.field{margin-bottom:14px}
-.field-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
-.select-wrap{position:relative}
-.select{width:100%;padding:9px 32px 9px 12px;border:1px solid #CBD5E1;border-radius:7px;background:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#1E293B;font-weight:600;outline:none;appearance:none}
-.select-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:11px;pointer-events:none}
+/* FOOTER */
+.modal-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none}
+.btn-primary{background:#3B82F6;color:#fff}
+.btn-secondary{background:#fff;color:#1E293B;border:1px solid #CBD5E1}
 
-.tmpl-card{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 14px;margin-top:8px}
-.tmpl-card .tc-pair{font-size:13px;font-weight:700;color:#166534;display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.tmpl-card .tc-pair .v{font-family:'IBM Plex Mono',monospace;font-size:10px;background:#fff;border:1px solid #BBF7D0;padding:1px 6px;border-radius:5px;color:#166534}
-.tmpl-card .tc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.tmpl-card .tc-stat{font-size:11px;color:#374151}
-.tmpl-card .tc-stat strong{font-size:14px;display:block;color:#166534;font-weight:700}
+/* CONFIRMATION MODAL */
+.confirm-wrap{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);border:1px solid #E2E8F0;max-width:520px;margin:0 auto}
+.confirm-body{padding:24px}
+.confirm-icon{width:48px;height:48px;border-radius:50%;background:#DCFCE7;color:#166534;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin-bottom:14px}
+.confirm-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:6px}
+.confirm-text{font-size:13px;color:#475569;line-height:1.6}
+.confirm-stats{display:flex;gap:14px;margin-top:14px;padding:14px;background:#F8FAFC;border-radius:8px}
+.confirm-stat{flex:1;text-align:center}
+.confirm-stat .stat-num{font-size:22px;font-weight:700;color:#1E3A5F}
+.confirm-stat .stat-label{font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.confirm-stat.skip .stat-num{color:#92400E}
 
-.opts{margin-top:14px;display:flex;flex-direction:column;gap:8px}
-.opt-row{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border:1px solid #E2E8F0;border-radius:7px;background:#FAFAFA;cursor:pointer}
-.opt-row.active{border-color:#1A202E;background:#fff}
-.opt-row .opt-radio{width:14px;height:14px;border:2px solid #CBD5E1;border-radius:50%;flex-shrink:0;margin-top:2px;background:#fff}
-.opt-row.active .opt-radio{border-color:#1A202E}
-.opt-row.active .opt-radio::after{content:'';display:block;width:6px;height:6px;background:#1A202E;border-radius:50%;margin:2px auto 0}
-.opt-text{flex:1;font-size:12px;color:#374151}
-.opt-text strong{display:block;color:#1E293B;font-size:13px;margin-bottom:2px}
-
-.danger-note{background:#FFFBEB;border:1px solid #FDE68A;border-left:3px solid #F59E0B;border-radius:6px;padding:9px 12px;font-size:11px;color:#78350F;margin-top:14px;line-height:1.5}
-.danger-note strong{color:#92400E}
-
-.cta-bar{padding:14px 18px;border-top:1px solid #E2E8F0;background:#F8FAFC;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:6px;padding:9px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
-.btn-primary{background:#1A202E;color:#fff}
-.btn-primary:hover{background:#2D3748}
-.btn-secondary{background:#fff;color:#374151;border:1px solid #CBD5E1}
-
-/* DIFF MODAL */
-.modal-overlay{background:rgba(15,23,42,.4);padding:32px;margin-top:18px;border-radius:12px;position:relative}
-.modal-overlay::before{content:'Modal preview · click "Preview &amp; Apply" in §A to see this';position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:10px;color:#fff;background:rgba(15,23,42,.6);padding:3px 10px;border-radius:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
-.modal{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 12px 40px rgba(15,23,42,.25);max-width:1100px;margin:0 auto}
-.modal-head{background:#F7F5FF;padding:18px 22px;border-bottom:1px solid #E9D5FF;display:flex;align-items:center;gap:12px}
-.modal-head .mh-icon{font-size:26px}
-.modal-head h3{font-size:17px;font-weight:700;color:#111827;flex:1}
-.modal-head .x{color:#94A3B8;font-size:18px}
-.modal-head .mh-sub{font-size:12px;color:#4b5563;display:block;margin-top:2px}
-
-.summary-strip{padding:14px 22px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;display:flex;gap:18px;flex-wrap:wrap;font-size:12px}
-.summary-strip .ss-stat{display:flex;flex-direction:column;gap:1px}
-.summary-strip .ss-num{font-size:18px;font-weight:700;color:#1E3A5F}
-.summary-strip .ss-num.add{color:#16A34A}
-.summary-strip .ss-num.rm{color:#DC2626}
-.summary-strip .ss-num.warn{color:#D97706}
-.summary-strip .ss-label{font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.4px;font-weight:700}
-
-.diff-table{width:100%;border-collapse:collapse;font-size:12px}
-.diff-table th{background:#F8FAFC;color:#374151;text-align:left;padding:10px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;border-bottom:1px solid #E2E8F0;position:sticky;top:0}
-.diff-table td{padding:10px 14px;border-bottom:1px solid #F1F5F9;vertical-align:top}
-.diff-table tr:hover td{background:#FAFAFA}
-.diff-table .co{font-weight:700;color:#1E3A5F;width:200px}
-.diff-table .co .co-meta{font-size:10px;color:#64748B;font-weight:500;margin-top:2px}
-.diff-table .changes{display:flex;flex-direction:column;gap:3px}
-.diff-table .change{display:flex;gap:6px;font-size:11px;line-height:1.45;align-items:center}
-.diff-table .change .sym{font-weight:700;width:14px;flex-shrink:0;text-align:center}
-.diff-table .change.add .sym{color:#16A34A}
-.diff-table .change.rm .sym{color:#DC2626}
-.diff-table .change.upd .sym{color:#D97706}
-.diff-table .change.skip .sym{color:#94A3B8}
-.diff-table .change.add .text{color:#166534}
-.diff-table .change.rm .text{color:#991B1B}
-.diff-table .change.upd .text{color:#92400E}
-.diff-table .change.skip .text{color:#64748B}
-.diff-table .change code{background:#F1F5F9;padding:1px 5px;border-radius:3px;font-size:10px}
-.diff-table .pair-status{display:inline-flex;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.2px}
-.ps-add{background:#DCFCE7;color:#166534}
-.ps-noop{background:#F1F5F9;color:#64748B}
-.ps-conflict{background:#FEF3C7;color:#92400E}
-.ps-overrides{background:#EFF6FF;color:#1E40AF}
-
-.audit-preview{padding:14px 22px;background:#F8FAFC;border-top:1px solid #E2E8F0;font-size:11px;color:#475569}
-.audit-preview .lbl{font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.4px;font-size:10px;margin-bottom:6px}
-.audit-preview pre{background:#fff;border:1px solid #E2E8F0;border-radius:6px;padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1E40AF;line-height:1.55;overflow-x:auto}
-
-.modal-footer{padding:14px 22px;border-top:1px solid #E2E8F0;background:#F8FAFC;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-
-.foot-nav{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:18px;border-top:1px solid #E2E8F0;font-size:12px;color:#64748B;flex-wrap:wrap;gap:8px}
-
-@media(max-width:1100px){.two-pane{grid-template-columns:1fr}}
+.divider{height:1px;background:#E2E8F0;margin:32px 0}
 </style>
 </head>
 <body>
 
 <nav class="topnav">
-  <span>← <a href="https://jfloyd-qredible.netlify.app/">All Mockups</a></span>
+  <a href="../">← All Tickets</a>
   <span class="sep">/</span>
-  <span class="current">Q-ScanAI · Bulk Apply Pair Template</span>
-  <span class="badge">SCAN-CFG · §4</span>
+  <span class="ticket-badge">QP-TBD</span>
+  <span class="sep">/</span>
+  <span class="title">Q-ScanAI Scanner Config — Bulk Apply</span>
 </nav>
 
-<div class="proto-banner">
-  <strong>Mockup — not production code.</strong>
-  <span>Reference: <code>scan-config-layered-resolution-2026-05-01</code></span>
-  <span style="color:#94A3B8">·</span>
-  <span>Operates on layer 2 (pair templates) but affects every linked company's resolved layer-4 config. Per-company overrides are preserved unless explicitly ticked.</span>
-</div>
-
 <div class="page">
-
-  <div class="page-title">Bulk Apply Industry-Pair Template</div>
-  <p class="page-sub">Roll a published pair-template version (or a brand-new pair) onto many companies at once. Critical safety properties: <strong>per-company overrides are preserved by default</strong>, conflicts are surfaced before commit, the diff preview is per-company, and the audit log captures every individual edit. Use for re-baselining, onboarding a portfolio, or migrating companies onto a newly-published version.</p>
-
-  <div class="layered-strip">
-    <span class="ls-title">Resolution chain · this screen mass-applies layer 2</span>
-    <span class="lay lay-global">1. Global default</span>
-    <span class="lay-arrow">›</span>
-    <span class="lay lay-pair active">2. Industry-pair template ←</span>
-    <span class="lay-arrow">›</span>
-    <span class="lay lay-signal">3. Product signals</span>
-    <span class="lay-arrow">›</span>
-    <span class="lay lay-override">4. Per-company override (preserved)</span>
+  <div class="page-header">
+    <h1>Apply tier config to many companies</h1>
+    <p>After saving an Industry Type or Type of Company tier config, push it to selected companies in one motion.</p>
   </div>
 
-  <!-- §A — TWO-PANE PICKER -->
+  <!-- ─────────── SECTION 1 — BULK APPLY ─────────── -->
   <div class="section">
-    <div class="section-title"><span class="section-num">§A</span>Pick targets · pick template</div>
-    <p class="section-sub">Left pane: company list with checkbox multi-select. Each row shows the company's current Industry pairs and the resolved-config summary so you can see what you're about to change. Right pane: pick which pair template to apply, plus the override-handling strategy.</p>
+    <div class="section-label">① Bulk apply flow</div>
+    <div class="section-title">Push a tier config to selected companies</div>
 
-    <div class="two-pane">
-
-      <!-- LEFT PANE -->
-      <div class="pane">
-        <div class="pane-head">
-          <span>Target companies · 4 of 67 selected</span>
-          <span class="pn-meta">Filtered: pair = Cannabis × Cultivator</span>
-        </div>
-        <div class="pane-body">
-          <div class="list-toolbar">
-            <div class="search-box">🔍 <input placeholder="Search 67 cannabis cultivators…" /></div>
-            <div class="filter-pill active">Cannabis × Cultivator <span style="background:#fff;border-radius:8px;padding:0 5px;color:#1E40AF">42</span></div>
-            <div class="filter-pill">Has overrides <span style="background:#fff;border-radius:8px;padding:0 5px;color:#475569">14</span></div>
-            <div class="filter-pill">Stale (&gt; 60d since last scan) <span style="background:#fff;border-radius:8px;padding:0 5px;color:#475569">8</span></div>
-          </div>
-
-          <div class="co-list">
-            <!-- HEADER -->
-            <div class="co-row" style="background:#FAFAFA;cursor:default;font-size:10px;text-transform:uppercase;color:#94A3B8;letter-spacing:.4px;font-weight:700;border-bottom:1px solid #E2E8F0">
-              <span class="cb indeterminate"></span>
-              <span>Company</span>
-              <span style="text-align:center">Resolved</span>
-              <span style="text-align:right">Overrides</span>
-            </div>
-
-            <div class="co-row selected">
-              <span class="cb checked"></span>
-              <span class="co-name">
-                <span class="nm">3rd Coast Blends, LLC</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span><span class="pair-tag hemp">Hemp × Manuf.</span></span>
-              </span>
-              <span class="co-current co-cur-on">28 / 47 ON</span>
-              <span class="co-overrides"><strong>3</strong> active<br><span style="color:#94A3B8">since 2026-04-22</span></span>
-            </div>
-
-            <div class="co-row selected">
-              <span class="cb checked"></span>
-              <span class="co-name">
-                <span class="nm">Bayou Greens Cooperative</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span></span>
-              </span>
-              <span class="co-current co-cur-on">26 / 47 ON</span>
-              <span class="co-overrides">0 active</span>
-            </div>
-
-            <div class="co-row selected">
-              <span class="cb checked"></span>
-              <span class="co-name">
-                <span class="nm">Sequoia Cultivars Co.</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span><span class="pair-tag mush">Mushroom × Cult.</span></span>
-              </span>
-              <span class="co-current co-cur-on">31 / 47 ON</span>
-              <span class="co-overrides"><strong>1</strong> active</span>
-            </div>
-
-            <div class="co-row selected">
-              <span class="cb checked"></span>
-              <span class="co-name">
-                <span class="nm">High Desert Farms</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span></span>
-              </span>
-              <span class="co-current co-cur-on">28 / 47 ON</span>
-              <span class="co-overrides">0 active</span>
-            </div>
-
-            <div class="co-row">
-              <span class="cb"></span>
-              <span class="co-name">
-                <span class="nm">Mile High Farm Direct</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span></span>
-              </span>
-              <span class="co-current co-cur-on">28 / 47 ON</span>
-              <span class="co-overrides">0 active</span>
-            </div>
-
-            <div class="co-row">
-              <span class="cb"></span>
-              <span class="co-name">
-                <span class="nm">Pacific Tide Genetics</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span></span>
-              </span>
-              <span class="co-current co-cur-on">28 / 47 ON</span>
-              <span class="co-overrides"><strong>2</strong> active</span>
-            </div>
-
-            <div class="co-row">
-              <span class="cb"></span>
-              <span class="co-name">
-                <span class="nm">Sonoran Sun Cultivation</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span></span>
-              </span>
-              <span class="co-current co-cur-on">28 / 47 ON</span>
-              <span class="co-overrides">0 active</span>
-            </div>
-
-            <div class="co-row">
-              <span class="cb"></span>
-              <span class="co-name">
-                <span class="nm">Verdant Valley Botanical</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span><span class="pair-tag hemp">Hemp × Manuf.</span></span>
-              </span>
-              <span class="co-current co-cur-on">29 / 47 ON</span>
-              <span class="co-overrides"><strong>4</strong> active</span>
-            </div>
-
-            <div class="co-row">
-              <span class="cb"></span>
-              <span class="co-name">
-                <span class="nm">Wildflower Co-op</span>
-                <span class="nm-pairs"><span class="pair-tag">Cannabis × Cultivator</span></span>
-              </span>
-              <span class="co-current co-cur-on">28 / 47 ON</span>
-              <span class="co-overrides">0 active</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="cta-bar">
-          <span style="font-size:12px;color:#475569"><strong>4 selected</strong> · 38 remaining matching filter</span>
-          <button class="btn btn-secondary">Select all 42</button>
-        </div>
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Apply Cannabis × Cultivator config to selected companies</h2>
+        <span class="close-btn">✕</span>
       </div>
 
-      <!-- RIGHT PANE -->
-      <div class="pane">
-        <div class="pane-head">
-          <span>Source template &amp; strategy</span>
-          <span class="pn-meta">Step 1 of 2 → Preview &amp; Apply</span>
+      <div class="modal-body">
+
+        <div class="scope-bar">
+          <span class="scope-label">Source tier:</span>
+          <span class="pill pill-green">Cannabis</span>
+          <span style="color:#94A3B8">×</span>
+          <span class="pill pill-orange">Cultivator</span>
+          <span style="flex:1"></span>
+          <span style="font-size:12px;color:#64748B">Saved 2 minutes ago</span>
         </div>
-        <div class="pane-body">
-          <div class="target-card">
 
-            <div class="field">
-              <label class="field-label">Apply this Industry-pair template</label>
-              <div class="select-wrap">
-                <select class="select">
-                  <option>Cannabis × Cultivator · v3.3 (draft) — most recent</option>
-                  <option>Cannabis × Cultivator · v3.2 (published)</option>
-                  <option>Cannabis × Cultivator · v3.1 (published)</option>
-                </select>
-              </div>
+        <div class="filter-row">
+          <input class="search-input" type="text" placeholder="Search companies by name…">
+          <div class="filter-dd">Industry Type: Cannabis <span class="dd-arrow">▼</span></div>
+          <div class="filter-dd">Type of Company: Cultivator <span class="dd-arrow">▼</span></div>
+        </div>
+
+        <div class="select-all-row">
+          <input type="checkbox" id="selall" checked>
+          <label for="selall">Select all matching (6 companies)</label>
+        </div>
+
+        <div class="company-list">
+
+          <div class="company-row">
+            <input type="checkbox" checked>
+            <span class="row-name">Green Thumb Holdings</span>
+            <div class="row-tags">
+              <span class="pill pill-green">Cannabis</span>
+              <span class="pill pill-orange">Cultivator</span>
             </div>
-
-            <div class="tmpl-card">
-              <div class="tc-pair">📋 Cannabis × Cultivator <span class="v">v3.3 draft</span></div>
-              <div style="font-size:11px;color:#374151;line-height:1.5;margin-bottom:6px">Differs from v3.2 by <strong>+3 ON, –1 OFF</strong>. Strain-list parsing tightened, license-xref now MRI-required, COA-age scalar drops from 365 → 180.</div>
-              <div class="tc-stats">
-                <div class="tc-stat"><strong>28 → 30</strong>compliance ON</div>
-                <div class="tc-stat"><strong>9 → 10</strong>analyst ON</div>
-                <div class="tc-stat"><strong>5 → 5</strong>kw sets</div>
-              </div>
-            </div>
-
-            <div class="field" style="margin-top:18px">
-              <label class="field-label">Override-handling strategy</label>
-              <div class="opts">
-
-                <div class="opt-row active">
-                  <span class="opt-radio"></span>
-                  <div class="opt-text">
-                    <strong>Preserve overrides (recommended)</strong>
-                    Per-company overrides win on every element they touch. Pair-template values apply only to elements the company hasn't overridden.
-                  </div>
-                </div>
-
-                <div class="opt-row">
-                  <span class="opt-radio"></span>
-                  <div class="opt-text">
-                    <strong>Reset overrides on changed elements</strong>
-                    Clear any per-company override that targets an element changed in this template version. Use when re-baselining after policy guidance.
-                  </div>
-                </div>
-
-                <div class="opt-row">
-                  <span class="opt-radio"></span>
-                  <div class="opt-text">
-                    <strong>Reset all overrides</strong>
-                    Wipe every override on every selected company. Returns each company to pure pair-template + product signals. Reversible from audit log within 30 days.
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <div class="danger-note">
-              <strong>Heads-up:</strong> 3 of 4 selected companies have <strong>7 total overrides</strong> active. Default strategy preserves all of them. Conflicts surface in the diff preview.
-            </div>
-
+            <span class="row-status status-will">✓ Will receive new baseline</span>
           </div>
+
+          <div class="company-row">
+            <input type="checkbox" checked>
+            <span class="row-name">Sun Valley Farms</span>
+            <div class="row-tags">
+              <span class="pill pill-green">Cannabis</span>
+              <span class="pill pill-orange">Cultivator</span>
+            </div>
+            <span class="row-status status-will">✓ Will receive new baseline</span>
+          </div>
+
+          <div class="company-row">
+            <input type="checkbox" checked>
+            <span class="row-name">High Plains Cultivation</span>
+            <div class="row-tags">
+              <span class="pill pill-green">Cannabis</span>
+              <span class="pill pill-orange">Cultivator</span>
+            </div>
+            <span class="row-status status-will">✓ Will receive new baseline</span>
+          </div>
+
+          <div class="company-row">
+            <input type="checkbox" checked>
+            <span class="row-name">Northern Leaf Co.</span>
+            <div class="row-tags">
+              <span class="pill pill-green">Cannabis</span>
+              <span class="pill pill-orange">Cultivator</span>
+            </div>
+            <span class="row-status status-will">✓ Will receive new baseline</span>
+          </div>
+
+          <div class="company-row skipped">
+            <input type="checkbox" checked>
+            <span class="row-name">Acme Cannabis Co</span>
+            <div class="row-tags">
+              <span class="pill pill-green">Cannabis</span>
+              <span class="pill pill-orange">Cultivator</span>
+              <span class="pill pill-blue">Has Company override</span>
+            </div>
+            <span class="row-status status-skip">⚠ Skipped — Company override saved</span>
+          </div>
+
+          <div class="company-row matches">
+            <input type="checkbox" checked>
+            <span class="row-name">Evergreen Botanicals</span>
+            <div class="row-tags">
+              <span class="pill pill-green">Cannabis</span>
+              <span class="pill pill-orange">Cultivator</span>
+            </div>
+            <span class="row-status status-match">ⓘ Already matches</span>
+          </div>
+
         </div>
 
-        <div class="cta-bar">
-          <button class="btn btn-secondary">Cancel</button>
-          <button class="btn btn-primary">Preview &amp; Apply →</button>
+        <div class="summary-line">
+          <strong>4 companies will be updated.</strong> 1 has a Company override and will be skipped. 1 already matches.
         </div>
+
+        <div class="opt-in">
+          <input type="checkbox" id="overwrite">
+          <label for="overwrite">
+            <strong>Also overwrite 1 existing Company override</strong> — opt-in. Off by default. Turning this on will replace the saved Company override on Acme Cannabis Co with the new Cultivator-tier baseline.
+          </label>
+        </div>
+
       </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Apply to 4 companies</button>
+      </div>
+    </div>
 
+    <div class="annotation green">
+      <strong>Safety:</strong> Bulk apply NEVER overwrites a Company override unless the operator explicitly opts in. The default is safe — Company overrides are always protected.
     </div>
   </div>
 
-  <!-- §B — DIFF MODAL -->
+  <div class="divider"></div>
+
+  <!-- ─────────── SECTION 2 — CONFIRMATION ─────────── -->
   <div class="section">
-    <div class="section-title"><span class="section-num">§B</span>Preview &amp; Apply · per-company diff</div>
-    <p class="section-sub">Before commit, surface what changes for each selected company individually. Conflicts (template wants ON, override says OFF) get a "🚫 Override wins" annotation so the analyst can see exactly what will or won't move. Apply commits all changes atomically — abort returns to the picker.</p>
+    <div class="section-label">② Confirmation</div>
+    <div class="section-title">After Apply runs</div>
 
-    <div class="modal-overlay">
-      <div class="modal">
+    <div class="confirm-wrap">
+      <div class="confirm-body">
+        <div class="confirm-icon">✓</div>
+        <div class="confirm-title">Applied Cannabis × Cultivator baseline</div>
+        <div class="confirm-text">
+          4 companies updated. 1 skipped because it had a Company override saved. <a href="#">View results</a>.
+        </div>
 
-        <div class="modal-head">
-          <span class="mh-icon">🧠</span>
-          <div style="flex:1">
-            <h3>Apply Cannabis × Cultivator v3.3 to 4 companies</h3>
-            <span class="mh-sub">Strategy: <strong>Preserve overrides</strong> · 18 changes total · 3 conflicts surface as no-ops · 0 destructive</span>
+        <div class="confirm-stats">
+          <div class="confirm-stat">
+            <div class="stat-num">4</div>
+            <div class="stat-label">Updated</div>
           </div>
-          <span class="x">✕</span>
-        </div>
-
-        <div class="summary-strip">
-          <div class="ss-stat"><span class="ss-num">4</span><span class="ss-label">Companies affected</span></div>
-          <div class="ss-stat"><span class="ss-num add">+15</span><span class="ss-label">Signals turning ON</span></div>
-          <div class="ss-stat"><span class="ss-num rm">−1</span><span class="ss-label">Signals turning OFF</span></div>
-          <div class="ss-stat"><span class="ss-num">2</span><span class="ss-label">Scalar updates</span></div>
-          <div class="ss-stat"><span class="ss-num warn">3</span><span class="ss-label">Conflicts (override wins)</span></div>
-          <div class="ss-stat"><span class="ss-num">+19 / −2</span><span class="ss-label">Keyword phrases</span></div>
-        </div>
-
-        <table class="diff-table">
-          <thead>
-            <tr>
-              <th>Company</th>
-              <th>Status</th>
-              <th>Diff</th>
-            </tr>
-          </thead>
-          <tbody>
-
-            <tr>
-              <td class="co">3rd Coast Blends, LLC<div class="co-meta">2 pairs · 3 overrides · last scan 04-29</div></td>
-              <td><span class="pair-status ps-overrides">3 OVERRIDES PRESERVED</span></td>
-              <td>
-                <div class="changes">
-                  <div class="change add"><span class="sym">+</span><span class="text">Strain / cultivar list parses cleanly <code>CANNABIS-CAT-STRAIN</code></span></div>
-                  <div class="change add"><span class="sym">+</span><span class="text">License # validated against state registry (analyst)</span></div>
-                  <div class="change upd"><span class="sym">±</span><span class="text">COA max age <code>365d</code> → <code>180d</code> · already overridden in this co. — <strong>no-op (override wins)</strong></span></div>
-                  <div class="change skip"><span class="sym">⊘</span><span class="text"><code>no_medical_claim_language</code> · override OFF preserved</span></div>
-                  <div class="change add"><span class="sym">+</span><span class="text">Watch keywords: <code>+19 phrases</code></span></div>
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="co">Bayou Greens Cooperative<div class="co-meta">1 pair · 0 overrides · last scan 04-26</div></td>
-              <td><span class="pair-status ps-add">CLEAN APPLY</span></td>
-              <td>
-                <div class="changes">
-                  <div class="change add"><span class="sym">+</span><span class="text">Strain / cultivar list parses cleanly</span></div>
-                  <div class="change add"><span class="sym">+</span><span class="text">License # validated against state registry</span></div>
-                  <div class="change upd"><span class="sym">±</span><span class="text">COA max age <code>365d</code> → <code>180d</code></span></div>
-                  <div class="change add"><span class="sym">+</span><span class="text">Watch keywords: <code>+19 phrases</code></span></div>
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="co">Sequoia Cultivars Co.<div class="co-meta">2 pairs (incl. Mushroom × Cult.) · 1 override · last scan 04-28</div></td>
-              <td><span class="pair-status ps-conflict">1 CONFLICT</span></td>
-              <td>
-                <div class="changes">
-                  <div class="change add"><span class="sym">+</span><span class="text">Strain / cultivar list parses cleanly</span></div>
-                  <div class="change add"><span class="sym">+</span><span class="text">License # validated against state registry</span></div>
-                  <div class="change skip"><span class="sym">⚠</span><span class="text">Watch keyword <code>delta-8</code> · already suppressed in override Allow-list — <strong>conflict surfaced for review</strong></span></div>
-                  <div class="change upd"><span class="sym">±</span><span class="text">COA max age <code>365d</code> → <code>180d</code></span></div>
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="co">High Desert Farms<div class="co-meta">1 pair · 0 overrides · last scan 04-30</div></td>
-              <td><span class="pair-status ps-add">CLEAN APPLY</span></td>
-              <td>
-                <div class="changes">
-                  <div class="change add"><span class="sym">+</span><span class="text">Strain / cultivar list parses cleanly</span></div>
-                  <div class="change add"><span class="sym">+</span><span class="text">License # validated against state registry</span></div>
-                  <div class="change upd"><span class="sym">±</span><span class="text">COA max age <code>365d</code> → <code>180d</code></span></div>
-                  <div class="change add"><span class="sym">+</span><span class="text">Watch keywords: <code>+19 phrases</code></span></div>
-                </div>
-              </td>
-            </tr>
-
-          </tbody>
-        </table>
-
-        <div class="audit-preview">
-          <div class="lbl">Audit log entry preview · written on Apply</div>
-<pre>2026-05-01 14:22:08  jane.miller@flexpay.com
-  bulk_apply_pair_template
-  pair: cannabis_cultivator  v3.2 → v3.3
-  strategy: preserve_overrides
-  affected_companies: [18472, 18519, 18601, 18733]
-  signals_added:    15  scalars_updated: 4  keywords_added: 76  keywords_removed: 8
-  overrides_preserved: 7    conflicts_surfaced: 3
-  rollback_token: bulk-apply-7c4a91…  (valid 30 days)</pre>
-        </div>
-
-        <div class="modal-footer">
-          <span style="font-size:12px;color:#475569">Atomic — applies to all 4 companies or none. Rollback token written to audit log.</span>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-secondary">← Back to picker</button>
-            <button class="btn btn-secondary">Export diff as CSV</button>
-            <button class="btn btn-primary">Apply to 4 companies →</button>
+          <div class="confirm-stat skip">
+            <div class="stat-num">1</div>
+            <div class="stat-label">Skipped</div>
+          </div>
+          <div class="confirm-stat">
+            <div class="stat-num">1</div>
+            <div class="stat-label">Already matched</div>
           </div>
         </div>
-
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">View results</button>
+        <button class="btn btn-primary">Done</button>
       </div>
     </div>
-  </div>
 
-  <div class="foot-nav">
-    <span>Prev: <a href="q-scanai-config-override.html"><strong>← Per-company resolved view + override</strong></a></span>
-    <span>Next: <a href="q-scanai-product-signals.html"><strong>Product-derived signal suggestions →</strong></a></span>
+    <div class="annotation blue">
+      Skipped companies retain their existing Company override. Operators can open them individually to review and decide whether to reset to the new inherited baseline.
+    </div>
   </div>
 
 </div>
-
 </body>
 </html>

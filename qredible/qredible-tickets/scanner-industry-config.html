@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q-ScanAI — Industry-Pair Scanner Configuration</title>
+<title>Q-ScanAI Scanner Config — Industry Type / Type of Company / Company</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -12,738 +12,434 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
 /* NAV */
 .topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8}
-.topnav a{color:#93C5FD}.topnav .sep{color:#475569}.topnav .ticket-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.topnav a{color:#93C5FD}.topnav .sep{color:#475569}
+.topnav .ticket-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
 .topnav .title{color:#fff;font-weight:600}
 
 /* PAGE */
 .page{max-width:960px;margin:0 auto;padding:32px 24px}
-.page-header{margin-bottom:32px}
+.page-header{margin-bottom:24px}
 .page-header h1{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
 .page-header p{color:#64748B;font-size:13px}
 
 /* SECTION */
-.section{margin-bottom:40px}
-.section-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.4px;text-transform:uppercase}
-.label-before{background:#FEF3C7;color:#92400E}
-.label-after{background:#DCFCE7;color:#166534}
-.label-lending{background:#DBEAFE;color:#1E40AF}
-.label-override{background:#EDE9FE;color:#4C1D95}
-.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:16px}
+.section{margin-bottom:36px}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.4px;text-transform:uppercase;background:#DBEAFE;color:#1E40AF}
+.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:14px}
 
 /* ANNOTATION */
 .annotation{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:14px;line-height:1.6}
 .annotation.green{background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D}
 .annotation.blue{background:#EFF6FF;border-color:#BFDBFE;border-left-color:#3B82F6;color:#1E40AF}
-.annotation.purple{background:#F5F3FF;border-color:#DDD6FE;border-left-color:#7C3AED;color:#3B0764}
 
-/* MODAL WRAPPER */
-.modal-wrap{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);overflow:hidden;border:1px solid #E2E8F0}
-
-/* MODAL HEADER */
+/* MODAL */
+.modal-wrap{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);overflow:hidden;border:1px solid #E2E8F0;margin-bottom:18px}
 .modal-header{background:#1E3A5F;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
 .modal-header h2{color:#fff;font-size:15px;font-weight:700}
 .modal-header .close-btn{color:#94A3B8;font-size:18px;cursor:pointer;line-height:1}
+.modal-body{padding:20px}
 
-/* COMPANY BAR */
-.company-bar{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.company-name{font-weight:700;color:#1E293B;font-size:14px}
+/* PILLS */
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px}
 .pill-green{background:#DCFCE7;color:#166534}
 .pill-blue{background:#DBEAFE;color:#1E40AF}
 .pill-orange{background:#FEF3C7;color:#92400E}
-.pill-info{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
-.pill-success{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
-.arrow-sep{color:#94A3B8;font-size:12px}
 
-/* MODAL BODY */
-.modal-body{padding:20px}
+/* TIER PICKER */
+.tier-picker{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:14px;margin-bottom:18px}
+.tier-pills{display:flex;gap:8px;margin-bottom:12px}
+.tier-pill{flex:1;text-align:center;padding:9px 14px;border-radius:6px;font-size:13px;font-weight:600;border:1px solid #CBD5E1;background:#fff;color:#1E293B;cursor:pointer}
+.tier-pill.active{background:#3B82F6;color:#fff;border-color:#3B82F6}
+.tier-dropdowns{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.tier-dd{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #CBD5E1;border-radius:6px;padding:6px 12px;font-size:13px;color:#1E293B}
+.tier-dd .dd-label{font-size:11px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.tier-dd .dd-value{font-weight:600}
+.tier-dd .dd-arrow{color:#94A3B8;font-size:11px;margin-left:4px}
+.tier-caption{font-size:12px;color:#64748B;line-height:1.5}
+.tier-caption strong{color:#1E3A5F}
 
-/* INDUSTRY PROFILE SELECTOR */
-.profile-selector{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 14px;margin-bottom:16px}
-.profile-selector-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.profile-selector-top select,.profile-select-mock{background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:600;color:#166534;font-family:'Plus Jakarta Sans',sans-serif;flex:1;display:flex;align-items:center;gap:6px}
-.profile-badge-row{font-size:11px;color:#16A34A;margin-bottom:6px}
-.profile-links{display:flex;gap:12px;font-size:12px}
-.profile-links a{color:#3B82F6}
-
-/* FORM ELEMENTS */
+/* FORM */
 .form-group{margin-bottom:14px}
 .form-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
-.form-input{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:8px 12px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:#1E293B;background:#fff;outline:none}
-.form-input:focus{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.12)}
-.form-textarea{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:8px 12px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:#1E293B;background:#fff;resize:none;height:60px;outline:none}
-.form-textarea:focus{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.12)}
 
 /* CHECKS GRID */
 .checks-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;margin-bottom:16px}
 .checks-col-header{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;padding:6px 0;border-bottom:1px solid #E2E8F0;margin-bottom:8px}
-.check-item{display:flex;align-items:flex-start;gap:8px;padding:5px 6px;border-radius:5px;margin-bottom:2px}
-.check-item.override-highlight{background:#EFF6FF;border:1px solid #BFDBFE}
+.check-item{display:flex;align-items:flex-start;gap:8px;padding:5px 6px;border-radius:5px}
 .check-item input[type=checkbox]{margin-top:2px;accent-color:#3B82F6;cursor:pointer;flex-shrink:0}
-.check-item input[type=checkbox]:disabled{accent-color:#94A3B8;cursor:not-allowed}
 .check-label{font-size:13px;color:#1E293B;flex:1}
-.check-label.muted{color:#94A3B8}
-.source-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;white-space:nowrap;flex-shrink:0}
-.src-industry{background:#F0FDF4;color:#166534}
-.src-universal{background:#EFF6FF;color:#1E40AF}
-.src-override{background:#DBEAFE;color:#1E40AF}
-.locked-icon{font-size:11px;color:#94A3B8}
 
 /* KEYWORD SETS */
-.keyword-sets{margin-bottom:14px}
-.keyword-sets-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block}
-.keyword-pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.kw-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:default}
+.kw-block{margin-bottom:14px}
+.kw-block-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block}
+.kw-pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.kw-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px}
 .kw-green{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
 .kw-blue{background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE}
-.kw-add{background:#fff;color:#3B82F6;border:1px dashed #3B82F6;cursor:pointer;font-size:12px}
-.kw-pill .kw-src{font-size:10px;opacity:.7}
+.kw-add{background:#fff;color:#3B82F6;border:1px dashed #3B82F6;cursor:pointer}
 
-/* MODAL FOOTER */
+/* COMPLIANCE ELEMENTS */
+.cel-group{margin-top:14px;border:1px solid #E2E8F0;border-radius:6px;overflow:hidden}
+.cel-group-header{background:#F8FAFC;padding:8px 12px;font-size:12px;font-weight:700;color:#1E3A5F;border-bottom:1px solid #E2E8F0}
+.cel-list{padding:8px 12px}
+.cel-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:#1E293B}
+.cel-item input[type=checkbox]{accent-color:#3B82F6}
+
+/* FOOTER */
 .modal-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;gap:10px;justify-content:flex-end}
-.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;transition:opacity .15s}
-.btn-primary{background:#3B82F6;color:#fff}.btn-primary:hover{opacity:.9}
-.btn-secondary{background:#fff;color:#1E293B;border:1px solid #CBD5E1}.btn-secondary:hover{background:#F8FAFC}
-.btn-danger{background:#fff;color:#DC2626;border:1px solid #FECACA}.btn-danger:hover{background:#FEF2F2}
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none}
+.btn-primary{background:#3B82F6;color:#fff}
+.btn-secondary{background:#fff;color:#1E293B;border:1px solid #CBD5E1}
 
-/* OVERRIDE BADGE */
-.override-badge-bar{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-size:12px;color:#1E40AF;font-weight:500}
-
-/* FLOW DIAGRAM */
-.flow-section{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px;margin-top:8px}
-.flow-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:16px;text-align:center}
+/* FLOW */
+.flow-section{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px}
+.flow-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:8px;text-align:center}
+.flow-sub{font-size:12px;color:#64748B;text-align:center;margin-bottom:18px}
 .flow-steps{display:flex;align-items:center;flex-wrap:wrap;gap:0;justify-content:center}
-.flow-step{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#1E3A5F;min-width:130px}
-.flow-step .step-num{font-size:10px;color:#94A3B8;font-weight:500;margin-bottom:2px}
-.flow-arrow{color:#3B82F6;font-size:18px;padding:0 6px;font-weight:700}
+.flow-step{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 16px;text-align:center;font-size:12px;font-weight:600;color:#1E3A5F;min-width:150px}
+.flow-step.tier-industry{background:#F0FDF4;border-color:#BBF7D0;color:#166534}
+.flow-step.tier-toc{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.flow-step.tier-company{background:#DBEAFE;border-color:#BFDBFE;color:#1E40AF}
+.flow-step .step-num{font-size:10px;font-weight:500;margin-bottom:2px;opacity:.7}
+.flow-arrow{color:#3B82F6;font-size:18px;padding:0 8px;font-weight:700}
 
-/* DIVIDER */
+/* RESOLVE BLOCK */
+.resolve-block{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:18px}
+.resolve-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:#1E293B;margin-bottom:6px}
+.resolve-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px}
+.resolve-tag.t-company{background:#DBEAFE;color:#1E40AF}
+.resolve-tag.t-toc{background:#FEF3C7;color:#92400E}
+.resolve-tag.t-industry{background:#DCFCE7;color:#166534}
+.resolve-tag.t-default{background:#F1F5F9;color:#475569}
+.resolve-arrow{color:#94A3B8;font-weight:700}
+
 .divider{height:1px;background:#E2E8F0;margin:32px 0}
-
-/* NEW TAG */
-.new-tag{background:#3B82F6;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.3px;vertical-align:middle;margin-left:4px}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="topnav">
-  <a href="https://jfloyd-qredible.netlify.app/">← All Mockups</a>
-  <span class="sep">/</span>
-  <span class="title">Q-ScanAI — Industry-Pair Scanner Configuration</span>
+  <a href="../">← All Tickets</a>
   <span class="sep">/</span>
   <span class="ticket-badge">QP-3649</span>
+  <span class="sep">/</span>
+  <span class="title">Q-ScanAI Scanner Config — Industry Type / Type of Company / Company</span>
 </nav>
 
-<!-- LAYERED SCAN-CONFIG CONTEXT BANNER -->
-<div style="background:#EFF6FF;border-bottom:3px solid #3B82F6;padding:14px 24px;font-size:13px;color:#1E3A5F;line-height:1.5">
-  <strong style="color:#1E3A5F">Layer 2 of the scan-config resolution chain —</strong>
-  This screen authors the <em>Industry Pair scan-config template</em> — what Q-ScanAI looks for on a website when a company has the <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">(Industry Type, Type of Company)</code> pair attached. Templates feed defaults into every linked company's resolved scan config (boolean union, keyword append-dedupe, scalar stricter-wins). Per-company overrides sit on top. Multi-pair assignment lives in <a href="multi-industry-type.html" style="color:#1E40AF;font-weight:600">QP-3646</a>. Resolution: 1. Global default → <strong>2. Industry-pair template (this screen)</strong> → 3. Product signals → 4. Per-company override. Reference: <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">scan-config-layered-resolution-2026-05-01</code>.
-</div>
-
-<!-- PAGE -->
 <div class="page">
   <div class="page-header">
-    <h1>Q-ScanAI — Industry-Pair Scanner Configuration</h1>
-    <p>Feature mockup: the Q-ScanAI Scanner Configuration modal, opened against an Industry Pair (e.g., Hemp / CBD × Retailer). Signals load from the pair template; analysts see exactly which checks are pair defaults, which are universal, and which are per-company overrides.</p>
+    <h1>Q-ScanAI Scanner Configuration</h1>
+    <p>Save the Q-ScanAI scanner config at three tiers. Most-specific tier wins.</p>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       SECTION 1 — BEFORE
-  ══════════════════════════════════════════ -->
+  <!-- SECTION 1 — How it resolves -->
   <div class="section">
-    <div class="section-label label-before">① Before — Manual Compliance Element Selection</div>
-    <div class="section-title">Current State: Operator picks which compliance elements apply, every scan
+    <div class="section-label">① How it resolves</div>
+    <div class="section-title">Lookup order at scan time</div>
 
-    <div class="modal-wrap">
-      <div class="modal-header">
-        <h2>Q-ScanAI — Acme Hemp Co.</h2>
-        <span class="close-btn">✕</span>
+    <div class="resolve-block">
+      <div class="resolve-row">
+        <span class="resolve-tag t-company">Company override</span>
+        <span class="resolve-arrow">→ falls back to →</span>
+        <span class="resolve-tag t-toc">Type of Company</span>
+        <span class="resolve-arrow">→ falls back to →</span>
+        <span class="resolve-tag t-industry">Industry Type</span>
+        <span class="resolve-arrow">→ falls back to →</span>
+        <span class="resolve-tag t-default">Existing per-company default</span>
       </div>
-      <div class="modal-body">
-
-        <div class="form-group">
-          <label class="form-label">Website URL</label>
-          <input class="form-input" type="text" value="https://acmehempco.com" readonly>
-        </div>
-
-        <div class="checks-grid">
-          <!-- LEFT: Compliance -->
-          <div>
-            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
-            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">FDA Disclaimer</span></div>
-            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Terms of Use</span></div>
-            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Privacy Policy</span></div>
-            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Return/Refund Policy</span></div>
-            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">Contact &amp; Business Info</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Age &amp; Access Controls</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Accepted Payment Methods</span></div>
-            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">SSL/TLS Security</span></div>
-          </div>
-          <!-- RIGHT: Analyst -->
-          <div>
-            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
-            <div class="check-item"><input type="checkbox" checked disabled><span class="check-label">THC Disclaimer</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Product Subscription Model</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Product/Service Match</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Price Points Match</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">Prohibited Products Search</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">No Hidden Fees</span></div>
-            <div class="check-item"><input type="checkbox" disabled><span class="check-label">GMP Certificate</span></div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Custom Keywords</label>
-          <textarea class="form-textarea" readonly>delta-8, delta-9, thc-o, hhc, synthetic cannabinoid</textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">White-List Keywords</label>
-          <textarea class="form-textarea" readonly>hemp-derived, federally legal, 0.3% THC</textarea>
-        </div>
-
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary">Save Configuration</button>
-        <button class="btn btn-primary">▶ Start AI Scan</button>
-      </div>
-    </div>
-
-    <div class="annotation">
-      <strong>Current state:</strong> Same checks shown for ALL companies regardless of industry. No industry-aware defaults. Manual checkbox selection every time — operator must know which checks apply to each industry type.
+      <p style="font-size:13px;color:#475569;margin-top:14px;line-height:1.6">
+        If a company has no override saved, the scanner config inherits from the Type of Company tier. If no Type of Company tier is saved, it inherits from the Industry Type tier. If nothing is saved at any tier, the existing per-company default applies — same as today.
+      </p>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════════════
-       SECTION 2 — AFTER (Hemp/CBD)
-  ══════════════════════════════════════════ -->
+  <!-- SECTION 2 — Set the config -->
   <div class="section">
-    <div class="section-label label-after">② After — Industry-Pair Scanner Configuration</div>
-    <div class="section-title">Hemp / CBD × Retailer — Signals Auto-Loaded From Pair Template</div>
+    <div class="section-label">② Set the config</div>
+    <div class="section-title">Three tier modes — pick where you're saving</div>
 
+    <!-- ── MODE A: INDUSTRY TYPE ── -->
     <div class="modal-wrap">
       <div class="modal-header">
-        <h2>Q-ScanAI — Industry-Pair Configuration</h2>
+        <h2>Q-ScanAI Scanner Configuration</h2>
         <span class="close-btn">✕</span>
       </div>
-
-      <!-- Company bar -->
-      <div class="company-bar">
-        <span class="company-name">3rd Coast Blends</span>
-        <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Industry: Hemp / CBD</span>
-        <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Type: Retailer</span>
-        <span style="flex:1"></span>
-        <span class="pill pill-success">✓ Pair template loaded</span>
-      </div>
-
       <div class="modal-body">
 
-        <!-- Active Industry Pair Selector -->
-        <div class="profile-selector">
-          <div class="profile-selector-top">
-            <span style="font-size:14px">📋</span>
-            <div class="profile-select-mock" style="background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#166534;flex:1">
-              Active Pair: Hemp / CBD × Retailer · v5.0 (published Apr 1, 2026) &nbsp;▾
+        <div class="tier-picker">
+          <div class="tier-pills">
+            <div class="tier-pill active">Industry Type</div>
+            <div class="tier-pill">Type of Company</div>
+            <div class="tier-pill">Company</div>
+          </div>
+          <div class="tier-dropdowns">
+            <div class="tier-dd">
+              <span class="dd-label">Industry Type</span>
+              <span class="dd-value">Cannabis</span>
+              <span class="dd-arrow">▼</span>
             </div>
-            <span class="new-tag">PAIR</span>
           </div>
-          <div class="profile-badge-row">✓ Loaded 42 scanner signals, 12 MRI checks, 159 keywords from pair_template.signals[]</div>
-          <div class="profile-links">
-            <a href="https://jfloyd-qredible.netlify.app/">↺ Revert to Pair Defaults</a>
-            <span style="color:#D1FAE5">|</span>
-            <a href="https://jfloyd-qredible.netlify.app/">⊕ Save as Per-Company Override</a>
-            <span style="color:#D1FAE5">|</span>
-            <a href="https://jfloyd-qredible.netlify.app/">📄 View Pair Template Spec</a>
+          <div class="tier-caption">
+            You're editing the <strong>Industry Type</strong> tier. Save here applies to <strong>all Cannabis-tagged companies that don't have a more specific config</strong>.
           </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Website URL</label>
-          <input class="form-input" type="text" value="https://3rdcoastblends.com" readonly>
         </div>
 
         <div class="checks-grid">
-          <!-- LEFT: Compliance -->
           <div>
-            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">FDA Disclaimer</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Terms of Use</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Privacy Policy</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Return/Refund Policy</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Contact &amp; Business Info</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">SSL/TLS Security <span class="locked-icon">🔒</span></span>
-              <span class="source-badge src-universal">🌐 Universal</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Age &amp; Access Controls</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Accepted Payment Methods</span>
-            </div>
+            <div class="checks-col-header">Scanner Checks</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Video Analysis</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Product Comparison</span></div>
+            <div class="check-item"><input type="checkbox"><span class="check-label">Auto-Create Product</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Address</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Phone</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Email</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Accepted Payment Methods</span></div>
           </div>
-          <!-- RIGHT: Analyst -->
           <div>
-            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">THC Disclaimer</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Prohibited Products Search</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Product Subscription Model</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Product/Service Match</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Price Points Match</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">No Hidden Fees</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">GMP Certificate for Supplements</span>
-            </div>
+            <div class="checks-col-header">Site Compliance</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Age &amp; Access Control</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Terms of Use</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Privacy Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Return / Refund Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">FDA Disclaimer</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Verify SSL Certificate</span></div>
           </div>
         </div>
 
-        <!-- Active Compliance Element Sets -->
-        <div class="keyword-sets">
-          <label class="keyword-sets-label">Active Compliance Element Sets <span class="new-tag">NEW</span></label>
-          <div class="keyword-pills">
-            <span class="kw-pill kw-green">CBD Health Claims — 137 keywords <span class="kw-src">📜</span></span>
-            <span class="kw-pill kw-green">THC Content Keywords — 22 keywords <span class="kw-src">📜</span></span>
-            <span class="kw-pill kw-add">+ Add Keyword Set</span>
+        <div class="kw-block">
+          <label class="kw-block-label">Custom Keywords</label>
+          <div class="kw-pills">
+            <span class="kw-pill kw-green">delta-8 ✕</span>
+            <span class="kw-pill kw-green">delta-9 ✕</span>
+            <span class="kw-pill kw-green">thc-o ✕</span>
+            <span class="kw-pill kw-green">hhc ✕</span>
+            <span class="kw-pill kw-add">+ Add keyword</span>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Custom Keywords</label>
-          <textarea class="form-textarea" readonly>delta-8, delta-9, thc-o, hhc, synthetic cannabinoid</textarea>
+        <div class="kw-block">
+          <label class="kw-block-label">Whitelist Keywords</label>
+          <div class="kw-pills">
+            <span class="kw-pill kw-blue">hemp-derived ✕</span>
+            <span class="kw-pill kw-blue">federally legal ✕</span>
+            <span class="kw-pill kw-blue">0.3% THC ✕</span>
+            <span class="kw-pill kw-add">+ Add whitelist</span>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">White-List Keywords</label>
-          <textarea class="form-textarea" readonly>hemp-derived, federally legal, 0.3% THC</textarea>
+
+        <div class="cel-group">
+          <div class="cel-group-header">Default Compliance Elements — Site Content</div>
+          <div class="cel-list">
+            <div class="cel-item"><input type="checkbox" checked> About Us page present</div>
+            <div class="cel-item"><input type="checkbox" checked> Contact page with form</div>
+            <div class="cel-item"><input type="checkbox"> COA document linked</div>
+          </div>
         </div>
 
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary">Save Configuration</button>
-        <button class="btn btn-primary">▶ Start AI Scan</button>
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Save Industry Type baseline</button>
       </div>
     </div>
 
     <div class="annotation green">
-      <strong>After:</strong> Signals loaded automatically from the Industry Pair template attached to the company. Analysts see which checks came from the pair template, which are universal, and which are per-company overrides. Source badges are traceable back to the exact pair-template version.
+      <strong>Saving at the Industry Type tier</strong> sets the baseline for every Cannabis-tagged company in the system. Companies without a more specific config inherit these checks at scan time.
     </div>
-  </div>
 
-  <div class="divider"></div>
+    <div class="divider"></div>
 
-  <!-- ══════════════════════════════════════════
-       SECTION 3 — TOBACCO / VAPE (different Industry Pair)
-  ══════════════════════════════════════════ -->
-  <div class="section">
-    <div class="section-label label-lending">③ Different Industry Pair — Tobacco / Vape × Retailer</div>
-    <div class="section-title">Tobacco / Vape × Retailer — Different Pair Template, Same Modal Shell</div>
-
+    <!-- ── MODE B: TYPE OF COMPANY ── -->
     <div class="modal-wrap">
       <div class="modal-header">
-        <h2>Q-ScanAI — Industry-Pair Configuration</h2>
+        <h2>Q-ScanAI Scanner Configuration</h2>
         <span class="close-btn">✕</span>
       </div>
-
-      <!-- Company bar -->
-      <div class="company-bar">
-        <span class="company-name">Lone Star Vape Co.</span>
-        <span class="arrow-sep">·</span>
-        <span class="pill pill-blue">Industry: Tobacco / Vape</span>
-        <span class="arrow-sep">·</span>
-        <span class="pill pill-blue">Type: Retailer</span>
-        <span style="flex:1"></span>
-        <span class="pill pill-info">✓ Pair template loaded</span>
-      </div>
-
       <div class="modal-body">
 
-        <!-- Active Industry Pair Selector -->
-        <div class="profile-selector" style="background:#EFF6FF;border-color:#BFDBFE">
-          <div class="profile-selector-top">
-            <span style="font-size:14px">📋</span>
-            <div class="profile-select-mock" style="background:#fff;border:1px solid #BFDBFE;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#1E40AF;flex:1">
-              Active Pair: Tobacco / Vape × Retailer · v3.0 (draft) &nbsp;▾
+        <div class="tier-picker">
+          <div class="tier-pills">
+            <div class="tier-pill">Industry Type</div>
+            <div class="tier-pill active">Type of Company</div>
+            <div class="tier-pill">Company</div>
+          </div>
+          <div class="tier-dropdowns">
+            <div class="tier-dd">
+              <span class="dd-label">Industry Type</span>
+              <span class="dd-value">Cannabis</span>
+              <span class="dd-arrow">▼</span>
+            </div>
+            <div class="tier-dd">
+              <span class="dd-label">Type of Company</span>
+              <span class="dd-value">Cultivator</span>
+              <span class="dd-arrow">▼</span>
             </div>
           </div>
-          <div class="profile-badge-row" style="color:#3B82F6">✓ Loaded 19 scanner signals, 7 MRI checks, 64 keywords from pair_template.signals[]</div>
-          <div class="profile-links">
-            <a href="https://jfloyd-qredible.netlify.app/">↺ Revert to Pair Defaults</a>
-            <span style="color:#BFDBFE">|</span>
-            <a href="https://jfloyd-qredible.netlify.app/">⊕ Save as Per-Company Override</a>
+          <div class="tier-caption">
+            You're editing the <strong>Type of Company</strong> tier. Save here applies to <strong>Cannabis Cultivators only</strong>, overriding the Cannabis baseline for those companies.
           </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Website URL</label>
-          <input class="form-input" type="text" value="https://lonestarvape.com" readonly>
         </div>
 
         <div class="checks-grid">
-          <!-- LEFT: Compliance -->
           <div>
-            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">21+ Age Gate (T21)</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Terms of Use</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Privacy Policy</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">SSL/TLS Security <span class="locked-icon">🔒</span></span>
-              <span class="source-badge src-universal">🌐 Universal</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Contact &amp; Business Info</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">FDA Disclaimer (CBD-style)</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Δ9-THC ≤ 0.3% notice</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">GMP Certificate</span>
-            </div>
+            <div class="checks-col-header">Scanner Checks</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Video Analysis</span></div>
+            <div class="check-item"><input type="checkbox"><span class="check-label">Product Comparison</span></div>
+            <div class="check-item"><input type="checkbox"><span class="check-label">Auto-Create Product</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Address</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Phone</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Email</span></div>
+            <div class="check-item"><input type="checkbox"><span class="check-label">Accepted Payment Methods</span></div>
           </div>
-          <!-- RIGHT: Analyst -->
           <div>
-            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">FDA-ENDS PMTA marketing-order letter on file</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">No flavor claims in restricted states</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Synthetic-nicotine notice present</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">State tobacco-license # surfaced</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">THC Disclaimer (cannabis)</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Strain / cultivar list parses</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">COA per batch</span>
-            </div>
+            <div class="checks-col-header">Site Compliance</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Age &amp; Access Control</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Terms of Use</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Privacy Policy</span></div>
+            <div class="check-item"><input type="checkbox"><span class="check-label">Return / Refund Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">FDA Disclaimer</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Verify SSL Certificate</span></div>
           </div>
         </div>
 
-        <!-- Active Compliance Element Sets -->
-        <div class="keyword-sets">
-          <label class="keyword-sets-label">Active Compliance Element Sets</label>
-          <div class="keyword-pills">
-            <span class="kw-pill kw-blue">FDA-ENDS Prohibited Claims — 38 keywords <span class="kw-src">📋</span></span>
-            <span class="kw-pill kw-blue">Synthetic-Nicotine Watch List — 14 keywords <span class="kw-src">📋</span></span>
-            <span class="kw-pill kw-blue">Restricted-Flavor State List — 12 keywords <span class="kw-src">📋</span></span>
-            <span class="kw-pill kw-add">+ Add Keyword Set</span>
+        <div class="kw-block">
+          <label class="kw-block-label">Custom Keywords</label>
+          <div class="kw-pills">
+            <span class="kw-pill kw-green">delta-8 ✕</span>
+            <span class="kw-pill kw-green">delta-9 ✕</span>
+            <span class="kw-pill kw-green">cultivar ✕</span>
+            <span class="kw-pill kw-green">grow ✕</span>
+            <span class="kw-pill kw-add">+ Add keyword</span>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Custom Keywords</label>
-          <textarea class="form-textarea" readonly></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">White-List Keywords</label>
-          <textarea class="form-textarea" readonly></textarea>
+        <div class="kw-block">
+          <label class="kw-block-label">Whitelist Keywords</label>
+          <div class="kw-pills">
+            <span class="kw-pill kw-blue">hemp-derived ✕</span>
+            <span class="kw-pill kw-blue">licensed cultivator ✕</span>
+            <span class="kw-pill kw-add">+ Add whitelist</span>
+          </div>
         </div>
 
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary">Save Configuration</button>
-        <button class="btn btn-primary">▶ Start AI Scan</button>
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Save Type of Company override</button>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Saving at the Type of Company tier</strong> overrides the Cannabis baseline for Cultivators only. Cannabis Retailers, Manufacturers, etc. continue to inherit from the Industry Type tier above.
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── MODE C: COMPANY ── -->
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Q-ScanAI Scanner Configuration</h2>
+        <span class="close-btn">✕</span>
+      </div>
+      <div class="modal-body">
+
+        <div class="tier-picker">
+          <div class="tier-pills">
+            <div class="tier-pill">Industry Type</div>
+            <div class="tier-pill">Type of Company</div>
+            <div class="tier-pill active">Company</div>
+          </div>
+          <div class="tier-dropdowns">
+            <div class="tier-dd">
+              <span class="dd-label">Company</span>
+              <span class="dd-value">Acme Cannabis Co</span>
+              <span class="dd-arrow">▼</span>
+            </div>
+          </div>
+          <div class="tier-caption">
+            You're editing the <strong>Company</strong> tier. Save here applies to <strong>Acme Cannabis Co only</strong>, overriding both the Cannabis baseline and any Cultivator-tier config for this single company.
+          </div>
+        </div>
+
+        <div class="checks-grid">
+          <div>
+            <div class="checks-col-header">Scanner Checks</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Video Analysis</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Product Comparison</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Auto-Create Product</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Address</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Phone</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Email</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Accepted Payment Methods</span></div>
+          </div>
+          <div>
+            <div class="checks-col-header">Site Compliance</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Age &amp; Access Control</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Terms of Use</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Privacy Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Return / Refund Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">FDA Disclaimer</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Verify SSL Certificate</span></div>
+          </div>
+        </div>
+
+        <div class="kw-block">
+          <label class="kw-block-label">Custom Keywords</label>
+          <div class="kw-pills">
+            <span class="kw-pill kw-green">delta-8 ✕</span>
+            <span class="kw-pill kw-green">delta-9 ✕</span>
+            <span class="kw-pill kw-green">acme-special-blend ✕</span>
+            <span class="kw-pill kw-add">+ Add keyword</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Save Company override</button>
       </div>
     </div>
 
     <div class="annotation blue">
-      <strong>Same modal, completely different configuration</strong> based on the Industry Pair. Tobacco / Vape × Retailer signals (T21, FDA-ENDS PMTA, synthetic-nicotine, restricted-state flavor) load from <code>tobacco-vape-retailer.signals[]</code> — hemp-specific signals (FDA Disclaimer, THC, GMP) aren't in this pair and don't appear. The same modal shell handles every Industry Pair without UI branching.
+      <strong>Saving at the Company tier</strong> overrides everything for Acme Cannabis Co. Other Cannabis Cultivators are unaffected.
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- ══════════════════════════════════════════
-       SECTION 4 — COMPANY OVERRIDE
-  ══════════════════════════════════════════ -->
+  <!-- SECTION 3 — Flow diagram -->
   <div class="section">
-    <div class="section-label label-override">④ Per-Company Override</div>
-    <div class="section-title">3rd Coast Blends — hemp-cbd-v3 with 2 Per-Company Overrides</div>
+    <div class="section-label">③ Flow</div>
+    <div class="section-title">Tier hierarchy</div>
 
-    <div class="modal-wrap">
-      <div class="modal-header">
-        <h2>Q-ScanAI — Industry-Pair Configuration</h2>
-        <span class="close-btn">✕</span>
-      </div>
-
-      <!-- Company bar -->
-      <div class="company-bar">
-        <span class="company-name">3rd Coast Blends</span>
-        <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Industry: Hemp / CBD</span>
-        <span class="arrow-sep">·</span>
-        <span class="pill pill-green">Type: Retailer</span>
-        <span style="flex:1"></span>
-        <span class="pill" style="background:#EDE9FE;color:#4C1D95;border:1px solid #DDD6FE">👤 2 overrides active</span>
-      </div>
-
-      <div class="modal-body">
-
-        <!-- Override badge bar -->
-        <div class="override-badge-bar">
-          <span>👤 <strong>2 per-company overrides</strong> active — these differ from the Hemp / CBD × Retailer pair template</span>
-          <button class="btn btn-danger" style="padding:4px 12px;font-size:12px">↺ Reset All to Pair Defaults</button>
+    <div class="flow-section">
+      <div class="flow-title">Three tiers — most-specific wins at scan time</div>
+      <div class="flow-sub">Save direction (left-to-right) builds the hierarchy. Lookup direction (right-to-left) is what the scanner does.</div>
+      <div class="flow-steps">
+        <div class="flow-step tier-industry">
+          <div class="step-num">TIER 1</div>
+          Industry Type<br>baseline
         </div>
-
-        <!-- Active Industry Pair Selector -->
-        <div class="profile-selector" style="background:#F5F3FF;border-color:#DDD6FE">
-          <div class="profile-selector-top">
-            <span style="font-size:14px">📋</span>
-            <div style="background:#fff;border:1px solid #DDD6FE;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600;color:#4C1D95;flex:1">
-              Active Pair: Hemp / CBD × Retailer · v5.0 (with 2 overrides) &nbsp;▾
-            </div>
-          </div>
-          <div class="profile-badge-row" style="color:#7C3AED">⚠ Per-company overrides are active — scan behavior differs from the published pair template</div>
-          <div class="profile-links">
-            <a href="q-scanai-config-override.html">↺ Reset to Pair Defaults</a>
-            <span style="color:#DDD6FE">|</span>
-            <a href="q-scanai-config-override.html">⊕ Save as Company Override</a>
-          </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step tier-toc">
+          <div class="step-num">TIER 2</div>
+          Type of Company<br>override
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Website URL</label>
-          <input class="form-input" type="text" value="https://3rdcoastblends.com" readonly>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step tier-company">
+          <div class="step-num">TIER 3</div>
+          Company<br>override
         </div>
-
-        <div class="checks-grid">
-          <!-- LEFT -->
-          <div>
-            <div class="checks-col-header">Compliance Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(automated)</span></div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">FDA Disclaimer</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Terms of Use</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Privacy Policy</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Return/Refund Policy</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Contact &amp; Business Info</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">SSL/TLS Security <span class="locked-icon">🔒</span></span>
-              <span class="source-badge src-universal">🌐 Universal</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Age &amp; Access Controls</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Accepted Payment Methods</span>
-            </div>
-          </div>
-          <!-- RIGHT -->
-          <div>
-            <div class="checks-col-header">Analyst Review Checks <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(manual)</span></div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">THC Disclaimer</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" checked disabled>
-              <span class="check-label">Prohibited Products Search</span>
-              <span class="source-badge src-industry">📋 Pair Template</span>
-            </div>
-            <!-- COMPANY OVERRIDES -->
-            <div class="check-item override-highlight">
-              <input type="checkbox" checked disabled>
-              <span class="check-label"><strong>GMP Certificate for Supplements</strong></span>
-              <span class="source-badge src-override">👤 Override</span>
-            </div>
-            <div class="check-item override-highlight">
-              <input type="checkbox" checked disabled>
-              <span class="check-label"><strong>Product Subscription Model</strong></span>
-              <span class="source-badge src-override">👤 Override</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Product/Service Match</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">Price Points Match</span>
-            </div>
-            <div class="check-item">
-              <input type="checkbox" disabled>
-              <span class="check-label muted">No Hidden Fees</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Active Compliance Element Sets -->
-        <div class="keyword-sets">
-          <label class="keyword-sets-label">Active Compliance Element Sets</label>
-          <div class="keyword-pills">
-            <span class="kw-pill kw-green">CBD Health Claims — 137 keywords <span class="kw-src">📜</span></span>
-            <span class="kw-pill kw-green">THC Content Keywords — 22 keywords <span class="kw-src">📜</span></span>
-            <span class="kw-pill" style="background:#EDE9FE;color:#4C1D95;border:1px solid #DDD6FE">Supplement Quality Claims — 18 keywords <span class="kw-src">👤</span></span>
-            <span class="kw-pill kw-add">+ Add Keyword Set</span>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Custom Keywords</label>
-          <textarea class="form-textarea" readonly>delta-8, delta-9, thc-o, hhc, synthetic cannabinoid</textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">White-List Keywords</label>
-          <textarea class="form-textarea" readonly>hemp-derived, federally legal, 0.3% THC</textarea>
-        </div>
-
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary">Save Configuration</button>
-        <button class="btn btn-primary">▶ Start AI Scan</button>
       </div>
     </div>
 
-    <div class="annotation purple">
-      <strong>Per-company overrides</strong> are the analyst's final say. The pair template provides the starting point — analysts can add, remove, or adjust signals per company. Overrides are preserved even when the pair template is published to a new version. The override always wins. <strong>Blue highlighted rows</strong> indicate signals that differ from the pair-template default. See <a href="q-scanai-config-override.html">per-company resolved view</a> for the full source-trace UI.
+    <div class="annotation green">
+      <strong>At scan time:</strong> Q-ScanAI looks for a Company override first. If none, it looks for a Type of Company override. If none, it falls back to the Industry Type baseline. If nothing is saved at any tier, the existing per-company default applies — same behavior as today.
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- ══════════════════════════════════════════
-       HOW IT WORKS FLOW
-  ══════════════════════════════════════════ -->
-  <div class="flow-section">
-    <div class="flow-title">How It Works</div>
-    <div class="flow-steps">
-      <div class="flow-step">
-        <div class="step-num">Step 1</div>
-        Industry pair(s)<br>assigned to company
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">
-        <div class="step-num">Step 2</div>
-        pair_template.signals[]<br>loaded as defaults
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">
-        <div class="step-num">Step 3</div>
-        Product signals<br>add additively
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">
-        <div class="step-num">Step 4</div>
-        Per-company override<br>wins where set
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">
-        <div class="step-num">Step 5</div>
-        Scan runs · pair version<br>stamped on result
-      </div>
-    </div>
-  </div>
-
-  <div style="height:40px"></div>
-</div><!-- /page -->
+</div>
 </body>
 </html>
