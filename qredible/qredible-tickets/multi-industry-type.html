@@ -3,739 +3,429 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QP-3646 — Multi-Industry Type Per Company</title>
+<title>QP-3646 — Multi-industry-type per company</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:#F0F4F8;color:#1E293B;font-size:14px;line-height:1.5}
-a{color:#3B82F6;text-decoration:none}
-a:hover{text-decoration:underline}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px;line-height:1.5}
+a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
 /* NAV */
-.topnav{background:#1E3A5F;padding:14px 32px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
-.topnav .breadcrumb{color:#93C5FD;font-size:13px}
-.topnav .breadcrumb span{color:#fff;font-weight:600}
-.topnav .badge{background:#3B82F6;color:#fff;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:.3px}
-.topnav .sep{color:#475569}
+.topnav{background:#1E3A5F;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8}
+.topnav a{color:#93C5FD}.topnav .sep{color:#475569}
+.topnav .ticket-badge{background:#3B82F6;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.topnav .title{color:#fff;font-weight:600}
 
 /* PAGE */
-.page{max-width:1200px;margin:0 auto;padding:28px 24px 60px}
-.page-title{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
-.page-sub{color:#64748B;font-size:13px;margin-bottom:32px}
+.page{max-width:960px;margin:0 auto;padding:32px 24px}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;color:#1E3A5F;margin-bottom:4px}
+.page-header p{color:#64748B;font-size:13px}
 
 /* SECTION */
-.section{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:28px;overflow:hidden}
-.section-header{background:#1E3A5F;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:10px}
-.section-header h2{font-size:14px;font-weight:600;letter-spacing:.2px}
-.section-num{background:#3B82F6;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:2px 7px;border-radius:4px}
-.section-body{padding:20px}
-
-/* SIDE BY SIDE */
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.col-before{border:2px solid #F59E0B;border-radius:8px;padding:16px}
-.col-after{border:2px solid #16A34A;border-radius:8px;padding:16px}
-.col-label{font-size:11px;font-weight:700;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.col-before .col-label{color:#D97706}
-.col-after .col-label{color:#16A34A}
-.col-label::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
-
-/* FORM ELEMENTS */
-.form-group{margin-bottom:12px}
-.form-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block}
-.form-select{width:100%;border:1px solid #CBD5E1;border-radius:6px;padding:7px 10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#1E293B;background:#F8FAFC;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-
-/* CHECKBOXES */
-.check-list{list-style:none}
-.check-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;cursor:default}
-.check-item .cb{width:16px;height:16px;border:2px solid #CBD5E1;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px}
-.check-item.checked .cb{background:#3B82F6;border-color:#3B82F6;color:#fff}
-.check-item.checked .cb::after{content:'✓'}
-
-/* CASCADED sub-types */
-.cascade-group{margin-left:24px;margin-top:4px;margin-bottom:8px;padding-left:12px;border-left:3px solid;border-radius:0}
-.cascade-group.hemp{border-color:#16A34A}
-.cascade-group.guns{border-color:#3B82F6}
-.cascade-group .sub-label{font-size:11px;font-weight:600;color:#64748B;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.sub-check{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:12px}
-.sub-check .cb{width:14px;height:14px;border:2px solid #CBD5E1;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px}
-.sub-check.checked .cb{background:#16A34A;border-color:#16A34A;color:#fff}
-.sub-check.checked .cb::after{content:'✓'}
-.cascade-group.guns .sub-check.checked .cb{background:#3B82F6;border-color:#3B82F6}
-
-/* PILLS */
-.pill-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 0}
-.pill{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500}
-.pill-gray{background:#E2E8F0;color:#475569}
-.pill-green{background:#DCFCE7;color:#16A34A;border:1px solid #BBF7D0}
-.pill-blue{background:#DBEAFE;color:#2563EB;border:1px solid #BFDBFE}
-.pill-green-dark{background:#16A34A;color:#fff}
-.pill-blue-dark{background:#2563EB;color:#fff}
-.pill-divider{width:1px;height:22px;background:#CBD5E1;margin:0 4px}
-.pill-group{display:flex;align-items:center;gap:5px}
-
-/* COMPANY ROW (pipeline) */
-.pipeline-row{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px}
-.company-name{font-size:13px;font-weight:600;color:#1E293B;min-width:160px}
-
-/* DETAIL PAGE */
-.detail-card{border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}
-.detail-header{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:14px 16px}
-.merchant-label{font-size:11px;font-weight:700;letter-spacing:.8px;color:#64748B;margin-bottom:4px}
-.merchant-value{font-size:15px;font-weight:700;color:#1E3A5F}
-.detail-body{padding:14px 16px}
-.detail-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.detail-row:last-child{margin-bottom:0}
-.manage-link{font-size:12px;color:#3B82F6;margin-left:8px}
-.type-groups{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.type-group{display:flex;align-items:center;gap:5px}
-.type-arrow{color:#94A3B8;font-size:12px}
-
-/* MODAL */
-.modal{border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1)}
-.modal-header{background:#1E3A5F;color:#fff;padding:12px 16px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
-.modal-close{color:#93C5FD;font-size:18px;cursor:default;line-height:1}
-.modal-body{padding:16px;background:#fff}
-.modal-section{margin-bottom:14px}
-.modal-section-label{font-size:11px;font-weight:700;color:#64748B;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
-.note-box{background:#FFF7ED;border:1px solid #FED7AA;border-radius:6px;padding:10px 12px;font-size:12px;color:#92400E;display:flex;gap:8px}
-.note-icon{flex-shrink:0;font-size:14px}
-.info-box{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:10px 12px;font-size:12px;color:#1D4ED8;display:flex;gap:8px}
-
-/* RTQ (Road to Qredibility) */
-.rtq-card{border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}
-.rtq-header{background:#1E3A5F;padding:14px 16px;color:#fff}
-.rtq-title{font-size:13px;font-weight:600;margin-bottom:2px}
-.rtq-company{font-size:11px;color:#93C5FD}
-.rtq-progress-wrap{padding:10px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0}
-.rtq-progress-bar{height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden;margin-bottom:4px}
-.rtq-progress-bar .fill{height:100%;background:#3B82F6;width:0%}
-.rtq-pct{font-size:11px;color:#64748B}
-.rtq-steps{display:flex;gap:0;border-bottom:1px solid #E2E8F0}
-.rtq-step{flex:1;padding:8px 12px;font-size:11px;font-weight:600;color:#94A3B8;border-right:1px solid #E2E8F0;text-align:center}
-.rtq-step:last-child{border-right:none}
-.rtq-step.active{color:#3B82F6;border-bottom:2px solid #3B82F6;margin-bottom:-1px;background:#EFF6FF}
-.rtq-body{padding:14px 16px}
-.rtq-section{border:1px solid #E2E8F0;border-radius:8px;margin-bottom:10px;overflow:hidden}
-.rtq-section-header{padding:9px 12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
-.rtq-section-header.hemp{background:#DCFCE7;color:#15803D}
-.rtq-section-header.guns{background:#DBEAFE;color:#1D4ED8}
-.rtq-section-header.shared{background:#F1F5F9;color:#475569}
-.rtq-section-body{padding:8px 12px}
-.rtq-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:#64748B}
-.rtq-item .x{color:#DC2626;font-size:14px;font-weight:700;line-height:1;width:14px;text-align:center}
-
-/* ADMIN TABLE */
-.admin-note{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:10px 14px;font-size:12px;color:#1D4ED8;margin-bottom:14px;display:flex;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead{background:#1E3A5F;color:#fff}
-thead th{padding:10px 12px;text-align:left;font-weight:600;font-size:11px;letter-spacing:.3px}
-tbody tr{border-bottom:1px solid #F1F5F9}
-tbody tr:hover{background:#F8FAFC}
-tbody td{padding:9px 12px;color:#374151}
-.badge-sm{display:inline-flex;align-items:center;gap:4px;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;border-radius:4px;padding:2px 7px;font-size:11px;font-family:'IBM Plex Mono',monospace}
-.badge-count{font-weight:600}
-.link-attrs{display:flex;gap:5px;flex-wrap:wrap}
-.action-btn{background:#EFF6FF;color:#3B82F6;border:1px solid #BFDBFE;border-radius:4px;padding:3px 8px;font-size:11px;cursor:default;font-family:'Plus Jakarta Sans',sans-serif}
-
-/* IMPACT TABLE */
-.impact-section{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
-.impact-header{background:#1E3A5F;color:#fff;padding:14px 20px;font-size:14px;font-weight:600}
-.impact-table-wrap{padding:0}
-.impact-table{width:100%;border-collapse:collapse;font-size:12px}
-.impact-table th{background:#F1F5F9;padding:10px 16px;text-align:left;font-weight:700;color:#374151;font-size:11px;letter-spacing:.5px;text-transform:uppercase;border-bottom:2px solid #E2E8F0}
-.impact-table td{padding:10px 16px;border-bottom:1px solid #F1F5F9;vertical-align:top}
-.impact-table td:first-child{font-weight:700;color:#1E3A5F;width:160px}
-.impact-table td.before{color:#92400E;background:#FFFBEB}
-.impact-table td.after{color:#14532D;background:#F0FDF4}
-.impact-table tr:hover td{filter:brightness(.98)}
+.section{margin-bottom:36px}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;letter-spacing:.4px;text-transform:uppercase;background:#DBEAFE;color:#1E40AF}
+.section-title{font-size:16px;font-weight:700;color:#1E3A5F;margin-bottom:14px}
 
 /* ANNOTATION */
-.annotation{background:#FFFBEB;border-left:3px solid #F59E0B;border-radius:0 6px 6px 0;padding:8px 12px;font-size:12px;color:#78350F;margin-top:10px}
+.annotation{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #F59E0B;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:14px;line-height:1.6}
+.annotation.green{background:#F0FDF4;border-color:#BBF7D0;border-left-color:#16A34A;color:#14532D}
+.annotation.blue{background:#EFF6FF;border-color:#BFDBFE;border-left-color:#3B82F6;color:#1E40AF}
 
-/* RESPONSIVE */
-@media(max-width:768px){.cols{grid-template-columns:1fr}}
+/* MODAL */
+.modal-wrap{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);overflow:hidden;border:1px solid #E2E8F0;margin-bottom:14px}
+.modal-header{background:#1E3A5F;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{color:#fff;font-size:15px;font-weight:700}
+.modal-header .close-btn{color:#94A3B8;font-size:18px;cursor:pointer;line-height:1}
+.modal-body{padding:20px}
+
+/* COMPANY BAR */
+.company-bar{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.company-name{font-weight:700;color:#1E293B;font-size:15px}
+.company-meta{font-size:12px;color:#64748B;margin-left:auto}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px}
+.pill-green{background:#DCFCE7;color:#166534}
+.pill-blue{background:#DBEAFE;color:#1E40AF}
+.pill-orange{background:#FEF3C7;color:#92400E}
+
+/* PAIR CHIP */
+.pair-chips{display:flex;flex-wrap:wrap;gap:8px;padding:6px 0}
+.pair-chip{display:inline-flex;align-items:center;gap:0;border-radius:20px;overflow:hidden;font-size:12px;font-weight:600;border:1px solid #E2E8F0;background:#fff}
+.pair-chip .pc-industry{padding:5px 10px 5px 12px;background:#DCFCE7;color:#166534}
+.pair-chip .pc-sep{padding:5px 4px;background:#F8FAFC;color:#94A3B8}
+.pair-chip .pc-toc{padding:5px 12px 5px 4px;background:#FEF3C7;color:#92400E}
+.pair-chip.is-blue .pc-industry{background:#DBEAFE;color:#1E40AF}
+.pair-chip.is-blue .pc-toc{background:#EFF6FF;color:#1E40AF}
+
+/* PROFILE GRID */
+.profile-grid{display:grid;grid-template-columns:160px 1fr;gap:14px 24px;font-size:13px;align-items:start}
+.profile-grid dt{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;padding-top:4px}
+.profile-grid dd{color:#1E293B}
+
+/* PAIR EDITOR ROW */
+.pair-editor{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.pair-row{display:flex;align-items:center;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px}
+.pair-handle{color:#94A3B8;font-size:14px;cursor:grab;user-select:none;flex-shrink:0;font-family:'IBM Plex Mono',monospace}
+.pair-num{font-size:11px;font-weight:700;color:#64748B;background:#fff;border:1px solid #E2E8F0;border-radius:4px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+.pair-dd{flex:1;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #CBD5E1;border-radius:6px;padding:7px 12px;font-size:13px;color:#1E293B;cursor:pointer;min-width:0}
+.pair-dd .dd-label{font-size:10px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.pair-dd .dd-value{font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pair-dd .dd-arrow{color:#94A3B8;font-size:11px;flex-shrink:0}
+.pair-remove{background:#fff;border:1px solid #CBD5E1;color:#94A3B8;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif}
+.pair-remove:hover{color:#DC2626;border-color:#FCA5A5}
+.pair-remove.disabled{opacity:.4;cursor:not-allowed}
+
+.kw-add{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:7px 14px;border-radius:20px;background:#fff;color:#3B82F6;border:1px dashed #3B82F6;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.kw-add:hover{background:#EFF6FF}
+
+.field-caption{font-size:12px;color:#64748B;margin-top:4px;line-height:1.5}
+
+/* FOOTER */
+.modal-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none}
+.btn-primary{background:#3B82F6;color:#fff}
+.btn-secondary{background:#fff;color:#1E293B;border:1px solid #CBD5E1}
+
+/* CODE BLOCK */
+.code-wrap{background:#0F172A;border-radius:8px;overflow:hidden;border:1px solid #1E293B;margin-bottom:10px}
+.code-head{background:#1E293B;padding:8px 14px;font-size:11px;font-weight:600;color:#94A3B8;font-family:'IBM Plex Mono',monospace;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.code-head .code-tag{background:#3B82F6;color:#fff;padding:1px 7px;border-radius:4px;font-size:10px}
+.code-body{padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E2E8F0;line-height:1.7;overflow-x:auto;white-space:pre}
+.code-body .c-comment{color:#64748B}
+.code-body .c-key{color:#93C5FD}
+.code-body .c-val{color:#FCD34D}
+.code-body .c-pipe{color:#94A3B8}
+
+/* AUDIT LOG */
+.audit-list{background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}
+.audit-row{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid #E2E8F0;font-size:13px}
+.audit-row:last-child{border-bottom:none}
+.audit-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px}
+.audit-icon.add{background:#DCFCE7;color:#166534}
+.audit-icon.remove{background:#FEE2E2;color:#991B1B}
+.audit-icon.reorder{background:#DBEAFE;color:#1E40AF}
+.audit-body{flex:1;min-width:0}
+.audit-line{color:#1E293B;margin-bottom:4px}
+.audit-line strong{color:#1E3A5F}
+.audit-meta{font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace}
+.audit-after{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.audit-after-label{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+
+/* DOWNSTREAM DIAGRAM */
+.flow-section{background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:24px}
+.flow-title{font-size:14px;font-weight:700;color:#1E3A5F;margin-bottom:8px;text-align:center}
+.flow-sub{font-size:12px;color:#64748B;text-align:center;margin-bottom:20px}
+.flow-body{display:flex;align-items:center;gap:16px;justify-content:center;flex-wrap:wrap}
+.flow-source{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px 18px;min-width:180px;text-align:center}
+.flow-source .src-title{font-size:13px;font-weight:700;color:#166534;margin-bottom:6px}
+.flow-source .src-pairs{display:flex;flex-direction:column;gap:4px;align-items:center}
+.flow-arrow-stack{display:flex;flex-direction:column;gap:6px;align-items:center}
+.flow-arrow-stack .fa{color:#3B82F6;font-size:16px;font-weight:700}
+.flow-targets{display:flex;flex-direction:column;gap:8px}
+.flow-target{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:9px 14px;font-size:12px;font-weight:600;color:#1E3A5F;min-width:200px;display:flex;align-items:center;gap:8px}
+.flow-target .ft-icon{font-family:'IBM Plex Mono',monospace;color:#3B82F6;font-size:11px}
+
+.divider{height:1px;background:#E2E8F0;margin:32px 0}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="topnav">
-  <span class="breadcrumb">← <a href="https://jfloyd-qredible.netlify.app/" style="color:#93C5FD">All Mockups</a></span>
+  <a href="../">← All Tickets</a>
   <span class="sep">/</span>
-  <span class="breadcrumb"><span>Multi-Industry Type Per Company</span></span>
-  <span class="badge">QP-3646</span>
+  <span class="ticket-badge">QP-3646</span>
+  <span class="sep">/</span>
+  <span class="title">Multi-industry-type per company</span>
 </nav>
 
-<!-- LAYERED SCAN-CONFIG CONTEXT BANNER -->
-<div style="background:#EFF6FF;border-bottom:3px solid #3B82F6;padding:14px 32px;font-size:13px;color:#1E3A5F;line-height:1.5">
-  <strong style="color:#1E3A5F">Prerequisite for the layered scan-config chain —</strong>
-  Today the data model only allows one <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">(Industry Type, Type of Company)</code> pair per company. This forces single-vertical assumptions across Q-ScanAI, MRI, and the questionnaire. This ticket replaces the single FK with an <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">industry_pair_ids[]</code> M:N. Each pair contributes its scan-config template independently — booleans union, keyword arrays append-deduped, scalars take the stricter value. The companion ticket <a href="scanner-industry-config.html" style="color:#1E40AF;font-weight:600">QP-3649 (scanner config editor)</a> defines what a single pair's template looks like. Reference: <code style="background:#DBEAFE;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px">scan-config-layered-resolution-2026-05-01</code>.
-</div>
-
 <div class="page">
-  <div class="page-title">Multi-Industry Type Per Company</div>
-  <div class="page-sub">A company can carry multiple <strong>(Industry Type, Type of Company)</strong> pairs simultaneously (e.g., a CBD retailer that also sells mushroom edibles, or a tobacco merchant who actually sells CBD + vape). Each pair contributes its scan config and questionnaire requirements independently — no silent merge into a single forced primary type. This unlocks the rest of the layered scan-config chain (templates → product signals → per-company override).</div>
+  <div class="page-header">
+    <h1>Multi-industry-type per company</h1>
+    <p>Assign multiple Industry Type / Type of Company pairs to a single company.</p>
+  </div>
 
-  <!-- SECTION 1 -->
+  <!-- ─────────── SECTION 1 — COMPANY PROFILE ─────────── -->
   <div class="section">
-    <div class="section-header">
-      <span class="section-num">§1</span>
-      <h2>Sign-Up / Onboarding Form</h2>
-    </div>
-    <div class="section-body">
-      <div class="cols">
-        <!-- BEFORE -->
-        <div class="col-before">
-          <div class="col-label">BEFORE</div>
-          <div class="form-group">
-            <label class="form-label">Select the primary nature of your business</label>
-            <select class="form-select" disabled>
-              <option>Hemp / CBD</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Type of Company</label>
-            <select class="form-select" disabled>
-              <option>Retailer</option>
-            </select>
-          </div>
-          <div class="annotation">Single dropdown pair — company locked to one industry + one type at registration.</div>
-        </div>
-        <!-- AFTER -->
-        <div class="col-after">
-          <div class="col-label">AFTER</div>
-          <div class="form-group">
-            <label class="form-label">Industry Types <span style="color:#DC2626">*</span></label>
-            <ul class="check-list">
-              <li class="check-item checked">
-                <span class="cb"></span> Hemp / CBD
-              </li>
-              <div class="cascade-group hemp">
-                <div class="sub-label">Type of Company — Hemp / CBD</div>
-                <div class="sub-check checked"><span class="cb"></span> Retailer</div>
-                <div class="sub-check"><span class="cb"></span> Cultivator</div>
-                <div class="sub-check"><span class="cb"></span> Distributor</div>
-                <div class="sub-check"><span class="cb"></span> Lab</div>
-                <div class="sub-check"><span class="cb"></span> Manufacturer</div>
-                <div class="sub-check"><span class="cb"></span> Processor</div>
-              </div>
-              <li class="check-item checked">
-                <span class="cb"></span> Guns and Ammunition
-              </li>
-              <div class="cascade-group guns">
-                <div class="sub-label">Types of Company — Guns and Ammunition</div>
-                <div class="sub-check checked"><span class="cb"></span> Retailer</div>
-                <div class="sub-check"><span class="cb"></span> Manufacturer</div>
-                <div class="sub-check"><span class="cb"></span> Distributor</div>
-              </div>
-              <li class="check-item"><span class="cb"></span> Cannabis / CBD</li>
-              <li class="check-item"><span class="cb"></span> ABCD</li>
-              <li class="check-item"><span class="cb"></span> Other</li>
-              <li class="check-item"><span class="cb"></span> On-Line Dating Industry</li>
-            </ul>
-          </div>
-          <div class="annotation">Selecting an Industry Type reveals its available Type-of-Company sub-options. Multiple Industry Types can be assigned per company. Each pair becomes a row in the <code>company_industry_pair</code> junction table.</div>
-        </div>
+    <div class="section-label">① Company Profile (read view)</div>
+    <div class="section-title">All assigned pairs surfaced as labeled chips</div>
+
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Company Profile</h2>
+        <span class="close-btn">✕</span>
       </div>
+
+      <div class="company-bar">
+        <span class="company-name">Green Valley Holdings</span>
+        <span class="company-meta">MID 4729118 · Onboarded Mar 14, 2026</span>
+      </div>
+
+      <div class="modal-body">
+        <dl class="profile-grid">
+          <dt>Legal Name</dt>
+          <dd>Green Valley Holdings, LLC</dd>
+
+          <dt>Industry Type Pairs</dt>
+          <dd>
+            <div class="pair-chips">
+              <span class="pair-chip">
+                <span class="pc-industry">Cannabis</span>
+                <span class="pc-sep">·</span>
+                <span class="pc-toc">Cultivator</span>
+              </span>
+              <span class="pair-chip">
+                <span class="pc-industry">Cannabis</span>
+                <span class="pc-sep">·</span>
+                <span class="pc-toc">Retailer</span>
+              </span>
+              <span class="pair-chip is-blue">
+                <span class="pc-industry">Hemp</span>
+                <span class="pc-sep">·</span>
+                <span class="pc-toc">Manufacturer</span>
+              </span>
+            </div>
+          </dd>
+
+          <dt>Primary Address</dt>
+          <dd>2840 Pine Ridge Rd, Boulder, CO 80301</dd>
+
+          <dt>Status</dt>
+          <dd><span class="pill pill-green">Active</span></dd>
+        </dl>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Close</button>
+        <button class="btn btn-primary">Edit company</button>
+      </div>
+    </div>
+
+    <div class="annotation green">
+      <strong>Existing single-pair companies migrate cleanly</strong> — every company keeps its current pair as the first (and only) entry in the list. No behavior change until a second pair is added.
     </div>
   </div>
 
-  <!-- SECTION 2 -->
+  <div class="divider"></div>
+
+  <!-- ─────────── SECTION 2 — COMPANY EDIT ─────────── -->
   <div class="section">
-    <div class="section-header">
-      <span class="section-num">§2</span>
-      <h2>WeMonitor Pipeline Pills</h2>
-    </div>
-    <div class="section-body">
-      <div class="cols">
-        <!-- BEFORE -->
-        <div class="col-before">
-          <div class="col-label">BEFORE</div>
-          <div class="pipeline-row">
-            <div class="company-name">Joe's CBD &amp; Guns</div>
-            <div class="pill-row">
-              <span class="pill pill-gray">TX</span>
-              <span class="pill pill-green">Hemp / CBD</span>
-              <span class="pill pill-green">Retailer</span>
+    <div class="section-label">② Company Edit (multi-pair selector)</div>
+    <div class="section-title">Add, remove, and reorder pairs — at least one required</div>
+
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <h2>Edit Company — Green Valley Holdings</h2>
+        <span class="close-btn">✕</span>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom:8px">
+          <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block">
+            Industry Type Pairs
+          </label>
+
+          <div class="pair-editor">
+            <div class="pair-row">
+              <span class="pair-handle">⋮⋮</span>
+              <span class="pair-num">1</span>
+              <div class="pair-dd">
+                <span class="dd-label">Industry Type</span>
+                <span class="dd-value">Cannabis</span>
+                <span class="dd-arrow">▼</span>
+              </div>
+              <div class="pair-dd">
+                <span class="dd-label">Type of Company</span>
+                <span class="dd-value">Cultivator</span>
+                <span class="dd-arrow">▼</span>
+              </div>
+              <button class="pair-remove" title="Remove pair">✕</button>
+            </div>
+
+            <div class="pair-row">
+              <span class="pair-handle">⋮⋮</span>
+              <span class="pair-num">2</span>
+              <div class="pair-dd">
+                <span class="dd-label">Industry Type</span>
+                <span class="dd-value">Cannabis</span>
+                <span class="dd-arrow">▼</span>
+              </div>
+              <div class="pair-dd">
+                <span class="dd-label">Type of Company</span>
+                <span class="dd-value">Retailer</span>
+                <span class="dd-arrow">▼</span>
+              </div>
+              <button class="pair-remove" title="Remove pair">✕</button>
+            </div>
+
+            <div class="pair-row">
+              <span class="pair-handle">⋮⋮</span>
+              <span class="pair-num">3</span>
+              <div class="pair-dd">
+                <span class="dd-label">Industry Type</span>
+                <span class="dd-value">Hemp</span>
+                <span class="dd-arrow">▼</span>
+              </div>
+              <div class="pair-dd">
+                <span class="dd-label">Type of Company</span>
+                <span class="dd-value">Manufacturer</span>
+                <span class="dd-arrow">▼</span>
+              </div>
+              <button class="pair-remove" title="Remove pair">✕</button>
             </div>
           </div>
-          <div class="annotation">Single pair. No visual distinction between location and industry data.</div>
-        </div>
-        <!-- AFTER -->
-        <div class="col-after">
-          <div class="col-label">AFTER</div>
-          <div class="pipeline-row">
-            <div class="company-name">Joe's CBD &amp; Guns</div>
-            <div class="pill-row">
-              <span class="pill pill-gray">TX</span>
-              <div class="pill-divider"></div>
-              <div class="pill-group">
-                <span class="pill pill-green">Hemp / CBD</span>
-                <span class="pill" style="background:#BBF7D0;color:#14532D;border:1px solid #86EFAC">Retailer</span>
-              </div>
-              <div class="pill-divider"></div>
-              <div class="pill-group">
-                <span class="pill pill-blue">Guns and Ammunition</span>
-                <span class="pill" style="background:#BFDBFE;color:#1E40AF;border:1px solid #93C5FD">Retailer</span>
-              </div>
-            </div>
-          </div>
-          <div class="annotation">Each Industry Type pair renders as a visually grouped unit. Dividers separate location and Industry pairs. Color-coded per Industry Type.</div>
+
+          <button class="kw-add">+ Add Industry Type pair</button>
+
+          <p class="field-caption">Drag the handle to reorder. At least one pair is required.</p>
         </div>
       </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Single-pair editing still works.</strong> Companies with one pair use the same control — the Add button is just unused. Removing the last remaining pair is blocked because at least one pair is required.
     </div>
   </div>
 
-  <!-- SECTION 3 -->
+  <div class="divider"></div>
+
+  <!-- ─────────── SECTION 3 — BULK UPLOAD FORMAT ─────────── -->
   <div class="section">
-    <div class="section-header">
-      <span class="section-num">§3</span>
-      <h2>Company Detail Page</h2>
-    </div>
-    <div class="section-body">
-      <div class="cols">
-        <!-- BEFORE -->
-        <div class="col-before">
-          <div class="col-label">BEFORE</div>
-          <div class="detail-card">
-            <div class="detail-header">
-              <div class="merchant-label">MERCHANT TYPE</div>
-              <div class="merchant-value">CBD / Retailer</div>
-            </div>
-            <div class="detail-body">
-              <div class="detail-row">
-                <span class="pill pill-gray">US</span>
-                <span class="pill pill-gray">Los Angeles, CA</span>
-                <span class="pill pill-green">Hemp / CBD</span>
-                <span class="pill" style="background:#BBF7D0;color:#14532D;border:1px solid #86EFAC">Retailer</span>
-              </div>
-            </div>
-          </div>
-          <div class="annotation">Single "MERCHANT TYPE" label limits display to one pair.</div>
-        </div>
-        <!-- AFTER -->
-        <div class="col-after">
-          <div class="col-label">AFTER</div>
-          <div class="detail-card">
-            <div class="detail-header">
-              <div class="merchant-label">MERCHANT TYPES</div>
-              <div class="type-groups" style="margin-top:6px">
-                <div class="type-group">
-                  <span class="pill pill-green">Hemp / CBD</span>
-                  <span class="type-arrow">→</span>
-                  <span class="pill" style="background:#BBF7D0;color:#14532D;border:1px solid #86EFAC">Retailer</span>
-                </div>
-                <div class="pill-divider" style="background:#3B5A8A"></div>
-                <div class="type-group">
-                  <span class="pill pill-blue">Guns and Ammunition</span>
-                  <span class="type-arrow">→</span>
-                  <span class="pill" style="background:#BFDBFE;color:#1E40AF;border:1px solid #93C5FD">Retailer</span>
-                </div>
-                <a href="https://jfloyd-qredible.netlify.app/" class="manage-link">✏️ Manage Types</a>
-              </div>
-            </div>
-            <div class="detail-body">
-              <div class="detail-row">
-                <span class="pill pill-gray">US</span>
-                <span class="pill pill-gray">Los Angeles, CA</span>
-              </div>
-            </div>
-          </div>
-          <div class="annotation">Label changes to plural "MERCHANT TYPES". Location pills separated from Industry pair pills. "✏️ Manage Types" opens the Industry Type + Type of Company assignment panel.</div>
-        </div>
+    <div class="section-label">③ Bulk upload format</div>
+    <div class="section-title">Multiple pairs per row — Westtown MID upload path</div>
+
+    <div class="code-wrap">
+      <div class="code-head">
+        <span>companies.csv — multi-pair format</span>
+        <span class="code-tag">NEW</span>
       </div>
+      <div class="code-body"><span class="c-comment"># pairs column accepts a pipe-separated list of "industry_type:type_of_company" entries</span>
+<span class="c-key">legal_name</span>,<span class="c-key">mid</span>,<span class="c-key">primary_address</span>,<span class="c-key">pairs</span>
+"Green Valley Holdings",4729118,"2840 Pine Ridge Rd, Boulder, CO","<span class="c-val">Cannabis:Cultivator</span><span class="c-pipe">|</span><span class="c-val">Cannabis:Retailer</span><span class="c-pipe">|</span><span class="c-val">Hemp:Manufacturer</span>"
+"Sunset Ridge Co",4729214,"118 Main St, Denver, CO","<span class="c-val">Cannabis:Retailer</span>"
+"Northern Leaf",4729309,"55 Birch Ln, Eugene, OR","<span class="c-val">Cannabis:Cultivator</span><span class="c-pipe">|</span><span class="c-val">Cannabis:Manufacturer</span>"</div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-head">
+        <span>companies.csv — single-pair (legacy) format still accepted</span>
+        <span class="code-tag" style="background:#64748B">LEGACY</span>
+      </div>
+      <div class="code-body"><span class="c-comment"># the old industry_type / type_of_company columns continue to work for single-pair rows</span>
+<span class="c-key">legal_name</span>,<span class="c-key">mid</span>,<span class="c-key">primary_address</span>,<span class="c-key">industry_type</span>,<span class="c-key">type_of_company</span>
+"Sunset Ridge Co",4729214,"118 Main St, Denver, CO",<span class="c-val">Cannabis</span>,<span class="c-val">Retailer</span></div>
+    </div>
+
+    <div class="annotation green">
+      <strong>Backward-compatible.</strong> Existing single-pair upload format continues to work. Westtown's current MID upload sheets keep functioning unchanged. Use the new <code style="font-family:'IBM Plex Mono',monospace;background:#fff;padding:1px 5px;border-radius:3px;border:1px solid #BBF7D0">pairs</code> column when you need more than one pair per row.
     </div>
   </div>
 
-  <!-- SECTION 4 -->
+  <div class="divider"></div>
+
+  <!-- ─────────── SECTION 4 — AUDIT LOG ─────────── -->
   <div class="section">
-    <div class="section-header">
-      <span class="section-num">§4</span>
-      <h2>Bulk Upload Companies</h2>
-    </div>
-    <div class="section-body">
-      <div class="cols">
-        <!-- BEFORE -->
-        <div class="col-before">
-          <div class="col-label">BEFORE</div>
-          <div class="modal">
-            <div class="modal-header">
-              Import Companies <span class="modal-close">×</span>
-            </div>
-            <div class="modal-body">
-              <div class="modal-section">
-                <div class="modal-section-label">Industry Type</div>
-                <select class="form-select" disabled style="margin-bottom:8px">
-                  <option>Other / Other</option>
-                </select>
-                <div style="font-size:11px;color:#64748B">All companies in this upload will be assigned this single Industry pair.</div>
-              </div>
-              <div style="border-top:1px solid #E2E8F0;padding-top:12px;margin-top:4px">
-                <div class="modal-section-label">Upload File</div>
-                <div style="border:2px dashed #CBD5E1;border-radius:6px;padding:16px;text-align:center;color:#94A3B8;font-size:12px">Drop CSV here or click to browse</div>
-              </div>
-            </div>
+    <div class="section-label">④ Audit log</div>
+    <div class="section-title">Every add, remove, and reorder is captured</div>
+
+    <div class="audit-list">
+
+      <div class="audit-row">
+        <div class="audit-icon add">+</div>
+        <div class="audit-body">
+          <div class="audit-line">
+            <strong>jane.ops@qredible.com</strong> added pair <strong>Hemp · Manufacturer</strong> to <strong>Green Valley Holdings</strong>
           </div>
-          <div class="annotation">Forces a single IT+ToC on all imported rows. No per-row override.</div>
-        </div>
-        <!-- AFTER -->
-        <div class="col-after">
-          <div class="col-label">AFTER</div>
-          <div class="modal">
-            <div class="modal-header">
-              Import Companies <span class="modal-close">×</span>
-            </div>
-            <div class="modal-body">
-              <div class="info-box" style="margin-bottom:14px">
-                <span class="note-icon">ℹ️</span>
-                <span>Industry pairs can be assigned <strong>per-row</strong> via column mapping, or set as a <strong>default</strong> below.</span>
-              </div>
-              <div class="modal-section">
-                <div class="modal-section-label">Default Industry Pair Assignment <span style="color:#94A3B8;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>
-                <ul class="check-list" style="margin-bottom:8px">
-                  <li class="check-item checked"><span class="cb"></span> Hemp / CBD</li>
-                  <div class="cascade-group hemp" style="margin-bottom:4px">
-                    <div class="sub-check checked"><span class="cb"></span> Retailer</div>
-                    <div class="sub-check"><span class="cb"></span> Cultivator</div>
-                  </div>
-                  <li class="check-item"><span class="cb"></span> Guns and Ammunition</li>
-                  <li class="check-item"><span class="cb"></span> Cannabis / CBD</li>
-                </ul>
-                <div style="font-size:11px;color:#64748B">⚙️ Override per-row in the column mapping step →</div>
-              </div>
-              <div style="border-top:1px solid #E2E8F0;padding-top:12px;margin-top:4px">
-                <div class="modal-section-label">Upload File</div>
-                <div style="border:2px dashed #CBD5E1;border-radius:6px;padding:16px;text-align:center;color:#94A3B8;font-size:12px">Drop CSV here or click to browse</div>
-              </div>
-            </div>
+          <div class="audit-meta">2026-05-02 14:22:08 UTC · audit_id 8a31f04c</div>
+          <div class="audit-after">
+            <span class="audit-after-label">After:</span>
+            <span class="pair-chip"><span class="pc-industry">Cannabis</span><span class="pc-sep">·</span><span class="pc-toc">Cultivator</span></span>
+            <span class="pair-chip"><span class="pc-industry">Cannabis</span><span class="pc-sep">·</span><span class="pc-toc">Retailer</span></span>
+            <span class="pair-chip is-blue"><span class="pc-industry">Hemp</span><span class="pc-sep">·</span><span class="pc-toc">Manufacturer</span></span>
           </div>
-          <div class="annotation">No forced global type. Default is optional and can be overridden per row. Multi-select with cascading types mirrors onboarding UX.</div>
         </div>
       </div>
+
+      <div class="audit-row">
+        <div class="audit-icon reorder">⇅</div>
+        <div class="audit-body">
+          <div class="audit-line">
+            <strong>marcus.cs@qredible.com</strong> reordered pairs on <strong>Green Valley Holdings</strong> — moved <strong>Cannabis · Retailer</strong> to position 2
+          </div>
+          <div class="audit-meta">2026-05-02 11:48:51 UTC · audit_id 8a2f1d22</div>
+          <div class="audit-after">
+            <span class="audit-after-label">After:</span>
+            <span class="pair-chip"><span class="pc-industry">Cannabis</span><span class="pc-sep">·</span><span class="pc-toc">Cultivator</span></span>
+            <span class="pair-chip"><span class="pc-industry">Cannabis</span><span class="pc-sep">·</span><span class="pc-toc">Retailer</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="audit-row">
+        <div class="audit-icon remove">−</div>
+        <div class="audit-body">
+          <div class="audit-line">
+            <strong>jane.ops@qredible.com</strong> removed pair <strong>Tobacco · Distributor</strong> from <strong>Green Valley Holdings</strong>
+          </div>
+          <div class="audit-meta">2026-04-29 09:14:33 UTC · audit_id 8a1c8b09</div>
+          <div class="audit-after">
+            <span class="audit-after-label">After:</span>
+            <span class="pair-chip"><span class="pc-industry">Cannabis</span><span class="pc-sep">·</span><span class="pc-toc">Cultivator</span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="annotation blue">
+      Each entry records <strong>who</strong>, <strong>when</strong>, the action, and the <strong>resulting pair list</strong>. Audit log is queryable per company and per actor.
     </div>
   </div>
 
-  <!-- SECTION 5 -->
+  <div class="divider"></div>
+
+  <!-- ─────────── SECTION 5 — DOWNSTREAM SURFACES ─────────── -->
   <div class="section">
-    <div class="section-header">
-      <span class="section-num">§5</span>
-      <h2>Road to Qredibility — Aggregated Questionnaire</h2>
-    </div>
-    <div class="section-body">
-      <div class="cols">
-        <!-- BEFORE -->
-        <div class="col-before">
-          <div class="col-label">BEFORE</div>
-          <div class="rtq-card">
-            <div class="rtq-header">
-              <div class="rtq-title">Road to Qredibility — 0%</div>
-              <div class="rtq-company">3rd Coast Blends</div>
-            </div>
-            <div class="rtq-progress-wrap">
-              <div class="rtq-progress-bar"><div class="fill"></div></div>
-              <div class="rtq-pct">0 of 6 requirements complete</div>
-            </div>
-            <div class="rtq-steps">
-              <div class="rtq-step" style="font-size:10px">Overview<br><span style="font-weight:400;color:#94A3B8">Basics · Contact · Mgmt · Entity</span></div>
-              <div class="rtq-step active" style="font-size:10px">Category Reqs<br><span style="font-weight:400">Licenses &amp; Certs</span></div>
-              <div class="rtq-step" style="font-size:10px">Submit</div>
-            </div>
-            <div class="rtq-body">
-              <div class="rtq-section">
-                <div class="rtq-section-header hemp">Hemp / CBD — Retailer</div>
-                <div class="rtq-section-body">
-                  <div class="rtq-item"><span class="x">✕</span> Licenses &amp; Certifications</div>
-                  <div class="rtq-item"><span class="x">✕</span> State Hemp License</div>
-                  <div class="rtq-item"><span class="x">✕</span> Business Insurance</div>
-                </div>
-              </div>
-            </div>
+    <div class="section-label">⑤ Downstream surfaces</div>
+    <div class="section-title">Every reader pulls the full pair list — no surface silently picks the first</div>
+
+    <div class="flow-section">
+      <div class="flow-title">One company → many pairs → many readers</div>
+      <div class="flow-sub">Reporting, dashboards, and Q-ScanAI scanner config all read the full list.</div>
+
+      <div class="flow-body">
+        <div class="flow-source">
+          <div class="src-title">Green Valley Holdings</div>
+          <div class="src-pairs">
+            <span class="pair-chip"><span class="pc-industry">Cannabis</span><span class="pc-sep">·</span><span class="pc-toc">Cultivator</span></span>
+            <span class="pair-chip"><span class="pc-industry">Cannabis</span><span class="pc-sep">·</span><span class="pc-toc">Retailer</span></span>
+            <span class="pair-chip is-blue"><span class="pc-industry">Hemp</span><span class="pc-sep">·</span><span class="pc-toc">Manufacturer</span></span>
           </div>
-          <div class="annotation">One IT+ToC pair = one questionnaire section. All companies of the same type see identical requirements.</div>
         </div>
-        <!-- AFTER -->
-        <div class="col-after">
-          <div class="col-label">AFTER</div>
-          <div class="rtq-card">
-            <div class="rtq-header">
-              <div class="rtq-title">Road to Qredibility — 0%</div>
-              <div class="rtq-company">Joe's CBD &amp; Guns</div>
-            </div>
-            <div class="rtq-progress-wrap">
-              <div class="rtq-progress-bar"><div class="fill"></div></div>
-              <div class="rtq-pct">0 of 10 requirements complete · 2 Industry pairs</div>
-            </div>
-            <div class="rtq-steps">
-              <div class="rtq-step" style="font-size:10px">Overview<br><span style="font-weight:400;color:#94A3B8">Basics · Contact · Mgmt · Entity</span></div>
-              <div class="rtq-step active" style="font-size:10px">Category Reqs<br><span style="font-weight:400">AGGREGATED</span></div>
-              <div class="rtq-step" style="font-size:10px">Submit</div>
-            </div>
-            <div class="rtq-body">
-              <div class="info-box" style="margin-bottom:10px;font-size:11px">
-                <span>ℹ️</span>
-                <span>Questions are aggregated across all your Industry pairs. Shared requirements appear once, not duplicated.</span>
-              </div>
-              <div class="rtq-section">
-                <div class="rtq-section-header hemp">🌿 Hemp / CBD — Retailer</div>
-                <div class="rtq-section-body">
-                  <div class="rtq-item"><span class="x">✕</span> Licenses &amp; Certifications</div>
-                  <div class="rtq-item"><span class="x">✕</span> State Hemp License</div>
-                  <div class="rtq-item"><span class="x">✕</span> COA Management Practices</div>
-                  <div class="rtq-item"><span class="x">✕</span> FDA Disclaimer Compliance</div>
-                </div>
-              </div>
-              <div class="rtq-section">
-                <div class="rtq-section-header guns">🔫 Guns and Ammunition — Retailer</div>
-                <div class="rtq-section-body">
-                  <div class="rtq-item"><span class="x">✕</span> Federal Firearms License (FFL)</div>
-                  <div class="rtq-item"><span class="x">✕</span> State Firearms Dealer Permit</div>
-                  <div class="rtq-item"><span class="x">✕</span> ATF Compliance Documentation</div>
-                  <div class="rtq-item"><span class="x">✕</span> Background Check Process</div>
-                </div>
-              </div>
-              <div class="rtq-section">
-                <div class="rtq-section-header shared">🔗 Shared Requirements</div>
-                <div class="rtq-section-body">
-                  <div class="rtq-item" style="color:#475569"><span style="color:#94A3B8;font-size:14px;width:14px;text-align:center">✕</span> Business Insurance</div>
-                  <div class="rtq-item" style="color:#475569"><span style="color:#94A3B8;font-size:14px;width:14px;text-align:center">✕</span> AML/KYC Policies</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="annotation">Category Requirements step now aggregates all IT+ToC sections. Shared questions deduplicated into one "Shared Requirements" block. Progress bar reflects total across all sections.</div>
+
+        <div class="flow-arrow-stack">
+          <span class="fa">→</span>
+          <span class="fa">→</span>
+          <span class="fa">→</span>
+          <span class="fa">→</span>
+        </div>
+
+        <div class="flow-targets">
+          <div class="flow-target"><span class="ft-icon">[01]</span> Reporting &amp; vertical breakdowns</div>
+          <div class="flow-target"><span class="ft-icon">[02]</span> Operator dashboards</div>
+          <div class="flow-target"><span class="ft-icon">[03]</span> Q-ScanAI scanner config (QP-3649)</div>
+          <div class="flow-target"><span class="ft-icon">[04]</span> Bulk apply target lists</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- SECTION 6 -->
-  
-  <!-- Configuration Flow Diagram -->
-  <div class="section">
-    <div class="section-header">
-      <span class="badge badge-blue">⚙ Architecture</span>
-      <h2>How Industry Pair Assignment Drives Configuration</h2>
-    </div>
-    <div class="section-body">
-      <p style="font-size:13px;color:#64748B;margin-bottom:16px;">Each Industry Type pair configures what Q-ScanAI looks for, what MRI checks run, and what regulatory attributes flow to products. MRI aggregates the results — it's not configured separately.</p>
-
-      <div style="display:flex;flex-direction:column;gap:0;align-items:center;margin-bottom:20px;">
-        <!-- Top: Industry Pair -->
-        <div style="padding:12px 20px;background:#1E3A5F;color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-align:center;min-width:300px;">
-          📋 Industry Pair<br/>
-          <span style="font-size:11px;font-weight:400;color:#93C5FD;">e.g., Hemp / CBD × Retailer</span>
-        </div>
-        <div style="font-size:20px;color:#CBD5E1;">↓</div>
-        
-        <!-- Config layer -->
-        <div style="display:flex;gap:12px;width:100%;max-width:700px;">
-          <div style="flex:1;padding:12px;background:#EFF6FF;border:2px solid #BFDBFE;border-radius:8px;text-align:center;">
-            <div style="font-size:13px;font-weight:700;color:#1D4ED8;">🔍 Scan Profile</div>
-            <div style="font-size:10px;color:#475569;margin-top:4px;">Compliance Checks<br/>Analyst Review Checks<br/>Compliance Elements (keywords)</div>
-            <div style="font-size:9px;color:#93C5FD;margin-top:4px;">CONFIGURABLE per pair</div>
-          </div>
-          <div style="flex:1;padding:12px;background:#F0FDF4;border:2px solid #BBF7D0;border-radius:8px;text-align:center;">
-            <div style="font-size:13px;font-weight:700;color:#166534;">🛡️ MRI Check Set</div>
-            <div style="font-size:10px;color:#475569;margin-top:4px;">Universal: OFAC, BBB, Google<br/>Pair-specific: FDA, NMLS, ATF, DEA<br/>License types to verify</div>
-            <div style="font-size:9px;color:#16A34A;margin-top:4px;">CONFIGURABLE per pair</div>
-          </div>
-          <div style="flex:1;padding:12px;background:#FEF3C7;border:2px solid #FDE68A;border-radius:8px;text-align:center;">
-            <div style="font-size:13px;font-weight:700;color:#92400E;">🏷️ Reg Attributes</div>
-            <div style="font-size:10px;color:#475569;margin-top:4px;">Auto-inherit to products<br/>COA field conditions<br/>Website finding triggers</div>
-            <div style="font-size:9px;color:#D97706;margin-top:4px;">CONFIGURABLE per pair</div>
-          </div>
-        </div>
-        
-        <div style="font-size:20px;color:#CBD5E1;">↓ results feed into</div>
-        
-        <!-- Output layer -->
-        <div style="display:flex;gap:12px;width:100%;max-width:700px;">
-          <div style="flex:1;padding:12px;background:#F1F5F9;border:2px solid #CBD5E1;border-radius:8px;text-align:center;">
-            <div style="font-size:13px;font-weight:700;color:#334155;">📊 Website Compliance</div>
-            <div style="font-size:10px;color:#64748B;margin-top:4px;">Scan findings column<br/>in Pipeline</div>
-          </div>
-          <div style="flex:1;padding:12px;background:#F1F5F9;border:2px solid #CBD5E1;border-radius:8px;text-align:center;">
-            <div style="font-size:13px;font-weight:700;color:#334155;">📦 Product Compliance</div>
-            <div style="font-size:10px;color:#64748B;margin-top:4px;">Attribute evaluation →<br/>compliance status</div>
-          </div>
-          <div style="flex:1;padding:12px;background:#DC2626;border:2px solid #991B1B;border-radius:8px;text-align:center;color:#fff;">
-            <div style="font-size:13px;font-weight:700;">🛡️ MRI Column</div>
-            <div style="font-size:10px;margin-top:4px;color:#FEE2E2;">READ-ONLY AGGREGATION<br/>Worst-case across all factors</div>
-          </div>
-        </div>
-      </div>
-      
-      <div style="padding:10px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:11px;color:#991B1B;">
-        ⚠️ <strong>Key distinction:</strong> MRI is NOT configured directly. You configure what <em>feeds into it</em> (scan profiles, MRI check sets, regulatory attributes). MRI displays the aggregated worst-case result. The MRI column/modal is a <em>dashboard</em>, not a configuration surface.
-      </div>
-    </div>
-  </div>
-
-<div class="section">
-    <div class="section-header">
-      <span class="section-num">§6</span>
-      <h2>Q-Audit Admin — Types of Company</h2>
-    </div>
-    <div class="section-body">
-      <div class="cols">
-        <!-- BEFORE -->
-        <div class="col-before">
-          <div class="col-label">BEFORE</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Industry Type</th>
-                <th>Type of Company</th>
-                <th>Description</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Hemp / CBD</td>
-                <td>Retailer</td>
-                <td>Retail hemp products</td>
-                <td><button class="action-btn">Edit</button></td>
-              </tr>
-              <tr>
-                <td>Cannabis / CBD</td>
-                <td>Retailer</td>
-                <td>Cannabis dispensary</td>
-                <td><button class="action-btn">Edit</button></td>
-              </tr>
-              <tr>
-                <td>Guns and Ammunition</td>
-                <td>Retailer</td>
-                <td>FFL dealer</td>
-                <td><button class="action-btn">Edit</button></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="annotation">Q-Audit admin pairs table — pre-rewrite: no visibility into what each pair drives (Q-ScanAI signals, MRI checks, questionnaire). No multi-assignment context.</div>
-        </div>
-        <!-- AFTER -->
-        <div class="col-after">
-          <div class="col-label">AFTER</div>
-          <div class="admin-note">
-            <span>ℹ️</span>
-            <span>Companies can now be assigned <strong>multiple pairs</strong> from this table. Each pair drives a scan profile, MRI profile, and questionnaire section.</span>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Industry Type</th>
-                <th>Type of Company</th>
-                <th>Description</th>
-                <th>Configuration Summary</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Hemp / CBD</td>
-                <td>Retailer</td>
-                <td>Retail hemp products</td>
-                <td>
-                  <div class="link-attrs">
-                    <span class="badge-sm"><span class="badge-count">3</span> Scan Defaults</span>
-                    <span class="badge-sm"><span class="badge-count">12</span> MRI</span>
-                    <span class="badge-sm"><span class="badge-count">8</span> Regs</span>
-                    <span class="badge-sm"><span class="badge-count">2</span> MCC</span>
-                  </div>
-                </td>
-                <td><button class="action-btn">Edit</button></td>
-              </tr>
-              <tr>
-                <td>Cannabis / CBD</td>
-                <td>Retailer</td>
-                <td>Cannabis dispensary</td>
-                <td>
-                  <div class="link-attrs">
-                    <span class="badge-sm"><span class="badge-count">2</span> Scan Defaults</span>
-                    <span class="badge-sm"><span class="badge-count">9</span> MRI</span>
-                    <span class="badge-sm"><span class="badge-count">6</span> Regs</span>
-                    <span class="badge-sm"><span class="badge-count">1</span> MCC</span>
-                  </div>
-                </td>
-                <td><button class="action-btn">Edit</button></td>
-              </tr>
-              <tr>
-                <td>Guns and Ammunition</td>
-                <td>Retailer</td>
-                <td>FFL dealer</td>
-                <td>
-                  <div class="link-attrs">
-                    <span class="badge-sm"><span class="badge-count">4</span> Scan Defaults</span>
-                    <span class="badge-sm"><span class="badge-count">15</span> MRI</span>
-                    <span class="badge-sm"><span class="badge-count">11</span> Regs</span>
-                    <span class="badge-sm"><span class="badge-count">3</span> MCC</span>
-                  </div>
-                </td>
-                <td><button class="action-btn">Edit</button></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="annotation">Pairs table unchanged in shape — still the source of truth for which Industry × Type combinations exist. "Configuration Summary" column gives admins visibility into each pair's downstream connections (scan templates, MRI checks, regulatory attributes, MCC codes).</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- IMPACT SUMMARY -->
-  <div class="impact-section">
-    <div class="impact-header">📊 Impact Summary — What Changes at Each Layer</div>
-    <div class="impact-table-wrap">
-      <table class="impact-table">
-        <thead>
-          <tr>
-            <th>Layer</th>
-            <th>Before</th>
-            <th>After</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Data Model</td>
-            <td class="before">Single <code>pl_business_type_id</code> FK on <code>pl_company</code></td>
-            <td class="after">Junction table <code>company_industry_pair</code> — many Industry × Type pairs per company, one flagged primary</td>
-          </tr>
-          <tr>
-            <td>Sign-Up</td>
-            <td class="before">Single-select dropdowns — one Industry pair at registration</td>
-            <td class="after">Multi-select Industry Type with cascading Type of Company per checked Industry</td>
-          </tr>
-          <tr>
-            <td>Pipeline</td>
-            <td class="before">One Industry pair shown as flat pills</td>
-            <td class="after">Multiple Industry pairs, visually grouped with dividers + color-coded per Industry Type</td>
-          </tr>
-          <tr>
-            <td>Company Page</td>
-            <td class="before">Single "MERCHANT TYPE" header label</td>
-            <td class="after">Plural "MERCHANT TYPES" with grouped pills + Manage Types link</td>
-          </tr>
-          <tr>
-            <td>Bulk Upload</td>
-            <td class="before">Forced single Industry pair for all rows in import</td>
-            <td class="after">Optional default Industry pair set + per-row override in column mapping step</td>
-          </tr>
-          <tr>
-            <td>Road to Qredibility</td>
-            <td class="before">Single questionnaire from one Industry pair</td>
-            <td class="after">Aggregated questionnaire from all Industry pairs — shared Qs deduplicated</td>
-          </tr>
-          <tr>
-            <td>Q-ScanAI Scan Config</td>
-            <td class="before">One pair's signal set per company</td>
-            <td class="after">Union of all assigned pair templates · booleans union · keywords append-deduped · scalars take stricter value (see <a href="scanner-industry-config.html">QP-3649</a>)</td>
-          </tr>
-          <tr>
-            <td>MRI Profile</td>
-            <td class="before">One Industry check set per company</td>
-            <td class="after">Union of MRI check sets from all assigned Industry pairs</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="annotation">
+      <strong>No surface silently picks the first pair.</strong> Anywhere the platform reads Industry Type today is updated to read the full list. If a downstream surface needs a single pair for display (e.g. a dense table), it shows "<em>+2 more</em>" rather than hiding the additional pairs.
     </div>
   </div>
 
