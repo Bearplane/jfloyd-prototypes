@@ -136,27 +136,37 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 <body>
 <nav class="proto-nav">
   <a href="../index.html" style="white-space:nowrap;">← All Mockups</a>
-  <div class="proto-center">Case-First UX Exploration · 1 / 4 — Entry Points</div>
+  <div class="proto-center">Case-First UX · v1 — Entry Points</div>
   <div class="proto-right" style="display:flex;align-items:center;gap:10px;">
+    <span style="background:#1A202E;color:white;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.04em;">v1 CUT</span>
     <span class="proto-pill">EXPLORATION</span>
     <a href="compliance-case-blank-canvas.html" style="background:#1E3A5F;color:#CBD5E1;border:1px solid #334155;border-radius:5px;padding:4px 10px;font-size:12px;text-decoration:none;">Next: Blank Canvas →</a>
   </div>
 </nav>
 
+<!-- v1 cut explainer -->
+<div style="background:#FFFBEB;border-bottom:2px solid #FDE68A;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="background:#1A202E;color:white;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">v1 CUT</span>
+    <span style="color:#78350F;font-weight:500;">Joseph's scope: ship empty-draft-create + 2 deep-links to existing item-add flows. <strong>No in-case picker, no multi-merchant cases.</strong></span>
+  </div>
+  <span style="font-size:11px;color:#6B7280;">In-case picker UX deferred until user feedback informs the design.</span>
+</div>
+
 <div class="page">
 
   <div class="intro">
     <h1>Where does <span style="color:#16a34a;">+ New Case</span> live?</h1>
-    <p class="lede">Today, every compliance case is born from items: an analyst selects products / findings, then clicks <em>"Add to case."</em> This exploration flips that — start from a blank case, then target violative findings across the merchant. To make that flow viable, the <strong>+ New Case</strong> CTA must be visible from anywhere a case might be conceived. This page maps the four entry points.</p>
+    <p class="lede">Today, every compliance case is born from items: an analyst selects products / findings, then clicks <em>"Add to case."</em> This v1 cut adds the inverse — start from a blank case for one merchant, then jump back into the existing tabs to attach items. The <strong>+ New Case</strong> CTA needs to be visible anywhere a case might be conceived. This page maps the three v1 entry points.</p>
     <div class="meta">
       <span class="meta-pill">Item-first ↔ Case-first</span>
-      <span class="meta-pill amber">Pre-ticket exploration</span>
+      <span class="meta-pill amber">v1 cut · single-merchant</span>
       <span class="meta-pill green">Visual lang: compliance-portal-v2</span>
       <span class="meta-pill gray">Companion: QP-3583 / QP-3584</span>
     </div>
   </div>
 
-  <div class="section-h">Four entry points · highlighted in red</div>
+  <div class="section-h">Three v1 entry points · highlighted in red</div>
 
   <div class="tile-grid">
 
@@ -279,7 +289,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
       </div>
       <div class="tile-caption">
         <div class="tile-caption-h">Why here</div>
-        <div class="tile-caption-b">The richest context: an analyst is already inside the merchant's profile and can see violative product / finding counts in the overview cards. Clicking "+ New Case for this Merchant" pre-fills <code>merchantId</code> and the targeting picker auto-scopes to this merchant's data.</div>
+        <div class="tile-caption-b">The richest context: an analyst is already inside the merchant's profile and can see violative product / finding counts in the overview cards. Clicking "+ New Case for this Merchant" pre-fills <code>merchantId</code> on a fresh DRAFT — the analyst then deep-links to Product Compliance or Q-ScanAI to attach items.</div>
       </div>
     </div>
 
@@ -353,51 +363,28 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
       </div>
     </div>
 
-    <!-- ──────────────── 4. BULK ACTION BAR ──────────────── -->
-    <div class="tile">
-      <div class="tile-head">
-        <div class="tile-num">4</div>
-        <div class="tile-title">Bulk action bar · multi-merchant case</div>
-        <div class="tile-sub">Power entry · sweep multiple merchants</div>
+    <!-- ──────────────── 4. DEFERRED TO V2 ──────────────── -->
+    <div class="tile" style="background:#F8FAFC;border-style:dashed;">
+      <div class="tile-head" style="background:#F1F5F9;">
+        <div class="tile-num" style="background:#475569;">4</div>
+        <div class="tile-title" style="color:#475569;">Bulk multi-merchant — <em>deferred</em></div>
+        <div class="tile-sub" style="color:#94A3B8;">Not in v1 · Joseph's call</div>
       </div>
-      <div class="tile-body faux">
-        <div class="faux-top">
-          <span class="faux-brand">Qredibility</span>
-          <div class="faux-nav">
-            <span class="active">Q-Monitor</span><span>Report</span><span>Q-Vault ▾</span><span>MyCOA</span>
+      <div class="tile-body" style="background:#FAFBFC;padding:24px 22px;">
+        <div style="text-align:center;padding:28px 14px 24px 14px;">
+          <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:white;border:1px solid #E5E7EB;font-size:22px;margin-bottom:14px;">⏸</div>
+          <div style="font-size:14px;font-weight:700;color:#1A202E;margin-bottom:6px;">No multi-merchant cases in v1</div>
+          <div style="font-size:12px;color:#475569;line-height:1.6;max-width:380px;margin:0 auto 18px auto;">
+            Each compliance case targets <strong>one merchant</strong>. The bulk action bar's "Create Case (N merchants)" pattern from QP-3583 Phase 2 isn't part of this scope — single-merchant only.
+          </div>
+          <div style="font-size:11px;color:#6B7280;background:white;border:1px solid #E5E7EB;border-radius:8px;padding:10px 14px;text-align:left;max-width:420px;margin:0 auto;line-height:1.55;">
+            <strong style="color:#1A202E;">If a sweep is needed:</strong> the analyst opens the Cases tab, files three single-merchant cases (one per merchant) using entry points 1–3. v2 may revisit batched creation pending real-world feedback.
           </div>
         </div>
-        <div class="faux-tabs">
-          <span class="faux-tab">Pipeline</span>
-          <span class="faux-tab">Findings</span>
-          <span class="faux-tab">Product Compliance</span>
-          <span class="faux-tab active">We Monitor</span>
-          <span class="faux-tab">Documents</span>
-        </div>
-        <div class="faux-page">
-          <div class="faux-bulk">
-            <span style="font-weight:600;flex:1;">3 merchants selected</span>
-            <div class="spotlight">
-              <span class="spotlight-tag">CTA #4</span>
-              <button class="cta-new-case" style="padding:5px 10px;font-size:11px;"><span class="plus">+</span> New Cases (3)</button>
-            </div>
-            <button style="background:white;border:1px solid #E5E7EB;color:#374151;padding:5px 10px;font-size:11px;border-radius:5px;">Send All Drafts</button>
-            <span class="muted" style="font-size:11px;">Clear ✕</span>
-          </div>
-          <table class="faux-table">
-            <thead><tr><th style="width:24px;">☐</th><th>Legal Name</th><th>License</th><th>Findings</th><th>Cases</th></tr></thead>
-            <tbody>
-              <tr class="active"><td>☑</td><td><strong>AG Living Solutions</strong></td><td><span class="pill pill-green">Active</span></td><td>31</td><td><span class="muted">—</span></td></tr>
-              <tr class="active"><td>☑</td><td><strong>Black Bear Wellness</strong></td><td><span class="pill pill-green">Active</span></td><td>8</td><td><span class="pill pill-red">3</span></td></tr>
-              <tr class="active"><td>☑</td><td><strong>Hempire Co</strong></td><td><span class="pill pill-amber">Renewing</span></td><td>2</td><td><span class="pill pill-amber">1</span></td></tr>
-              <tr><td>☐</td><td>Texas Canna RN</td><td><span class="pill pill-green">Active</span></td><td>0</td><td><span class="muted">—</span></td></tr>
-            </tbody>
-          </table>
-        </div>
       </div>
-      <div class="tile-caption">
-        <div class="tile-caption-h">Why here</div>
-        <div class="tile-caption-b">Already specced in QP-3583 Phase 2 ("Create Case (N merchants)"). The case-first blank canvas changes what happens after click: instead of opening N drawers sequentially, we open <strong>one targeting picker scoped to all N merchants</strong> — the analyst sees their 3 merchants' findings in one consolidated view.</div>
+      <div class="tile-caption" style="background:#F1F5F9;">
+        <div class="tile-caption-h">Why deferred</div>
+        <div class="tile-caption-b">Multi-merchant cases complicate SLA, resolution, and merchant-side surfacing in ways that don't pay off until we see real usage. v1 ships the simpler primitive; v2 considers batched creation if it's worth it.</div>
       </div>
     </div>
 
@@ -405,7 +392,7 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 
   <!-- Decision matrix -->
   <div class="matrix">
-    <h3>Entry-point decision matrix</h3>
+    <h3>Entry-point decision matrix · v1</h3>
     <table>
       <thead>
         <tr>
@@ -425,8 +412,8 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
         <tr>
           <td class="where">2 · Company profile</td>
           <td>Analyst reviewing one merchant in depth</td>
-          <td><code>merchantId</code> + summary stats inform suggestions</td>
-          <td>Blank canvas, <strong>merchant locked</strong>, targeting picker primed with this merchant's findings</td>
+          <td><code>merchantId</code> + summary stats</td>
+          <td>Blank canvas, <strong>merchant locked</strong>, with two deep-link buttons (Product Compliance / Q-ScanAI)</td>
         </tr>
         <tr>
           <td class="where">3 · Cases mini-panel</td>
@@ -434,21 +421,18 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
           <td><code>merchantId</code> from row context</td>
           <td>Same as #2 — merchant locked</td>
         </tr>
-        <tr>
-          <td class="where">4 · Bulk action bar</td>
-          <td>Analyst sweeping multiple flagged merchants</td>
-          <td><code>merchantId[]</code> array</td>
-          <td>Multi-merchant variant of targeting picker, grouped by merchant</td>
+        <tr style="opacity:0.5;">
+          <td class="where" style="text-decoration:line-through;">4 · Bulk action bar</td>
+          <td colspan="3" style="font-style:italic;color:#475569;"><strong>Deferred from v1.</strong> No multi-merchant cases in this scope — single-merchant only. Sweep multiple merchants by filing one case per merchant via entry points 1–3.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <div class="footer-cta">
-    <span class="lbl">All four CTAs land on the same blank canvas →</span>
+    <span class="lbl">All three v1 CTAs land on the same blank canvas →</span>
     <a class="btn-link" href="compliance-case-blank-canvas.html">2 / Blank Canvas →</a>
-    <a class="btn-ghost" href="compliance-case-target-findings.html">3 / Targeting Picker</a>
-    <a class="btn-ghost" href="compliance-case-quick-add-modal.html">4 / Quick-Add</a>
+    <span style="font-size:11px;color:#9CA3AF;font-style:italic;">v2: in-case targeting picker + ⌘K quick-add (deferred pending user feedback)</span>
   </div>
 
 </div>

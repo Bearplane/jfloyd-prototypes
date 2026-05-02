@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Case-First UX — Blank Canvas · Exploration</title>
+<title>Case-First UX — Blank Canvas (v1) · Exploration</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #1E293B; color: #1A202E; }
@@ -50,20 +50,22 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 .annot-text { color: #166534; font-weight: 500; }
 .annot-meta { font-size: 11px; color: #6B7280; }
 
+/* v1 cut chip */
+.v1-chip { background: #1A202E; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
+
 /* Drawer overlay */
-.drawer-overlay { position: fixed; top: 40px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.32); z-index: 100; }
+.drawer-overlay { position: fixed; top: 80px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.32); z-index: 100; }
 
 /* Case drawer */
-.case-drawer { position: fixed; top: 40px; right: 0; width: min(840px, 64vw); height: calc(100vh - 40px); background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.18); z-index: 200; display: flex; flex-direction: column; overflow: hidden; }
+.case-drawer { position: fixed; top: 80px; right: 0; width: min(840px, 64vw); height: calc(100vh - 80px); background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.18); z-index: 200; display: flex; flex-direction: column; overflow: hidden; }
 .drawer-header { background: #F7F5FF; padding: 18px 22px; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
 .drawer-header-left { flex: 1; min-width: 0; }
-.drawer-header-eyebrow { font-size: 11px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.drawer-header-eyebrow { font-size: 11px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; display: inline-flex; align-items: center; gap: 8px; }
+.draft-pill { background: #FEF3C7; color: #92400E; padding: 1px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; border: 1px solid #FDE68A; }
 .drawer-header-title { font-size: 17px; font-weight: 700; color: #1A202E; }
 .drawer-header-merchant { font-size: 12px; color: #6B7280; margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .merchant-chip { display: inline-flex; align-items: center; gap: 6px; background: white; border: 1px solid #E5E7EB; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 500; color: #1A202E; }
 .merchant-chip .lock { color: #9CA3AF; font-size: 11px; }
-.merchant-chip.changeable { cursor: pointer; }
-.merchant-chip.changeable:hover { background: #F1F5F9; }
 .drawer-close { background: none; border: none; cursor: pointer; font-size: 22px; color: #6B7280; line-height: 1; }
 .drawer-close:hover { color: #1A202E; }
 
@@ -73,13 +75,30 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 .drawer-label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
 .drawer-label .req { color: #DC2626; }
 .drawer-label .hint { color: #9CA3AF; font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 11px; }
-.drawer-input { width: 100%; border: 1px solid #E5E7EB; border-radius: 6px; padding: 9px 12px; font-size: 13px; color: #1A202E; background: white; font-family: inherit; }
-.drawer-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
-.drawer-input::placeholder { color: #9CA3AF; }
+.drawer-label .auto-tag { background: #DCFCE7; color: #166534; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; border: 1px solid #BBF7D0; }
 
-.suggested-line { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: #6B7280; flex-wrap: wrap; }
-.suggested-chip { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 500; cursor: pointer; }
-.suggested-chip:hover { background: #DBEAFE; }
+/* Title field with override hint */
+.title-field-wrap { position: relative; }
+.title-field {
+  width: 100%; border: 1px solid #E5E7EB; border-radius: 6px; padding: 9px 110px 9px 12px;
+  font-size: 13px; color: #1A202E; background: white; font-family: inherit;
+}
+.title-field:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+.title-field-suffix {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: flex; gap: 4px; align-items: center;
+}
+.title-field-suffix .auto-badge {
+  background: #F1F5F9; color: #475569; padding: 2px 7px; border-radius: 4px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+}
+.title-field-suffix .override-btn {
+  background: white; color: #2563eb; border: 1px solid #BFDBFE; padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.title-field-suffix .override-btn:hover { background: #EFF6FF; }
+.title-help { font-size: 11px; color: #6B7280; margin-top: 6px; line-height: 1.5; }
+.title-help code { font-family: monospace; background: #F1F5F9; padding: 1px 5px; border-radius: 3px; font-size: 11px; color: #1A202E; }
 
 /* Inline rows */
 .row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -95,58 +114,55 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 .priority-opt .label { font-weight: 600; color: #1A202E; }
 .priority-opt .sla { color: #6B7280; font-size: 11px; margin-left: auto; }
 
-/* Empty items zone */
+/* Empty items zone (revised: 2 quick-links, no in-case picker) */
 .items-empty {
   border: 2px dashed #BFDBFE;
   background: linear-gradient(135deg, #F0F9FF 0%, #FFFFFF 50%, #F5F3FF 100%);
   border-radius: 12px;
-  padding: 26px 22px;
+  padding: 22px;
   margin-top: 6px;
 }
-.items-empty-h { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-.items-empty-h .icon { width: 32px; height: 32px; background: #2563eb; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; flex-shrink: 0; }
-.items-empty-title { font-size: 15px; font-weight: 700; color: #1A202E; }
-.items-empty-sub { font-size: 12px; color: #475569; line-height: 1.55; margin-bottom: 16px; max-width: 540px; }
+.items-empty-h { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 4px; }
+.items-empty-h .icon { width: 32px; height: 32px; background: #1A202E; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.items-empty-title { font-size: 15px; font-weight: 700; color: #1A202E; margin-bottom: 2px; }
+.items-empty-sub { font-size: 12px; color: #475569; line-height: 1.55; max-width: 580px; }
 
-.quick-add-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-@media (max-width: 720px) { .quick-add-grid { grid-template-columns: 1fr; } }
-.quick-add-card {
+/* Quick-link buttons (replaces the 4-card grid + smart-add bar) */
+.quick-link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+@media (max-width: 760px) { .quick-link-grid { grid-template-columns: 1fr; } }
+.quick-link {
+  display: flex; align-items: center; gap: 14px;
   background: white; border: 1px solid #E5E7EB; border-radius: 10px;
-  padding: 12px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; cursor: pointer; font-family: inherit; text-align: left; width: 100%;
   transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
-  text-align: left; font-family: inherit; width: 100%;
+  text-decoration: none;
 }
-.quick-add-card:hover { border-color: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.08); }
-.qac-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
-.qac-icon.red { background: #FEE2E2; color: #991B1B; }
-.qac-icon.amber { background: #FEF3C7; color: #92400E; }
-.qac-icon.purple { background: #EDE9FE; color: #5B21B6; }
-.qac-icon.blue { background: #DBEAFE; color: #1E40AF; }
-.qac-icon.gray { background: #F1F5F9; color: #475569; }
-.qac-body { flex: 1; min-width: 0; }
-.qac-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.qac-title { font-size: 13px; font-weight: 600; color: #1A202E; }
-.qac-count { font-size: 12px; font-weight: 700; color: #1A202E; background: #F1F5F9; padding: 1px 7px; border-radius: 999px; }
-.qac-sub { font-size: 11px; color: #6B7280; margin-top: 3px; line-height: 1.5; }
-.qac-arrow { color: #9CA3AF; align-self: center; font-size: 14px; }
-
-.divider-or {
-  display: flex; align-items: center; gap: 12px; margin: 14px 0;
-  font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em;
+.quick-link:hover { border-color: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.08); }
+.quick-link .ql-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; font-weight: 700;
 }
-.divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+.quick-link .ql-icon.product { background: #FEE2E2; color: #991B1B; }
+.quick-link .ql-icon.scan { background: #EDE9FE; color: #5B21B6; }
+.quick-link .ql-body { flex: 1; min-width: 0; }
+.quick-link .ql-title { font-size: 13px; font-weight: 700; color: #1A202E; display: flex; align-items: center; gap: 8px; }
+.quick-link .ql-title .arrow { color: #9CA3AF; font-size: 12px; transition: transform 0.15s, color 0.15s; }
+.quick-link:hover .ql-title .arrow { color: #2563eb; transform: translateX(2px); }
+.quick-link .ql-sub { font-size: 11px; color: #6B7280; margin-top: 3px; line-height: 1.55; }
+.quick-link .ql-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.quick-link .ql-tag { background: #F1F5F9; color: #475569; padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 600; }
+.quick-link .ql-tag.red { background: #FEE2E2; color: #991B1B; }
+.quick-link .ql-tag.amber { background: #FEF3C7; color: #92400E; }
+.quick-link .ql-tag.purple { background: #EDE9FE; color: #5B21B6; }
 
-.smart-add-bar {
-  display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #E5E7EB; border-radius: 10px;
-  padding: 10px 14px;
+/* Round-trip explainer */
+.round-trip {
+  margin-top: 16px; padding: 12px 14px; background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 8px;
+  font-size: 11px; color: #475569; line-height: 1.6;
 }
-.smart-add-bar .kbd { font-family: monospace; font-size: 10px; background: #F1F5F9; color: #475569; padding: 2px 6px; border-radius: 4px; border: 1px solid #E5E7EB; }
-.smart-add-bar input { flex: 1; border: none; outline: none; font-size: 13px; color: #1A202E; background: transparent; font-family: inherit; }
-.smart-add-bar input::placeholder { color: #9CA3AF; }
-.smart-add-bar .icon { color: #9CA3AF; font-size: 14px; }
-
-.empty-tip { font-size: 11px; color: #6B7280; margin-top: 10px; text-align: center; }
-.empty-tip a { color: #2563eb; text-decoration: none; font-weight: 500; }
+.round-trip .rt-h { font-size: 10px; font-weight: 700; color: #1A202E; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.round-trip strong { color: #1A202E; }
+.round-trip code { font-family: monospace; background: white; padding: 1px 5px; border-radius: 3px; border: 1px solid #E5E7EB; font-size: 10px; color: #1A202E; }
 
 /* Drawer footer */
 .drawer-footer { padding: 14px 22px; border-top: 1px solid #E5E7EB; display: flex; gap: 8px; background: white; align-items: center; }
@@ -161,19 +177,9 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 .btn.disabled { opacity: 0.45; cursor: not-allowed; }
 .btn.disabled:hover { background: #1A202E; }
 
-/* Annotation panel below */
-.exploration-notes {
-  position: relative;
-  z-index: 250;
-  margin: -100vh 22px 22px 22px;
-  padding-top: calc(100vh - 40px);
-  pointer-events: none;
-}
-/* Skip the trick and just add notes inside the body — do at bottom of page instead */
-
-/* Inline annotations on right side of drawer — actually we'll use floating callout */
+/* Floating callout (desktop only) */
 .callout-side {
-  position: fixed; top: 80px; right: calc(min(840px, 64vw) + 30px); width: 280px; max-width: 30vw;
+  position: fixed; top: 120px; right: calc(min(840px, 64vw) + 30px); width: 280px; max-width: 30vw;
   background: white; border: 1px solid #E5E7EB; border-left: 4px solid #16a34a; border-radius: 10px;
   padding: 14px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 300;
   font-size: 12px; color: #1A202E; line-height: 1.55;
@@ -209,22 +215,31 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 <body>
 <nav class="proto-nav">
   <a href="../index.html" style="white-space:nowrap;">← All Mockups</a>
-  <div class="proto-center">Case-First UX Exploration · 2 / 4 — Blank Canvas</div>
+  <div class="proto-center">Case-First UX · v1 — Blank Canvas</div>
   <div style="display:flex;gap:8px;align-items:center;">
+    <span class="v1-chip">v1 CUT</span>
     <span class="proto-pill">EXPLORATION</span>
     <a class="proto-nav-link" href="compliance-case-create-blank.html">← Entry Points</a>
-    <a class="proto-nav-link" href="compliance-case-target-findings.html">Targeting Picker →</a>
   </div>
 </nav>
 
-<!-- Annotation bar above app chrome -->
+<!-- v1-cut explainer bar -->
+<div class="annot-bar" style="background:#FFFBEB;border-bottom-color:#FDE68A;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="annot-pill" style="background:#1A202E;">v1 CUT</span>
+    <span class="annot-text" style="color:#78350F;">Joseph: ship empty-draft-create + deep-link to existing item-add flows. Targeting picker / quick-add modal deferred until user feedback informs the in-case picker UX.</span>
+  </div>
+  <span class="annot-meta">Round-trip: leave case (DRAFT) → use shipped per-row / bulk Add-to-case → land back via toast or Cases tab</span>
+</div>
+
+<!-- Standard annotation bar -->
 <div class="annot-bar">
   <div style="display:flex;align-items:center;gap:10px;">
     <span class="annot-pill">EXPLORATION</span>
     <span class="annot-text">Blank case after click-create — what does empty look like?</span>
     <span class="annot-meta">Entered from: <strong>Cases mini-panel · Black Bear Wellness</strong></span>
   </div>
-  <span class="annot-meta">Drawer reuses CaseDraftDrawer chrome · empty-items zone is new</span>
+  <span class="annot-meta">Drawer reuses CaseDraftDrawer chrome · empty zone is new</span>
 </div>
 
 <div class="app-chrome">
@@ -276,18 +291,22 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 
   <!-- Floating callout (desktop only) -->
   <div class="callout-side">
-    <h4>Why this empty state matters</h4>
-    <p>The existing CaseDraftDrawer always opens with items already attached — there is no <span class="key">empty</span> path today. This view is the missing one.</p>
-    <p>Goal: feel <span class="key">inviting</span>, not bureaucratic. The page should <em>pull</em> the analyst into adding items, not list 14 form fields.</p>
-    <div class="ref">Variants explored:<br>· 4-card quick-add grid (shown)<br>· Single big targeting button<br>· Smart-search-first (see mockup 4)</div>
+    <h4>v1 design decisions</h4>
+    <p><span class="key">Title</span> auto-generated as <code>[Merchant] — [Date]</code>. Processor can override inline if they want to standardize.</p>
+    <p><span class="key">No in-case picker.</span> Two deep-link buttons send the analyst to existing tabs (Product Compliance, Q-ScanAI) where the shipped Add-to-case flows already work.</p>
+    <p><span class="key">Case stays DRAFT</span> until items are added and the analyst hits Send. They can leave + return any time.</p>
+    <div class="ref">Deferred to v2 (pending user feedback): in-case targeting picker, ⌘K quick-add modal, multi-merchant cases.</div>
   </div>
 
   <!-- The blank case drawer -->
   <div class="case-drawer">
     <div class="drawer-header">
       <div class="drawer-header-left">
-        <div class="drawer-header-eyebrow">📋 New Compliance Case · Draft</div>
-        <div class="drawer-header-title">Untitled case</div>
+        <div class="drawer-header-eyebrow">
+          📋 New Compliance Case
+          <span class="draft-pill">● DRAFT</span>
+        </div>
+        <div class="drawer-header-title">Black Bear Wellness — May 2, 2026</div>
         <div class="drawer-header-merchant">
           <span class="merchant-chip">
             <span style="color:#16a34a;">●</span>
@@ -306,16 +325,19 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
       <!-- Case Title -->
       <div class="drawer-section">
         <div class="drawer-label">
-          Case Title <span class="req">*</span>
-          <span class="hint" style="margin-left:auto;">Optional — auto-generated when sent</span>
+          Case Title
+          <span class="auto-tag">AUTO</span>
+          <span class="hint" style="margin-left:auto;">Click to edit · standardize naming if you prefer</span>
         </div>
-        <input class="drawer-input" placeholder="e.g. Black Bear Wellness — Q1 COA Refresh" autofocus>
-        <div class="suggested-line">
-          <span>Suggestions:</span>
-          <span class="suggested-chip">📅 Q1 Audit — May 2026</span>
-          <span class="suggested-chip">🧪 COA Refresh</span>
-          <span class="suggested-chip">🤖 Q-ScanAI Findings Sweep</span>
-          <span class="suggested-chip">🛒 Product Compliance</span>
+        <div class="title-field-wrap">
+          <input class="title-field" value="Black Bear Wellness — May 2, 2026">
+          <div class="title-field-suffix">
+            <span class="auto-badge">AUTO</span>
+            <button class="override-btn">✎ Edit</button>
+          </div>
+        </div>
+        <div class="title-help">
+          Default pattern: <code>[Merchant] — [Date]</code>. Editable now or later (the case is a DRAFT). The auto-generated value re-applies if the field is cleared.
         </div>
       </div>
 
@@ -357,86 +379,61 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
       <hr style="border:none;border-top:1px solid #E5E7EB;margin:8px 0 20px 0;">
 
       <!-- EMPTY ITEMS ZONE -->
-      <div class="drawer-label" style="margin-bottom:8px;">Case Items <span class="hint" style="margin-left:6px;">at least 1 item required</span></div>
+      <div class="drawer-label" style="margin-bottom:8px;">Case Items <span class="hint" style="margin-left:6px;">at least 1 item required before Send</span></div>
 
       <div class="items-empty">
         <div class="items-empty-h">
-          <div class="icon">+</div>
+          <div class="icon">📋</div>
           <div>
-            <div class="items-empty-title">Add items to this case</div>
-            <div style="font-size:11px;color:#6B7280;">Black Bear Wellness has <strong style="color:#991B1B;">3 violative products</strong>, <strong style="color:#92400E;">5 missing COAs</strong>, and <strong style="color:#5B21B6;">8 Q-ScanAI findings</strong> ready to target.</div>
+            <div class="items-empty-title">No items yet — this case is a draft</div>
+            <div class="items-empty-sub">Items live in <strong>Product Compliance</strong> (COA-related) and <strong>Q-ScanAI Findings</strong> (website / content). Jump to either, multi-select what you need, then use the existing <em>"Add to case"</em> action — your draft stays open and waiting.</div>
           </div>
         </div>
-        <div class="items-empty-sub" style="margin-top:14px;">Pick a source to browse this merchant's flagged items, or paste a SKU / finding ID to add inline.</div>
 
-        <div class="quick-add-grid">
-          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
-            <div class="qac-icon red">🧪</div>
-            <div class="qac-body">
-              <div class="qac-title-row">
-                <div class="qac-title">Products with violative COAs</div>
-                <span class="qac-count">3</span>
+        <div class="quick-link-grid">
+          <a class="quick-link" href="#" onclick="event.preventDefault();">
+            <div class="ql-icon product">🛒</div>
+            <div class="ql-body">
+              <div class="ql-title">
+                Add from Product Compliance
+                <span class="arrow">→</span>
               </div>
-              <div class="qac-sub">Δ-9 THC over limit · expired · unverified lab</div>
+              <div class="ql-sub">Opens the Product Compliance tab pre-filtered to <strong>Black Bear Wellness</strong>. Multi-select products → "Add to case" → returns here.</div>
+              <div class="ql-meta">
+                <span class="ql-tag red">3 violative COAs</span>
+                <span class="ql-tag amber">5 missing COAs</span>
+                <span class="ql-tag">12 products total</span>
+              </div>
             </div>
-            <div class="qac-arrow">→</div>
-          </button>
+          </a>
 
-          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
-            <div class="qac-icon amber">📄</div>
-            <div class="qac-body">
-              <div class="qac-title-row">
-                <div class="qac-title">Products with missing COAs</div>
-                <span class="qac-count">5</span>
+          <a class="quick-link" href="#" onclick="event.preventDefault();">
+            <div class="ql-icon scan">🤖</div>
+            <div class="ql-body">
+              <div class="ql-title">
+                Add from Q-ScanAI Findings
+                <span class="arrow">→</span>
               </div>
-              <div class="qac-sub">Required by policy · no COA on file</div>
-            </div>
-            <div class="qac-arrow">→</div>
-          </button>
-
-          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
-            <div class="qac-icon purple">🤖</div>
-            <div class="qac-body">
-              <div class="qac-title-row">
-                <div class="qac-title">Violative Q-ScanAI findings</div>
-                <span class="qac-count">8</span>
+              <div class="ql-sub">Opens the Q-ScanAI Findings modal scoped to <strong>Black Bear Wellness</strong>. Multi-select findings → "Add to case" → returns here.</div>
+              <div class="ql-meta">
+                <span class="ql-tag purple">8 violative findings</span>
+                <span class="ql-tag">5 high · 3 medium</span>
+                <span class="ql-tag">last 30 days</span>
               </div>
-              <div class="qac-sub">5 high · 3 medium · website scrape · last 30 days</div>
             </div>
-            <div class="qac-arrow">→</div>
-          </button>
-
-          <button class="quick-add-card" onclick="window.location.href='compliance-case-target-findings.html'">
-            <div class="qac-icon blue">🪪</div>
-            <div class="qac-body">
-              <div class="qac-title-row">
-                <div class="qac-title">License / OFAC issues</div>
-                <span class="qac-count">0</span>
-              </div>
-              <div class="qac-sub">No flags · skip or check anyway</div>
-            </div>
-            <div class="qac-arrow">→</div>
-          </button>
+          </a>
         </div>
 
-        <div class="divider-or">or</div>
-
-        <div class="smart-add-bar" onclick="window.location.href='compliance-case-quick-add-modal.html';">
-          <span class="icon">🔍</span>
-          <input placeholder="Type SKU, finding ID, or keyword to add inline (e.g. GB-500, F-2849, 'gummy')">
-          <span class="kbd">⌘K</span>
-        </div>
-
-        <div class="empty-tip">
-          <a href="compliance-case-target-findings.html">Browse all flagged items →</a>
-          <span style="margin: 0 10px; color: #D1D5DB;">·</span>
-          <a href="compliance-case-quick-add-modal.html">Quick-add for power users →</a>
-          <span style="margin: 0 10px; color: #D1D5DB;">·</span>
-          <a href="#">+ Add manually</a>
+        <div class="round-trip">
+          <div class="rt-h">How the round-trip works</div>
+          <strong>1.</strong> Click a button → leave this draft → land on the matching tab pre-filtered to this merchant.
+          &nbsp;<strong>2.</strong> Multi-select with the existing UI and click <em>"Add to case"</em> (shipped via QP-3582 / QP-3581).
+          &nbsp;<strong>3.</strong> A confirmation toast deep-links back to this draft (or re-open from <code>Q-Monitor → Cases</code>).
+          &nbsp;<strong>4.</strong> Items now attached. Edit resolutions per-item, then <em>Send to Merchant</em>.
         </div>
       </div>
 
-      <!-- Note (collapsed by default in empty state) -->
+      <!-- Note -->
       <div class="drawer-section" style="margin-top:24px;">
         <div class="drawer-label">
           Note to Merchant <span class="hint" style="margin-left:auto;">Optional · prepended to email</span>
@@ -450,43 +447,41 @@ body { font-family: "Uber Move", system-ui, -apple-system, BlinkMacSystemFont, s
 
     <div class="drawer-footer">
       <span class="helper">
-        <strong>0 items added</strong> · Save Draft enabled · Send disabled until ≥ 1 item
+        <strong>0 items</strong> · stays as <strong>DRAFT</strong> · Send disabled until ≥ 1 item attached
       </span>
-      <button class="btn secondary">Save Draft</button>
+      <button class="btn secondary">Save Draft &amp; Close</button>
       <button class="btn green disabled">Send to Merchant →</button>
     </div>
   </div>
 
 </div>
 
-<!-- Notes block below the drawer (mobile-friendly fallback for the floating callout) -->
+<!-- Notes block -->
 <div class="notes-block">
-  <h3>Designer notes — Why empty looks like this</h3>
+  <h3>Designer notes — v1 cut decisions</h3>
   <div class="nb-grid">
     <div class="nb-card">
-      <div class="nb-h"><span class="dot" style="background:#16a34a;"></span>Encouraging, not intimidating</div>
-      <p>The empty zone uses a subtle violet→blue gradient and an avatar-sized "+" rather than a generic dashed rectangle. The headline counts the merchant's flagged items — this is the cue that "you have stuff to find here, it's not a blank page."</p>
-      <p>Quick-add cards mirror the source categories the targeting picker will use, so the analyst's mental model carries forward.</p>
+      <div class="nb-h"><span class="dot" style="background:#16a34a;"></span>Auto-title with override</div>
+      <p>Field is pre-filled with <code>[Merchant] — [Date]</code> so the analyst doesn't have to think about naming on the fast path.</p>
+      <p>The <code>AUTO</code> badge + <code>✎ Edit</code> button signal it's editable — analysts who want to standardize ("Q1 Audit", "Quarterly Refresh") can override inline. Clearing the field re-applies the auto value.</p>
     </div>
     <div class="nb-card">
-      <div class="nb-h"><span class="dot" style="background:#2563eb;"></span>Three ways forward</div>
-      <p><code>Browse</code> — click a quick-add card → opens targeting picker scoped to that source.</p>
-      <p><code>Inline</code> — paste a SKU/finding ID into the smart-add bar, hit ↩ to add (no full picker).</p>
-      <p><code>Manual</code> — small link for one-off items not yet captured by the system.</p>
+      <div class="nb-h"><span class="dot" style="background:#1A202E;"></span>No in-case picker (yet)</div>
+      <p>v1 doesn't ship the targeting picker or ⌘K quick-add. Joseph wants user feedback on the empty-draft + deep-link round-trip before designing the in-case picker.</p>
+      <p>Two buttons cover the actual sources: <strong>Add from Product Compliance</strong> (COA work) and <strong>Add from Q-ScanAI Findings</strong> (website / content). Each deep-links scoped to this merchant.</p>
     </div>
     <div class="nb-card">
-      <div class="nb-h"><span class="dot" style="background:#F05252;"></span>Defaults that matter</div>
-      <p><code>Priority</code> defaults to <strong>Medium</strong>, SLA auto-fills to 7 days. High = 3d, Low = 14d (matches existing convention).</p>
-      <p><code>Title</code> is optional in the empty state — auto-generated on send if left blank ("[Merchant] — [Date]").</p>
-      <p><code>Send</code> button stays disabled until ≥ 1 item; <code>Save Draft</code> works at zero items so the analyst can come back later.</p>
+      <div class="nb-h"><span class="dot" style="background:#F05252;"></span>Stays DRAFT, round-trips cleanly</div>
+      <p>The case persists as <code>DRAFT</code> the moment it opens. Leaving doesn't lose anything.</p>
+      <p>The shipped per-row and bulk <em>Add to case</em> affordances (QP-3582 / QP-3581) attach to the draft. A confirmation toast deep-links back; if the analyst dismisses it, the draft is one click away from <code>Q-Monitor → Cases → Drafts (N)</code>.</p>
+      <p><code>Send</code> stays disabled until ≥ 1 item is attached.</p>
     </div>
   </div>
 </div>
 
 <div class="next-up">
-  <span class="label">When the analyst clicks a quick-add card →</span>
-  <a href="compliance-case-target-findings.html">3 / Targeting Picker →</a>
-  <a class="ghost" href="compliance-case-quick-add-modal.html">4 / Quick-Add Modal</a>
+  <span class="label">v1 ships only this canvas + entry points. In-case item picker deferred:</span>
+  <a class="ghost" href="compliance-case-create-blank.html">← Entry Points</a>
 </div>
 
 </body>
