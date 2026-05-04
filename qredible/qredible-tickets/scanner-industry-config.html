@@ -121,6 +121,35 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
 .divider{height:1px;background:#E2E8F0;margin:32px 0}
 
+/* ─── SCOPE MULTI-SELECT ─── */
+.scope-block{margin-bottom:10px}
+.scope-picker-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.scope-chips-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;background:#fff;border:1px solid #CBD5E1;border-radius:6px;min-height:40px}
+.scope-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
+.scope-chip-green{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.scope-chip-orange{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.scope-chip-blue{background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE}
+.chip-x{color:currentColor;font-size:10px;cursor:pointer;margin-left:2px;opacity:.6}
+.scope-add{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:#fff;color:#3B82F6;border:1px dashed #3B82F6;cursor:pointer}
+.scope-explainer{font-size:11px;color:#64748B;margin-top:7px;line-height:1.55;font-style:italic}
+
+/* ─── RADIO SCOPE TOGGLE ─── */
+.radio-scope{display:flex;flex-direction:column;gap:6px;margin-top:8px;margin-bottom:8px}
+.radio-opt{display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-radius:6px;border:1px solid #E2E8F0;background:#F8FAFC;cursor:pointer}
+.radio-opt.chosen{border-color:#3B82F6;background:#EFF6FF}
+.radio-opt input[type=radio]{margin-top:2px;accent-color:#3B82F6;flex-shrink:0}
+.radio-opt-body{flex:1}
+.radio-opt-text{font-size:13px;color:#1E293B;font-weight:500}
+.radio-opt-sub{font-size:11px;color:#64748B;margin-top:2px;line-height:1.4}
+
+/* ─── CONFIRM MODAL ─── */
+.confirm-body{padding:20px}
+.confirm-stat{font-size:13px;color:#1E293B;line-height:1.7;margin-bottom:10px}
+.confirm-stat strong{color:#1E3A5F}
+.confirm-example{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:11px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#14532D;line-height:1.7;margin:12px 0}
+.confirm-preserve{background:#FFFBEB;border:1px solid #FDE68A;border-left:3px solid #F59E0B;border-radius:6px;padding:9px 14px;font-size:12px;color:#78350F;line-height:1.5;margin-bottom:14px}
+.confirm-question{font-size:13px;color:#64748B;margin-bottom:4px}
+
 /* ─── NEW: MANY-TO-ONE PANEL ─── */
 .m2o-panel{background:#FFF7ED;border:2px solid #FED7AA;border-radius:10px;padding:20px;margin-bottom:8px}
 .m2o-title{font-size:15px;font-weight:700;color:#9A3412;margin-bottom:4px;display:flex;align-items:center;gap:8px}
@@ -701,15 +730,19 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="tier-pill">Type of Company</div>
             <div class="tier-pill">Company</div>
           </div>
-          <div class="tier-dropdowns">
-            <div class="tier-dd">
-              <span class="dd-label">Industry Type</span>
-              <span class="dd-value">Cannabis</span>
-              <span class="dd-arrow">▼</span>
+          <!-- Multi-select Industry Types chip stack -->
+          <div class="scope-block">
+            <label class="scope-picker-label">Industry Types (select one or more)</label>
+            <div class="scope-chips-wrap">
+              <span class="scope-chip scope-chip-green">Cannabis <span class="chip-x">✕</span></span>
+              <span class="scope-chip scope-chip-green">Hemp/CBD <span class="chip-x">✕</span></span>
+              <span class="scope-chip scope-chip-orange">Firearms &amp; Ammo <span class="chip-x">✕</span></span>
+              <span class="scope-add">+ Add Industry Type</span>
             </div>
+            <p class="scope-explainer">Pick one Industry Type or many. Saving applies the same configuration to every selected scope in one motion. The Company tier remains single-target.</p>
           </div>
           <div class="tier-caption">
-            You're editing the <strong>Industry Type</strong> tier. Save here applies to <strong>all Cannabis-tagged companies that don't have a more specific config</strong>.
+            You're editing the <strong>Industry Type</strong> baseline for <strong>3 selected Industry Types</strong> covering an estimated <strong>127 companies</strong> that don't have a more specific config.
           </div>
         </div>
 
@@ -760,7 +793,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
         <div class="aw-block">
           <label class="aw-block-label">Additional Words — Compliance Elements</label>
           <div class="aw-block-note">
-            Pulled from <strong>Q-Audit Global Settings → Compliance Elements</strong>. Edits here override the global default for the <em>Cannabis Industry Type tier</em>. All Cannabis-tagged merchants without a more specific config will use these terms.
+            Pulled from <strong>Q-Audit Global Settings → Compliance Elements</strong>. Edits here override the global default for all <em>3 selected Industry Types</em>. All merchants under those Industry Types without a more specific config will use these terms.
           </div>
           <div class="aw-cat">
             <div class="aw-cat-header">Peptide Compliance <span class="aw-cat-count">5 terms</span></div>
@@ -831,12 +864,12 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary">Cancel</button>
-        <button class="btn btn-primary">Save Industry Type baseline</button>
+        <button class="btn btn-primary">Save Industry Type baseline (3)</button>
       </div>
     </div>
 
     <div class="annotation green">
-      <strong>Saving at the Industry Type tier</strong> sets the baseline for every Cannabis-tagged company in the system. Companies without a more specific config inherit these checks and Additional Words at scan time.
+      <strong>Saving at the Industry Type tier</strong> sets the baseline for every company under each selected Industry Type. With 3 Industry Types selected (Cannabis, Hemp/CBD, Firearms &amp; Ammo), one save fans out to ~127 companies across all three. Companies with a more specific Type of Company or Company override are unaffected.
     </div>
 
     <div class="divider"></div>
@@ -855,20 +888,45 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
             <div class="tier-pill active">Type of Company</div>
             <div class="tier-pill">Company</div>
           </div>
-          <div class="tier-dropdowns">
-            <div class="tier-dd">
-              <span class="dd-label">Industry Type</span>
-              <span class="dd-value">Cannabis</span>
-              <span class="dd-arrow">▼</span>
+          <!-- Step 1: multi-select Industry Types -->
+          <div class="scope-block">
+            <label class="scope-picker-label">Industry Types (select one or more)</label>
+            <div class="scope-chips-wrap">
+              <span class="scope-chip scope-chip-green">Cannabis <span class="chip-x">✕</span></span>
+              <span class="scope-chip scope-chip-green">Hemp/CBD <span class="chip-x">✕</span></span>
+              <span class="scope-chip scope-chip-orange">Firearms &amp; Ammo <span class="chip-x">✕</span></span>
+              <span class="scope-add">+ Add Industry Type</span>
             </div>
-            <div class="tier-dd">
-              <span class="dd-label">Type of Company</span>
-              <span class="dd-value">Cultivator</span>
-              <span class="dd-arrow">▼</span>
+          </div>
+          <!-- Step 2: Type of Company scope — radio toggle -->
+          <div class="scope-block">
+            <label class="scope-picker-label">Type of Company scope</label>
+            <div class="radio-scope">
+              <label class="radio-opt">
+                <input type="radio" name="toc-scope" value="all">
+                <div class="radio-opt-body">
+                  <div class="radio-opt-text">All Types of Company under the selected Industry Types</div>
+                  <div class="radio-opt-sub">Default — applies to every Type of Company in Cannabis, Hemp/CBD, and Firearms &amp; Ammo</div>
+                </div>
+              </label>
+              <label class="radio-opt chosen">
+                <input type="radio" name="toc-scope" value="specific" checked>
+                <div class="radio-opt-body">
+                  <div class="radio-opt-text">Select specific Types of Company</div>
+                  <div class="radio-opt-sub">Pick a subset — only those Types of Company receive the override</div>
+                </div>
+              </label>
+            </div>
+            <!-- Shown when "Select specific" is chosen -->
+            <div class="scope-chips-wrap" style="margin-top:8px">
+              <span class="scope-chip scope-chip-blue">Cultivator <span class="chip-x">✕</span></span>
+              <span class="scope-chip scope-chip-blue">Manufacturer <span class="chip-x">✕</span></span>
+              <span class="scope-chip scope-chip-blue">Retailer <span class="chip-x">✕</span></span>
+              <span class="scope-add">+ Add Type of Company</span>
             </div>
           </div>
           <div class="tier-caption">
-            You're editing the <strong>Type of Company</strong> tier. Save here applies to <strong>Cannabis Cultivators only</strong>, overriding the Cannabis baseline for those companies.
+            You're editing the <strong>Type of Company</strong> tier. Saves here apply to every <strong>(Industry Type × Type of Company) pair selected — 9 pairs covering ~340 companies</strong> — overriding the Industry Type baseline for those companies.
           </div>
         </div>
 
@@ -917,18 +975,18 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
         <div class="aw-block">
           <label class="aw-block-label">Additional Words — Compliance Elements</label>
           <div class="aw-block-note">
-            Inherits all Additional Words from the Cannabis Industry Type baseline. Override specific categories here for Cultivators only. Other Cannabis company types are unaffected.
+            Inherits Additional Words from the selected Industry Type baselines. Override specific categories here for the selected Types of Company across all selected Industry Types. Unselected pairs continue to inherit from their Industry Type baseline.
           </div>
           <div class="aw-cat">
-            <div class="aw-cat-header">Inherited from Cannabis baseline <span class="aw-cat-count">40 terms across 4 categories</span></div>
+            <div class="aw-cat-header">Inherited from selected Industry Type baselines <span class="aw-cat-count">40 terms across 4 categories</span></div>
             <div class="aw-cat-terms">
               <span style="font-size:12px;color:#64748B;font-style:italic">Peptide Compliance (5) · Drug References (8) · Health Claims (12) · Cannabis Compliance (15) — edit at Industry Type tier to change these for all Cannabis companies.</span>
             </div>
           </div>
           <div class="aw-cat">
-            <div class="aw-cat-header">Cultivator-Specific Override <span class="aw-cat-count">0 terms — none added yet</span></div>
+            <div class="aw-cat-header">Type-of-Company Override (Cultivator, Manufacturer, Retailer) <span class="aw-cat-count">0 terms — none added yet</span></div>
             <div class="aw-cat-terms">
-              <span class="aw-term-add">+ Add cultivator-specific terms</span>
+              <span class="aw-term-add">+ Add terms for selected Types of Company</span>
             </div>
           </div>
         </div>
@@ -936,12 +994,12 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary">Cancel</button>
-        <button class="btn btn-primary">Save Type of Company override</button>
+        <button class="btn btn-primary">Save Type of Company override (9)</button>
       </div>
     </div>
 
     <div class="annotation">
-      <strong>Saving at the Type of Company tier</strong> overrides the Cannabis baseline for Cultivators only. Cannabis Retailers, Manufacturers, etc. continue to inherit from the Industry Type tier.
+      <strong>Saving at the Type of Company tier</strong> overrides the baseline for every selected (Industry Type × Type of Company) pair — 9 pairs here (3 Industry Types × 3 Types of Company). Types of Company not selected, and Industry Types not selected, continue to inherit from their Industry Type tier unchanged.
     </div>
 
     <div class="divider"></div>
@@ -1031,17 +1089,58 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     </div>
 
     <div class="annotation blue">
-      <strong>Saving at the Company tier</strong> overrides everything for Acme Cannabis Co. Other Cannabis Cultivators are unaffected.
+      <strong>Saving at the Company tier</strong> overrides everything for Acme Cannabis Co. The Company tier is always single-target — no bulk multi-select here. Other companies are unaffected.
     </div>
   </div>
 
   <div class="divider"></div>
 
   <!-- ═══════════════════════════════════════════════════════
-       SECTION ④ — FLOW DIAGRAM
+       SECTION ④ — BULK-ASSIGN CONFIRMATION MODAL
        ═══════════════════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label">④ Flow</div>
+    <div class="section-label">④ Confirmation</div>
+    <div class="section-title">Save confirmation — bulk fan-out preview</div>
+
+    <div class="modal-wrap" style="max-width:560px">
+      <div class="modal-header">
+        <h2>Confirm Bulk Configuration Save</h2>
+        <span class="close-btn">✕</span>
+      </div>
+      <div class="confirm-body">
+        <p class="confirm-stat">
+          This will apply the same scanner configuration to
+          <strong>9 scopes</strong> (Industry Type × Type of Company pairs)
+          covering an estimated <strong>340 companies</strong>.
+        </p>
+        <div class="confirm-example">
+[Cannabis, Hemp/CBD, Firearms &amp; Ammo]<br>
+× [Cultivator, Manufacturer, Retailer]<br>
+→ 9 pairs covering ~340 companies
+        </div>
+        <div class="confirm-preserve">
+          Existing overrides at the <strong>Company tier are preserved</strong> — individual company configs will not be changed.
+        </div>
+        <p class="confirm-question">Continue?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-primary">Confirm — apply to 9 scopes</button>
+      </div>
+    </div>
+
+    <div class="annotation blue">
+      <strong>Before any bulk save commits</strong>, this confirmation dialog shows the exact scope count and estimated company coverage. Company-tier overrides are always preserved — bulk assignments only affect the Industry Type and Type of Company tiers.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION ⑤ — FLOW DIAGRAM
+       ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">⑤ Flow</div>
     <div class="section-title">Tier hierarchy</div>
 
     <div class="flow-section">
