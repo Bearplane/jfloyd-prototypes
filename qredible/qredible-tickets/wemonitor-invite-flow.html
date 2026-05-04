@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QP-3731 — We Monitor Invites (MyCOA Feature Toggle + Activity Dates)</title>
+<title>QP-3731 — We Monitor Invites (Unified Send Invite Flow)</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /*
@@ -105,6 +105,8 @@ tr.selected{background:#F7F5FF}
 .pill-active{background:#C6F6D5;color:#276749}
 .pill-company-pending{background:#FEEBC8;color:#975A16}
 .pill-hemp{background:#E9D8FD;color:#553C9A}
+.pill-ready{background:#C6F6D5;color:#276749}
+.pill-duplicate{background:#FED7D7;color:#9B2C2C}
 
 .email-cell{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4A5568}
 
@@ -186,6 +188,20 @@ tr.selected{background:#F7F5FF}
 .flow-step.highlight{border-color:#805AD5;background:#F7F5FF}
 .flow-step.gated{border-color:#F05252;background:#FFF5F5}
 .flow-arrow{display:flex;align-items:center;justify-content:center;color:#A0AEC0;font-size:14px}
+
+/* COMPARISON GRID */
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cmp-col{}
+.cmp-header{background:#1A202E;border-radius:8px 8px 0 0;padding:12px 16px}
+.cmp-header .cmp-mode{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
+.cmp-header .cmp-trigger-label{font-size:10px;color:#94A3B8;font-family:'IBM Plex Mono',monospace;line-height:1.5;margin-bottom:8px}
+.cmp-header .cmp-btn-demo{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#1A202E;font-size:11px;font-weight:700;padding:5px 12px;border-radius:5px;border:none;cursor:default}
+.cmp-scrim{background:rgba(26,32,46,.55);padding:20px 16px;border-radius:0 0 8px 8px}
+.cmp-modal-inner{max-height:520px;overflow-y:auto}
+.recipient-table{font-size:12px;min-width:0;width:100%;border-collapse:collapse}
+.recipient-table thead th{background:#F7FAFC;text-align:left;font-size:10px;font-weight:700;color:#4A5568;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #E2E8F0}
+.recipient-table tbody td{padding:7px 10px;border-bottom:1px solid #F7FAFC;vertical-align:middle}
+.recipient-table tbody tr:last-child td{border-bottom:none}
 </style>
 </head>
 <body>
@@ -193,7 +209,7 @@ tr.selected{background:#F7F5FF}
 <nav class="topnav">
   <a href="../index.html">← All Mockups</a>
   <span class="sep">/</span>
-  <span class="title">We Monitor Invites · MyCOA Feature Toggle</span>
+  <span class="title">We Monitor Invites · Unified Send Invite Flow</span>
   <span class="sep">/</span>
   <span class="ticket-badge">QP-3731</span>
 </nav>
@@ -201,10 +217,10 @@ tr.selected{background:#F7F5FF}
 <div class="page">
 
   <div class="page-header">
-    <h1>We Monitor · Invites tab — MyCOA invite toggle &amp; activity dates</h1>
+    <h1>We Monitor · Invites tab — unified "Send Invite" flow</h1>
     <p>
       <a class="jira-link" href="https://qredible.atlassian.net/browse/QP-3731" target="_blank">QP-3731</a>
-      Invites tab adds a stacked <strong>Activity Dates</strong> column (Sent / Joined / Last Active) and drops License Status. At invite-send time a single <strong>"MyCOA invite"</strong> toggle decides whether the recipient lands in the MyCOA setup wizard (ON) or the standard post-join flow (OFF).
+      Invites tab adds a stacked <strong>Activity Dates</strong> column (Sent / Joined / Last Active) and drops License Status. One <strong>"Send Invite"</strong> button handles both single and multi-row invites — no separate Bulk Invite modal. At invite-send time a single <strong>"MyCOA invite"</strong> toggle decides whether the recipient lands in the MyCOA setup wizard (ON) or the standard post-join flow (OFF).
     </p>
   </div>
 
@@ -212,20 +228,20 @@ tr.selected{background:#F7F5FF}
     <div class="info-pill">ℹ DESIGN NOTES — NOT IN BUILD</div>
     <ul>
       <li><strong>Columns:</strong> checkbox · Legal Name · Email Invite Status · Company Status · Activity Dates · Team Members · Actions. License Status is <strong>removed</strong>. Inner Active/Pending sub-tabs are <strong>removed</strong> (Company Status pill carries that state inline).</li>
-      <li><strong>No per-row Feature column.</strong> Scope is intentionally simple for v1 — a single MyCOA toggle lives on the invite-creation surface, not on every row. When the compliance portal / additional features ship later we can revisit and add per-row controls as needed.</li>
+      <li><strong>No per-row Feature column.</strong> Scope is intentionally simple for v1 — a single MyCOA toggle lives on the invite-creation surface, not on every row.</li>
       <li><strong>MyCOA invite toggle</strong> (on the Invite dialog): ON → recipient is routed into the MyCOA setup wizard after joining, before the paywall. OFF → standard post-join flow, no wizard. One boolean, stamped on the invite token at send time.</li>
       <li><strong>Activity Dates</strong> is a 3-line stack: <code>Sent: MM/DD/YYYY</code> · <code>Joined: MM/DD/YYYY</code> · <code>Last Active: MM/DD/YYYY</code>. Missing values render as <code>—</code>.</li>
       <li><strong>Email template modal</strong> is a single modal with Subject, Body, CTA, and standard merge tags (<code>{{sender_name}}</code>, <code>{{recipient_first_name}}</code>, <code>{{company_name}}</code>). No per-feature token — the template is MyCOA-agnostic for v1.</li>
-      <li><strong>Bulk invite</strong> has two entry points: (a) the "Bulk Invite" toolbar button on the Invites tab (CSV/XLSX upload or multi-row entry), and (b) multi-select + bulk action bar on the Invites table itself (Resend / Revoke / Send). The same <strong>MyCOA invite</strong> toggle concept applies at batch level — one boolean stamps the wizard flag on every generated token in the batch. Sibling bulk pattern on Active Companies is being tracked under <a href="https://qredible.atlassian.net/browse/QP-3738" target="_blank"><code>QP-3738</code></a>.</li>
+      <li><strong>Single "Send Invite" entry point — no separate Bulk Invite modal.</strong> The toolbar always shows one <code>Send Invite</code> button. When no rows are selected it opens the single-merchant modal ("Invite merchant"). When N rows are selected in the table, the button label adapts to <code>Send Invite (N)</code> and opens the batch modal listing those selected rows — no CSV upload, no manual-entry tab. One code path, two modes. The same <strong>MyCOA invite</strong> toggle concept applies at batch level.</li>
     </ul>
   </div>
 
   <!-- ═══════════════════════════════════════
-       INVITES TAB — real Qredible shell
+       INVITES TAB — real Qredible shell (no rows selected)
   ═══════════════════════════════════════ -->
   <div class="section-block">
     <div class="section-label">QP-3731 · Invites tab</div>
-    <div class="section-title">We Monitor → Invites</div>
+    <div class="section-title">We Monitor → Invites (no rows selected — "Send Invite" opens single-merchant modal)</div>
 
     <div class="app-shell">
       <div class="app-topbar">
@@ -253,8 +269,7 @@ tr.selected{background:#F7F5FF}
         <span class="spacer"></span>
         <button class="btn btn-secondary">⇪ Export</button>
         <button class="btn btn-secondary">⚙ Configure Invite Template</button>
-        <button class="btn btn-secondary">⇪ Bulk Invite</button>
-        <button class="btn btn-primary">✉ Invite</button>
+        <button class="btn btn-primary">✉ Send Invite</button>
       </div>
 
       <div class="table-wrap">
@@ -393,11 +408,11 @@ tr.selected{background:#F7F5FF}
   </div>
 
   <!-- ═══════════════════════════════════════
-       INVITES TAB — multi-select + bulk action bar state
+       INVITES TAB — multi-select state (N rows checked → button adapts)
   ═══════════════════════════════════════ -->
   <div class="section-block">
-    <div class="section-label">QP-3731 · Invites tab · bulk selection state</div>
-    <div class="section-title">Multi-select rows → bulk action bar (Resend / Revoke / Send)</div>
+    <div class="section-label">QP-3731 · Invites tab · multi-select state</div>
+    <div class="section-title">27 rows selected — "Send Invite" button adapts to "Send Invite (27)" in the toolbar</div>
 
     <div class="app-shell">
       <div class="app-topbar">
@@ -412,10 +427,17 @@ tr.selected{background:#F7F5FF}
         <div class="tab active">Invites <span class="tab-count">8</span></div>
       </div>
 
+      <div class="toolbar">
+        <input class="search-input" placeholder="Search invited companies, contacts, emails…">
+        <span class="spacer"></span>
+        <button class="btn btn-secondary">⇪ Export</button>
+        <button class="btn btn-secondary">⚙ Configure Invite Template</button>
+        <button class="btn btn-primary">✉ Send Invite <span style="background:rgba(255,255,255,.18);padding:1px 7px;border-radius:3px;font-size:10px;margin-left:2px;font-family:'IBM Plex Mono',monospace">(27)</span></button>
+      </div>
+
       <div class="bulk-bar on">
-        <span class="bulk-count">3 invites selected</span>
+        <span class="bulk-count">27 rows selected</span>
         <button class="btn btn-primary">↻ Resend Invites</button>
-        <button class="btn btn-primary">✉ Send Invites</button>
         <button class="btn btn-secondary" style="color:#C53030;border-color:#FEB2B2">⊘ Revoke Invites</button>
         <span class="spacer" style="flex:1"></span>
         <button class="btn btn-ghost" style="color:#4A5568">Clear selection</button>
@@ -518,201 +540,187 @@ tr.selected{background:#F7F5FF}
     </div>
 
     <div class="callout" style="margin-top:14px">
-      <strong>Action visibility rules:</strong>
+      <strong>Bulk action bar (Resend / Revoke) vs Send Invite button:</strong>
       <ul style="margin:6px 0 0 20px">
+        <li><strong>Send Invite (N)</strong> in the toolbar — opens the "Invite N merchants" modal for the selected rows. This is the only invite entry point, single or bulk.</li>
         <li><strong>Resend Invites</strong> — enabled when every selected row has status <code>Sent</code> or <code>Expired</code>. Regenerates the token and re-emails using the current template.</li>
-        <li><strong>Send Invites</strong> — enabled when every selected row is in a pre-send / draft state (none in the example above; shown for completeness).</li>
         <li><strong>Revoke Invites</strong> — enabled when every selected row has status <code>Sent</code> or <code>Expired</code>. Invalidates the token; accepted invites are never revoked from this surface.</li>
-        <li>If selection is mixed (e.g. includes a <code>Joined</code> row), the incompatible bulk actions disable with a tooltip explaining why.</li>
+        <li>If selection is mixed (e.g. includes a <code>Joined</code> row), incompatible bulk actions disable with a tooltip explaining why.</li>
       </ul>
     </div>
   </div>
 
   <!-- ═══════════════════════════════════════
-       BULK INVITE DIALOG — CSV upload + inline rows, batch MyCOA toggle
+       SEND INVITE — modal comparison (single vs multi-row)
   ═══════════════════════════════════════ -->
   <div class="section-block">
-    <div class="section-label">QP-3731 · Bulk Invite dialog</div>
-    <div class="section-title">Bulk Invite — CSV/XLSX upload or multi-row entry, single batch-level MyCOA toggle</div>
+    <div class="section-label">QP-3731 · Send Invite — modal comparison</div>
+    <div class="section-title">One "Send Invite" button — two modes depending on table row selection</div>
 
-    <div class="modal-scrim">
-      <div class="modal-wrap" style="max-width:720px">
-        <div class="modal-header">
-          <div>
-            <h2>Bulk invite merchants</h2>
-            <p>Send invitations to many companies at once. Each recipient receives a separate email with a unique 14-day token.</p>
-          </div>
-          <button class="modal-close">✕</button>
+    <div class="callout" style="margin-bottom:20px">
+      <strong>How invite scoping works:</strong> Selecting rows in the WeMonitor table is how you invite many at once — there is no separate bulk-import flow and no CSV upload. Single-row invites and many-row invites share the same code path and the same email template. The toolbar button label adapts: no selection → <code>Send Invite</code>; N rows selected → <code>Send Invite (N)</code>. Clicking either opens the appropriate modal shown below.
+    </div>
+
+    <div class="comparison-grid">
+
+      <!-- LEFT COLUMN: single invite -->
+      <div class="cmp-col">
+        <div class="cmp-header">
+          <div class="cmp-mode">Single invite</div>
+          <div class="cmp-trigger-label">Trigger: "Send Invite" toolbar button — no rows selected<br>OR: row ⋯ menu → "Invite"</div>
+          <div><span class="cmp-btn-demo">✉ Send Invite</span></div>
         </div>
-
-        <div class="modal-tabs">
-          <div class="modal-tab active">Upload CSV / XLSX</div>
-          <div class="modal-tab">Enter rows manually</div>
-        </div>
-
-        <div class="modal-body">
-
-          <!-- CSV upload zone -->
-          <div class="field-group">
-            <label>Upload a list</label>
-            <div style="border:2px dashed #CBD5E1;border-radius:8px;padding:22px;text-align:center;background:#FAFAFA">
-              <div style="font-size:28px;margin-bottom:6px">⇪</div>
-              <div style="font-size:13px;font-weight:700;color:#1A202E;margin-bottom:4px">Drop a CSV or XLSX here, or <a href="#" style="color:#1A202E;text-decoration:underline">browse</a></div>
-              <div style="font-size:11px;color:#718096">Required columns: <code>legal_name</code>, <code>primary_contact_email</code>. Optional: <code>first_name</code>. <a href="#" style="color:#1A202E;text-decoration:underline">Download template</a></div>
+        <div class="cmp-scrim">
+          <div class="modal-wrap" style="max-width:100%">
+            <div class="modal-header">
+              <div>
+                <h2>Invite merchant</h2>
+                <p>Send a sign-up invitation. The recipient receives an email with a one-time link that expires in 14 days.</p>
+              </div>
+              <button class="modal-close">✕</button>
             </div>
-            <div class="helper">Max 500 rows per batch. Duplicate emails against existing invites are flagged for review before send.</div>
-          </div>
 
-          <!-- Parsed preview -->
-          <div class="field-group">
-            <label>Parsed rows <span style="font-size:11px;color:#718096;font-weight:500;margin-left:6px">3rd_coast_blends_list.csv · 28 rows</span></label>
-            <div style="border:1px solid #E2E8F0;border-radius:6px;overflow:hidden">
-              <table style="font-size:12px;min-width:0">
-                <thead>
-                  <tr>
-                    <th style="padding:8px 10px">Legal Name</th>
-                    <th style="padding:8px 10px">Primary contact email</th>
-                    <th style="padding:8px 10px;width:90px">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td style="padding:8px 10px">Willow Creek Extracts</td><td style="padding:8px 10px" class="email-cell">ops@willowcreek.co</td><td style="padding:8px 10px"><span class="pill pill-none">Ready</span></td></tr>
-                  <tr><td style="padding:8px 10px">Ridgeway Botanicals</td><td style="padding:8px 10px" class="email-cell">hello@ridgewaybot.com</td><td style="padding:8px 10px"><span class="pill pill-none">Ready</span></td></tr>
-                  <tr><td style="padding:8px 10px">Black Bear Hemp Dispensary</td><td style="padding:8px 10px" class="email-cell">tasha@blackbearhemp.com</td><td style="padding:8px 10px"><span class="pill pill-pending">Duplicate</span></td></tr>
-                  <tr><td style="padding:8px 10px;color:#A0AEC0;font-style:italic" colspan="3">+ 25 more rows…</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+            <div class="modal-body">
+              <div class="field-group">
+                <label>Legal name</label>
+                <input class="form-input" value="Willow Creek Extracts">
+              </div>
 
-          <!-- Batch MyCOA toggle -->
-          <div class="field-group">
-            <div class="blurb-card">
-              <div class="blurb-row">
-                <div>
-                  <div class="br-label">MyCOA invite (applies to all recipients in this batch)</div>
-                  <div class="br-hint">When <strong>ON</strong>, every invitee in this batch lands in the <strong>MyCOA setup wizard</strong> after joining, before the paywall. When <strong>OFF</strong>, all recipients go to the standard post-join flow. One boolean stamped on every generated token in the batch.</div>
+              <div class="field-group">
+                <label>Primary contact email</label>
+                <input class="form-input" value="ops@willowcreek.co">
+                <div class="helper">The invitation link is scoped to this address.</div>
+              </div>
+
+              <div class="field-group">
+                <div class="blurb-card">
+                  <div class="blurb-row">
+                    <div>
+                      <div class="br-label">MyCOA invite</div>
+                      <div class="br-hint">When <strong>ON</strong>, the recipient lands in the <strong>MyCOA setup wizard</strong> after joining, before the paywall. When <strong>OFF</strong>, they go to the standard post-join flow.</div>
+                    </div>
+                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                  </div>
                 </div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="helper" style="margin-top:6px">One boolean, stamped on the invite token at send time. Future features (e.g. Compliance Portal) can extend this surface once they ship.</div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <span class="footer-note">Uses the current invite email template.</span>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-secondary">Cancel</button>
+                <button class="btn btn-primary">Send invite</button>
               </div>
             </div>
           </div>
-
-          <!-- Template note + summary -->
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F7FAFC;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;color:#4A5568">
-            <span style="font-size:14px">📧</span>
-            <span>Uses the current <strong>invite email template</strong>. <a href="#" style="color:#1A202E;text-decoration:underline">Preview</a> · <a href="#" style="color:#1A202E;text-decoration:underline">Edit template</a></span>
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <span class="footer-note">Sending <strong>27 invitations</strong> (1 duplicate skipped). Each recipient receives a separate email with a unique 14-day token.</span>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-secondary">Cancel</button>
-            <button class="btn btn-primary">Send 27 invites</button>
-          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Manual entry variant preview -->
-    <div style="margin-top:18px">
-      <div class="section-title" style="font-size:13px;margin-bottom:10px">Alternative: "Enter rows manually" tab of the same dialog</div>
-      <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:16px">
-        <table style="font-size:12px;min-width:0">
-          <thead>
-            <tr>
-              <th style="padding:8px 10px">#</th>
-              <th style="padding:8px 10px">Legal Name</th>
-              <th style="padding:8px 10px">Primary contact email</th>
-              <th style="padding:8px 10px;width:40px"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td style="padding:6px 10px;color:#A0AEC0">1</td><td style="padding:6px 10px"><input class="form-input" value="Willow Creek Extracts" style="padding:6px 10px"></td><td style="padding:6px 10px"><input class="form-input" value="ops@willowcreek.co" style="padding:6px 10px"></td><td style="padding:6px 10px"><button class="icon-btn" title="Remove">✕</button></td></tr>
-            <tr><td style="padding:6px 10px;color:#A0AEC0">2</td><td style="padding:6px 10px"><input class="form-input" value="Ridgeway Botanicals" style="padding:6px 10px"></td><td style="padding:6px 10px"><input class="form-input" value="hello@ridgewaybot.com" style="padding:6px 10px"></td><td style="padding:6px 10px"><button class="icon-btn" title="Remove">✕</button></td></tr>
-            <tr><td style="padding:6px 10px;color:#A0AEC0">3</td><td style="padding:6px 10px"><input class="form-input" placeholder="Company name" style="padding:6px 10px"></td><td style="padding:6px 10px"><input class="form-input" placeholder="contact@example.com" style="padding:6px 10px"></td><td style="padding:6px 10px"><button class="icon-btn" title="Remove">✕</button></td></tr>
-          </tbody>
-        </table>
-        <button class="btn btn-secondary" style="margin-top:10px">+ Add row</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════
-       BULK ENTRY POINTS — flow
-  ═══════════════════════════════════════ -->
-  <div class="section-block">
-    <div class="section-label">QP-3731 · Bulk invite entry points</div>
-    <div class="section-title">Two entry points land in the same Bulk Invite dialog</div>
-
-    <div class="flow" style="grid-template-columns:1fr 16px 1fr 16px 1fr">
-      <div class="flow-step"><span class="fs-ico">⇪</span><div class="fs-title">"Bulk Invite" button</div><div class="fs-sub">Invites tab toolbar</div></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step highlight"><span class="fs-ico">✉</span><div class="fs-title">Bulk Invite dialog</div><div class="fs-sub">Upload CSV or enter rows</div></div>
-      <div class="flow-arrow">←</div>
-      <div class="flow-step"><span class="fs-ico">☑</span><div class="fs-title">Active Companies<br>bulk action bar</div><div class="fs-sub">"Invite selected" · see <a href="https://qredible.atlassian.net/browse/QP-3738" target="_blank">QP-3738</a></div></div>
-    </div>
-
-    <div class="callout" style="margin-top:14px">
-      <strong>Batch-level MyCOA toggle is a single boolean.</strong> Whichever entry point launches the dialog, the toggle applies to every recipient in the batch — one value is stamped on every generated invite token at send time. Paywall plan filtering (for recipients who join with MyCOA = ON) is driven by the Focus Features mapping in Q-Config, tracked under <a href="https://qredible.atlassian.net/browse/QP-3732" target="_blank"><code>QP-3732</code></a>.
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════
-       INVITE DIALOG — single MyCOA toggle lives here
-  ═══════════════════════════════════════ -->
-  <div class="section-block">
-    <div class="section-label">QP-3731 · Invite dialog</div>
-    <div class="section-title">Invite dialog — single <strong>MyCOA invite</strong> toggle stamps the wizard flag on the token</div>
-
-    <div class="modal-scrim">
-      <div class="modal-wrap" style="max-width:520px">
-        <div class="modal-header">
+      <!-- RIGHT COLUMN: multi-row invite -->
+      <div class="cmp-col">
+        <div class="cmp-header">
+          <div class="cmp-mode">Multi-row invite (N selected)</div>
+          <div class="cmp-trigger-label">Trigger: "Send Invite (27)" toolbar button — 27 rows checked in the table</div>
           <div>
-            <h2>Invite merchant</h2>
-            <p>Send a sign-up invitation. The recipient receives an email with a one-time link that expires in 14 days.</p>
+            <span class="cmp-btn-demo">✉ Send Invite <span style="background:#E2E8F0;color:#4A5568;padding:1px 7px;border-radius:3px;font-size:10px;margin-left:2px;font-family:'IBM Plex Mono',monospace">(27)</span></span>
           </div>
-          <button class="modal-close">✕</button>
         </div>
+        <div class="cmp-scrim">
+          <div class="modal-wrap" style="max-width:100%">
+            <div class="modal-header">
+              <div>
+                <h2>Invite 27 merchants</h2>
+                <p>Each recipient receives a separate email with a unique 14-day token. Duplicates are detected and skipped automatically.</p>
+              </div>
+              <button class="modal-close">✕</button>
+            </div>
 
-        <div class="modal-body">
+            <div class="modal-body">
 
-          <div class="field-group">
-            <label>Legal name</label>
-            <input class="form-input" value="Willow Creek Extracts">
-          </div>
-
-          <div class="field-group">
-            <label>Primary contact email</label>
-            <input class="form-input" value="ops@willowcreek.co">
-            <div class="helper">The invitation link is scoped to this address.</div>
-          </div>
-
-          <div class="field-group">
-            <div class="blurb-card">
-              <div class="blurb-row">
-                <div>
-                  <div class="br-label">MyCOA invite</div>
-                  <div class="br-hint">When <strong>ON</strong>, the recipient lands in the <strong>MyCOA setup wizard</strong> after joining, before the paywall. When <strong>OFF</strong>, they go to the standard post-join flow.</div>
+              <!-- Selected rows list — read from table selection, no upload -->
+              <div class="field-group">
+                <label>Selected recipients <span style="font-size:11px;color:#718096;font-weight:500;margin-left:6px">27 rows from table · 1 duplicate detected</span></label>
+                <div style="border:1px solid #E2E8F0;border-radius:6px;overflow:hidden;max-height:188px;overflow-y:auto">
+                  <table class="recipient-table">
+                    <thead>
+                      <tr>
+                        <th>Legal Name</th>
+                        <th>Primary contact email</th>
+                        <th style="width:84px">Status</th>
+                        <th style="width:32px"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="font-weight:600">3rd Coast Blends LLC</td>
+                        <td class="email-cell">miles@3rdcoastblends.com</td>
+                        <td><span class="pill pill-ready">Ready</span></td>
+                        <td><button class="icon-btn" title="Remove from batch" style="font-size:11px">✕</button></td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight:600">Rocky Seeds LLC</td>
+                        <td class="email-cell">priya@rockyseeds.com</td>
+                        <td><span class="pill pill-ready">Ready</span></td>
+                        <td><button class="icon-btn" title="Remove from batch" style="font-size:11px">✕</button></td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight:600">Willow Creek Extracts</td>
+                        <td class="email-cell">ops@willowcreek.co</td>
+                        <td><span class="pill pill-ready">Ready</span></td>
+                        <td><button class="icon-btn" title="Remove from batch" style="font-size:11px">✕</button></td>
+                      </tr>
+                      <tr style="opacity:.6">
+                        <td style="font-weight:600;text-decoration:line-through">Black Bear Hemp Dispensary</td>
+                        <td class="email-cell" style="text-decoration:line-through">tasha@blackbearhemp.com</td>
+                        <td><span class="pill pill-duplicate">Duplicate</span></td>
+                        <td><button class="icon-btn" title="Remove from batch" style="font-size:11px">✕</button></td>
+                      </tr>
+                      <tr>
+                        <td colspan="4" style="color:#A0AEC0;font-style:italic;font-size:11px">+ 23 more rows…</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                <div class="helper">Rows flagged as <strong>Duplicate</strong> already have an active invite against this email address — they will be skipped at send time. Remove them or leave them; either way only <em>Ready</em> rows generate tokens.</div>
+              </div>
+
+              <!-- Batch-level MyCOA toggle -->
+              <div class="field-group">
+                <div class="blurb-card">
+                  <div class="blurb-row">
+                    <div>
+                      <div class="br-label">MyCOA invite <span style="font-size:10px;font-weight:500;color:#718096;margin-left:4px">(applies to all recipients in this batch)</span></div>
+                      <div class="br-hint">When <strong>ON</strong>, every invitee in this batch lands in the <strong>MyCOA setup wizard</strong> after joining, before the paywall. One boolean stamped on every generated token in the batch.</div>
+                    </div>
+                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="modal-footer" style="flex-direction:column;align-items:stretch;gap:10px;padding:16px 24px">
+              <div style="font-size:11px;color:#718096;line-height:1.55">Sending <strong>27 invitations</strong> (1 duplicate skipped). Each recipient receives a separate email with a unique 14-day token.</div>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-secondary">Cancel</button>
+                <button class="btn btn-primary">Send 27 invites</button>
               </div>
             </div>
-            <div class="helper" style="margin-top:6px">One boolean, stamped on the invite token at send time. Future features (e.g. Compliance Portal) can extend this surface once they ship.</div>
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <span class="footer-note">Uses the current invite email template.</span>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-secondary">Cancel</button>
-            <button class="btn btn-primary">Send invite</button>
           </div>
         </div>
       </div>
+
+    </div><!-- /comparison-grid -->
+
+    <div class="callout" style="margin-top:20px">
+      <strong>Key differences between modes:</strong>
+      <ul style="margin:6px 0 0 20px">
+        <li><strong>Single invite</strong> — free-form Legal Name + Email fields. The user types or pastes the recipient details.</li>
+        <li><strong>Multi-row invite</strong> — no free-form entry, no CSV upload. Recipients are pulled directly from the rows already checked in the table. The modal lists them with a per-row × to remove any before sending.</li>
+        <li>Both modes use the same email template and the same MyCOA toggle concept. The only structural difference is where the recipient list originates.</li>
+        <li>Duplicate detection runs against existing active invites for the same email address. Duplicates are shown inline and skipped at send time — no blocking pre-send confirmation dialog needed.</li>
+      </ul>
     </div>
   </div>
 
