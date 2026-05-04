@@ -34,6 +34,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
 /* MODAL */
 .modal-wrap{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);overflow:hidden;border:1px solid #E2E8F0;margin-bottom:18px}
+.modal-wrap.edit-mode{border:2px dashed #3B82F6;box-shadow:0 4px 24px rgba(59,130,246,.18)}
 .modal-header{background:#1E3A5F;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
 .modal-header h2{color:#fff;font-size:15px;font-weight:700}
 .modal-header .close-btn{color:#94A3B8;font-size:18px;cursor:pointer;line-height:1}
@@ -78,12 +79,17 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 .kw-blue{background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE}
 .kw-add{background:#fff;color:#3B82F6;border:1px dashed #3B82F6;cursor:pointer}
 
-/* COMPLIANCE ELEMENTS */
-.cel-group{margin-top:14px;border:1px solid #E2E8F0;border-radius:6px;overflow:hidden}
-.cel-group-header{background:#F8FAFC;padding:8px 12px;font-size:12px;font-weight:700;color:#1E3A5F;border-bottom:1px solid #E2E8F0}
-.cel-list{padding:8px 12px}
-.cel-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:#1E293B}
-.cel-item input[type=checkbox]{accent-color:#3B82F6}
+/* COMPLIANCE ELEMENTS / ADDITIONAL WORDS */
+.aw-block{margin-top:18px;border-top:1px solid #E2E8F0;padding-top:16px}
+.aw-block-label{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block}
+.aw-block-note{font-size:11px;color:#64748B;font-style:italic;line-height:1.5;margin-bottom:10px;background:#F8FAFC;border-radius:5px;padding:8px 10px;border-left:3px solid #CBD5E1}
+.aw-cat{border:1px solid #E2E8F0;border-radius:6px;overflow:hidden;margin-bottom:8px}
+.aw-cat-header{background:#F8FAFC;padding:8px 12px;font-size:12px;font-weight:700;color:#1E3A5F;border-bottom:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center}
+.aw-cat-count{font-size:11px;font-weight:500;color:#64748B;font-family:'IBM Plex Mono',monospace}
+.aw-cat-terms{padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.aw-term{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;background:#FEF9C3;color:#713F12;border:1px solid #FDE047}
+.aw-term-removable{cursor:pointer}
+.aw-term-add{background:#fff;color:#64748B;border:1px dashed #CBD5E1;cursor:pointer;font-size:11px;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center}
 
 /* FOOTER */
 .modal-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;gap:10px;justify-content:flex-end}
@@ -114,6 +120,98 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 .resolve-arrow{color:#94A3B8;font-weight:700}
 
 .divider{height:1px;background:#E2E8F0;margin:32px 0}
+
+/* ─── NEW: MANY-TO-ONE PANEL ─── */
+.m2o-panel{background:#FFF7ED;border:2px solid #FED7AA;border-radius:10px;padding:20px;margin-bottom:8px}
+.m2o-title{font-size:15px;font-weight:700;color:#9A3412;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.m2o-subtitle{font-size:13px;color:#C2410C;margin-bottom:12px;font-weight:500}
+.m2o-body{font-size:13px;color:#431407;line-height:1.6;margin-bottom:16px}
+.m2o-diagram{background:#fff;border:1px solid #FED7AA;border-radius:8px;padding:18px}
+.m2o-diagram-title{font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.m2o-row{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap}
+.m2o-company-box{background:#DBEAFE;border:2px solid #3B82F6;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700;color:#1E40AF;white-space:nowrap;align-self:center;flex-shrink:0}
+.m2o-arrow-col{display:flex;flex-direction:column;gap:18px;align-self:center;padding-top:2px}
+.m2o-arrow{color:#94A3B8;font-size:14px;font-weight:700;line-height:1}
+.m2o-sources{display:flex;flex-direction:column;gap:10px}
+.m2o-source{display:flex;align-items:center;gap:10px;font-size:12px}
+.m2o-source-tag{font-weight:600;padding:4px 10px;border-radius:4px;font-size:12px;white-space:nowrap}
+.m2o-ind{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.m2o-toc{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.m2o-co{background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE}
+.m2o-source-desc{color:#64748B;font-size:11px;line-height:1.4}
+.m2o-result-box{background:#F0FDF4;border:2px solid #16A34A;border-radius:8px;padding:14px;margin-top:14px}
+.m2o-result-title{font-size:12px;font-weight:700;color:#14532D;margin-bottom:6px}
+.m2o-result-body{font-size:12px;color:#166534;line-height:1.7}
+.m2o-mvp-note{background:#FEF3C7;border:1px solid #FDE68A;border-radius:6px;padding:10px 14px;font-size:12px;color:#78350F;margin-top:14px;line-height:1.6}
+
+/* ─── NEW: SCANNER TAB WINDOW ─── */
+.scanner-window{background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.10);border:1px solid #E2E8F0;overflow:hidden;margin-bottom:18px}
+.scanner-window-header{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:0 20px}
+.tab-bar{display:flex;gap:0}
+.tab{padding:12px 20px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:#3B82F6;border-bottom-color:#3B82F6}
+.scanner-window-body{padding:20px}
+
+/* ─── NEW: MERCHANT BAR ─── */
+.merchant-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.merchant-info{display:flex;align-items:center;gap:10px}
+.merchant-avatar{width:36px;height:36px;background:#DBEAFE;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1E40AF;flex-shrink:0}
+.merchant-name{font-size:14px;font-weight:700;color:#1E3A5F}
+.merchant-url{font-size:12px;color:#64748B}
+.merchant-tags{display:flex;gap:6px;flex-wrap:wrap}
+.merchant-tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px}
+
+/* ─── NEW: LOADED-FROM STRIP ─── */
+.loaded-from-strip{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;margin-bottom:16px}
+.lf-row{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.lf-label{font-size:10px;font-weight:700;color:#14532D;text-transform:uppercase;letter-spacing:.5px;padding-top:4px;flex-shrink:0;white-space:nowrap}
+.lf-sources{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1}
+.lf-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px}
+.lf-ind{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.lf-toc{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.lf-co{background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE}
+.lf-sep{color:#94A3B8;font-size:12px;font-weight:700}
+.lf-view-btn{font-size:11px;color:#3B82F6;cursor:pointer;background:none;border:none;padding:0;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:underline;white-space:nowrap;align-self:center}
+.lf-merge-detail{background:#fff;border:1px solid #BBF7D0;border-radius:6px;padding:12px;margin-top:10px}
+.lf-merge-title{font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.lf-merge-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid #F1F5F9;font-size:12px}
+.lf-merge-item:last-child{border-bottom:none}
+.lf-merge-num{font-size:10px;font-weight:700;color:#94A3B8;min-width:16px;padding-top:2px;flex-shrink:0}
+.lf-merge-label{font-weight:600;color:#1E293B}
+.lf-merge-desc{color:#64748B;font-size:11px;margin-top:1px}
+
+/* ─── NEW: OVERVIEW CONFIG CARD ─── */
+.ov-config-card{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:16px;margin-bottom:16px}
+.ov-config-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.ov-config-title{font-size:12px;font-weight:700;color:#1E3A5F}
+.ov-config-meta{font-size:11px;color:#64748B;font-weight:500}
+.ov-section{margin-bottom:14px}
+.ov-section:last-child{margin-bottom:0}
+.ov-section-label{font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.ov-checks{display:flex;flex-wrap:wrap;gap:5px}
+.ov-check{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+.ov-check::before{content:"✓ ";font-weight:700;font-size:10px}
+.aw-summary-badge{display:inline-flex;align-items:center;gap:8px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:8px 14px;font-size:13px;color:#1E40AF;font-weight:500;flex-wrap:wrap}
+.aw-count-chip{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;background:#DBEAFE;padding:2px 8px;border-radius:4px;color:#1E40AF}
+
+/* ─── NEW: SCAN CTA ─── */
+.scan-cta{background:#1E3A5F;border-radius:8px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.scan-cta-left{flex:1}
+.scan-cta-title{color:#fff;font-size:15px;font-weight:700;margin-bottom:3px}
+.scan-cta-sub{color:#93C5FD;font-size:12px}
+.btn-scan{background:#22C55E;color:#fff;padding:11px 28px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+
+/* ─── NEW: EDIT MODE EXTRAS ─── */
+.modal-header-right{display:flex;align-items:center;gap:10px}
+.edit-badge{background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.edit-footer{background:#EFF6FF;border-top:2px solid #BFDBFE;padding:14px 20px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.edit-footer-note{font-size:11px;color:#1E40AF;line-height:1.5;flex:1;min-width:200px}
+.edit-footer-btns{display:flex;gap:8px;flex-shrink:0}
+
+/* ─── NEW: MODE LABELS ─── */
+.mode-label{display:inline-flex;align-items:center;gap:6px;background:#F1F5F9;border:1px solid #CBD5E1;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;color:#475569;margin-bottom:16px}
+.mode-label.overview{background:#F0FDF4;border-color:#BBF7D0;color:#14532D}
+.mode-label.editing{background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF}
 </style>
 </head>
 <body>
@@ -129,12 +227,433 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 <div class="page">
   <div class="page-header">
     <h1>Q-ScanAI Scanner Configuration</h1>
-    <p>Save the Q-ScanAI scanner config at three tiers. Most-specific tier wins.</p>
+    <p>Three-tier config (Industry Type / Type of Company / Company) · Overview + Edit UX · Additional Words (Compliance Elements) · Many-to-one data model requirement.</p>
   </div>
 
-  <!-- SECTION 1 — How it resolves -->
+  <!-- ═══════════════════════════════════════════════════════
+       MANY-TO-ONE DATA MODEL CALLOUT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="m2o-panel">
+    <div class="m2o-title">⚠ Data Model Requirement — Many-to-One (Post-MVP Priority)</div>
+    <div class="m2o-subtitle">A single company can belong to multiple Industry Types and/or Types of Company simultaneously.</div>
+    <div class="m2o-body">
+      Currently the system is <strong>one-to-one</strong> — one Industry Type per company. For this feature to work correctly in real-world scenarios, we need a <strong>many-to-one</strong> relationship: one company maps to <em>multiple</em> Industry Types and/or <em>multiple</em> Types of Company. The scanner config for that company must <strong>aggregate all unique settings</strong> from every matching tier config, then apply any company-level overrides on top.
+      <br><br>
+      This does not need to ship in the initial release but will be <strong>critical</strong> for handling mixed-category merchants (e.g., a retailer selling both CBD products and firearms). The initial v1 can use a single Industry Type assignment per company; the many-to-one aggregation is a fast-follow requirement.
+    </div>
+    <div class="m2o-diagram">
+      <div class="m2o-diagram-title">Example — AG Living Solutions LLC (Hemp/CBD + Firearms &amp; Ammo)</div>
+      <div class="m2o-row">
+        <div class="m2o-company-box">AG Living Solutions LLC</div>
+        <div class="m2o-arrow-col">
+          <div class="m2o-arrow">→</div>
+          <div class="m2o-arrow">→</div>
+          <div class="m2o-arrow">→</div>
+          <div class="m2o-arrow">→</div>
+        </div>
+        <div class="m2o-sources">
+          <div class="m2o-source">
+            <span class="m2o-source-tag m2o-ind">Industry Type: Hemp/CBD</span>
+            <span class="m2o-source-desc">Hemp/CBD checks + keywords + Peptide / Drug / Health / Cannabis Additional Words</span>
+          </div>
+          <div class="m2o-source">
+            <span class="m2o-source-tag m2o-ind">Industry Type: Firearms &amp; Ammo</span>
+            <span class="m2o-source-desc">Firearms checks + keywords + Firearms Compliance Additional Words</span>
+          </div>
+          <div class="m2o-source">
+            <span class="m2o-source-tag m2o-toc">Type of Company: E-commerce</span>
+            <span class="m2o-source-desc">Adds Accepted Payment Methods check; inherits from both industry tiers</span>
+          </div>
+          <div class="m2o-source">
+            <span class="m2o-source-tag m2o-co">Company: AG Living Solutions overrides</span>
+            <span class="m2o-source-desc">No company-specific overrides saved — inherits aggregated config from above</span>
+          </div>
+        </div>
+      </div>
+      <div class="m2o-result-box">
+        <div class="m2o-result-title">Aggregated Scanner Config — what the scanner actually uses</div>
+        <div class="m2o-result-body">
+          <strong>Checks:</strong> Union of all unique checks from Hemp/CBD baseline + Firearms &amp; Ammo baseline + E-commerce override (Accepted Payment Methods added)<br>
+          <strong>Custom Keywords:</strong> Union of all unique keywords from Hemp/CBD config + Firearms &amp; Ammo config<br>
+          <strong>Whitelist Keywords:</strong> Union of all unique whitelist terms from all matching tiers<br>
+          <strong>Additional Words:</strong> Union of all violative term categories — Peptide Compliance, Drug References, Health Claims, Cannabis Compliance (from Hemp/CBD tier) + Firearms Compliance (from Firearms &amp; Ammo tier)
+        </div>
+      </div>
+    </div>
+    <div class="m2o-mvp-note">
+      <strong>Conflict resolution for boolean checks:</strong> If a check is enabled in <em>any</em> matching tier config, it is enabled in the aggregated config. Company-level overrides can explicitly disable a check for a specific merchant. For keywords and Additional Words: additive union — no deduplication needed since the scanner checks for presence of any term.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION ① — SCANNER TAB: WHAT THE USER SEES
+       ═══════════════════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label">① How it resolves</div>
+    <div class="section-label">① Scanner Tab — What the User Sees</div>
+    <div class="section-title">Overview (default) and Edit Configuration toggle</div>
+
+    <div class="annotation blue" style="margin-bottom:20px">
+      <strong>Design decision — Edit toggle in the Scanner tab itself, not a separate Settings tab.</strong><br>
+      The user is already in the Scanner tab when they're about to run a scan. Keeping the loaded-config summary and the "Edit configuration" button in the same view means they can review what config will be used, make any needed tweaks, and immediately start the scan — without navigating away. A separate Settings tab would require context-switching back and forth. <strong>Recommended approach: Scanner tab with Edit toggle.</strong>
+    </div>
+
+    <!-- ── OVERVIEW MODE ── -->
+    <div class="mode-label overview">▸ Mode A — Overview (default when opening the Scanner tab)</div>
+
+    <div class="scanner-window">
+      <div class="scanner-window-header">
+        <div class="tab-bar">
+          <div class="tab active">Scanner</div>
+          <div class="tab">Reports</div>
+          <div class="tab">Settings</div>
+        </div>
+      </div>
+      <div class="scanner-window-body">
+
+        <!-- Merchant context -->
+        <div class="merchant-bar">
+          <div class="merchant-info">
+            <div class="merchant-avatar">AG</div>
+            <div>
+              <div class="merchant-name">AG Living Solutions LLC</div>
+              <div class="merchant-url">aglivingsolutions.com</div>
+            </div>
+          </div>
+          <div class="merchant-tags">
+            <span class="merchant-tag" style="background:#DCFCE7;color:#166534;border:1px solid #BBF7D0">Hemp/CBD</span>
+            <span class="merchant-tag" style="background:#DCFCE7;color:#166534;border:1px solid #BBF7D0">Firearms &amp; Ammo</span>
+            <span class="merchant-tag" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">E-commerce</span>
+          </div>
+        </div>
+
+        <!-- Loaded-from strip -->
+        <div class="loaded-from-strip">
+          <div class="lf-row">
+            <span class="lf-label">Loaded from:</span>
+            <div class="lf-sources">
+              <span class="lf-chip lf-ind">Industry: Hemp/CBD</span>
+              <span class="lf-sep">+</span>
+              <span class="lf-chip lf-ind">Industry: Firearms &amp; Ammo</span>
+              <span class="lf-sep">+</span>
+              <span class="lf-chip lf-toc">E-commerce (ToC)</span>
+              <span class="lf-sep">+</span>
+              <span class="lf-chip lf-co">AG Living Solutions (no company overrides)</span>
+              <button class="lf-view-btn">View merge order ▾</button>
+            </div>
+          </div>
+          <div class="lf-merge-detail">
+            <div class="lf-merge-title">Merge order — lowest to highest priority (highest wins on conflicts)</div>
+            <div class="lf-merge-item">
+              <span class="lf-merge-num">①</span>
+              <div>
+                <div class="lf-merge-label">Industry Type "Hemp/CBD" baseline</div>
+                <div class="lf-merge-desc">Video Analysis, Product Comparison, Address, Phone, Email, FDA Disclaimer, SSL · Keywords: delta-8, delta-9, thc-o, hhc · Additional Words: Peptide Compliance, Drug References, Health Claims, Cannabis Compliance</div>
+              </div>
+            </div>
+            <div class="lf-merge-item">
+              <span class="lf-merge-num">②</span>
+              <div>
+                <div class="lf-merge-label">Industry Type "Firearms &amp; Ammo" baseline</div>
+                <div class="lf-merge-desc">Adds: Age &amp; Access Control, Terms of Use, Privacy Policy, Return Policy · Keywords: firearms, ammo, suppressor, silencer · Additional Words: Firearms Compliance</div>
+              </div>
+            </div>
+            <div class="lf-merge-item">
+              <span class="lf-merge-num">③</span>
+              <div>
+                <div class="lf-merge-label">Type of Company "E-commerce" (Hemp/CBD × E-commerce)</div>
+                <div class="lf-merge-desc">Adds: Accepted Payment Methods check · Whitelist: licensed dealer, FFL</div>
+              </div>
+            </div>
+            <div class="lf-merge-item">
+              <span class="lf-merge-num">④</span>
+              <div>
+                <div class="lf-merge-label">Company "AG Living Solutions LLC" — no overrides saved</div>
+                <div class="lf-merge-desc">Inherits the fully aggregated config from tiers ①–③. No company-specific customizations.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Read-only config summary -->
+        <div class="ov-config-card">
+          <div class="ov-config-header">
+            <span class="ov-config-title">Loaded Scanner Configuration</span>
+            <span class="ov-config-meta">read only · aggregated from 3 tier sources</span>
+          </div>
+
+          <div class="ov-section">
+            <span class="ov-section-label">Active Checks (13 of 13)</span>
+            <div class="ov-checks">
+              <span class="ov-check">Video Analysis</span>
+              <span class="ov-check">Product Comparison</span>
+              <span class="ov-check">Auto-Create Product</span>
+              <span class="ov-check">Address</span>
+              <span class="ov-check">Phone</span>
+              <span class="ov-check">Email</span>
+              <span class="ov-check">Accepted Payment Methods</span>
+              <span class="ov-check">Age &amp; Access Control</span>
+              <span class="ov-check">Terms of Use</span>
+              <span class="ov-check">Privacy Policy</span>
+              <span class="ov-check">Return / Refund Policy</span>
+              <span class="ov-check">FDA Disclaimer</span>
+              <span class="ov-check">Verify SSL Certificate</span>
+            </div>
+          </div>
+
+          <div class="ov-section">
+            <span class="ov-section-label">Custom Keywords (8 terms — aggregated)</span>
+            <div class="kw-pills">
+              <span class="kw-pill kw-green">delta-8</span>
+              <span class="kw-pill kw-green">delta-9</span>
+              <span class="kw-pill kw-green">thc-o</span>
+              <span class="kw-pill kw-green">hhc</span>
+              <span class="kw-pill kw-green">firearms</span>
+              <span class="kw-pill kw-green">ammo</span>
+              <span class="kw-pill kw-green">suppressor</span>
+              <span class="kw-pill kw-green">silencer</span>
+            </div>
+          </div>
+
+          <div class="ov-section">
+            <span class="ov-section-label">Whitelist Keywords (5 terms — aggregated)</span>
+            <div class="kw-pills">
+              <span class="kw-pill kw-blue">hemp-derived</span>
+              <span class="kw-pill kw-blue">federally legal</span>
+              <span class="kw-pill kw-blue">0.3% THC</span>
+              <span class="kw-pill kw-blue">licensed dealer</span>
+              <span class="kw-pill kw-blue">FFL</span>
+            </div>
+          </div>
+
+          <div class="ov-section">
+            <span class="ov-section-label">Additional Words — Compliance Elements</span>
+            <div class="aw-summary-badge">
+              <span>Comprehensive violative terms database</span>
+              <span class="aw-count-chip">52 terms</span>
+              <span style="color:#64748B;font-size:11px">across 5 categories</span>
+              <a href="#edit-mode" style="font-size:11px;margin-left:2px">Edit to expand ↓</a>
+            </div>
+            <div style="font-size:11px;color:#64748B;margin-top:6px;line-height:1.5">Active categories: Peptide Compliance (5) · Drug References (8) · Health Claims (12) · Cannabis Compliance (15) · Firearms Compliance (12) · Pulled from Q-Audit Global Settings → Compliance Elements.</div>
+          </div>
+        </div>
+
+        <!-- Start Scan CTA -->
+        <div class="scan-cta">
+          <div class="scan-cta-left">
+            <div class="scan-cta-title">Ready to scan aglivingsolutions.com</div>
+            <div class="scan-cta-sub">Using aggregated config · 13 checks · 13 custom keywords · 52 additional words from 5 categories</div>
+          </div>
+          <button class="btn-scan">▶ Start AI Scan</button>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="justify-content:flex-start;gap:14px">
+        <button class="btn btn-secondary" style="font-size:12px">⚙ Edit configuration</button>
+        <span style="font-size:11px;color:#64748B">Edits apply to AG Living Solutions LLC only (Company tier override).</span>
+      </div>
+    </div>
+
+    <div class="annotation green">
+      <strong>Overview mode:</strong> The user sees the fully-resolved, aggregated config at a glance — which checks are active, merged keywords, and a count of Additional Words (with a note where they come from). They click <strong>▶ Start AI Scan</strong> to run immediately, or <strong>⚙ Edit configuration</strong> to drop into edit mode below.
+    </div>
+
+    <div class="divider" style="margin:24px 0"></div>
+
+    <!-- ── EDIT MODE ── -->
+    <div id="edit-mode" class="mode-label editing">✎ Mode B — Edit Configuration (after clicking "⚙ Edit configuration")</div>
+
+    <div class="modal-wrap edit-mode">
+      <div class="modal-header">
+        <h2>Q-ScanAI Scanner Configuration</h2>
+        <div class="modal-header-right">
+          <span class="edit-badge">● EDITING</span>
+          <span class="close-btn">✕</span>
+        </div>
+      </div>
+      <div class="modal-body">
+
+        <!-- Scope reminder in edit mode -->
+        <div class="loaded-from-strip" style="margin-bottom:18px">
+          <div class="lf-row">
+            <span class="lf-label">Editing scope:</span>
+            <div class="lf-sources">
+              <span class="lf-chip lf-co">AG Living Solutions LLC — Company tier override</span>
+              <span style="font-size:11px;color:#64748B">Changes saved here are layered on top of the aggregated Hemp/CBD + Firearms &amp; Ammo + E-commerce baseline. Other merchants are unaffected.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="checks-grid">
+          <div>
+            <div class="checks-col-header">Scanner Checks</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Video Analysis</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Product Comparison</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Auto-Create Product</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Address</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Phone</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Email</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Accepted Payment Methods</span></div>
+          </div>
+          <div>
+            <div class="checks-col-header">Site Compliance</div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Age &amp; Access Control</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Terms of Use</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Privacy Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Return / Refund Policy</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">FDA Disclaimer</span></div>
+            <div class="check-item"><input type="checkbox" checked><span class="check-label">Verify SSL Certificate</span></div>
+          </div>
+        </div>
+
+        <div class="kw-block">
+          <label class="kw-block-label">Custom Keywords</label>
+          <div class="kw-pills">
+            <span class="kw-pill kw-green">delta-8 ✕</span>
+            <span class="kw-pill kw-green">delta-9 ✕</span>
+            <span class="kw-pill kw-green">thc-o ✕</span>
+            <span class="kw-pill kw-green">hhc ✕</span>
+            <span class="kw-pill kw-green">firearms ✕</span>
+            <span class="kw-pill kw-green">ammo ✕</span>
+            <span class="kw-pill kw-green">suppressor ✕</span>
+            <span class="kw-pill kw-green">silencer ✕</span>
+            <span class="kw-pill kw-add">+ Add keyword</span>
+          </div>
+        </div>
+
+        <div class="kw-block">
+          <label class="kw-block-label">Whitelist Keywords</label>
+          <div class="kw-pills">
+            <span class="kw-pill kw-blue">hemp-derived ✕</span>
+            <span class="kw-pill kw-blue">federally legal ✕</span>
+            <span class="kw-pill kw-blue">0.3% THC ✕</span>
+            <span class="kw-pill kw-blue">licensed dealer ✕</span>
+            <span class="kw-pill kw-blue">FFL ✕</span>
+            <span class="kw-pill kw-add">+ Add whitelist</span>
+          </div>
+        </div>
+
+        <!-- Additional Words — expanded in edit mode -->
+        <div class="aw-block">
+          <label class="aw-block-label">Additional Words — Compliance Elements (52 terms)</label>
+          <div class="aw-block-note">
+            Pulled from <strong>Q-Audit Global Settings → Compliance Elements</strong>. These are your violative-terms database, organized by category. Edits here create a <strong>Company-level override</strong> for AG Living Solutions LLC — the global default and tier-level settings are preserved for other merchants.
+          </div>
+
+          <div class="aw-cat">
+            <div class="aw-cat-header">Peptide Compliance <span class="aw-cat-count">5 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">collagen boost ✕</span>
+              <span class="aw-term aw-term-removable">BPC-157 ✕</span>
+              <span class="aw-term aw-term-removable">growth peptide ✕</span>
+              <span class="aw-term aw-term-removable">IGF-1 ✕</span>
+              <span class="aw-term aw-term-removable">muscle peptide ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+
+          <div class="aw-cat">
+            <div class="aw-cat-header">Drug References <span class="aw-cat-count">8 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">prescription required ✕</span>
+              <span class="aw-term aw-term-removable">FDA-approved drug ✕</span>
+              <span class="aw-term aw-term-removable">controlled substance ✕</span>
+              <span class="aw-term aw-term-removable">Schedule II ✕</span>
+              <span class="aw-term aw-term-removable">DEA-regulated ✕</span>
+              <span class="aw-term aw-term-removable">treat depression ✕</span>
+              <span class="aw-term aw-term-removable">cure anxiety ✕</span>
+              <span class="aw-term aw-term-removable">medical grade ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+
+          <div class="aw-cat">
+            <div class="aw-cat-header">Health Claims <span class="aw-cat-count">12 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">cures cancer ✕</span>
+              <span class="aw-term aw-term-removable">treats diabetes ✕</span>
+              <span class="aw-term aw-term-removable">reverses aging ✕</span>
+              <span class="aw-term aw-term-removable">eliminates pain ✕</span>
+              <span class="aw-term aw-term-removable">clinically proven ✕</span>
+              <span class="aw-term aw-term-removable">FDA approved treatment ✕</span>
+              <span class="aw-term aw-term-removable">no side effects ✕</span>
+              <span class="aw-term aw-term-removable">proven to heal ✕</span>
+              <span class="aw-term aw-term-removable">stronger than medication ✕</span>
+              <span class="aw-term aw-term-removable">alternative to chemo ✕</span>
+              <span class="aw-term aw-term-removable">replaces insulin ✕</span>
+              <span class="aw-term aw-term-removable">scientifically proven cure ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+
+          <div class="aw-cat">
+            <div class="aw-cat-header">Cannabis Compliance <span class="aw-cat-count">15 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">get high ✕</span>
+              <span class="aw-term aw-term-removable">psychoactive effect ✕</span>
+              <span class="aw-term aw-term-removable">intoxicating ✕</span>
+              <span class="aw-term aw-term-removable">trip ✕</span>
+              <span class="aw-term aw-term-removable">euphoric high ✕</span>
+              <span class="aw-term aw-term-removable">THC buzz ✕</span>
+              <span class="aw-term aw-term-removable">stoned ✕</span>
+              <span class="aw-term aw-term-removable">blazed ✕</span>
+              <span class="aw-term aw-term-removable">420 ✕</span>
+              <span class="aw-term aw-term-removable">weed ✕</span>
+              <span class="aw-term aw-term-removable">mary jane ✕</span>
+              <span class="aw-term aw-term-removable">reefer ✕</span>
+              <span class="aw-term aw-term-removable">herb slang ✕</span>
+              <span class="aw-term aw-term-removable">baked ✕</span>
+              <span class="aw-term aw-term-removable">blaze ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+
+          <div class="aw-cat">
+            <div class="aw-cat-header">Firearms Compliance <span class="aw-cat-count">12 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">untraceable ✕</span>
+              <span class="aw-term aw-term-removable">ghost gun ✕</span>
+              <span class="aw-term aw-term-removable">illegal conversion ✕</span>
+              <span class="aw-term aw-term-removable">bump stock ✕</span>
+              <span class="aw-term aw-term-removable">automatic conversion ✕</span>
+              <span class="aw-term aw-term-removable">no background check ✕</span>
+              <span class="aw-term aw-term-removable">bypass NICS ✕</span>
+              <span class="aw-term aw-term-removable">unregistered suppressor ✕</span>
+              <span class="aw-term aw-term-removable">illegal mod ✕</span>
+              <span class="aw-term aw-term-removable">solvent trap kit ✕</span>
+              <span class="aw-term aw-term-removable">coat hanger auto ✕</span>
+              <span class="aw-term aw-term-removable">switch ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="edit-footer">
+        <div class="edit-footer-note">
+          <strong>Scope:</strong> Changes saved here apply to <strong>AG Living Solutions LLC only</strong> (Company tier). The underlying Hemp/CBD, Firearms &amp; Ammo, and E-commerce tier configs are unchanged — other merchants on those tiers are unaffected. Future scans of this company use the new config.
+        </div>
+        <div class="edit-footer-btns">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Save Company override</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Edit mode:</strong> Triggered by "⚙ Edit configuration" in the Overview. The <strong>blue dashed border</strong> and <strong>● EDITING badge</strong> make the state change unmistakable. All checks, keywords, whitelist terms, and Additional Words categories are editable. Cancel returns to read-only Overview without saving.
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION ② — HOW IT RESOLVES
+       ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">② How it resolves</div>
     <div class="section-title">Lookup order at scan time</div>
 
     <div class="resolve-block">
@@ -149,16 +668,24 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
       </div>
       <p style="font-size:13px;color:#475569;margin-top:14px;line-height:1.6">
         If a company has no override saved, the scanner config inherits from the Type of Company tier. If no Type of Company tier is saved, it inherits from the Industry Type tier. If nothing is saved at any tier, the existing per-company default applies — same as today.
+        <br><br>
+        <strong>With many-to-one (post-MVP):</strong> A company mapped to multiple Industry Types and/or Types of Company gets an <em>aggregated</em> config — the union of all unique checks, keywords, and Additional Words from all matching tier configs, with Company-level overrides applied last at highest priority.
       </p>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- SECTION 2 — Set the config -->
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION ③ — ADMIN TIER EDITOR (Set the config)
+       ═══════════════════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label">② Set the config</div>
+    <div class="section-label">③ Admin Tier Editor — Set the config</div>
     <div class="section-title">Three tier modes — pick where you're saving</div>
+
+    <div class="annotation blue" style="margin-bottom:18px">
+      <strong>This is the admin/settings view</strong> — where a Qredible admin configures scanner baselines at each tier. This is separate from the per-merchant Scanner tab shown in Section ①. Admins use this to set industry-wide defaults; merchants see the aggregated result when they open their Scanner tab.
+    </div>
 
     <!-- ── MODE A: INDUSTRY TYPE ── -->
     <div class="modal-wrap">
@@ -229,12 +756,75 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
           </div>
         </div>
 
-        <div class="cel-group">
-          <div class="cel-group-header">Default Compliance Elements — Site Content</div>
-          <div class="cel-list">
-            <div class="cel-item"><input type="checkbox" checked> About Us page present</div>
-            <div class="cel-item"><input type="checkbox" checked> Contact page with form</div>
-            <div class="cel-item"><input type="checkbox"> COA document linked</div>
+        <!-- Additional Words in admin tier editor -->
+        <div class="aw-block">
+          <label class="aw-block-label">Additional Words — Compliance Elements</label>
+          <div class="aw-block-note">
+            Pulled from <strong>Q-Audit Global Settings → Compliance Elements</strong>. Edits here override the global default for the <em>Cannabis Industry Type tier</em>. All Cannabis-tagged merchants without a more specific config will use these terms.
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Peptide Compliance <span class="aw-cat-count">5 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">collagen boost ✕</span>
+              <span class="aw-term aw-term-removable">BPC-157 ✕</span>
+              <span class="aw-term aw-term-removable">growth peptide ✕</span>
+              <span class="aw-term aw-term-removable">IGF-1 ✕</span>
+              <span class="aw-term aw-term-removable">muscle peptide ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Drug References <span class="aw-cat-count">8 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">prescription required ✕</span>
+              <span class="aw-term aw-term-removable">FDA-approved drug ✕</span>
+              <span class="aw-term aw-term-removable">controlled substance ✕</span>
+              <span class="aw-term aw-term-removable">Schedule II ✕</span>
+              <span class="aw-term aw-term-removable">DEA-regulated ✕</span>
+              <span class="aw-term aw-term-removable">treat depression ✕</span>
+              <span class="aw-term aw-term-removable">cure anxiety ✕</span>
+              <span class="aw-term aw-term-removable">medical grade ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Health Claims <span class="aw-cat-count">12 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">cures cancer ✕</span>
+              <span class="aw-term aw-term-removable">treats diabetes ✕</span>
+              <span class="aw-term aw-term-removable">reverses aging ✕</span>
+              <span class="aw-term aw-term-removable">eliminates pain ✕</span>
+              <span class="aw-term aw-term-removable">clinically proven ✕</span>
+              <span class="aw-term aw-term-removable">FDA approved treatment ✕</span>
+              <span class="aw-term aw-term-removable">no side effects ✕</span>
+              <span class="aw-term aw-term-removable">proven to heal ✕</span>
+              <span class="aw-term aw-term-removable">stronger than medication ✕</span>
+              <span class="aw-term aw-term-removable">alternative to chemo ✕</span>
+              <span class="aw-term aw-term-removable">replaces insulin ✕</span>
+              <span class="aw-term aw-term-removable">scientifically proven cure ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Cannabis Compliance <span class="aw-cat-count">15 terms</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term aw-term-removable">get high ✕</span>
+              <span class="aw-term aw-term-removable">psychoactive effect ✕</span>
+              <span class="aw-term aw-term-removable">intoxicating ✕</span>
+              <span class="aw-term aw-term-removable">trip ✕</span>
+              <span class="aw-term aw-term-removable">euphoric high ✕</span>
+              <span class="aw-term aw-term-removable">THC buzz ✕</span>
+              <span class="aw-term aw-term-removable">stoned ✕</span>
+              <span class="aw-term aw-term-removable">blazed ✕</span>
+              <span class="aw-term aw-term-removable">420 ✕</span>
+              <span class="aw-term aw-term-removable">weed ✕</span>
+              <span class="aw-term aw-term-removable">mary jane ✕</span>
+              <span class="aw-term aw-term-removable">reefer ✕</span>
+              <span class="aw-term aw-term-removable">herb slang ✕</span>
+              <span class="aw-term aw-term-removable">baked ✕</span>
+              <span class="aw-term aw-term-removable">blaze ✕</span>
+              <span class="aw-term-add">+ Add</span>
+            </div>
           </div>
         </div>
 
@@ -246,7 +836,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     </div>
 
     <div class="annotation green">
-      <strong>Saving at the Industry Type tier</strong> sets the baseline for every Cannabis-tagged company in the system. Companies without a more specific config inherit these checks at scan time.
+      <strong>Saving at the Industry Type tier</strong> sets the baseline for every Cannabis-tagged company in the system. Companies without a more specific config inherit these checks and Additional Words at scan time.
     </div>
 
     <div class="divider"></div>
@@ -324,6 +914,25 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
           </div>
         </div>
 
+        <div class="aw-block">
+          <label class="aw-block-label">Additional Words — Compliance Elements</label>
+          <div class="aw-block-note">
+            Inherits all Additional Words from the Cannabis Industry Type baseline. Override specific categories here for Cultivators only. Other Cannabis company types are unaffected.
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Inherited from Cannabis baseline <span class="aw-cat-count">40 terms across 4 categories</span></div>
+            <div class="aw-cat-terms">
+              <span style="font-size:12px;color:#64748B;font-style:italic">Peptide Compliance (5) · Drug References (8) · Health Claims (12) · Cannabis Compliance (15) — edit at Industry Type tier to change these for all Cannabis companies.</span>
+            </div>
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Cultivator-Specific Override <span class="aw-cat-count">0 terms — none added yet</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term-add">+ Add cultivator-specific terms</span>
+            </div>
+          </div>
+        </div>
+
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary">Cancel</button>
@@ -332,7 +941,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     </div>
 
     <div class="annotation">
-      <strong>Saving at the Type of Company tier</strong> overrides the Cannabis baseline for Cultivators only. Cannabis Retailers, Manufacturers, etc. continue to inherit from the Industry Type tier above.
+      <strong>Saving at the Type of Company tier</strong> overrides the Cannabis baseline for Cultivators only. Cannabis Retailers, Manufacturers, etc. continue to inherit from the Industry Type tier.
     </div>
 
     <div class="divider"></div>
@@ -395,6 +1004,25 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
           </div>
         </div>
 
+        <div class="aw-block">
+          <label class="aw-block-label">Additional Words — Compliance Elements</label>
+          <div class="aw-block-note">
+            Inherits all Additional Words from the Cannabis baseline + Cultivator override. Add company-specific terms here to extend or replace inherited terms for Acme Cannabis Co only.
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Inherited from tier configs <span class="aw-cat-count">40 terms across 4 categories</span></div>
+            <div class="aw-cat-terms">
+              <span style="font-size:12px;color:#64748B;font-style:italic">Peptide Compliance (5) · Drug References (8) · Health Claims (12) · Cannabis Compliance (15)</span>
+            </div>
+          </div>
+          <div class="aw-cat">
+            <div class="aw-cat-header">Company-Specific Override <span class="aw-cat-count">0 terms — none added yet</span></div>
+            <div class="aw-cat-terms">
+              <span class="aw-term-add">+ Add company-specific terms</span>
+            </div>
+          </div>
+        </div>
+
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary">Cancel</button>
@@ -409,14 +1037,16 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
 
   <div class="divider"></div>
 
-  <!-- SECTION 3 — Flow diagram -->
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION ④ — FLOW DIAGRAM
+       ═══════════════════════════════════════════════════════ -->
   <div class="section">
-    <div class="section-label">③ Flow</div>
+    <div class="section-label">④ Flow</div>
     <div class="section-title">Tier hierarchy</div>
 
     <div class="flow-section">
       <div class="flow-title">Three tiers — most-specific wins at scan time</div>
-      <div class="flow-sub">Save direction (left-to-right) builds the hierarchy. Lookup direction (right-to-left) is what the scanner does.</div>
+      <div class="flow-sub">Save direction (left-to-right) builds the hierarchy. Lookup direction (right-to-left) is what the scanner does at scan time.</div>
       <div class="flow-steps">
         <div class="flow-step tier-industry">
           <div class="step-num">TIER 1</div>
@@ -436,7 +1066,7 @@ a{color:#3B82F6;text-decoration:none}a:hover{text-decoration:underline}
     </div>
 
     <div class="annotation green">
-      <strong>At scan time:</strong> Q-ScanAI looks for a Company override first. If none, it looks for a Type of Company override. If none, it falls back to the Industry Type baseline. If nothing is saved at any tier, the existing per-company default applies — same behavior as today.
+      <strong>At scan time:</strong> Q-ScanAI looks for a Company override first. If none, it looks for a Type of Company override. If none, it falls back to the Industry Type baseline. If nothing is saved at any tier, the existing per-company default applies — same behavior as today. Post-MVP with many-to-one: config is aggregated across all matching tiers before company overrides are applied.
     </div>
   </div>
 
