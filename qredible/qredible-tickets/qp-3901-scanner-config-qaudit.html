@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3901 — Scanner Config → Q-Audit Baseline + Processor Override</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+
+/* PAGE WRAPPER */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:40px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;letter-spacing:.3px}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+.section-header{font-size:14px;font-weight:700;color:#1A202E;padding:16px 20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:10px;background:#fff}
+.section-note{font-size:11px;color:#64748B;font-weight:400;margin-left:4px}
+
+/* MODAL STATIC WRAPPER */
+.modal-backdrop{background:#F0F0F7;padding:32px;border-radius:0}
+.modal{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);max-width:780px;margin:0 auto;overflow:hidden}
+.modal-header{padding:16px 20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px}
+.modal-icon{width:36px;height:36px;background:#EFF6FF;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-title{font-size:15px;font-weight:700;color:#1A202E}
+.modal-subtitle{font-size:11px;color:#94A3B8;margin-top:1px}
+.modal-company{margin-left:auto;display:flex;align-items:center;gap:8px}
+.modal-company select,.company-select{background:#fff;border:1px solid #CBD5E1;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;color:#1A202E;cursor:pointer}
+.close-btn{width:28px;height:28px;border-radius:6px;border:1px solid #E2E8F0;background:#F8FAFC;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748B;font-size:14px;font-weight:700;flex-shrink:0}
+
+/* TABS — filled segment style */
+.seg-tabs{display:flex;gap:0;padding:12px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0}
+.seg-tab{padding:7px 16px;font-size:12px;font-weight:600;border:1px solid #E2E8F0;background:#fff;color:#374151;cursor:pointer;transition:background .1s}
+.seg-tab:first-child{border-radius:6px 0 0 6px}
+.seg-tab:last-child{border-radius:0 6px 6px 0}
+.seg-tab+.seg-tab{border-left:none}
+.seg-tab.active{background:#2563EB;color:#fff;border-color:#2563EB}
+
+/* MODAL BODY */
+.modal-body{padding:16px 20px}
+.scope-banner{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1E40AF;line-height:1.55}
+.scope-banner strong{font-weight:700}
+.cycle-note{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:9px 14px;margin-bottom:14px;font-size:11px;color:#64748B;line-height:1.55}
+
+/* CHECKS GRID */
+.checks-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-bottom:16px}
+.checks-col-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;padding-bottom:6px;margin-bottom:4px;border-bottom:1px solid #F1F5F9}
+.check-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F8FAFC}
+.check-row:last-child{border-bottom:none}
+.check-cb{width:14px;height:14px;accent-color:#2563EB;flex-shrink:0}
+.check-label{font-size:12px;color:#1A202E}
+.check-label.dim{color:#94A3B8}
+.check-annot{font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px;font-weight:600}
+.annot-baseline{background:#EFF6FF;color:#1D4ED8}
+.annot-override{background:#F3E8FF;color:#7C3AED}
+
+/* KEYWORDS SECTION */
+.kw-section{margin-top:14px}
+.kw-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:6px}
+.kw-row{display:flex;gap:8px;margin-bottom:8px}
+.kw-input{flex:1;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;background:#fff;color:#1A202E}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-blue{background:#2563EB;border-color:#2563EB;color:#fff}
+.btn-green{background:#059669;border-color:#059669;color:#fff}
+.btn-cancel{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-sm{padding:5px 10px;font-size:11px}
+
+/* Q-AUDIT SHELL */
+.qaudit-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+.qaudit-topbar{background:#fff;border-bottom:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;gap:12px}
+.qaudit-topbar h3{font-size:15px;font-weight:700;color:#1A202E}
+.qaudit-topbar .spacer{flex:1}
+.qtrust-nav{background:#1A202E;padding:8px 20px;display:flex;align-items:center;gap:16px}
+.qtrust-nav .nav-item{font-size:12px;color:#94A3B8;font-weight:600;cursor:pointer;padding:4px 0;border-bottom:2px solid transparent}
+.qtrust-nav .nav-item.active{color:#fff;border-bottom-color:#2563EB}
+.qtrust-brand{color:#fff;font-size:14px;font-weight:700;margin-right:8px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#1E3A5F}
+thead th{color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid #F1F5F9}
+tbody tr:hover{background:#FAFCFF}
+tbody tr.highlighted{background:#EFF6FF}
+tbody td{padding:9px 14px;font-size:13px;color:#1A202E;vertical-align:middle}
+.action-btns{display:flex;gap:6px;align-items:center}
+.icon-btn{width:26px;height:26px;border-radius:5px;border:1px solid #E2E8F0;background:#F8FAFC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#64748B;transition:background .1s}
+.icon-btn:hover{background:#EFF6FF;color:#2563EB}
+.icon-btn.delete:hover{background:#FEE2E2;color:#DC2626}
+.icon-btn.config{background:#EFF6FF;color:#2563EB;border-color:#BFDBFE}
+
+/* BASELINE CARD */
+.baseline-card{background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;margin-top:0}
+.baseline-header{background:#1E3A5F;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.baseline-header h4{font-size:13px;font-weight:700;color:#fff}
+.qredible-badge{background:#2563EB;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.3px}
+.baseline-body{padding:16px}
+.baseline-note{background:#EFF6FF;border-left:3px solid #2563EB;padding:8px 12px;font-size:12px;color:#1E40AF;border-radius:0 6px 6px 0;margin-bottom:14px}
+
+/* READONLY CHECK ROW */
+.ro-check-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F8FAFC}
+.ro-check-row:last-child{border-bottom:none}
+.check-icon{width:16px;height:16px;border-radius:3px;border:1.5px solid #CBD5E1;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
+.check-icon.checked{background:#2563EB;border-color:#2563EB;color:#fff;font-size:10px}
+.check-icon.unchecked{background:#F8FAFC;border-color:#CBD5E1}
+
+/* BANNER */
+.info-banner{display:flex;align-items:flex-start;gap:8px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:9px 12px;margin-bottom:10px;font-size:12px;color:#1E40AF}
+.info-banner .icon{flex-shrink:0;font-size:14px;margin-top:1px}
+.loaded-badge{display:inline-flex;align-items:center;gap:5px;background:#DBEAFE;color:#1D4ED8;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:4px}
+
+/* PROBLEM CALLOUT */
+.problem-callout{background:#FEE2E2;border:2px dashed #FCA5A5;border-radius:8px;padding:12px 16px;margin-top:12px}
+.problem-callout p{font-size:12px;color:#991B1B;line-height:1.6}
+
+/* ORIGIN BANNER */
+.origin-banner{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:9px 14px;margin-bottom:12px;font-size:12px;color:#166534;display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">Tickets</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3901</span>
+  <span class="title">Scanner Config → Q-Audit Baseline + Processor Override</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- INFO ANNOTATION -->
+  <div class="info-block">
+    <div class="info-pill">QP-3901</div>
+    <p><strong>QP-3901 — Scanner Config → Q-Audit Baseline + Processor Override.</strong> Moves industry-type and type-of-company scanner configuration into Q-Audit, where Qredible sets a central baseline. Processors can override the baseline at their scope without cross-contamination — FlexPay and Westtown can hold different hemp/CBD configs.</p>
+  </div>
+
+  <!-- SECTION A -->
+  <div>
+    <div class="section-label">Section A — Current State — Q-ScanAI Scanner Configuration (Processor tab)</div>
+    <div class="app-shell">
+      <div class="section-header">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#64748B" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+        Static reproduction of the existing Q-ScanAI Processor-scope modal
+      </div>
+      <div class="modal-backdrop">
+        <div class="modal">
+          <!-- Modal header -->
+          <div class="modal-header">
+            <div class="modal-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+            </div>
+            <div>
+              <div class="modal-title">Q-ScanAI Scanner Configuration</div>
+              <div class="modal-subtitle">by Qredible</div>
+            </div>
+            <div class="modal-company">
+              <span style="font-size:12px;color:#64748B;">Scanning:</span>
+              <select class="company-select"><option>FLEX Payment Solutions LLC</option></select>
+            </div>
+            <div class="close-btn">×</div>
+          </div>
+          <!-- Tabs -->
+          <div class="seg-tabs">
+            <div class="seg-tab active">Processors</div>
+            <div class="seg-tab">Industry Type</div>
+            <div class="seg-tab">Type of Company</div>
+            <div class="seg-tab">Company</div>
+          </div>
+          <!-- Body -->
+          <div class="modal-body">
+            <div class="scope-banner">
+              <strong>PROCESSOR</strong> — You're editing the Processor profile for <strong>FLEX Payment Solutions</strong>. This config is the default applied to every client under this processor unless overridden by a more-specific tier (Industry Type, Type of Company, or Company) for the client only.
+            </div>
+            <div class="cycle-note">Each check is in one of 3 life-states: override (over-rides lower tiers), OFF (overrides lower tiers and — default added to the last known tier ON list for 0 cycle).</div>
+            <div class="checks-grid">
+              <!-- Compliance Checks -->
+              <div>
+                <div class="checks-col-header">Compliance Checks</div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">FDA Disclaimer</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Terms of Use</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Privacy Policy</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Return/Refund Policy</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Contact &amp; Business Info</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Age &amp; Access Controls</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Accepted Payment Methods</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">SSL/TLS Security &amp; Integrity</span></div>
+              </div>
+              <!-- Analyst Review Checks -->
+              <div>
+                <div class="checks-col-header">Analyst Review Checks</div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">THC Disclaimer</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Product Subscription Model</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">Product/Service Match</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">Price Points Match</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">Prohibited Products Search</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">No Hidden Fees</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">No Free Trials (Unless Disclosed)</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">GMP Certificate for Supplements</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Checkboxes Unchecked by Default</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">External Links Review</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">No Auto-Checked Boxes</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Terms Checkbox Pre-Purchase</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Shipping to Prohibited States</span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Shipping/Billing Address Match</span></div>
+              </div>
+            </div>
+            <!-- Keywords -->
+            <div class="kw-section">
+              <div class="kw-label">Custom Bet Keywords</div>
+              <div class="kw-row">
+                <input type="text" class="kw-input" placeholder="Submit">
+                <button class="btn btn-primary btn-sm">+ Add</button>
+              </div>
+            </div>
+            <div class="kw-section">
+              <div class="kw-label">Whitelist Keywords</div>
+              <div class="kw-row">
+                <input type="text" class="kw-input" placeholder="">
+                <button class="btn btn-primary btn-sm">+ Add</button>
+              </div>
+            </div>
+            <div class="kw-section">
+              <div class="kw-label">Additional Words</div>
+              <div style="font-size:11px;color:#64748B;margin-bottom:6px;">Comprehensive violation terms database (22 terms)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION B -->
+  <div>
+    <div class="section-label">Section B — Current State — Q-Audit Industry Types (no scanner config)</div>
+    <div class="qaudit-shell">
+      <!-- Q-Trust nav bar simulation -->
+      <div class="qtrust-nav">
+        <span class="qtrust-brand">Q-Trust™</span>
+        <span class="nav-item">Community Forum</span>
+        <span class="nav-item active">Q-Audit</span>
+        <span class="nav-item">Form Builder</span>
+        <span class="nav-item">Q-Comply</span>
+      </div>
+      <div style="padding:16px 20px 0 20px;">
+        <div style="font-size:18px;font-weight:700;color:#1A202E;margin-bottom:16px;">
+          <span style="color:#2563EB;">Q</span>-Audit™
+        </div>
+        <!-- Industry Types panel -->
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+          <div class="qaudit-topbar">
+            <h3>Industry Types</h3>
+            <span class="spacer"></span>
+            <button class="btn btn-primary btn-sm">+ Add</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Industry Types</th>
+                  <th>Description</th>
+                  <th>Creation Date</th>
+                  <th>Last Modification Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cannabis / CBD</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>09/23/22</td>
+                  <td>09/23/22</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Hemp / CBD</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>09/23/22</td>
+                  <td>09/23/22</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Cannabis / MJ Only</td>
+                  <td style="font-size:12px;color:#374151;">A Cannabis Business that does not offer CBD Products</td>
+                  <td>09/02/25</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Functional Mushrooms</td>
+                  <td style="font-size:12px;color:#374151;">Companies offering functional and nootropic mushroom supplements...</td>
+                  <td>11/26/25</td>
+                  <td>11/26/25</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Nutraceuticals/Supplements</td>
+                  <td style="font-size:12px;color:#374151;">Nutraceuticals/Supplements is a broad merchant category used by payment processors for businesses s...</td>
+                  <td>01/17/26</td>
+                  <td>01/17/26</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Parking</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Peptides</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Digital Assets</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Unknown</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:14px 20px;border-top:1px solid #F1F5F9;background:#F8FAFC;">
+            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:4px;">Policy and Procedure Applicability</div>
+            <div style="font-size:12px;color:#94A3B8;">(partially visible — continued below)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION C -->
+  <div>
+    <div class="section-label">Section C — After QP-3901 — Q-Audit Industry Types with Scanner Config Action <span class="new-pill">NEW</span></div>
+    <div class="qaudit-shell">
+      <div class="qtrust-nav">
+        <span class="qtrust-brand">Q-Trust™</span>
+        <span class="nav-item">Community Forum</span>
+        <span class="nav-item active">Q-Audit</span>
+        <span class="nav-item">Form Builder</span>
+        <span class="nav-item">Q-Comply</span>
+      </div>
+      <div style="padding:16px 20px 20px 20px;">
+        <div style="font-size:18px;font-weight:700;color:#1A202E;margin-bottom:16px;"><span style="color:#2563EB;">Q</span>-Audit™</div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;">
+          <div class="qaudit-topbar">
+            <h3>Industry Types</h3>
+            <span class="spacer"></span>
+            <button class="btn btn-primary btn-sm">+ Add</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Industry Types</th>
+                  <th>Description</th>
+                  <th>Creation Date</th>
+                  <th>Last Modification Date</th>
+                  <th>Action <span class="new-pill">NEW</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cannabis / CBD</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>09/23/22</td>
+                  <td>09/23/22</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr class="highlighted">
+                  <td><strong>Hemp / CBD</strong></td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>09/23/22</td>
+                  <td>09/23/22</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner" style="background:#2563EB;color:#fff;border-color:#2563EB;">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Cannabis / MJ Only</td>
+                  <td style="font-size:12px;color:#374151;">A Cannabis Business that does not offer CBD Products</td>
+                  <td>09/02/25</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Functional Mushrooms</td>
+                  <td style="font-size:12px;color:#374151;">Companies offering functional and nootropic mushroom supplements...</td>
+                  <td>11/26/25</td>
+                  <td>11/26/25</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Nutraceuticals/Supplements</td>
+                  <td style="font-size:12px;color:#374151;">Nutraceuticals/Supplements is a broad merchant category...</td>
+                  <td>01/17/26</td>
+                  <td>01/17/26</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Parking</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Peptides</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Digital Assets</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+                <tr>
+                  <td>Unknown</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td>05/04/26</td>
+                  <td style="color:#94A3B8;font-style:italic;">—</td>
+                  <td><div class="action-btns"><div class="icon-btn" title="Edit">✎</div><div class="icon-btn config" title="Configure Scanner">⚙</div><div class="icon-btn delete" title="Delete">🗑</div></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION D -->
+  <div>
+    <div class="section-label">Section D — After QP-3901 — Q-Audit Baseline Scanner Config Panel <span class="new-pill">NEW</span></div>
+    <div class="app-shell">
+      <div class="section-header">
+        Q-Audit: Baseline Scanner Configuration (expanded from Hemp/CBD row ⚙ click)
+        <span class="new-pill">NEW</span>
+      </div>
+      <div style="padding:20px;">
+        <div class="baseline-card">
+          <!-- Baseline header -->
+          <div class="baseline-header">
+            <h4>Baseline Scanner Configuration — Hemp / CBD</h4>
+            <span class="qredible-badge">Qredible-managed</span>
+          </div>
+          <div class="baseline-body">
+            <div class="baseline-note">
+              This baseline applies to all processors for Hemp/CBD merchants unless a processor override exists.
+            </div>
+            <div class="checks-grid">
+              <!-- Compliance Checks -->
+              <div>
+                <div class="checks-col-header">Compliance Checks</div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">FDA Disclaimer</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Terms of Use</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Privacy Policy</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Return/Refund Policy</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Contact &amp; Business Info</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Age &amp; Access Controls</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Accepted Payment Methods</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">SSL/TLS Security &amp; Integrity</span></div>
+              </div>
+              <!-- Analyst Review Checks -->
+              <div>
+                <div class="checks-col-header">Analyst Review Checks</div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">THC Disclaimer</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Product Subscription Model</span></div>
+                <div class="ro-check-row"><div class="check-icon unchecked"></div><span class="check-label dim">Product/Service Match</span></div>
+                <div class="ro-check-row"><div class="check-icon unchecked"></div><span class="check-label dim">Price Points Match</span></div>
+                <div class="ro-check-row"><div class="check-icon unchecked"></div><span class="check-label dim">Prohibited Products Search</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">No Hidden Fees</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">No Free Trials (Unless Disclosed)</span></div>
+                <div class="ro-check-row"><div class="check-icon unchecked"></div><span class="check-label dim">GMP Certificate for Supplements</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Checkboxes Unchecked by Default</span></div>
+                <div class="ro-check-row"><div class="check-icon unchecked"></div><span class="check-label dim">External Links Review</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">No Auto-Checked Boxes</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Terms Checkbox Pre-Purchase</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Shipping to Prohibited States</span></div>
+                <div class="ro-check-row"><div class="check-icon checked">✓</div><span class="check-label">Shipping/Billing Address Match</span></div>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:8px;align-items:center;">
+              <button class="btn btn-blue">Save Baseline</button>
+              <button class="btn btn-secondary">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION E -->
+  <div>
+    <div class="section-label">Section E — After QP-3901 — Q-ScanAI Processor View with Baseline Origin <span class="new-pill">NEW</span></div>
+    <div class="app-shell">
+      <div class="section-header">
+        Q-ScanAI Processor tab — now shows baseline origin + overrides
+        <span class="new-pill">NEW</span>
+      </div>
+      <div class="modal-backdrop">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+            </div>
+            <div>
+              <div class="modal-title">Q-ScanAI Scanner Configuration</div>
+              <div class="modal-subtitle">by Qredible</div>
+            </div>
+            <div class="modal-company">
+              <span style="font-size:12px;color:#64748B;">Scanning:</span>
+              <select class="company-select"><option>FLEX Payment Solutions LLC</option></select>
+            </div>
+            <div class="close-btn">×</div>
+          </div>
+          <div class="seg-tabs">
+            <div class="seg-tab active">Processors</div>
+            <div class="seg-tab">Industry Type</div>
+            <div class="seg-tab">Type of Company</div>
+            <div class="seg-tab">Company</div>
+          </div>
+          <div class="modal-body">
+            <!-- Origin banner — NEW -->
+            <div class="origin-banner">
+              <span>ℹ️</span>
+              <span><strong>Loaded from: Q-Audit Baseline — Hemp / CBD.</strong> Processor-level overrides shown in <strong>bold</strong>.</span>
+            </div>
+            <div class="scope-banner">
+              <strong>PROCESSOR</strong> — You're editing the Processor profile for <strong>FLEX Payment Solutions</strong>. This config overrides the Q-Audit baseline at this processor scope only.
+            </div>
+            <div class="checks-grid">
+              <!-- Compliance Checks -->
+              <div>
+                <div class="checks-col-header">Compliance Checks</div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">FDA Disclaimer <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Terms of Use <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Privacy Policy <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Return/Refund Policy <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Contact &amp; Business Info <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Age &amp; Access Controls <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label"><strong>Accepted Payment Methods</strong> <span class="check-annot annot-override">override</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">SSL/TLS Security &amp; Integrity <span class="check-annot annot-baseline">baseline</span></span></div>
+              </div>
+              <!-- Analyst Review Checks -->
+              <div>
+                <div class="checks-col-header">Analyst Review Checks</div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">THC Disclaimer <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Product Subscription Model <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">Product/Service Match <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">Price Points Match <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label"><strong>Prohibited Products Search</strong> <span class="check-annot annot-override">override</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">No Hidden Fees <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">No Free Trials (Unless Disclosed) <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">GMP Certificate for Supplements <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Checkboxes Unchecked by Default <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb"> <span class="check-label">External Links Review <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">No Auto-Checked Boxes <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Terms Checkbox Pre-Purchase <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label">Shipping to Prohibited States <span class="check-annot annot-baseline">baseline</span></span></div>
+                <div class="check-row"><input type="checkbox" class="check-cb" checked> <span class="check-label"><strong>Shipping/Billing Address Match</strong> <span class="check-annot annot-override">override</span></span></div>
+              </div>
+            </div>
+            <div class="kw-section">
+              <div class="kw-label">Custom Bet Keywords</div>
+              <div class="kw-row"><input type="text" class="kw-input" placeholder="Submit"><button class="btn btn-primary btn-sm">+ Add</button></div>
+            </div>
+            <div class="kw-section">
+              <div class="kw-label">Whitelist Keywords</div>
+              <div class="kw-row"><input type="text" class="kw-input" placeholder=""><button class="btn btn-primary btn-sm">+ Add</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
