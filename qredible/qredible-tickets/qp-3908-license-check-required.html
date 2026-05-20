@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3908 — Industry-Level License Check Required Flag</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:40px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94A3B8;margin-bottom:10px}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+
+/* MODAL CARD */
+.modal-card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);overflow:hidden;max-width:480px;margin:0 auto}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid #E2E8F0}
+.modal-title{font-size:16px;font-weight:700;color:#1A202E;margin-bottom:3px}
+.modal-close-row{display:flex;align-items:flex-start;justify-content:space-between}
+.modal-close{width:28px;height:28px;border-radius:6px;border:1px solid #E2E8F0;background:#fff;font-size:16px;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+/* MODAL BODY */
+.modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+
+/* FORM */
+.form-row{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:12px;font-weight:600;color:#374151}
+.form-input{width:100%;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#f8faff}
+.form-textarea{width:100%;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#f8faff;resize:vertical;min-height:80px}
+
+/* BTNS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-save{background:#16A34A;border-color:#16A34A;color:#fff}
+.modal-footer{padding:14px 24px;border-top:1px solid #E2E8F0;display:flex;align-items:center;gap:8px;background:#fff}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block}
+
+/* RADIO GROUP */
+.radio-group{display:flex;flex-direction:column;gap:7px;padding:10px 12px;border:1px solid #CBD5E1;border-radius:6px;background:#fff}
+.radio-option{display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer}
+.radio-option input[type="radio"]{accent-color:#1E3A5F;width:14px;height:14px;flex-shrink:0}
+.radio-checked{font-weight:600;color:#1A202E}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#1E3A5F}
+thead th{color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left;white-space:nowrap;letter-spacing:.02em}
+tbody tr{border-bottom:1px solid #F1F5F9}
+tbody tr:hover{background:#FAFCFF}
+tbody td{padding:10px 14px;font-size:13px;color:#1A202E;vertical-align:middle}
+
+/* LICENSE STATUS BADGES */
+.lic-not-found{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;background:#F1F5F9;border:1px solid #CBD5E1;color:#64748B;font-size:12px;font-style:italic;font-weight:500;white-space:nowrap}
+.lic-na{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;background:#F1F5F9;border:1px solid #CBD5E1;color:#64748B;font-size:12px;font-style:italic;font-weight:500;white-space:nowrap}
+
+/* INDUSTRY TYPE CHIPS */
+.ind-chip{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:#EDE9FE;color:#4C1D95;border:1px solid #C4B5FD;white-space:nowrap}
+.ind-chip.cannabis{background:#DCFCE7;color:#166534;border-color:#bbf7d0}
+.ind-chip.other{background:#F1F5F9;color:#475569;border-color:#CBD5E1}
+
+/* LEGAL NAME CELL */
+.legal-name{font-weight:700;color:#1A202E;font-size:13px}
+.legal-sub{font-size:11px;color:#94A3B8;margin-top:1px}
+
+/* DBA chips in table */
+.dba-none{font-size:12px;color:#CBD5E1;font-style:italic}
+.dba-chips{display:flex;flex-direction:column;gap:3px}
+.dba-chip-sm{display:inline-flex;align-items:center;font-size:11px;font-weight:600;background:#F1F5F9;color:#475569;padding:2px 7px;border-radius:10px;width:fit-content;border:1px solid #E2E8F0}
+
+/* PROBLEM CALLOUT */
+.callout-red{background:#FEF2F2;border:2px dashed #FCA5A5;border-radius:8px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start;margin-top:12px}
+.callout-red .icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.callout-red p{font-size:12px;color:#991B1B;line-height:1.6}
+
+/* AFTER callout */
+.callout-green{background:#F0FDF4;border:2px dashed #86EFAC;border-radius:8px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start;margin-top:12px}
+.callout-green p{font-size:12px;color:#166534;line-height:1.6}
+
+/* VARIANT EXAMPLES BOX */
+.variants-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 16px;margin-top:12px}
+.variants-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:8px}
+.variant-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F1F5F9;font-size:12px}
+.variant-row:last-child{border-bottom:none}
+.variant-name{font-weight:600;color:#1A202E;min-width:220px}
+.variant-flag-yes{display:inline-flex;align-items:center;gap:5px;background:#DCFCE7;border:1px solid #bbf7d0;color:#166534;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px}
+.variant-flag-no{display:inline-flex;align-items:center;gap:5px;background:#FEE2E2;border:1px solid #fecaca;color:#991B1B;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px}
+.variant-result{font-size:11px;color:#64748B;font-style:italic;margin-left:6px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">← Prototypes</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3908</span>
+  <span class="title">Industry-Level "License Check Required" Flag</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- INFO ANNOTATION -->
+  <div class="info-block">
+    <div class="info-pill">QP-3908 &nbsp;·&nbsp; Context</div>
+    <p><strong>QP-3908 — Industry-Level "License Check Required" Flag.</strong> Adds a configurable toggle per industry type. Industries without it (Parking, Digital Assets, On-Line Dating, etc.) show "N/A — Not Applicable" in We Monitor license status instead of the misleading "License Not Found". No code deploy required to enable checks for a new vertical — just set the flag.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION A -->
+  <div>
+    <div class="section-label">Section A — Current State — Add Industry Type Modal (No License Flag)</div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-close-row">
+          <div class="modal-title">Add Industry Type</div>
+          <div class="modal-close">×</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label class="form-label">Industry Type</label>
+          <input class="form-input" type="text" placeholder="">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" placeholder=""></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-save">Save</button>
+        <button class="btn btn-primary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION B -->
+  <div>
+    <div class="section-label">Section B — After QP-3908 — Add Industry Type with License Check Required</div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-close-row">
+          <div class="modal-title">Add Industry Type</div>
+          <div class="modal-close">×</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label class="form-label">Industry Type</label>
+          <input class="form-input" type="text" placeholder="">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" placeholder=""></textarea>
+        </div>
+
+        <!-- NEW: License Check Required field -->
+        <div class="form-row">
+          <label class="form-label">
+            License Check Required
+            <span class="new-pill">NEW</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="lic-check" checked>
+              <span class="radio-checked">Yes</span>
+              <span style="color:#64748B;font-weight:400"> — run license verification for this industry</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="lic-check">
+              <span>No</span>
+              <span style="color:#64748B;font-weight:400"> — show N/A for license status</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-save">Save</button>
+        <button class="btn btn-primary">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Variant examples -->
+    <div class="variants-box">
+      <div class="variants-title">Example: How the flag is set per industry</div>
+      <div class="variant-row">
+        <span class="variant-name">Cannabis / CBD</span>
+        <span class="variant-flag-yes">✓ Yes — license checks run</span>
+        <span class="variant-result">→ "License Not Found" / "Compliant" / "Violative" shown in We Monitor</span>
+      </div>
+      <div class="variant-row">
+        <span class="variant-name">Hemp / CBD</span>
+        <span class="variant-flag-yes">✓ Yes — license checks run</span>
+        <span class="variant-result">→ "License Not Found" / "Compliant" / "Violative" shown in We Monitor</span>
+      </div>
+      <div class="variant-row">
+        <span class="variant-name">Parking</span>
+        <span class="variant-flag-no">✗ No — show N/A</span>
+        <span class="variant-result">→ "N/A — Not Applicable" shown in We Monitor</span>
+      </div>
+      <div class="variant-row">
+        <span class="variant-name">Digital Assets</span>
+        <span class="variant-flag-no">✗ No — show N/A</span>
+        <span class="variant-result">→ "N/A — Not Applicable" shown in We Monitor</span>
+      </div>
+      <div class="variant-row">
+        <span class="variant-name">On-Line Dating Service</span>
+        <span class="variant-flag-no">✗ No — show N/A</span>
+        <span class="variant-result">→ "N/A — Not Applicable" shown in We Monitor</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION C -->
+  <div>
+    <div class="section-label">Section C — Current State — We Monitor: "License Not Found" for Non-Applicable Industries</div>
+    <div class="app-shell">
+      <div style="padding:14px 20px;border-bottom:1px solid #E2E8F0;background:#fff;display:flex;align-items:center;gap:10px">
+        <div style="font-size:15px;font-weight:700;color:#1A202E">FLEX Payment Solutions — We Monitor</div>
+        <div style="font-size:12px;color:#64748B;margin-left:auto;font-style:italic">Active Companies tab</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px"><input type="checkbox" style="accent-color:#1E3A5F"></th>
+              <th>Legal Name</th>
+              <th>DBA Names</th>
+              <th>License Status</th>
+              <th style="color:#94A3B8;font-style:italic;font-weight:400;font-size:11px">Website Compliance · Product Compliance · … (cols omitted)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1: AXO Identifikum -->
+            <tr>
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">AXO Identifikum</div>
+                <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap">
+                  <span class="ind-chip cannabis">Retailer</span>
+                  <span class="ind-chip cannabis">MJ</span>
+                </div>
+              </td>
+              <td><span class="dba-none">No DBA Names</span></td>
+              <td><span class="lic-not-found">License Not Found</span></td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+            <!-- Row 2: 3rd Coast Service -->
+            <tr>
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">3rd Coast Service</div>
+                <div style="display:flex;gap:4px;margin-top:3px">
+                  <span class="ind-chip cannabis">Retailer</span>
+                </div>
+              </td>
+              <td><span class="dba-none">No DBA Names</span></td>
+              <td><span class="lic-not-found">License Not Found</span></td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+            <!-- Row 3: ALLIVING SOLUTIONS — On-Line Dating -->
+            <tr>
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">ALLIVING SOLUTIONS</div>
+                <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap">
+                  <span class="ind-chip other">On-Line Dating Service</span>
+                  <span class="ind-chip other">On-Line Dating Service</span>
+                </div>
+              </td>
+              <td><span class="dba-none">No DBA Names</span></td>
+              <td><span class="lic-not-found">License Not Found</span></td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+            <!-- Row 4: TPR Labs LLC -->
+            <tr>
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">TPR Labs LLC</div>
+                <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap">
+                  <span class="ind-chip cannabis">MJ</span>
+                  <span class="ind-chip cannabis">CBD</span>
+                  <span class="ind-chip cannabis">Retailer</span>
+                </div>
+              </td>
+              <td><span class="dba-none">—</span></td>
+              <td><span class="lic-not-found">License Not Found</span></td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout-red">
+      <div class="icon">⚠️</div>
+      <p><strong>Problem:</strong> "License Not Found" is misleading for On-Line Dating Service merchants — they're not in a regulated industry, so "not found" implies a compliance failure when none exists. The same issue applies to Parking, Digital Assets, and any other non-regulated vertical added in the future.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION D -->
+  <div>
+    <div class="section-label">Section D — After QP-3908 — N/A for Non-Applicable Industries</div>
+    <div class="app-shell">
+      <div style="padding:14px 20px;border-bottom:1px solid #E2E8F0;background:#fff;display:flex;align-items:center;gap:10px">
+        <div style="font-size:15px;font-weight:700;color:#1A202E">FLEX Payment Solutions — We Monitor</div>
+        <div style="font-size:12px;color:#64748B;margin-left:auto;font-style:italic">Active Companies tab</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px"><input type="checkbox" style="accent-color:#1E3A5F"></th>
+              <th>Legal Name</th>
+              <th>DBA Names</th>
+              <th>License Status</th>
+              <th style="color:#94A3B8;font-style:italic;font-weight:400;font-size:11px">Website Compliance · Product Compliance · … (cols omitted)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1: AXO Identifikum — Cannabis/MJ/Retailer → License check = Yes → stays "License Not Found" -->
+            <tr>
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">AXO Identifikum</div>
+                <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap">
+                  <span class="ind-chip cannabis">Retailer</span>
+                  <span class="ind-chip cannabis">MJ</span>
+                </div>
+              </td>
+              <td><span class="dba-none">No DBA Names</span></td>
+              <td>
+                <span class="lic-not-found">License Not Found</span>
+                <div style="font-size:10px;color:#94A3B8;margin-top:3px;font-style:italic">License Check Required = Yes</div>
+              </td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+            <!-- Row 2: 3rd Coast Service — Retailer → License check = Yes → stays "License Not Found" -->
+            <tr>
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">3rd Coast Service</div>
+                <div style="display:flex;gap:4px;margin-top:3px">
+                  <span class="ind-chip cannabis">Retailer</span>
+                </div>
+              </td>
+              <td><span class="dba-none">No DBA Names</span></td>
+              <td>
+                <span class="lic-not-found">License Not Found</span>
+                <div style="font-size:10px;color:#94A3B8;margin-top:3px;font-style:italic">License Check Required = Yes</div>
+              </td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+            <!-- Row 3: ALLIVING SOLUTIONS — On-Line Dating → flag = No → N/A -->
+            <tr style="background:#F0FDF4">
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">ALLIVING SOLUTIONS</div>
+                <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap">
+                  <span class="ind-chip other">On-Line Dating Service</span>
+                  <span class="ind-chip other">On-Line Dating Service</span>
+                </div>
+              </td>
+              <td><span class="dba-none">No DBA Names</span></td>
+              <td>
+                <span class="lic-na" style="background:#F1F5F9;border:1px solid #CBD5E1;color:#64748B">N/A — Not Applicable</span>
+                <div style="font-size:10px;color:#16A34A;margin-top:3px;font-style:italic;font-weight:600">License Check Required = No <span class="new-pill">NEW</span></div>
+              </td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+            <!-- Row 4: TPR Labs LLC — On-Line Dating → flag = No → N/A -->
+            <tr style="background:#F0FDF4">
+              <td><input type="checkbox" style="accent-color:#1E3A5F"></td>
+              <td>
+                <div class="legal-name">TPR Labs LLC</div>
+                <div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap">
+                  <span class="ind-chip other">On-Line Dating Service</span>
+                </div>
+              </td>
+              <td><span class="dba-none">—</span></td>
+              <td>
+                <span class="lic-na" style="background:#F1F5F9;border:1px solid #CBD5E1;color:#64748B">N/A — Not Applicable</span>
+                <div style="font-size:10px;color:#16A34A;margin-top:3px;font-style:italic;font-weight:600">License Check Required = No <span class="new-pill">NEW</span></div>
+              </td>
+              <td style="color:#CBD5E1;font-size:12px;font-style:italic">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout-green">
+      <div style="font-size:15px;flex-shrink:0;margin-top:1px">✅</div>
+      <p>Industries with "License Check Required = No" show <strong>N/A — Not Applicable</strong>. Eliminates misleading "License Not Found" for non-regulated verticals. Rows 3 and 4 above (On-Line Dating Service) now correctly surface N/A. Rows 1 and 2 (Retailer / MJ industries with flag = Yes) continue to show "License Not Found" as before.</p>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3906 — DBA Names Linked to Location + Type of Company</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:40px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94A3B8;margin-bottom:10px}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+
+/* MODAL CARD */
+.modal-card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);overflow:hidden;max-width:580px;margin:0 auto}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid #E2E8F0}
+.modal-title{font-size:16px;font-weight:700;color:#1A202E;margin-bottom:3px}
+.modal-subtitle{font-size:12px;color:#64748B}
+.modal-close-row{display:flex;align-items:flex-start;justify-content:space-between}
+.modal-close{width:28px;height:28px;border-radius:6px;border:1px solid #E2E8F0;background:#fff;font-size:16px;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+/* MODAL TABS */
+.modal-tabs{display:flex;gap:0;border-bottom:1px solid #E2E8F0;background:#fff;padding:0 24px}
+.modal-tab{padding:11px 14px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.modal-tab.active{color:#1A202E;border-bottom-color:#F05252}
+
+/* MODAL BODY */
+.modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+
+/* FORM ROW */
+.form-row{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:12px;font-weight:600;color:#374151}
+.form-input{width:100%;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#fff}
+.form-input:focus{outline:none;border-color:#94A3B8}
+.form-select{width:100%;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#fff;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.form-textarea{width:100%;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#fff;resize:vertical;min-height:80px}
+
+/* PHOTO UPLOAD CIRCLE */
+.photo-upload{width:72px;height:72px;border-radius:50%;border:2px dashed #CBD5E1;display:flex;align-items:center;justify-content:center;font-size:22px;color:#CBD5E1;cursor:pointer;flex-shrink:0}
+
+/* TWO-COL GRID */
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* DBA SECTION */
+.dba-section{display:flex;flex-direction:column;gap:8px}
+.dba-section-title{font-size:12px;font-weight:700;color:#374151;margin-bottom:2px}
+.dba-yes-row{display:flex;align-items:center;gap:10px}
+.dba-yes-label{font-size:13px;color:#374151}
+.dba-select{padding:5px 28px 5px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#fff;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.dba-chip-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dba-chip{display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;font-size:13px;font-weight:600;padding:5px 10px;border-radius:6px}
+.dba-chip-remove{width:18px;height:18px;border-radius:50%;background:#BFDBFE;color:#1D4ED8;border:none;cursor:pointer;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.dba-add-link{display:inline-flex;align-items:center;gap:5px;color:#2563eb;font-size:13px;font-weight:600;cursor:pointer}
+
+/* MODAL FOOTER */
+.modal-footer{padding:14px 24px;border-top:1px solid #E2E8F0;display:flex;align-items:center;justify-content:flex-end;gap:8px;background:#fff}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-save{background:#16A34A;border-color:#16A34A;color:#fff}
+.btn-outline{background:#fff;border-color:#CBD5E1;color:#374151}
+
+/* LOCATIONS MODAL */
+.loc-modal-card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);overflow:hidden;max-width:480px;margin:0 auto}
+.loc-row{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #F1F5F9}
+.loc-address{font-size:13px;color:#1A202E;flex:1}
+.loc-display-label{font-size:12px;color:#64748B;font-weight:600}
+.toggle-wrap{display:flex;align-items:center;gap:6px}
+.toggle{width:40px;height:20px;border-radius:20px;background:#16A34A;position:relative;flex-shrink:0;cursor:pointer}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;right:3px;transition:right .15s}
+.toggle.off{background:#9CA3AF}
+.toggle.off::after{right:auto;left:3px}
+.loc-func-row{padding:14px 20px 10px;display:flex;flex-direction:column;gap:5px}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block}
+
+/* DBA EXPANDED CARD (QP-3906 After state) */
+.dba-expanded-card{border:1px solid #BFDBFE;border-radius:8px;background:#F8FBFF;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.dba-card-header{display:flex;align-items:center;gap:8px}
+.dba-card-name{font-size:13px;font-weight:700;color:#1A202E;flex:1}
+.dba-remove-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:5px;border:1px solid #fecaca;background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:600;cursor:pointer}
+.dba-field-group{display:flex;flex-direction:column;gap:6px}
+.dba-field-label{font-size:12px;font-weight:600;color:#374151}
+.radio-group{display:flex;flex-direction:column;gap:6px;padding-left:2px}
+.radio-option{display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer}
+.radio-option input[type="radio"]{accent-color:#1E3A5F;width:14px;height:14px;flex-shrink:0}
+.radio-checked{font-weight:600;color:#1A202E}
+.industry-readonly{font-size:13px;color:#9CA3AF;background:#F8FAFC;padding:7px 10px;border-radius:6px;border:1px solid #E2E8F0}
+
+/* ADD DBA EXPANDED FORM */
+.dba-add-form{border:1.5px dashed #CBD5E1;border-radius:8px;background:#FAFAFA;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.dba-add-form-btns{display:flex;align-items:center;gap:8px;margin-top:4px}
+.btn-save-dba{background:#16A34A;border-color:#16A34A;color:#fff;padding:5px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid}
+.btn-cancel-dba{background:#fff;border-color:#CBD5E1;color:#374151;padding:5px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid}
+
+/* SECTION DIVIDER */
+.section-divider{display:flex;align-items:center;gap:12px;margin:4px 0}
+.section-divider-line{flex:1;height:1px;background:#E2E8F0}
+.section-divider-text{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;white-space:nowrap}
+
+/* PROBLEM CALLOUT */
+.callout-red{background:#FEF2F2;border:1.5px dashed #FCA5A5;border-radius:8px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start;margin-top:8px}
+.callout-red .icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.callout-red p{font-size:12px;color:#991B1B;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">← Prototypes</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3906</span>
+  <span class="title">DBA Names Linked to Location + Type of Company</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- INFO ANNOTATION -->
+  <div class="info-block">
+    <div class="info-pill">QP-3906 &nbsp;·&nbsp; Context</div>
+    <p><strong>QP-3906 — DBA Names linked to Location + Type of Company.</strong> Each DBA name is now associated with a location/address and type of company. This enables per-location license verification (license lookups require jurisdiction, which comes from the address). Industry type is inherited from the legal name.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION A -->
+  <div>
+    <div class="section-label">Section A — Current State — Edit Company Profile → DBA Names</div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-close-row">
+          <div>
+            <div class="modal-title">Edit Company Profile</div>
+            <div class="modal-subtitle">Update your company information</div>
+          </div>
+          <div class="modal-close">×</div>
+        </div>
+      </div>
+      <div class="modal-tabs">
+        <div class="modal-tab active">Summary</div>
+        <div class="modal-tab">Socials</div>
+        <div class="modal-tab">Team</div>
+        <div class="modal-tab">Referral</div>
+      </div>
+      <div class="modal-body">
+        <!-- Company Photo -->
+        <div class="form-row" style="flex-direction:row;align-items:center;gap:14px">
+          <div class="photo-upload">📷</div>
+          <div style="flex:1">
+            <div class="form-label" style="margin-bottom:4px">Company Photo</div>
+            <div style="font-size:11px;color:#94A3B8">Upload a profile image</div>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label class="form-label">Cover ID</label>
+            <input class="form-input" type="text" value="">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Legal ID</label>
+            <input class="form-input" type="text" value="">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label class="form-label">Industry</label>
+            <select class="form-select">
+              <option selected>Hemp / CBD</option>
+              <option>Cannabis / CBD</option>
+              <option>Cannabis / MJ Only</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Type of Company</label>
+            <select class="form-select">
+              <option selected>Retailer</option>
+              <option>Manufacturer</option>
+              <option>Distributor</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- DBA Names Section -->
+        <div class="dba-section">
+          <div class="dba-section-title">DBA Names (Doing Business As)</div>
+          <div class="dba-yes-row">
+            <span class="dba-yes-label">Do you have DBA Names?</span>
+            <select class="dba-select">
+              <option selected>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+          <div class="dba-chip-row">
+            <div class="dba-chip">
+              Cave Creek Relief
+              <button class="dba-chip-remove">×</button>
+            </div>
+          </div>
+          <div>
+            <a class="dba-add-link" href="#">+ Add Additional DBA Name</a>
+          </div>
+        </div>
+
+        <!-- Summary textarea -->
+        <div class="form-row">
+          <label class="form-label">Summary</label>
+          <textarea class="form-textarea" placeholder="Enter company summary"></textarea>
+        </div>
+
+        <!-- Website -->
+        <div class="form-row">
+          <label class="form-label">Website</label>
+          <input class="form-input" type="text" value="https://www.cavecreekrelief@cravecreekrelief.com">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION B -->
+  <div>
+    <div class="section-label">Section B — Current State — Locations Modal</div>
+    <div class="loc-modal-card">
+      <div class="modal-header">
+        <div class="modal-close-row">
+          <div>
+            <div class="modal-title">Locations</div>
+            <div class="modal-subtitle">Edit your Company locations</div>
+          </div>
+          <div class="modal-close">×</div>
+        </div>
+      </div>
+      <div style="padding:16px 20px 0">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:8px">Location</div>
+        <div class="loc-row" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:14px">
+          <div class="loc-address">600 East Main Street, Fredericksburg, TX, 78624, US</div>
+          <div class="toggle-wrap">
+            <div class="loc-display-label">Display</div>
+            <div class="toggle"></div>
+          </div>
+        </div>
+      </div>
+      <div class="loc-func-row">
+        <label class="form-label">Function of Location</label>
+        <select class="form-select">
+          <option selected>Corporate Office</option>
+          <option>Retail Store</option>
+          <option>Warehouse</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline">Add Location</button>
+        <button class="btn btn-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION C -->
+  <div>
+    <div class="section-label">Section C — After QP-3906 — DBA Entry with Location + Type</div>
+
+    <div class="callout-red" style="background:#EFF6FF;border-color:#93C5FD;margin-bottom:16px">
+      <div class="icon" style="font-size:15px">ℹ️</div>
+      <p style="color:#1D4ED8">The "Cave Creek Relief" DBA entry now expands into a structured card. Each DBA gets its own location (defaulting to the corporate address) and type of company. Industry type is always inherited from the legal name (read-only).</p>
+    </div>
+
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-close-row">
+          <div>
+            <div class="modal-title">Edit Company Profile</div>
+            <div class="modal-subtitle">Update your company information</div>
+          </div>
+          <div class="modal-close">×</div>
+        </div>
+      </div>
+      <div class="modal-tabs">
+        <div class="modal-tab active">Summary</div>
+        <div class="modal-tab">Socials</div>
+        <div class="modal-tab">Team</div>
+        <div class="modal-tab">Referral</div>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label class="form-label">Industry</label>
+            <select class="form-select">
+              <option selected>Hemp / CBD</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Type of Company</label>
+            <select class="form-select">
+              <option selected>Retailer</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- DBA Names Section — After state -->
+        <div class="dba-section">
+          <div class="dba-section-title">DBA Names (Doing Business As)</div>
+          <div class="dba-yes-row">
+            <span class="dba-yes-label">Do you have DBA Names?</span>
+            <select class="dba-select">
+              <option selected>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <!-- Expanded DBA Card -->
+          <div class="dba-expanded-card">
+            <div class="dba-card-header">
+              <div class="dba-chip" style="background:#EDE9FE;border-color:#C4B5FD;color:#4C1D95">Cave Creek Relief</div>
+              <button class="dba-remove-btn">× Remove</button>
+            </div>
+
+            <!-- Location field — NEW -->
+            <div class="dba-field-group">
+              <div class="dba-field-label">
+                Location for this DBA:
+                <span class="new-pill">NEW</span>
+              </div>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="loc-ccr" checked>
+                  <span class="radio-checked">Use corporate address</span>
+                  <span style="font-size:12px;color:#64748B;font-weight:400">&nbsp;(600 East Main Street, Fredericksburg, TX, 78624, US)</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="loc-ccr">
+                  <span>Enter separate address</span>
+                  <span style="font-size:11px;color:#94A3B8;font-style:italic;margin-left:4px">— address fields appear when selected</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Type of Company — NEW -->
+            <div class="dba-field-group">
+              <div class="dba-field-label">
+                Type of Company for this DBA:
+                <span class="new-pill">NEW</span>
+              </div>
+              <select class="form-select" style="max-width:280px">
+                <option selected>Retailer</option>
+                <option>Manufacturer</option>
+                <option>Distributor</option>
+                <option>Wholesaler</option>
+              </select>
+            </div>
+
+            <!-- Industry inherited — NEW -->
+            <div class="dba-field-group">
+              <div class="dba-field-label">
+                Industry Type (inherited from legal name):
+                <span class="new-pill">NEW</span>
+              </div>
+              <div class="industry-readonly">Hemp / CBD &nbsp;—&nbsp; <span style="font-size:11px;color:#9CA3AF">read-only, set on legal name</span></div>
+            </div>
+          </div>
+
+          <div>
+            <a class="dba-add-link" href="#">+ Add Additional DBA Name</a>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SECTION D -->
+  <div>
+    <div class="section-label">Section D — After QP-3906 — Add Additional DBA Name (Expanded Form)</div>
+
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-close-row">
+          <div>
+            <div class="modal-title">Edit Company Profile</div>
+            <div class="modal-subtitle">Update your company information</div>
+          </div>
+          <div class="modal-close">×</div>
+        </div>
+      </div>
+      <div class="modal-tabs">
+        <div class="modal-tab active">Summary</div>
+        <div class="modal-tab">Socials</div>
+        <div class="modal-tab">Team</div>
+        <div class="modal-tab">Referral</div>
+      </div>
+      <div class="modal-body">
+
+        <!-- Existing DBA chip (collapsed, already saved) -->
+        <div class="dba-section">
+          <div class="dba-section-title">DBA Names (Doing Business As)</div>
+          <div class="dba-yes-row">
+            <span class="dba-yes-label">Do you have DBA Names?</span>
+            <select class="dba-select">
+              <option selected>Yes</option>
+            </select>
+          </div>
+          <div class="dba-chip-row">
+            <div class="dba-chip" style="background:#EDE9FE;border-color:#C4B5FD;color:#4C1D95">
+              Cave Creek Relief
+              <button class="dba-chip-remove">×</button>
+            </div>
+          </div>
+
+          <!-- Add DBA Expanded Form -->
+          <div class="dba-add-form">
+            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:2px">New DBA Name</div>
+
+            <div class="form-row">
+              <label class="form-label">DBA Name</label>
+              <input class="form-input" type="text" placeholder="Enter DBA name">
+            </div>
+
+            <!-- Location — NEW -->
+            <div class="dba-field-group">
+              <div class="dba-field-label">
+                Location for this DBA:
+                <span class="new-pill">NEW</span>
+              </div>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="loc-new" checked>
+                  <span class="radio-checked">Use corporate address</span>
+                  <span style="font-size:12px;color:#64748B;font-weight:400">&nbsp;(600 East Main Street, Fredericksburg, TX, 78624, US)</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="loc-new">
+                  <span>Enter separate address</span>
+                  <span style="font-size:11px;color:#94A3B8;font-style:italic;margin-left:4px">— address fields appear when selected</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Type of Company — NEW -->
+            <div class="dba-field-group">
+              <div class="dba-field-label">
+                Type of Company for this DBA:
+                <span class="new-pill">NEW</span>
+              </div>
+              <select class="form-select" style="max-width:280px">
+                <option value="" selected disabled>Select type…</option>
+                <option>Retailer</option>
+                <option>Manufacturer</option>
+                <option>Distributor</option>
+                <option>Wholesaler</option>
+              </select>
+            </div>
+
+            <!-- Industry inherited — NEW -->
+            <div class="dba-field-group">
+              <div class="dba-field-label">
+                Industry Type (inherited from legal name):
+                <span class="new-pill">NEW</span>
+              </div>
+              <div class="industry-readonly">Hemp / CBD &nbsp;—&nbsp; <span style="font-size:11px;color:#9CA3AF">read-only, set on legal name</span></div>
+            </div>
+
+            <div class="dba-add-form-btns">
+              <button class="btn-save-dba">Save DBA</button>
+              <button class="btn-cancel-dba">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
