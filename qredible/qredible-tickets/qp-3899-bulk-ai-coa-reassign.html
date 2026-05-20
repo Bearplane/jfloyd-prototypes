@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3899 — Bulk AI COA Reassignment</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+.topnav .nav-note{font-size:11px;color:#64748B;font-style:italic}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:40px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px;margin-bottom:0}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px;margin-top:0}
+
+/* SECTION WRAPPER */
+.section{display:flex;flex-direction:column;gap:8px}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block;line-height:14px}
+
+/* MODAL SIMULATION (static) */
+.modal-scene{position:relative;background:#0F172A;background:rgba(15,23,42,.45);border-radius:10px;padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:420px}
+.modal-scene.tall{min-height:540px}
+
+/* MODAL CARD */
+.modal-card{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);width:100%;max-width:860px;overflow:hidden}
+.modal-card.narrow{max-width:480px}
+.modal-card.medium{max-width:600px}
+
+/* MODAL HEADER */
+.modal-hdr{padding:16px 20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:flex-start;gap:12px}
+.modal-hdr-text{flex:1}
+.modal-hdr-title{font-size:14px;font-weight:700;color:#1A202E;line-height:1.3}
+.modal-hdr-sub{font-size:11px;color:#64748B;margin-top:2px}
+.modal-hdr-meta{font-size:11px;color:#94A3B8;margin-top:3px}
+.modal-hdr-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit;white-space:nowrap}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-blue{background:#2563EB;border-color:#2563EB;color:#fff}
+.btn-close{background:none;border:none;font-size:18px;color:#64748B;cursor:pointer;padding:4px;line-height:1}
+
+/* MODAL TABLE */
+.modal-table-wrap{overflow-x:auto}
+.modal-table{width:100%;border-collapse:collapse}
+.modal-table thead tr{background:#1E3A5F}
+.modal-table thead th{color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left;white-space:nowrap}
+.modal-table thead th:first-child{width:36px;text-align:center}
+.modal-table tbody tr{border-bottom:1px solid #F1F5F9}
+.modal-table tbody tr:hover{background:#FAFCFF}
+.modal-table tbody td{padding:9px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
+.modal-table tbody td:first-child{text-align:center}
+.cb{width:14px;height:14px;accent-color:#1E3A5F;cursor:pointer}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge-blue{background:#DBEAFE;color:#1E40AF}
+.badge-green{background:#DCFCE7;color:#166534}
+.badge-amber{background:#FEF3C7;color:#92400E}
+.badge-na{background:#F1F5F9;color:#64748B}
+
+/* FILE NAME CELL */
+.file-cell{display:flex;align-items:center;gap:6px}
+.file-icon{font-size:14px;color:#64748B;flex-shrink:0}
+.file-name{font-size:12px;color:#1A202E;font-family:'IBM Plex Mono',monospace;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* DATE CELL */
+.date-red{color:#DC2626;font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:12px}
+.date-normal{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#374151}
+
+/* ADD URL LINK */
+.add-url{color:#2563eb;font-size:11px;font-weight:600}
+
+/* ROW ACTIONS */
+.row-actions{display:flex;align-items:center;gap:4px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;border:1px solid #E2E8F0;background:#fff;cursor:pointer;color:#64748B;font-size:13px}
+.icon-btn:hover{background:#F8FAFC}
+.icon-btn.reassign{color:#2563eb;border-color:#BFDBFE;background:#EFF6FF}
+
+/* TABS */
+.modal-tabs{display:flex;gap:0;border-bottom:1px solid #E2E8F0}
+.modal-tab{padding:10px 16px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.modal-tab.active{color:#1A202E;border-bottom-color:#F05252}
+
+/* PRODUCT LIST */
+.product-list{padding:12px 20px;display:flex;flex-direction:column;gap:8px}
+.product-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #E2E8F0;border-radius:8px;background:#F8FAFC}
+.product-icon{width:28px;height:28px;border-radius:6px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.product-name{font-size:13px;font-weight:600;color:#1A202E}
+.product-sub{font-size:11px;color:#94A3B8}
+.product-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:auto;white-space:nowrap}
+.product-badge.this{background:#EDE9FE;color:#4C1D95}
+.product-badge.child{background:#DBEAFE;color:#1E40AF}
+.product-row.active-row{border-color:#BFDBFE;background:#EFF6FF}
+
+/* REASSIGN NOTE */
+.reassign-note{padding:12px 20px;border-top:1px solid #E2E8F0;background:#F8FAFC;font-size:12px;color:#374151;line-height:1.5}
+.reassign-note strong{color:#1A202E}
+
+/* MODAL FOOTER */
+.modal-footer{padding:12px 20px;border-top:1px solid #E2E8F0;display:flex;align-items:center;justify-content:flex-end;gap:8px;background:#fff}
+
+/* SUBSECTION LABEL */
+.subsec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:10px 20px 4px}
+
+/* BULK RESULT TABLE NOTE */
+.table-note{padding:8px 16px;background:#FFFBEB;border-top:1px solid #FDE68A;font-size:11px;color:#78350F;font-style:italic}
+
+/* CONFIDENCE BADGE */
+.conf-high{background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.conf-med{background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">← Prototypes</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3899</span>
+  <span class="title">Bulk AI COA Reassignment</span>
+  <span class="spacer"></span>
+  <span class="nav-note">Sections A–D below ↓</span>
+</nav>
+
+<div class="page">
+
+  <!-- INFO ANNOTATION -->
+  <div class="info-block">
+    <div class="info-pill">QP-3899</div>
+    <p><strong>QP-3899 — Bulk AI COA Reassignment.</strong> Adds a single "Bulk Reassign" action to the product-family COA view. AI analyzes all COAs and variants in the family and proposes matches. One click replaces N individual reassign operations. Builds on the existing parent→child reassign flow already in dev.</p>
+  </div>
+
+  <!-- ═══════════════════════════════ SECTION A -->
+  <div class="section">
+    <div class="section-label">Section A — Current State — COA List Modal</div>
+    <div class="modal-scene tall">
+      <div class="modal-card">
+        <!-- Modal header -->
+        <div class="modal-hdr">
+          <div class="modal-hdr-text">
+            <div class="modal-hdr-title">Beach Break THC Seltzer 4-pack - Swell Berry</div>
+            <div class="modal-hdr-meta">SKU: 169702-MOF-2 &nbsp;/&nbsp; Dorado-3</div>
+            <div class="modal-hdr-sub">Certificate of Analysis (COA) Dorado-3 / 3 COAs</div>
+          </div>
+          <div class="modal-hdr-actions">
+            <button class="btn btn-blue">× Assign COA</button>
+            <button class="btn-close">×</button>
+          </div>
+        </div>
+        <!-- COA Table -->
+        <div class="modal-table-wrap">
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="cb"></th>
+                <th>File Name</th>
+                <th>Product Name from COA</th>
+                <th>Batch Number</th>
+                <th>COA Status</th>
+                <th>Disposition</th>
+                <th>COA URL</th>
+                <th>Expiration</th>
+                <th>Date Added</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="cb"></td>
+                <td>
+                  <div class="file-cell">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">THC-4.pdf</span>
+                  </div>
+                </td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span class="badge badge-blue">Processing</span></td>
+                <td><span class="badge badge-na">N/A</span></td>
+                <td><a href="#" class="add-url">+ Add URL</a></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span class="date-normal">02/09/2026</span></td>
+                <td>
+                  <div class="row-actions">
+                    <span class="icon-btn" title="Copy">📋</span>
+                    <span class="icon-btn" title="View">👁</span>
+                    <span class="icon-btn" title="Delete">🗑</span>
+                    <span class="icon-btn reassign" title="Reassign">⇄</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="cb"></td>
+                <td>
+                  <div class="file-cell">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name" title="gummies_rtt_passionfruit_2023-05-29-CLB-12-CLBB400G-024-000RDFC02.pdf">gummies_rtt_passionfruit_2023-0...</span>
+                  </div>
+                </td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span class="badge badge-green">COA Validated</span></td>
+                <td><span class="badge badge-na">N/A</span></td>
+                <td><a href="#" class="add-url">+ Add URL</a></td>
+                <td><span class="date-red">⚠ 05/15/25</span></td>
+                <td><span class="date-normal">05/09/2025</span></td>
+                <td>
+                  <div class="row-actions">
+                    <span class="icon-btn" title="Copy">📋</span>
+                    <span class="icon-btn" title="View">👁</span>
+                    <span class="icon-btn" title="Delete">🗑</span>
+                    <span class="icon-btn reassign" title="Reassign">⇄</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="cb"></td>
+                <td>
+                  <div class="file-cell">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">COA_09-284-2024.pdf</span>
+                  </div>
+                </td>
+                <td style="font-size:12px;color:#374151">Bulk Hashables Milk Chocolate</td>
+                <td style="font-size:12px;font-family:'IBM Plex Mono',monospace">MMCB-3-052525</td>
+                <td><span class="badge badge-green">COA Validated</span></td>
+                <td><span class="badge badge-na">N/A</span></td>
+                <td><a href="#" class="add-url">Add URL</a></td>
+                <td><span class="date-red">⚠ 06/03/24</span></td>
+                <td><span class="date-normal">06/03/2024</span></td>
+                <td>
+                  <div class="row-actions">
+                    <span class="icon-btn" title="Copy">📋</span>
+                    <span class="icon-btn" title="View">👁</span>
+                    <span class="icon-btn" title="Delete">🗑</span>
+                    <span class="icon-btn reassign" title="Reassign">⇄</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ SECTION B -->
+  <div class="section">
+    <div class="section-label">Section B — Current State — Individual Reassign Modal</div>
+    <div class="modal-scene tall">
+      <!-- Background: COA list modal (dimmed) -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:40px 24px;pointer-events:none">
+        <div class="modal-card" style="opacity:.35;pointer-events:none">
+          <div class="modal-hdr">
+            <div class="modal-hdr-text">
+              <div class="modal-hdr-title">Beach Break THC Seltzer 4-pack - Swell Berry</div>
+              <div class="modal-hdr-meta">SKU: 169702-MOF-2 &nbsp;/&nbsp; Dorado-3</div>
+              <div class="modal-hdr-sub">Certificate of Analysis (COA) Dorado-3 / 3 COAs</div>
+            </div>
+            <div class="modal-hdr-actions">
+              <button class="btn btn-blue">× Assign COA</button>
+            </div>
+          </div>
+          <div class="modal-table-wrap">
+            <table class="modal-table">
+              <thead><tr><th></th><th>File Name</th><th>Product Name from COA</th><th>Batch Number</th><th>COA Status</th><th>Disposition</th><th>COA URL</th><th>Expiration</th><th>Date Added</th><th></th></tr></thead>
+              <tbody>
+                <tr><td></td><td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">THC-4.pdf</span></div></td><td>—</td><td>—</td><td><span class="badge badge-blue">Processing</span></td><td><span class="badge badge-na">N/A</span></td><td><a href="#">+ Add URL</a></td><td>—</td><td>02/09/2026</td><td></td></tr>
+                <tr><td></td><td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">gummies_rtt_passionfruit_2023-0...</span></div></td><td>—</td><td>—</td><td><span class="badge badge-green">COA Validated</span></td><td><span class="badge badge-na">N/A</span></td><td><a href="#">+ Add URL</a></td><td><span class="date-red">⚠ 05/15/25</span></td><td>05/09/2025</td><td></td></tr>
+                <tr><td></td><td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">COA_09-284-2024.pdf</span></div></td><td style="font-size:12px">Bulk Hashables Milk Chocolate</td><td style="font-size:12px;font-family:monospace">MMCB-3-052525</td><td><span class="badge badge-green">COA Validated</span></td><td><span class="badge badge-na">N/A</span></td><td><a href="#">Add URL</a></td><td><span class="date-red">⚠ 06/03/24</span></td><td>06/03/2024</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Foreground: Reassign COA modal -->
+      <div class="modal-card narrow" style="position:relative;z-index:2">
+        <div class="modal-hdr" style="padding:14px 18px">
+          <div class="modal-hdr-text">
+            <div class="modal-hdr-title">Reassign COA</div>
+          </div>
+          <button class="btn-close" style="margin-left:auto">×</button>
+        </div>
+        <div class="modal-tabs" style="padding:0 18px">
+          <div class="modal-tab active">This Product</div>
+          <div class="modal-tab">All Products</div>
+        </div>
+        <div class="subsec-label">CHILD PRODUCTS &amp; PARENT (2)</div>
+        <div class="product-list" style="padding:8px 18px;gap:6px">
+          <div class="product-row">
+            <div class="product-icon">🫙</div>
+            <div>
+              <div class="product-name">Beach Break THC Seltzer 4-pack — Swell Berry</div>
+              <div class="product-sub">SKU: 169702-MOF-2</div>
+            </div>
+            <span class="product-badge this">THIS PRODUCT</span>
+          </div>
+          <div class="product-row active-row">
+            <div class="product-icon">🫙</div>
+            <div>
+              <div class="product-name">Beach Break THC Seltzer 4-pack — Watermelon</div>
+              <div class="product-sub">SKU: 169702-MOF-3</div>
+            </div>
+            <span class="product-badge child">CHILD</span>
+          </div>
+        </div>
+        <div class="reassign-note">
+          Reassign <strong>gummies_rtt_passionfruit_2023-05-29-CLB-12-CLBB400G-024-000RDFC02.pdf</strong> → Beach Break THC Seltzer 4-pack — Watermelon?
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ SECTION C -->
+  <div class="section">
+    <div class="section-label">Section C — After QP-3899 — COA Modal with Bulk Reassign Button</div>
+    <div class="modal-scene tall">
+      <div class="modal-card">
+        <!-- Modal header — NEW bulk reassign button added -->
+        <div class="modal-hdr">
+          <div class="modal-hdr-text">
+            <div class="modal-hdr-title">Beach Break THC Seltzer 4-pack - Swell Berry</div>
+            <div class="modal-hdr-meta">SKU: 169702-MOF-2 &nbsp;/&nbsp; Dorado-3</div>
+            <div class="modal-hdr-sub">Certificate of Analysis (COA) Dorado-3 / 3 COAs</div>
+          </div>
+          <div class="modal-hdr-actions">
+            <!-- NEW: Bulk Reassign button -->
+            <button class="btn btn-secondary">⚡ Bulk Reassign <span class="new-pill">NEW</span></button>
+            <button class="btn btn-blue">× Assign COA</button>
+            <button class="btn-close">×</button>
+          </div>
+        </div>
+        <!-- COA Table (same as Section A) -->
+        <div class="modal-table-wrap">
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="cb"></th>
+                <th>File Name</th>
+                <th>Product Name from COA</th>
+                <th>Batch Number</th>
+                <th>COA Status</th>
+                <th>Disposition</th>
+                <th>COA URL</th>
+                <th>Expiration</th>
+                <th>Date Added</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="cb"></td>
+                <td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">THC-4.pdf</span></div></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span class="badge badge-blue">Processing</span></td>
+                <td><span class="badge badge-na">N/A</span></td>
+                <td><a href="#" class="add-url">+ Add URL</a></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span class="date-normal">02/09/2026</span></td>
+                <td><div class="row-actions"><span class="icon-btn">📋</span><span class="icon-btn">👁</span><span class="icon-btn">🗑</span><span class="icon-btn reassign">⇄</span></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="cb"></td>
+                <td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name" title="gummies_rtt_passionfruit_2023-05-29-CLB-12-CLBB400G-024-000RDFC02.pdf">gummies_rtt_passionfruit_2023-0...</span></div></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span style="color:#CBD5E1;font-style:italic">—</span></td>
+                <td><span class="badge badge-green">COA Validated</span></td>
+                <td><span class="badge badge-na">N/A</span></td>
+                <td><a href="#" class="add-url">+ Add URL</a></td>
+                <td><span class="date-red">⚠ 05/15/25</span></td>
+                <td><span class="date-normal">05/09/2025</span></td>
+                <td><div class="row-actions"><span class="icon-btn">📋</span><span class="icon-btn">👁</span><span class="icon-btn">🗑</span><span class="icon-btn reassign">⇄</span></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="cb"></td>
+                <td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">COA_09-284-2024.pdf</span></div></td>
+                <td style="font-size:12px;color:#374151">Bulk Hashables Milk Chocolate</td>
+                <td style="font-size:12px;font-family:'IBM Plex Mono',monospace">MMCB-3-052525</td>
+                <td><span class="badge badge-green">COA Validated</span></td>
+                <td><span class="badge badge-na">N/A</span></td>
+                <td><a href="#" class="add-url">Add URL</a></td>
+                <td><span class="date-red">⚠ 06/03/24</span></td>
+                <td><span class="date-normal">06/03/2024</span></td>
+                <td><div class="row-actions"><span class="icon-btn">📋</span><span class="icon-btn">👁</span><span class="icon-btn">🗑</span><span class="icon-btn reassign">⇄</span></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ SECTION D -->
+  <div class="section">
+    <div class="section-label">Section D — After QP-3899 — Bulk Reassign COAs Modal</div>
+    <div class="modal-scene tall">
+      <!-- Background: COA list modal (dimmed) -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:40px 24px;pointer-events:none">
+        <div class="modal-card" style="opacity:.3;pointer-events:none">
+          <div class="modal-hdr">
+            <div class="modal-hdr-text">
+              <div class="modal-hdr-title">Beach Break THC Seltzer 4-pack - Swell Berry</div>
+              <div class="modal-hdr-meta">SKU: 169702-MOF-2 &nbsp;/&nbsp; Dorado-3</div>
+              <div class="modal-hdr-sub">Certificate of Analysis (COA) Dorado-3 / 3 COAs</div>
+            </div>
+            <div class="modal-hdr-actions">
+              <button class="btn btn-secondary">⚡ Bulk Reassign</button>
+              <button class="btn btn-blue">× Assign COA</button>
+            </div>
+          </div>
+          <div class="modal-table-wrap">
+            <table class="modal-table">
+              <thead><tr><th></th><th>File Name</th><th>Product Name from COA</th><th>Batch Number</th><th>COA Status</th><th>Disposition</th><th>COA URL</th><th>Expiration</th><th>Date Added</th><th></th></tr></thead>
+              <tbody>
+                <tr><td></td><td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">THC-4.pdf</span></div></td><td>—</td><td>—</td><td><span class="badge badge-blue">Processing</span></td><td>N/A</td><td>+ Add URL</td><td>—</td><td>02/09/2026</td><td></td></tr>
+                <tr><td></td><td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">gummies_rtt_passionfruit_2023-0...</span></div></td><td>—</td><td>—</td><td><span class="badge badge-green">COA Validated</span></td><td>N/A</td><td>+ Add URL</td><td><span class="date-red">⚠ 05/15/25</span></td><td>05/09/2025</td><td></td></tr>
+                <tr><td></td><td><div class="file-cell"><span class="file-icon">📄</span><span class="file-name">COA_09-284-2024.pdf</span></div></td><td style="font-size:12px">Bulk Hashables Milk Chocolate</td><td style="font-size:12px">MMCB-3-052525</td><td><span class="badge badge-green">COA Validated</span></td><td>N/A</td><td>Add URL</td><td><span class="date-red">⚠ 06/03/24</span></td><td>06/03/2024</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Foreground: Bulk Reassign modal -->
+      <div class="modal-card medium" style="position:relative;z-index:2">
+        <div class="modal-hdr" style="padding:16px 20px">
+          <div class="modal-hdr-text">
+            <div class="modal-hdr-title">
+              Bulk Reassign COAs — Beach Break THC Seltzer 4-pack
+              <span class="new-pill">NEW</span>
+            </div>
+            <div class="modal-hdr-sub" style="margin-top:4px">
+              AI will analyze all 3 COAs and 2 variants in this family and suggest the best COA-to-product matches.
+            </div>
+          </div>
+          <button class="btn-close" style="margin-left:16px">×</button>
+        </div>
+        <!-- Results table -->
+        <div class="modal-table-wrap">
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th style="width:auto">File Name</th>
+                <th>Proposed Product</th>
+                <th style="width:120px">Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="file-cell">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">THC-4.pdf</span>
+                  </div>
+                </td>
+                <td style="font-size:12px;color:#374151">Beach Break THC Seltzer 4-pack — Swell Berry</td>
+                <td><span class="conf-high">94%</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="file-cell">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name" title="gummies_rtt_passionfruit_2023-05-29-CLB-12-CLBB400G-024-000RDFC02.pdf">gummies_rtt_passionfruit_2023-0...</span>
+                  </div>
+                </td>
+                <td style="font-size:12px;color:#374151">Beach Break THC Seltzer 4-pack — Watermelon</td>
+                <td><span class="conf-high">87%</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="file-cell">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">COA_09-284-2024.pdf</span>
+                  </div>
+                </td>
+                <td style="font-size:12px;color:#374151">Beach Break THC Seltzer 4-pack — Swell Berry</td>
+                <td><span class="conf-med">72%</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-note">
+          AI matching is advisory. Review proposed matches before applying.
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Apply Matches</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
