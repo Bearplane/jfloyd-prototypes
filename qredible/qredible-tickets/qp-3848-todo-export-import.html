@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3848 — To-Do Export / Import</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px;margin-bottom:20px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06);margin-bottom:40px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-danger-outline{background:#fff;border-color:#FCA5A5;color:#DC2626}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px}
+
+/* Q-AUDIT APP SHELL INNER */
+.qaudit-header{padding:16px 20px 0;background:#fff}
+.qaudit-title{font-size:20px;font-weight:700;color:#1A202E;margin-bottom:0}
+.qaudit-tm{font-size:11px;vertical-align:super;color:#94A3B8}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid #E2E8F0;background:#fff;padding:0 20px}
+.tab{padding:12px 14px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab.active{color:#1A202E;border-bottom-color:#F05252}
+
+/* FILTER BAR */
+.filter-bar{padding:10px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-select{height:30px;border:1px solid #CBD5E1;border-radius:5px;background:#fff;font-size:12px;font-family:inherit;color:#374151;padding:0 8px;cursor:pointer;min-width:140px}
+.filter-date{height:30px;border:1px solid #CBD5E1;border-radius:5px;background:#fff;font-size:12px;font-family:inherit;color:#94A3B8;padding:0 8px;width:100px}
+.filter-label{font-size:12px;color:#64748B;white-space:nowrap}
+.filter-spacer{flex:1}
+.btn-export{background:#1A202E;border:1px solid #1A202E;color:#fff;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn-add-task{background:#fff;border:1px solid #CBD5E1;color:#374151;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+
+/* KANBAN BOARD */
+.kanban{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:16px 20px;background:#F8FAFC;min-height:400px;column-gap:16px}
+.kanban-col{}
+.kanban-col-header{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748B;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #E2E8F0}
+.kanban-cards{display:flex;flex-direction:column;gap:10px}
+
+/* KANBAN CARD */
+.kcard{background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.kcard-top{padding:8px 10px 6px}
+.kcard-status{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.02em}
+.kcard-status.not-found{background:#FEE2E2;color:#991B1B}
+.kcard-status.pending{background:#FEF3C7;color:#92400E}
+.kcard-status.active{background:#DCFCE7;color:#166534}
+.kcard-status.other-quality{background:#EDE9FE;color:#4C1D95}
+.kcard-company{font-size:12px;font-weight:700;color:#1A202E;margin-bottom:2px}
+.kcard-address{font-size:11px;color:#94A3B8;margin-bottom:6px}
+.kcard-docid{font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace;margin-bottom:6px}
+.kcard-mid{padding:0 10px 6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.kcard-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600}
+.kcard-badge.distributor{background:#DBEAFE;color:#1E40AF}
+.kcard-badge.processor{background:#FEF3C7;color:#92400E}
+.kcard-badge.retailer{background:#DCFCE7;color:#166534}
+.kcard-badge.third-party{background:#F3E8FF;color:#6B21A8}
+.kcard-state{font-size:11px;color:#94A3B8}
+.kcard-bottom{padding:6px 10px 8px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #F1F5F9}
+.kcard-exp{font-size:11px;color:#64748B}
+.kcard-days{display:inline-flex;align-items:center;background:#F1F5F9;border:1px solid #E2E8F0;color:#64748B;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+.kcard-days.urgent{background:#FEE2E2;border-color:#FCA5A5;color:#DC2626}
+
+/* EXPORT STATUS PILLS */
+.export-status-not{display:inline-flex;align-items:center;gap:4px;background:#F1F5F9;border:1px solid #E2E8F0;color:#64748B;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+.export-status-done{display:inline-flex;align-items:center;gap:4px;background:#DCFCE7;border:1px solid #BBF7D0;color:#166534;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+
+/* CARDS ZOOM ROW */
+.cards-zoom{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px;padding:20px}
+
+/* TABLE */
+.preview-table{width:100%;border-collapse:collapse}
+.preview-table thead tr{background:#1E3A5F}
+.preview-table thead th{color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left}
+.preview-table tbody tr{border-bottom:1px solid #F1F5F9}
+.preview-table tbody td{padding:10px 14px;font-size:12px;color:#1A202E}
+.preview-table tbody tr:hover{background:#FAFCFF}
+
+/* MODAL OVERLAY MOCK */
+.modal-overlay{background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:40px;border-radius:10px}
+.modal{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);padding:24px;max-width:560px;width:100%}
+.modal-title{font-size:17px;font-weight:700;color:#1A202E;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #E2E8F0}
+
+/* FILE INPUT */
+.file-input-row{border:2px dashed #CBD5E1;border-radius:8px;padding:20px;text-align:center;margin-bottom:16px;background:#F8FAFC}
+.file-input-label{font-size:13px;color:#64748B;margin-bottom:8px}
+.file-input-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #CBD5E1;background:#fff;color:#374151;font-family:inherit}
+
+/* PREVIEW HEADER */
+.preview-heading{font-size:13px;font-weight:700;color:#1A202E;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.preview-count{background:#DBEAFE;color:#1E40AF;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/">qredible-prototypes</a>
+  <span class="sep">/</span>
+  <a href="/qredible-tickets/">qredible-tickets</a>
+  <span class="sep">/</span>
+  <span class="title">To-Do Export / Import</span>
+  <span class="badge">QP-3848</span>
+</nav>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION A — CURRENT STATE                                   -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label">Section A — Current State</div>
+
+  <div class="app-shell">
+    <!-- Q-Audit header -->
+    <div class="qaudit-header" style="padding:16px 20px 10px">
+      <div class="qaudit-title">Q-Audit<span class="qaudit-tm">™</span></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active">Audit</div>
+      <div class="tab">Global Settings</div>
+      <div class="tab">Payroll</div>
+      <div class="tab">Import</div>
+      <div class="tab">Finances</div>
+      <div class="tab">Companies</div>
+      <div class="tab">Prospects</div>
+      <div class="tab">Sales</div>
+      <div class="tab">Promotions</div>
+      <div class="tab">Q-Comply</div>
+      <div class="tab">Activity Log</div>
+      <div class="tab">Q-AI Settings</div>
+      <div class="tab">Display Settings</div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <select class="filter-select"><option>Company</option></select>
+      <select class="filter-select"><option>Document Type</option></select>
+      <select class="filter-select" style="min-width:160px"><option>License States</option></select>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="filter-label">Start Date</span>
+        <input class="filter-date" type="text" placeholder="Start Date">
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="filter-label">End Date</span>
+        <input class="filter-date" type="text" placeholder="End Date">
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="filter-label">Sort By</span>
+        <select class="filter-select" style="min-width:140px"><option>Date Modified</option></select>
+      </div>
+      <div class="filter-spacer"></div>
+      <button class="btn-add-task">Add License Task</button>
+      <button class="btn-export">Export</button>
+    </div>
+
+    <!-- Kanban board -->
+    <div class="kanban">
+
+      <!-- REJECT -->
+      <div class="kanban-col">
+        <div class="kanban-col-header">Reject</div>
+        <div class="kanban-cards">
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Black Bear Wellness Inc.</div>
+              <div class="kcard-address">472 Lakeville Road, North New Hyde Park, NY 11042, US</div>
+              <div class="kcard-docid">Doc ID: 241-DF</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge distributor">Distributor</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 05/23/26</span>
+              <span class="kcard-days">75 days</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">SKG NW LLC</div>
+              <div class="kcard-address">SKG NW 140 AB, US</div>
+              <div class="kcard-docid">Doc ID: Ali-GR-0000…</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge processor">Cultivator</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 12/30/98</span>
+              <span class="kcard-days urgent">87 days</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status other-quality">Other Quality…</div>
+              <div class="kcard-company">River Valley Organics</div>
+              <div class="kcard-address">9352 Green Bridge Road, Monroe, ND 25752, US</div>
+              <div class="kcard-docid">Doc ID: 24-ef-4…</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge processor">Processor</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 12/15/26</span>
+              <span class="kcard-days">4 months</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status other-quality">Document Proc…</div>
+              <div class="kcard-company">Summit Extracts LLC</div>
+              <div class="kcard-address">1042 Industrial Pkwy, Denver, CO 80216, US</div>
+              <div class="kcard-docid">Doc ID: 24-gh-7…</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge third-party">3rdParty</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 12/19/98</span>
+              <span class="kcard-days">4 months</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TO DO -->
+      <div class="kanban-col">
+        <div class="kanban-col-header">To Do</div>
+        <div class="kanban-cards">
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Sublime Collective</div>
+              <div class="kcard-address">2840 Pacific Ave, Stockton, CA 95204, US</div>
+              <div class="kcard-docid">Doc ID: —</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge retailer">Retailer</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: —</span>
+              <span class="kcard-days">13 minutes</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">COPACK OREGON LLC</div>
+              <div class="kcard-address">Vietnam Veterans Memorial Highway, Colorado Springs, CO, US</div>
+              <div class="kcard-docid">Doc ID: —</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge processor">Processor</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: —</span>
+              <span class="kcard-days">1 day</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Green Horizon Farms</div>
+              <div class="kcard-address">QP-3800(Primary)</div>
+              <div class="kcard-docid">Doc ID: QP-3800</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge distributor">Distributor</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: —</span>
+              <span class="kcard-days">2 days</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ACCEPT -->
+      <div class="kanban-col">
+        <div class="kanban-col-header">Accept</div>
+        <div class="kanban-cards">
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Apex Peptide Research Suppl...</div>
+              <div class="kcard-address">Apex Peptide Research Suppl...</div>
+              <div class="kcard-docid">Doc ID: —</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge third-party">3rdParty</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 06/06/57</span>
+              <span class="kcard-days">27 days</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Rua's 76F</div>
+              <div class="kcard-address">Office 12 Ecostreet, UT, US</div>
+              <div class="kcard-docid">Doc ID: about</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge retailer">Retailer</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 06/06/57</span>
+              <span class="kcard-days">27 days</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Rua's 76F</div>
+              <div class="kcard-address">Office 12 Ecostreet, UT, US</div>
+              <div class="kcard-docid">Doc ID: 12449</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge retailer">Retailer</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 05/22/26</span>
+              <span class="kcard-days">2 days</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /kanban -->
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION B — AFTER QP-3848: Import + Export Status filter   -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label">Section B — After QP-3848 — Import Button + Export Status Filter</div>
+
+  <div class="app-shell">
+    <div class="qaudit-header" style="padding:16px 20px 10px">
+      <div class="qaudit-title">Q-Audit<span class="qaudit-tm">™</span></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active">Audit</div>
+      <div class="tab">Global Settings</div>
+      <div class="tab">Payroll</div>
+      <div class="tab">Import</div>
+      <div class="tab">Finances</div>
+      <div class="tab">Companies</div>
+      <div class="tab">Prospects</div>
+      <div class="tab">Sales</div>
+      <div class="tab">Promotions</div>
+      <div class="tab">Q-Comply</div>
+      <div class="tab">Activity Log</div>
+      <div class="tab">Q-AI Settings</div>
+      <div class="tab">Display Settings</div>
+    </div>
+
+    <div class="filter-bar">
+      <select class="filter-select"><option>Company</option></select>
+      <select class="filter-select"><option>Document Type</option></select>
+      <select class="filter-select" style="min-width:160px"><option>License States</option></select>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="filter-label">Start Date</span>
+        <input class="filter-date" type="text" placeholder="Start Date">
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="filter-label">End Date</span>
+        <input class="filter-date" type="text" placeholder="End Date">
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="filter-label">Sort By</span>
+        <select class="filter-select" style="min-width:140px"><option>Date Modified</option></select>
+      </div>
+      <!-- NEW: Export Status filter -->
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="filter-label">Export Status</span>
+        <select class="filter-select" style="min-width:120px"><option>All ▾</option><option>Not Exported</option><option>Exported</option></select>
+        <span class="new-pill">NEW</span>
+      </div>
+      <div class="filter-spacer"></div>
+      <button class="btn-add-task">Add License Task</button>
+      <!-- NEW: Import button -->
+      <button class="btn-add-task" style="position:relative">
+        Import <span class="new-pill">NEW</span>
+      </button>
+      <button class="btn-export">Export</button>
+    </div>
+
+    <!-- Kanban board (same cards, abbreviated) -->
+    <div class="kanban">
+      <div class="kanban-col">
+        <div class="kanban-col-header">Reject</div>
+        <div class="kanban-cards">
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Black Bear Wellness Inc.</div>
+              <div class="kcard-address">472 Lakeville Road, North New Hyde Park, NY 11042, US</div>
+              <div class="kcard-docid">Doc ID: 241-DF</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge distributor">Distributor</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 05/23/26</span>
+              <span class="kcard-days">75 days</span>
+            </div>
+          </div>
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status other-quality">Other Quality…</div>
+              <div class="kcard-company">River Valley Organics</div>
+              <div class="kcard-address">9352 Green Bridge Road, Monroe, ND 25752, US</div>
+              <div class="kcard-docid">Doc ID: 24-ef-4…</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge processor">Processor</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 12/15/26</span>
+              <span class="kcard-days">4 months</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kanban-col">
+        <div class="kanban-col-header">To Do</div>
+        <div class="kanban-cards">
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Sublime Collective</div>
+              <div class="kcard-address">2840 Pacific Ave, Stockton, CA 95204, US</div>
+              <div class="kcard-docid">Doc ID: —</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge retailer">Retailer</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: —</span>
+              <span class="kcard-days">13 minutes</span>
+            </div>
+          </div>
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">COPACK OREGON LLC</div>
+              <div class="kcard-address">Vietnam Veterans Memorial Hwy, Colorado Springs, CO, US</div>
+              <div class="kcard-docid">Doc ID: —</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge processor">Processor</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: —</span>
+              <span class="kcard-days">1 day</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kanban-col">
+        <div class="kanban-col-header">Accept</div>
+        <div class="kanban-cards">
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Apex Peptide Research Suppl...</div>
+              <div class="kcard-address">Apex Peptide Research Suppl...</div>
+              <div class="kcard-docid">Doc ID: —</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge third-party">3rdParty</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 06/06/57</span>
+              <span class="kcard-days">27 days</span>
+            </div>
+          </div>
+          <div class="kcard">
+            <div class="kcard-top">
+              <div class="kcard-status not-found">License Not Fo…</div>
+              <div class="kcard-company">Rua's 76F</div>
+              <div class="kcard-address">Office 12 Ecostreet, UT, US</div>
+              <div class="kcard-docid">Doc ID: 12449</div>
+            </div>
+            <div class="kcard-mid">
+              <span class="kcard-badge retailer">Retailer</span>
+              <span class="kcard-state">State Verified</span>
+            </div>
+            <div class="kcard-bottom">
+              <span class="kcard-exp">Exp Date: 05/22/26</span>
+              <span class="kcard-days">2 days</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION C — Export status on task cards (zoom-in)          -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label">Section C — After QP-3848 — Task Card Export Status</div>
+
+  <div class="app-shell">
+    <div class="info-block" style="margin:16px 20px 0">
+      <div class="info-pill">QP-3848 · NEW</div>
+      <p>Each task card now shows export status. Use the "Not Exported" filter to find tasks not yet sent to LicenseIQ.</p>
+    </div>
+    <div class="cards-zoom">
+
+      <!-- Card A — Not yet exported -->
+      <div class="kcard">
+        <div class="kcard-top">
+          <div class="kcard-status not-found">License Not Fo…</div>
+          <div class="kcard-company">Black Bear Wellness Inc.</div>
+          <div class="kcard-address">472 Lakeville Road, North New Hyde Park, NY 11042, US</div>
+          <div class="kcard-docid">Doc ID: 241-DF</div>
+        </div>
+        <div class="kcard-mid">
+          <span class="kcard-badge distributor">Distributor</span>
+          <span class="kcard-state">State Verified</span>
+        </div>
+        <div class="kcard-bottom" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+            <span class="kcard-exp">Exp Date: 05/23/26</span>
+            <span class="kcard-days">75 days</span>
+          </div>
+          <div>
+            <span class="export-status-not">Not yet exported</span>
+            <span class="new-pill">NEW</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card B — Exported -->
+      <div class="kcard">
+        <div class="kcard-top">
+          <div class="kcard-status not-found">License Not Fo…</div>
+          <div class="kcard-company">Sublime Collective</div>
+          <div class="kcard-address">2840 Pacific Ave, Stockton, CA 95204, US</div>
+          <div class="kcard-docid">Doc ID: —</div>
+        </div>
+        <div class="kcard-mid">
+          <span class="kcard-badge retailer">Retailer</span>
+          <span class="kcard-state">State Verified</span>
+        </div>
+        <div class="kcard-bottom" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+            <span class="kcard-exp">Exp Date: —</span>
+            <span class="kcard-days">13 minutes</span>
+          </div>
+          <div>
+            <span class="export-status-done">Exported 05/19/26 10:42 AM 🔒</span>
+            <span class="new-pill">NEW</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION D — Import License Tasks modal                     -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label">Section D — After QP-3848 — Import License Tasks Modal</div>
+
+  <div class="app-shell">
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-title">
+          Import License Tasks
+          <span class="new-pill">NEW</span>
+        </div>
+
+        <!-- File input -->
+        <div class="file-input-row">
+          <div class="file-input-label" style="margin-bottom:10px">Select a JSON file exported from LicenseIQ to import tasks</div>
+          <label class="file-input-btn">
+            📂 Choose JSON file
+            <input type="file" accept=".json" style="display:none">
+          </label>
+        </div>
+
+        <!-- Preview after file selected -->
+        <div class="preview-heading">
+          Preview
+          <span class="preview-count">12 tasks found</span>
+        </div>
+
+        <table class="preview-table" style="margin-bottom:16px">
+          <thead>
+            <tr>
+              <th>Doc ID</th>
+              <th>Company</th>
+              <th>License Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">LIQ-00441</span></td>
+              <td>Black Bear Wellness Inc.</td>
+              <td><span class="kcard-badge distributor" style="font-size:11px">Distributor</span></td>
+              <td><span class="kcard-status not-found" style="font-size:10px;padding:2px 7px">License Not Found</span></td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">LIQ-00442</span></td>
+              <td>Sublime Collective</td>
+              <td><span class="kcard-badge retailer" style="font-size:11px">Retailer</span></td>
+              <td><span class="kcard-status pending" style="font-size:10px;padding:2px 7px">Pending Review</span></td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">LIQ-00443</span></td>
+              <td>COPACK OREGON LLC</td>
+              <td><span class="kcard-badge processor" style="font-size:11px">Processor</span></td>
+              <td><span class="kcard-status active" style="font-size:10px;padding:2px 7px">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p style="font-size:11px;color:#94A3B8;margin-bottom:4px">Showing 3 of 12 tasks. All 12 will be imported.</p>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Import 12 Tasks</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

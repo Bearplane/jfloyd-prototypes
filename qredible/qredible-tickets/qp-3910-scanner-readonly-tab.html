@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3910 — Q-ScanAI Scanner Tab: Genuinely Read-Only</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:40px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* SECTION */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+.section-heading{font-size:15px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.section-sub{font-size:12px;color:#64748B;margin-bottom:14px}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-blue{background:#2563EB;border-color:#2563EB;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+
+/* Q-SCANAI PANEL */
+.qs-panel{background:#fff;border-radius:10px;overflow:hidden;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+
+/* PANEL HEADER */
+.qs-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #E2E8F0;background:#fff}
+.qs-brain{width:36px;height:36px;border-radius:8px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.qs-title-block{}
+.qs-title{font-size:15px;font-weight:700;color:#1A202E}
+.qs-subtitle{font-size:11px;color:#64748B}
+.qs-scanning-label{font-size:12px;color:#64748B;margin-left:auto;white-space:nowrap}
+.qs-company-drop{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #CBD5E1;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:700;color:#1A202E;cursor:pointer}
+.qs-company-drop svg{color:#64748B}
+.qs-close{width:28px;height:28px;border-radius:5px;border:1px solid #E2E8F0;background:#fff;font-size:16px;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:8px;flex-shrink:0}
+
+/* SCANNER/FINDINGS TABS */
+.qs-tabs{display:flex;padding:0 18px;border-bottom:1px solid #E2E8F0;background:#fff;gap:4px}
+.qs-tab{padding:12px 16px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:5px}
+.qs-tab.active{color:#2563EB;border-bottom-color:#2563EB}
+.qs-tab svg{color:currentColor}
+
+/* PANEL BODY */
+.qs-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+
+/* URL SECTION */
+.url-card{border:1px solid #E2E8F0;border-radius:8px;padding:14px 16px;background:#fff}
+.url-label{font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.url-input{width:100%;padding:8px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:'IBM Plex Mono',monospace;color:#1A202E;background:#fff}
+
+/* SCANNER CONFIG CARD */
+.sc-card{border:1px solid #E2E8F0;border-radius:8px;background:#fff;overflow:hidden}
+.sc-card-header{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #E2E8F0;gap:12px}
+.sc-card-title{font-size:14px;font-weight:700;color:#1A202E;margin-bottom:2px}
+.sc-card-subtitle{font-size:11px;color:#64748B}
+
+/* SCOPE TABS (pill tabs) */
+.scope-tabs{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid #F1F5F9;flex-wrap:wrap}
+.scope-tab{padding:7px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1.5px solid #E2E8F0;background:#fff;color:#374151;cursor:pointer;white-space:nowrap}
+.scope-tab.active{background:#2563EB;border-color:#2563EB;color:#fff}
+
+/* INFO BANNERS */
+.info-banner{display:flex;align-items:flex-start;gap:8px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:10px 14px;font-size:12px;color:#1E3A8A}
+.info-banner svg{flex-shrink:0;margin-top:1px;color:#2563EB}
+.info-banner .loaded-tag{display:inline-block;background:#DBEAFE;color:#1D4ED8;font-size:11px;font-weight:700;padding:1px 8px;border-radius:4px;margin-left:4px}
+
+.grey-note{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px;font-size:11px;color:#64748B;font-style:italic}
+
+/* CHECK COLUMNS */
+.check-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:14px 16px;border-top:1px solid #F1F5F9}
+.check-col-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94A3B8;margin-bottom:8px}
+.check-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:#1A202E}
+.check-item input[type=checkbox]{width:14px;height:14px;accent-color:#2563EB;flex-shrink:0}
+
+/* READ-ONLY CHECK (non-interactive look-alike) */
+.check-ro{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:#1A202E}
+.check-ro-box{width:14px;height:14px;border-radius:2px;border:1.5px solid #CBD5E1;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94A3B8}
+.check-ro-box.checked{background:#2563EB;border-color:#2563EB;color:#fff}
+.check-ro-box.checked::after{content:'✓';font-size:10px;font-weight:700}
+
+/* FINDINGS FOOTER */
+.qs-footer{display:flex;align-items:center;padding:10px 18px;border-top:1px solid #E2E8F0;background:#FFF7ED}
+.findings-badge{display:inline-flex;align-items:center;gap:6px;background:#FEF3C7;border:1px solid #FDE68A;color:#92400E;font-size:12px;font-weight:700;padding:4px 12px;border-radius:6px}
+
+/* RESOLVED CONFIG (Section B) */
+.resolved-section{padding:14px 16px}
+.resolved-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94A3B8;margin-bottom:4px}
+.resolved-subtitle{font-size:12px;color:#64748B;margin-bottom:12px}
+.resolved-table{border:1px solid #E2E8F0;border-radius:6px;overflow:hidden}
+.resolved-group-header{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:8px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748B}
+.resolved-row{display:flex;align-items:center;padding:7px 14px;border-bottom:1px solid #F1F5F9;gap:10px}
+.resolved-row:last-child{border-bottom:none}
+.resolved-row:hover{background:#FAFCFF}
+.resolved-check{color:#16A34A;font-size:13px;font-weight:700;flex-shrink:0;width:16px}
+.resolved-name{flex:1;font-size:12px;color:#1A202E}
+.scope-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0}
+.sb-processor{background:#1E3A5F;color:#fff}
+.sb-industry{background:#1D4ED8;color:#fff}
+.sb-type-co{background:#0D9488;color:#fff}
+.sb-company{background:#7C3AED;color:#fff}
+
+.resolved-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:10px 14px;font-size:11px;color:#64748B;line-height:1.6}
+
+/* ANNOTATION CALLOUT */
+.problem-callout{background:#FEF2F2;border:2px solid #FECACA;border-radius:8px;padding:14px 18px;margin-top:14px}
+.problem-callout .pc-icon{font-size:16px;margin-right:6px}
+.problem-callout p{font-size:12px;color:#991B1B;line-height:1.6}
+
+.layout-q-box{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:16px 20px;margin-top:32px}
+.layout-q-box .lq-title{font-size:13px;font-weight:700;color:#78350F;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.layout-q-box p,.layout-q-box li{font-size:12px;color:#78350F;line-height:1.7}
+.layout-q-box ul{padding-left:20px;margin-top:6px;margin-bottom:8px}
+.layout-q-box .lq-arrow{font-size:12px;font-weight:700;color:#92400E;margin-top:8px}
+
+/* TAB ANNOTATION */
+.tab-annotation{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:10px 14px;margin:10px 16px;font-size:11px;color:#1E3A8A;font-style:italic}
+
+/* INDUSTRY DROPDOWN (read-only) */
+.industry-drop-ro{display:inline-flex;align-items:center;gap:6px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:7px 12px;font-size:12px;font-weight:600;color:#64748B;cursor:not-allowed;margin:10px 16px}
+
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">← Prototypes</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3910</span>
+  <span class="title">Q-ScanAI Scanner Tab — Genuinely Read-Only</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- INFO ANNOTATION -->
+  <div class="info-block">
+    <div class="info-pill">QP-3910</div>
+    <p><strong>QP-3910 — Q-ScanAI Scanner Tab: Genuinely Read-Only.</strong> Makes the Scanner tab a true read-only view. PRIMARY BUILD: single collapsed resolved list showing all checks that WILL run, each attributed to its contributing scope (Processor / Industry Type / Type of Company / Company Override). The four-tab view is also shown as a secondary alternative. All editing moves to 'Edit Configuration'. Supersedes the T7 disable-buttons hotfix once shipped. Depends on QP-3903 (aggregated resolved config) as data source.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION A -->
+  <div>
+    <div class="section-label">Section A</div>
+    <div class="section-heading">CURRENT STATE — QScanAI Company tab (contradictory read-only claim)</div>
+    <div class="section-sub">Faithful reproduction of the current Company-tab state. The header claims read-only, the grey banner contradicts it, and checkboxes remain interactive.</div>
+
+    <div class="qs-panel">
+      <!-- Header -->
+      <div class="qs-header">
+        <div class="qs-brain">🧠</div>
+        <div class="qs-title-block">
+          <div class="qs-title">Q-ScanAI</div>
+          <div class="qs-subtitle">AI-Enhanced Compliance Scanning</div>
+        </div>
+        <span class="qs-scanning-label">Scanning:</span>
+        <div class="qs-company-drop">
+          3rd Coast Blends LLC
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="qs-close">×</div>
+      </div>
+
+      <!-- Scanner / Findings tabs -->
+      <div class="qs-tabs">
+        <div class="qs-tab active">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Scanner
+        </div>
+        <div class="qs-tab">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m10.29 3.86-8.18 14.2A2 2 0 0 0 3.82 21h16.36a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Findings
+        </div>
+      </div>
+
+      <div class="qs-body">
+        <!-- Website URL -->
+        <div class="url-card">
+          <div class="url-label">Website URL</div>
+          <input class="url-input" type="text" value="https://www.3rdcoastblends.com" readonly>
+        </div>
+
+        <!-- Scanner Configuration -->
+        <div class="sc-card">
+          <div class="sc-card-header">
+            <div>
+              <div class="sc-card-title">Scanner Configuration</div>
+              <div class="sc-card-subtitle">Read-only view per scope. Click <strong>Edit Configuration</strong> to edit existing or create new.</div>
+            </div>
+            <button class="btn btn-blue" style="flex-shrink:0">✎ Edit Configuration</button>
+          </div>
+
+          <!-- Scope tabs -->
+          <div class="scope-tabs">
+            <div class="scope-tab">Processor</div>
+            <div class="scope-tab">Industry Type</div>
+            <div class="scope-tab">Type of Company</div>
+            <div class="scope-tab active">Company</div>
+          </div>
+
+          <!-- Info banners -->
+          <div style="padding:10px 16px 0;display:flex;flex-direction:column;gap:8px">
+            <div class="info-banner">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Viewing the Company tier for 3rd Coast Blends LLC. Change the active company from the header dropdown.
+            </div>
+            <div class="info-banner">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Loaded from: <span class="loaded-tag">Company — 3rd Coast Blends LLC</span>
+            </div>
+          </div>
+
+          <!-- Grey note -->
+          <div style="padding:10px 16px">
+            <div class="grey-note">Toggle individual checks below — values shown reflect the aggregated config and can be overridden before the scan. The edited config is sent in the scan request.</div>
+          </div>
+
+          <!-- Check columns — interactive (current state) -->
+          <div class="check-cols">
+            <div>
+              <div class="check-col-title">Compliance Checks</div>
+              <div class="check-item"><input type="checkbox"> FDA Disclaimer</div>
+              <div class="check-item"><input type="checkbox"> Terms of Use</div>
+              <div class="check-item"><input type="checkbox"> Privacy Policy</div>
+              <div class="check-item"><input type="checkbox"> Return/Refund Policy</div>
+              <div class="check-item"><input type="checkbox"> Contact &amp; Business Info</div>
+              <div class="check-item"><input type="checkbox"> Age &amp; Access Controls</div>
+              <div class="check-item"><input type="checkbox"> Accepted Payment Methods</div>
+              <div class="check-item"><input type="checkbox"> SSL/TLS Security &amp; Integrity</div>
+            </div>
+            <div>
+              <div class="check-col-title">Analyst Review Checks</div>
+              <div class="check-item"><input type="checkbox"> THC Disclaimer</div>
+              <div class="check-item"><input type="checkbox"> Product Subscription Model</div>
+              <div class="check-item"><input type="checkbox"> Product/Service Match</div>
+              <div class="check-item"><input type="checkbox"> Price Points Match</div>
+              <div class="check-item"><input type="checkbox"> Prohibited Products Search</div>
+              <div class="check-item"><input type="checkbox"> No Hidden Fees</div>
+              <div class="check-item"><input type="checkbox"> No Free Trials (Unless Disclosed)</div>
+              <div class="check-item"><input type="checkbox"> GMP Certificate for Supplements</div>
+              <div class="check-item"><input type="checkbox"> Checkboxes Unchecked by Default</div>
+              <div class="check-item"><input type="checkbox"> External Links Review</div>
+              <div class="check-item"><input type="checkbox"> No Auto-Checked Boxes</div>
+              <div class="check-item"><input type="checkbox"> Terms Checkbox Pre-Purchase</div>
+              <div class="check-item"><input type="checkbox"> Shipping to Prohibited States</div>
+              <div class="check-item"><input type="checkbox"> Shipping/Billing Address Match</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Findings footer -->
+      <div class="qs-footer">
+        <span class="findings-badge">⚠ 12 Findings</span>
+      </div>
+    </div>
+
+    <!-- Problem annotation -->
+    <div class="problem-callout">
+      <p><span class="pc-icon">⚠️</span><strong>Problem:</strong> The page header says "Read-only view per scope" but the grey banner immediately says "Toggle individual checks below" — directly contradicting the read-only claim. Checkboxes remain interactive. This is the contradiction QP-3910 resolves.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION B -->
+  <div>
+    <div class="section-label">Section B — PRIMARY</div>
+    <div class="section-heading">AFTER QP-3910 — PRIMARY: Single resolved list with level attribution <span class="new-pill">NEW</span></div>
+    <div class="section-sub">The four-tab scope selector is removed. All checks that will actually run are shown in one resolved list, each attributed to the scope that contributed it. No interactive checkboxes.</div>
+
+    <div class="qs-panel">
+      <!-- Header -->
+      <div class="qs-header">
+        <div class="qs-brain">🧠</div>
+        <div class="qs-title-block">
+          <div class="qs-title">Q-ScanAI</div>
+          <div class="qs-subtitle">AI-Enhanced Compliance Scanning</div>
+        </div>
+        <span class="qs-scanning-label">Scanning:</span>
+        <div class="qs-company-drop">
+          3rd Coast Blends LLC
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="qs-close">×</div>
+      </div>
+
+      <!-- Scanner / Findings tabs -->
+      <div class="qs-tabs">
+        <div class="qs-tab active">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Scanner
+        </div>
+        <div class="qs-tab">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m10.29 3.86-8.18 14.2A2 2 0 0 0 3.82 21h16.36a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Findings
+        </div>
+      </div>
+
+      <div class="qs-body">
+        <!-- Website URL -->
+        <div class="url-card">
+          <div class="url-label">Website URL</div>
+          <input class="url-input" type="text" value="https://www.3rdcoastblends.com" readonly>
+        </div>
+
+        <!-- Scanner Configuration — resolved view -->
+        <div class="sc-card">
+          <div class="sc-card-header">
+            <div>
+              <div class="sc-card-title">Scanner Configuration</div>
+              <div class="sc-card-subtitle">Showing all checks that will run for: <strong>3rd Coast Blends LLC</strong></div>
+            </div>
+            <button class="btn btn-blue" style="flex-shrink:0">✎ Edit Configuration</button>
+          </div>
+
+          <!-- Resolved list — NO scope tabs, NO interactive checkboxes -->
+          <div class="resolved-section">
+            <div class="resolved-table">
+              <!-- Compliance Checks group -->
+              <div class="resolved-group-header">Compliance Checks</div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">FDA Disclaimer</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Terms of Use</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Privacy Policy</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Return/Refund Policy</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Contact &amp; Business Info</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Age &amp; Access Controls</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Accepted Payment Methods</span>
+                <span class="scope-badge sb-type-co">Type of Company — Retailer</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">SSL/TLS Security &amp; Integrity</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+
+              <!-- Analyst Review Checks group -->
+              <div class="resolved-group-header" style="border-top:1px solid #E2E8F0">Analyst Review Checks</div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">THC Disclaimer</span>
+                <span class="scope-badge sb-industry">Industry Type — Hemp/CBD</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Product Subscription Model</span>
+                <span class="scope-badge sb-industry">Industry Type — Hemp/CBD</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">No Hidden Fees</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">No Free Trials (Unless Disclosed)</span>
+                <span class="scope-badge sb-company">Company Override</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Checkboxes Unchecked by Default</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">No Auto-Checked Boxes</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Terms Checkbox Pre-Purchase</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Shipping to Prohibited States</span>
+                <span class="scope-badge sb-industry">Industry Type — Hemp/CBD</span>
+              </div>
+              <div class="resolved-row">
+                <span class="resolved-check">✓</span>
+                <span class="resolved-name">Shipping/Billing Address Match</span>
+                <span class="scope-badge sb-processor">Processor</span>
+              </div>
+            </div>
+
+            <!-- Badge legend -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
+              <span style="font-size:11px;color:#94A3B8;font-weight:600">Scope:</span>
+              <span class="scope-badge sb-processor" style="font-size:10px;padding:2px 8px;border-radius:3px">Processor</span>
+              <span class="scope-badge sb-industry" style="font-size:10px;padding:2px 8px;border-radius:3px">Industry Type</span>
+              <span class="scope-badge sb-type-co" style="font-size:10px;padding:2px 8px;border-radius:3px">Type of Company</span>
+              <span class="scope-badge sb-company" style="font-size:10px;padding:2px 8px;border-radius:3px">Company Override</span>
+            </div>
+
+            <div class="resolved-footer" style="margin-top:10px;border-radius:6px;border:1px solid #E2E8F0">
+              Resolved from: <strong>Processor</strong> (FLEX Payment Solutions) → <strong>Industry Type</strong> (Hemp/CBD) → <strong>Type of Company</strong> (Retailer) → <strong>Company</strong> (3rd Coast Blends LLC). Most-specific scope wins.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Findings footer -->
+      <div class="qs-footer">
+        <span class="findings-badge">⚠ 12 Findings</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION C -->
+  <div>
+    <div class="section-label">Section C — SECONDARY</div>
+    <div class="section-heading">AFTER QP-3910 — SECONDARY: Four-tabs as read-only context <span class="new-pill">NEW</span></div>
+    <div class="section-sub">Alternative layout. Four scope tabs are preserved for context drill-down. Checks are shown as non-interactive styled divs — no cursor pointer, no toggleing. Industry Type tab active, showing Hemp/CBD scope.</div>
+
+    <div class="qs-panel">
+      <!-- Header -->
+      <div class="qs-header">
+        <div class="qs-brain">🧠</div>
+        <div class="qs-title-block">
+          <div class="qs-title">Q-ScanAI</div>
+          <div class="qs-subtitle">AI-Enhanced Compliance Scanning</div>
+        </div>
+        <span class="qs-scanning-label">Scanning:</span>
+        <div class="qs-company-drop">
+          3rd Coast Blends LLC
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="qs-close">×</div>
+      </div>
+
+      <!-- Scanner / Findings tabs -->
+      <div class="qs-tabs">
+        <div class="qs-tab active">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Scanner
+        </div>
+        <div class="qs-tab">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m10.29 3.86-8.18 14.2A2 2 0 0 0 3.82 21h16.36a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Findings
+        </div>
+      </div>
+
+      <div class="qs-body">
+        <!-- Website URL -->
+        <div class="url-card">
+          <div class="url-label">Website URL</div>
+          <input class="url-input" type="text" value="https://www.3rdcoastblends.com" readonly>
+        </div>
+
+        <!-- Scanner Configuration — four-tab read-only -->
+        <div class="sc-card">
+          <div class="sc-card-header">
+            <div>
+              <div class="sc-card-title">Scanner Configuration</div>
+              <div class="sc-card-subtitle">Read-only scope view. Use <strong>Resolved Configuration</strong> to see what will actually run.</div>
+            </div>
+            <button class="btn btn-blue" style="flex-shrink:0">✎ Edit Configuration</button>
+          </div>
+
+          <!-- Scope tabs — Industry Type active -->
+          <div class="scope-tabs">
+            <div class="scope-tab">Processor</div>
+            <div class="scope-tab active">Industry Type</div>
+            <div class="scope-tab">Type of Company</div>
+            <div class="scope-tab">Company</div>
+          </div>
+
+          <!-- Industry Type dropdown — greyed out / read-only -->
+          <div style="padding:10px 16px 4px">
+            <div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Industry Type <span style="color:#DC2626">*</span></div>
+            <div class="industry-drop-ro" style="margin:0">
+              Hemp / CBD
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+
+          <!-- Info banner -->
+          <div style="padding:8px 16px">
+            <div class="info-banner">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Loaded from: <span class="loaded-tag">Industry Type — Hemp / CBD</span>
+            </div>
+          </div>
+
+          <!-- Check columns — NON-INTERACTIVE styled divs -->
+          <div class="check-cols">
+            <div>
+              <div class="check-col-title">Compliance Checks</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> FDA Disclaimer</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> Terms of Use</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> Privacy Policy</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> Return/Refund Policy</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> Contact &amp; Business Info</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> Age &amp; Access Controls</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> Accepted Payment Methods</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> SSL/TLS Security &amp; Integrity</div>
+            </div>
+            <div>
+              <div class="check-col-title">Analyst Review Checks</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> THC Disclaimer</div>
+              <div class="check-ro"><div class="check-ro-box checked"></div> Product Subscription Model</div>
+              <div class="check-ro"><div class="check-ro-box"></div> Product/Service Match</div>
+              <div class="check-ro"><div class="check-ro-box"></div> Price Points Match</div>
+              <div class="check-ro"><div class="check-ro-box"></div> Prohibited Products Search</div>
+              <div class="check-ro"><div class="check-ro-box"></div> No Hidden Fees</div>
+              <div class="check-ro"><div class="check-ro-box"></div> No Free Trials (Unless Disclosed)</div>
+              <div class="check-ro"><div class="check-ro-box"></div> GMP Certificate for Supplements</div>
+              <div class="check-ro"><div class="check-ro-box"></div> Checkboxes Unchecked by Default</div>
+              <div class="check-ro"><div class="check-ro-box"></div> External Links Review</div>
+              <div class="check-ro"><div class="check-ro-box"></div> No Auto-Checked Boxes</div>
+              <div class="check-ro"><div class="check-ro-box"></div> Terms Checkbox Pre-Purchase</div>
+              <div class="check-ro"><div class="check-ro-box"></div> Shipping to Prohibited States</div>
+              <div class="check-ro"><div class="check-ro-box"></div> Shipping/Billing Address Match</div>
+            </div>
+          </div>
+
+          <!-- Tab annotation -->
+          <div class="tab-annotation">
+            This tab shows the raw configuration at the <strong>Industry Type — Hemp/CBD</strong> scope only. Use the Resolved Configuration view (Section B) to see what will actually run.
+          </div>
+        </div>
+      </div>
+
+      <!-- Findings footer -->
+      <div class="qs-footer">
+        <span class="findings-badge">⚠ 12 Findings</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION D -->
+  <div class="layout-q-box">
+    <div class="lq-title">⚠️ Open Layout Question for Joseph</div>
+    <p><strong>PRIMARY</strong> build above (Section B) shows the collapsed single resolved list — recommended: simpler, shows exactly what will run.</p>
+    <p style="margin-top:6px"><strong>SECONDARY</strong> alternative (Section C) keeps the four-tab scope drill-down, which preserves context about where each check comes from at each level.</p>
+    <p style="margin-top:8px;font-weight:700">Tradeoff:</p>
+    <ul>
+      <li><strong>Single resolved list</strong> — cleaner, directly answers "what will run?" but loses per-scope granularity visible to power users.</li>
+      <li><strong>Four tabs (read-only)</strong> — shows scope context but adds visual complexity and may confuse users who expect the tabs to be editable.</li>
+    </ul>
+    <div class="lq-arrow" style="margin-top:10px">→ Both are built here for review. Please confirm which layout to ship.</div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

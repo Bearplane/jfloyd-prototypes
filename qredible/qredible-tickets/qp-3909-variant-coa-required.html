@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3909 — Variant COA Required: AI Advisory Determination</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:40px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+
+/* SECTION HEADING */
+.section-heading{font-size:15px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.section-sub{font-size:12px;color:#64748B;margin-bottom:14px}
+
+/* TABLE */
+.table-toolbar{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #E2E8F0;background:#F8FAFC;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;max-width:280px}
+.search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#94A3B8}
+.search-input{width:100%;padding:7px 12px 7px 32px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;background:#fff;color:#1A202E}
+.search-input::placeholder{color:#94A3B8}
+.select-sm{padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;background:#fff;color:#374151}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-save{background:#16A34A;border-color:#16A34A;color:#fff}
+.btn-blue{background:#2563EB;border-color:#2563EB;color:#fff}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#1E3A5F}
+thead th{color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid #F1F5F9}
+tbody tr:hover{background:#FAFCFF}
+tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
+
+.toggle-switch{display:inline-flex;align-items:center;width:36px;height:20px;background:#16A34A;border-radius:10px;position:relative;cursor:default}
+.toggle-switch::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;right:3px;transition:right .15s}
+.toggle-switch.off{background:#CBD5E1}
+.toggle-switch.off::after{right:auto;left:3px}
+
+.coa-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;border:1px solid}
+.coa-required{background:#FEE2E2;border-color:#fecaca;color:#991B1B}
+.coa-not-required{background:#DCFCE7;border-color:#bbf7d0;color:#166534}
+.coa-conditional{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+
+.kw-count{font-size:11px;color:#2563EB;font-weight:600}
+.action-cell{display:flex;gap:5px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;border:1px solid #E2E8F0;background:#fff;cursor:pointer;color:#64748B;font-size:13px}
+
+/* MODAL OVERLAY (for sections B/C/D) */
+.modal-overlay{position:relative;background:rgba(15,23,42,.45);border-radius:10px;padding:32px;display:flex;align-items:flex-start;justify-content:center;min-height:420px}
+.modal{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);width:100%;max-width:600px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid #E2E8F0}
+.modal-header h3{font-size:15px;font-weight:700;color:#1A202E}
+.modal-close{width:28px;height:28px;border-radius:5px;border:1px solid #E2E8F0;background:#fff;font-size:16px;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.modal-body{padding:18px 20px}
+
+/* FORM FIELDS */
+.field-row{display:flex;gap:12px;margin-bottom:14px}
+.field-group{display:flex;flex-direction:column;gap:4px;flex:1}
+.field-group label{font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em}
+.field-group .hint{font-size:11px;color:#94A3B8;font-style:italic;margin-top:2px}
+.form-input{padding:7px 10px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:inherit;color:#1A202E;background:#fff}
+.form-select{padding:7px 10px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:inherit;color:#1A202E;background:#fff}
+.form-input-narrow{width:80px;padding:7px 10px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:inherit;color:#1A202E}
+
+.auto-class-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.auto-class-row input[type=checkbox]{width:15px;height:15px;accent-color:#1E3A5F}
+.auto-class-row label{font-size:12px;font-weight:600;color:#1A202E}
+
+.form-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151;margin-bottom:8px;margin-top:2px}
+
+/* RADIO GROUP */
+.radio-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.radio-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#1A202E}
+.radio-item input[type=radio]{width:14px;height:14px;accent-color:#1E3A5F}
+.radio-item.selected{font-weight:600}
+
+/* KEYWORD CHIP AREA */
+.chip-input-area{border:1px solid #CBD5E1;border-radius:6px;padding:8px 10px;background:#fff;margin-bottom:14px}
+.chip-list{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:#1E3A5F;color:#fff;font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px}
+.chip-x{cursor:pointer;opacity:.7;font-size:10px}
+.chip-input-row{display:flex;gap:6px;align-items:center}
+.chip-input-row input{flex:1;padding:5px 8px;border:1px solid #E2E8F0;border-radius:4px;font-size:12px;font-family:inherit;background:#F8FAFC;color:#1A202E}
+.chip-add-btn{width:28px;height:28px;border-radius:4px;border:1px solid #CBD5E1;background:#fff;color:#374151;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* AI ADVISORY CARD */
+.ai-advisory{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:8px;padding:12px 16px;margin:12px 0}
+.ai-advisory-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ai-advisory-title{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#1E3A8A}
+.ai-advisory-title .star{color:#2563EB;font-size:14px}
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block}
+
+.ai-grid{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;align-items:start}
+.ai-label{font-size:11px;font-weight:700;color:#64748B;white-space:nowrap;padding-top:2px}
+.ai-value{font-size:12px;color:#1A202E}
+
+.det-badge-green{display:inline-flex;align-items:center;background:#DCFCE7;color:#166534;border:1px solid #bbf7d0;padding:3px 10px;border-radius:4px;font-weight:600;font-size:11px}
+.det-badge-amber{display:inline-flex;align-items:center;background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;padding:3px 10px;border-radius:4px;font-weight:600;font-size:11px}
+
+.conf-row{display:flex;align-items:center;gap:8px}
+.conf-bar-wrap{width:120px;height:8px;background:#DBEAFE;border-radius:4px;overflow:hidden}
+.conf-bar{height:100%;border-radius:4px;background:#2563EB}
+.conf-pct{font-size:11px;font-weight:700;color:#1E3A8A}
+
+.ai-reason{font-size:11px;color:#374151;font-style:italic;line-height:1.5}
+.ai-override{font-size:11px;color:#64748B;line-height:1.5}
+.ai-current{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#374151}
+.ai-current strong{color:#1A202E}
+
+.ai-divider{border:none;border-top:1px solid #BFDBFE;margin:8px 0}
+
+/* MODAL FOOTER */
+.modal-footer{padding:14px 20px;border-top:1px solid #E2E8F0;display:flex;gap:8px;justify-content:flex-end;background:#F8FAFC;border-radius:0 0 12px 12px}
+
+/* IMAGE UPLOAD AREA */
+.img-upload{border:1.5px dashed #CBD5E1;border-radius:6px;padding:20px;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:12px;margin-bottom:14px;background:#F8FAFC}
+
+.form-textarea{width:100%;padding:7px 10px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:inherit;color:#1A202E;min-height:60px;resize:vertical;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">← Prototypes</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3909</span>
+  <span class="title">Variant COA Required — AI Advisory Determination</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- INFO ANNOTATION -->
+  <div class="info-block">
+    <div class="info-pill">QP-3909</div>
+    <p><strong>QP-3909 — Variant COA Required: AI Advisory Determination.</strong> Adds an AI-assisted advisory to the COA Requirement field on product classifications. When the system detects a variant classification context, AI analyzes the variation pattern (weight-only vs. strain/color/composition) and suggests whether a separate COA is typically required. The human radio selection always takes precedence — AI advisory is informational only. Extends QP-3829's smokable flower variant logic to be configurable across all classifications.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION A -->
+  <div>
+    <div class="section-label">Section A</div>
+    <div class="section-heading">CURRENT STATE — Product Classification list</div>
+    <div class="section-sub">The Q-Audit Product Classification panel. No AI advisory exists anywhere in this view.</div>
+
+    <div class="app-shell">
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="search-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" type="text" placeholder="Search classifications or keywords…">
+        </div>
+        <select class="select-sm">
+          <option>All Types</option>
+          <option>Product</option>
+          <option>Service</option>
+        </select>
+        <select class="select-sm">
+          <option>All COA Reqs</option>
+          <option>Required</option>
+          <option>Conditional</option>
+          <option>Not Required</option>
+        </select>
+        <span style="flex:1"></span>
+        <button class="btn btn-primary">+ Add</button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:60px">Priority</th>
+              <th style="width:120px">Auto-Classification</th>
+              <th style="width:80px">Type</th>
+              <th>Product Classification</th>
+              <th style="width:110px">COA</th>
+              <th style="width:90px">Keywords</th>
+              <th>Description</th>
+              <th style="width:90px">Created</th>
+              <th style="width:90px">Modified</th>
+              <th style="width:80px">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="mono" style="font-size:12px;font-weight:700">14</span></td>
+              <td><span class="toggle-switch"></span></td>
+              <td><span style="font-size:11px;color:#374151">Service</span></td>
+              <td>Accounting, Tax and Business Advisory Services</td>
+              <td><span class="coa-badge coa-required">Required</span></td>
+              <td><span class="kw-count">● 1111</span></td>
+              <td></td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">01/06/23</span></td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">02/10/26</span></td>
+              <td><div class="action-cell"><span class="icon-btn">✎</span><span class="icon-btn" style="color:#DC2626">🗑</span></div></td>
+            </tr>
+            <tr>
+              <td><span class="mono" style="font-size:12px;font-weight:700">38</span></td>
+              <td><span class="toggle-switch"></span></td>
+              <td><span style="font-size:11px;color:#374151">Service</span></td>
+              <td>BBB</td>
+              <td><span class="coa-badge coa-required">Required</span></td>
+              <td><span class="kw-count">● 0</span></td>
+              <td></td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">01/06/26</span></td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">02/10/26</span></td>
+              <td><div class="action-cell"><span class="icon-btn">✎</span><span class="icon-btn" style="color:#DC2626">🗑</span></div></td>
+            </tr>
+            <tr>
+              <td><span class="mono" style="font-size:12px;font-weight:700">44</span></td>
+              <td><span class="toggle-switch off"></span></td>
+              <td><span style="font-size:11px;color:#374151">Product</span></td>
+              <td>Pet Products</td>
+              <td><span class="coa-badge coa-conditional">Conditional</span></td>
+              <td><span class="kw-count">● 14</span></td>
+              <td>Anna</td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">02/08/26</span></td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">02/08/26</span></td>
+              <td><div class="action-cell"><span class="icon-btn">✎</span><span class="icon-btn" style="color:#DC2626">🗑</span></div></td>
+            </tr>
+            <tr>
+              <td><span class="mono" style="font-size:12px;font-weight:700">50</span></td>
+              <td><span class="toggle-switch"></span></td>
+              <td><span style="font-size:11px;color:#374151">Product</span></td>
+              <td>TestProductClassification</td>
+              <td><span class="coa-badge coa-not-required">Not Required</span></td>
+              <td><span class="kw-count">● 0</span></td>
+              <td>TEXT</td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">01/27/26</span></td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">02/10/26</span></td>
+              <td><div class="action-cell"><span class="icon-btn">✎</span><span class="icon-btn" style="color:#DC2626">🗑</span></div></td>
+            </tr>
+            <tr>
+              <td><span class="mono" style="font-size:12px;font-weight:700">57</span></td>
+              <td><span class="toggle-switch"></span></td>
+              <td><span style="font-size:11px;color:#374151">Product</span></td>
+              <td>Accessories</td>
+              <td><span class="coa-badge coa-not-required">Not Required</span></td>
+              <td><span class="kw-count">● 24</span></td>
+              <td>Test</td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">01/27/26</span></td>
+              <td><span class="mono" style="font-size:11px;color:#64748B">02/10/26</span></td>
+              <td><div class="action-cell"><span class="icon-btn">✎</span><span class="icon-btn" style="color:#DC2626">🗑</span></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION B -->
+  <div>
+    <div class="section-label">Section B</div>
+    <div class="section-heading">CURRENT STATE — Edit Product Classification modal</div>
+    <div class="section-sub">The modal as it exists today. No AI advisory between COA Requirement and Mapping Keywords.</div>
+
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Edit Product Classification</h3>
+          <div class="modal-close">×</div>
+        </div>
+        <div class="modal-body">
+
+          <!-- Type + Priority -->
+          <div class="field-row">
+            <div class="field-group">
+              <label>Type</label>
+              <select class="form-select">
+                <option selected>Product</option>
+                <option>Service</option>
+              </select>
+            </div>
+            <div class="field-group" style="flex:0 0 auto">
+              <label>Priority</label>
+              <input class="form-input-narrow" type="number" value="44">
+            </div>
+          </div>
+          <div style="font-size:11px;color:#94A3B8;margin-top:-10px;margin-bottom:14px;font-style:italic">Lower number = Guarded first in classification</div>
+
+          <!-- Auto-Classification -->
+          <div class="auto-class-row">
+            <input type="checkbox" id="ac-b" checked>
+            <label for="ac-b">Auto-Classification</label>
+          </div>
+
+          <!-- Product Classification -->
+          <div class="field-group" style="margin-bottom:14px">
+            <label>Product Classification</label>
+            <input class="form-input" type="text" value="Pet Products" style="width:100%">
+          </div>
+
+          <!-- COA Requirement -->
+          <div class="form-section-label">COA Requirement</div>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" name="coa-b" id="coa-b-req"> <label for="coa-b-req">Required</label>
+            </div>
+            <div class="radio-item selected">
+              <input type="radio" name="coa-b" id="coa-b-cond" checked> <label for="coa-b-cond">Conditional</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="coa-b" id="coa-b-not"> <label for="coa-b-not">Not Required</label>
+            </div>
+          </div>
+
+          <!-- ← NO AI ADVISORY HERE in current state -->
+
+          <!-- Mapping Keywords -->
+          <div class="form-section-label">Mapping Keywords</div>
+          <div class="chip-input-area">
+            <div class="chip-list">
+              <span class="chip">for pets <span class="chip-x">×</span></span>
+              <span class="chip">cat treats <span class="chip-x">×</span></span>
+              <span class="chip">pet oil <span class="chip-x">×</span></span>
+              <span class="chip">pet biscuits <span class="chip-x">×</span></span>
+              <span class="chip">for dogs <span class="chip-x">×</span></span>
+              <span class="chip">for cats <span class="chip-x">×</span></span>
+              <span class="chip">dog treats <span class="chip-x">×</span></span>
+              <span class="chip">canine <span class="chip-x">×</span></span>
+            </div>
+            <div class="chip-input-row">
+              <input type="text" placeholder="Type a keyword and press Enter or click +">
+              <div class="chip-add-btn">+</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-save">Save</button>
+          <button class="btn btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION C -->
+  <div>
+    <div class="section-label">Section C</div>
+    <div class="section-heading">AFTER QP-3909 — AI Advisory: weight-only variant — COA NOT required</div>
+    <div class="section-sub">Same modal structure. AI advisory card inserted between COA Requirement radios and Mapping Keywords. Pet Products / weight-only variant context detected.</div>
+
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Edit Product Classification</h3>
+          <div class="modal-close">×</div>
+        </div>
+        <div class="modal-body">
+
+          <!-- Type + Priority -->
+          <div class="field-row">
+            <div class="field-group">
+              <label>Type</label>
+              <select class="form-select"><option selected>Product</option></select>
+            </div>
+            <div class="field-group" style="flex:0 0 auto">
+              <label>Priority</label>
+              <input class="form-input-narrow" type="number" value="44">
+            </div>
+          </div>
+          <div style="font-size:11px;color:#94A3B8;margin-top:-10px;margin-bottom:14px;font-style:italic">Lower number = Guarded first in classification</div>
+
+          <div class="auto-class-row">
+            <input type="checkbox" id="ac-c" checked>
+            <label for="ac-c">Auto-Classification</label>
+          </div>
+
+          <div class="field-group" style="margin-bottom:14px">
+            <label>Product Classification</label>
+            <input class="form-input" type="text" value="Pet Products" style="width:100%">
+          </div>
+
+          <!-- COA Requirement -->
+          <div class="form-section-label">COA Requirement</div>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" name="coa-c" id="coa-c-req"> <label for="coa-c-req">Required</label>
+            </div>
+            <div class="radio-item selected">
+              <input type="radio" name="coa-c" id="coa-c-cond" checked> <label for="coa-c-cond">Conditional</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="coa-c" id="coa-c-not"> <label for="coa-c-not">Not Required</label>
+            </div>
+          </div>
+
+          <!-- ★ AI ADVISORY — NEW -->
+          <div class="ai-advisory">
+            <div class="ai-advisory-header">
+              <div class="ai-advisory-title">
+                <span class="star">✦</span>
+                AI Advisory — variant context detected
+                <span class="new-pill">NEW</span>
+              </div>
+            </div>
+            <div class="ai-grid">
+              <span class="ai-label">Determination:</span>
+              <span class="ai-value"><span class="det-badge-green">Weight-only variants — COA NOT typically required</span></span>
+
+              <span class="ai-label">Confidence:</span>
+              <span class="ai-value">
+                <div class="conf-row">
+                  <span class="conf-pct">87%</span>
+                  <div class="conf-bar-wrap"><div class="conf-bar" style="width:87%"></div></div>
+                </div>
+              </span>
+
+              <span class="ai-label">Reason:</span>
+              <span class="ai-value ai-reason">"Weight-only size variants (e.g. 1oz, 4oz, 8oz) reference the parent product's formulation. A separate COA is redundant unless composition differs."</span>
+            </div>
+            <hr class="ai-divider">
+            <div class="ai-override" style="margin-bottom:5px">"Your radio selection above takes precedence. This advisory is informational only."</div>
+            <div class="ai-current">Current selection: <strong style="margin-left:4px">Conditional</strong> <span style="color:#94A3B8;font-size:11px">(reflects the radio above)</span></div>
+          </div>
+
+          <!-- Mapping Keywords -->
+          <div class="form-section-label">Mapping Keywords</div>
+          <div class="chip-input-area">
+            <div class="chip-list">
+              <span class="chip">for pets <span class="chip-x">×</span></span>
+              <span class="chip">cat treats <span class="chip-x">×</span></span>
+              <span class="chip">pet oil <span class="chip-x">×</span></span>
+              <span class="chip">pet biscuits <span class="chip-x">×</span></span>
+              <span class="chip">for dogs <span class="chip-x">×</span></span>
+              <span class="chip">for cats <span class="chip-x">×</span></span>
+              <span class="chip">dog treats <span class="chip-x">×</span></span>
+              <span class="chip">canine <span class="chip-x">×</span></span>
+            </div>
+            <div class="chip-input-row">
+              <input type="text" placeholder="Type a keyword and press Enter or click +">
+              <div class="chip-add-btn">+</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-save">Save</button>
+          <button class="btn btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION D -->
+  <div>
+    <div class="section-label">Section D</div>
+    <div class="section-heading">AFTER QP-3909 — AI Advisory: composition variant — COA IS required</div>
+    <div class="section-sub">Same modal, different classification context (Smokable Flower — Strain Variety). AI determines distinct strain/formulation composition requires its own COA.</div>
+
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Edit Product Classification</h3>
+          <div class="modal-close">×</div>
+        </div>
+        <div class="modal-body">
+
+          <!-- Type + Priority -->
+          <div class="field-row">
+            <div class="field-group">
+              <label>Type</label>
+              <select class="form-select"><option selected>Product</option></select>
+            </div>
+            <div class="field-group" style="flex:0 0 auto">
+              <label>Priority</label>
+              <input class="form-input-narrow" type="number" value="12">
+            </div>
+          </div>
+          <div style="font-size:11px;color:#94A3B8;margin-top:-10px;margin-bottom:14px;font-style:italic">Lower number = Guarded first in classification</div>
+
+          <div class="auto-class-row">
+            <input type="checkbox" id="ac-d" checked>
+            <label for="ac-d">Auto-Classification</label>
+          </div>
+
+          <div class="field-group" style="margin-bottom:14px">
+            <label>Product Classification</label>
+            <input class="form-input" type="text" value="Smokable Flower — Strain Variety" style="width:100%">
+          </div>
+
+          <!-- COA Requirement -->
+          <div class="form-section-label">COA Requirement</div>
+          <div class="radio-group">
+            <div class="radio-item selected">
+              <input type="radio" name="coa-d" id="coa-d-req" checked> <label for="coa-d-req">Required</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="coa-d" id="coa-d-cond"> <label for="coa-d-cond">Conditional</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="coa-d" id="coa-d-not"> <label for="coa-d-not">Not Required</label>
+            </div>
+          </div>
+
+          <!-- ★ AI ADVISORY — NEW (composition variant) -->
+          <div class="ai-advisory">
+            <div class="ai-advisory-header">
+              <div class="ai-advisory-title">
+                <span class="star">✦</span>
+                AI Advisory — variant context detected
+                <span class="new-pill">NEW</span>
+              </div>
+            </div>
+            <div class="ai-grid">
+              <span class="ai-label">Determination:</span>
+              <span class="ai-value"><span class="det-badge-amber">Strain/color/composition variants — COA IS required</span></span>
+
+              <span class="ai-label">Confidence:</span>
+              <span class="ai-value">
+                <div class="conf-row">
+                  <span class="conf-pct">91%</span>
+                  <div class="conf-bar-wrap"><div class="conf-bar" style="width:91%"></div></div>
+                </div>
+              </span>
+
+              <span class="ai-label">Reason:</span>
+              <span class="ai-value ai-reason">"Distinct strain or formulation composition indicates a unique product requiring its own Certificate of Analysis for accurate compliance verification."</span>
+            </div>
+            <hr class="ai-divider">
+            <div class="ai-override" style="margin-bottom:5px">"Your radio selection above takes precedence."</div>
+            <div class="ai-current">Current selection: <strong style="margin-left:4px">Required</strong> <span style="color:#94A3B8;font-size:11px">(reflects radio above)</span></div>
+          </div>
+
+          <!-- Mapping Keywords -->
+          <div class="form-section-label">Mapping Keywords</div>
+          <div class="chip-input-area">
+            <div class="chip-list">
+              <span class="chip">flower <span class="chip-x">×</span></span>
+              <span class="chip">hemp flower <span class="chip-x">×</span></span>
+              <span class="chip">strain <span class="chip-x">×</span></span>
+              <span class="chip">smokable <span class="chip-x">×</span></span>
+              <span class="chip">indoor flower <span class="chip-x">×</span></span>
+              <span class="chip">sativa <span class="chip-x">×</span></span>
+              <span class="chip">indica <span class="chip-x">×</span></span>
+              <span class="chip">hybrid <span class="chip-x">×</span></span>
+            </div>
+            <div class="chip-input-row">
+              <input type="text" placeholder="Type a keyword and press Enter or click +">
+              <div class="chip-add-btn">+</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-save">Save</button>
+          <button class="btn btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
