@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3898 — Partner Code Tracking (Finances + Invites)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/*
+  Design tokens — qredible-brain + RTQ-Admin-UI production
+  Font: Plus Jakarta Sans / Uber Move (prod), 13px base
+  Body bg: #F7F5FF  Nav: #1A202E  Ticket badge: #F05252
+  Table head: #1E3A5F  Tab active indicator: #F05252
+  Primary btn: #1A202E  Border: #E2E8F0
+*/
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}
+a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+.topnav .nav-note{font-size:11px;color:#64748B;font-style:italic}
+
+/* PAGE WRAPPER */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px;margin-bottom:28px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+.info-block code{background:#FDE68A;padding:1px 5px;border-radius:3px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:#92400E}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px;margin-top:32px}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06);margin-bottom:12px}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:5px;display:inline-block;line-height:1.5}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit;transition:background .1s}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-primary:hover{background:#0F172A}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-secondary:hover{background:#F8FAFC}
+.btn-blue{background:#2563EB;border-color:#2563EB;color:#fff}
+.btn-blue:hover{background:#1D4ED8}
+
+/* ─── Q-AUDIT CHROME ─── */
+/* Product nav bar (top application nav — Q-Audit) */
+.product-nav{background:#fff;border-bottom:1px solid #E2E8F0;padding:0 20px;display:flex;align-items:center;gap:0}
+.product-logo{font-size:15px;font-weight:700;color:#1A202E;padding:14px 20px 14px 0;border-right:1px solid #E2E8F0;margin-right:4px;white-space:nowrap}
+.product-logo sup{font-size:9px;color:#F05252;font-weight:700;vertical-align:super}
+.product-tab{padding:14px 16px;font-size:12px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .12s,border-color .12s}
+.product-tab:hover{color:#1A202E}
+.product-tab.active{color:#1A202E;border-bottom-color:#F05252}
+
+/* METRIC CARDS */
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px 20px 16px}
+.metric-card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+.metric-card .icon-box{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:6px;flex-shrink:0}
+.metric-card .icon-box.blue{background:#EFF6FF}
+.metric-card .icon-box.green{background:#DCFCE7}
+.metric-card .icon-box.amber{background:#FFFBEB}
+.metric-card .metric-label{font-size:12px;font-weight:600;color:#1A202E}
+.metric-card .metric-value{font-size:22px;font-weight:700;color:#1A202E;line-height:1.2}
+.metric-card .metric-sub{font-size:11px;color:#64748B;margin-top:2px}
+.metric-card .metric-sub2{font-size:11px;color:#94A3B8}
+
+/* RETENTION CARDS */
+.retention-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 20px 20px}
+.retention-card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px 20px;opacity:.55}
+.retention-card .ret-label{font-size:12px;font-weight:600;color:#64748B;margin-bottom:2px}
+.retention-card .ret-sub{font-size:11px;color:#94A3B8;font-style:italic}
+
+/* FILTER ROW */
+.filter-row{padding:12px 20px;border-top:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;background:#F8FAFC;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-label{font-size:11px;font-weight:600;color:#64748B}
+.filter-input{padding:5px 10px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:inherit;color:#374151;background:#fff;width:120px}
+.filter-chip-btn{padding:5px 12px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-weight:600;color:#374151;background:#fff;cursor:pointer}
+.filter-chip-btn:hover{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
+.filter-clear{font-size:12px;font-weight:600;color:#F05252;cursor:pointer;margin-left:2px}
+.filter-spacer{flex:1}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#1E3A5F}
+thead th{color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left;white-space:nowrap;letter-spacing:.02em}
+tbody tr{border-bottom:1px solid #F1F5F9}
+tbody tr:hover{background:#FAFCFF}
+tbody td{padding:10px 14px;font-size:13px;color:#1A202E;vertical-align:middle}
+.co-name{font-weight:600;color:#1A202E;font-size:13px}
+.co-sub{font-size:11px;color:#94A3B8;margin-top:1px}
+.badge-paid{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;white-space:nowrap}
+.partner-code{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:#1E3A5F;background:#EFF6FF;padding:2px 8px;border-radius:4px;display:inline-block;white-space:nowrap}
+.partner-dash{font-size:13px;color:#CBD5E1;font-style:italic}
+.amount{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500}
+.date-mono{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#64748B;white-space:nowrap}
+
+/* ─── WE MONITOR / G-MONITOR CHROME ─── */
+.gm-header{padding:16px 20px 0;background:#fff}
+.gm-title{font-size:18px;font-weight:700;color:#1A202E;margin-bottom:3px}
+.gm-sub{font-size:12px;color:#64748B;margin-bottom:12px}
+.gm-actions{display:flex;gap:8px;flex-wrap:wrap;padding:0 20px 16px;background:#fff;border-bottom:1px solid #E2E8F0}
+.gm-action-btn{display:flex;flex-direction:column;gap:3px;padding:10px 14px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;cursor:pointer;min-width:140px}
+.gm-action-btn .act-title{font-size:12px;font-weight:700;color:#1A202E}
+.gm-action-btn .act-sub{font-size:11px;color:#94A3B8;line-height:1.4}
+
+/* GM TABS */
+.gm-tabs{display:flex;gap:0;padding:0 20px;border-bottom:1px solid #E2E8F0;background:#fff}
+.gm-tab{padding:12px 16px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.gm-tab.active{color:#1A202E;border-bottom-color:#2563EB}
+
+/* SUMMARY PILLS */
+.summary-pills{display:flex;gap:8px;padding:12px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;flex-wrap:wrap;align-items:center}
+.sum-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;background:#fff;border:1px solid #E2E8F0;color:#374151;white-space:nowrap}
+.sum-pill .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sum-pill .dot.blue{background:#2563EB}
+.sum-pill .dot.green{background:#16A34A}
+.sum-pill .dot.amber{background:#D97706}
+.sum-pill .dot.red{background:#DC2626}
+
+/* INVITE TABLE TOOLBAR */
+.invite-toolbar{padding:10px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border-bottom:1px solid #E2E8F0}
+.search-input{padding:7px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;background:#fff;color:#1A202E;width:220px}
+.search-input::placeholder{color:#94A3B8}
+.invite-spacer{flex:1}
+
+/* INVITE TABLE BADGES */
+.badge-opened{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.badge-sent{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.badge-not-joined{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.badge-active{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.email-cell{font-size:12px;color:#64748B}
+
+/* ICON BUTTONS */
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;border:1px solid #E2E8F0;background:#fff;cursor:pointer;color:#64748B;font-size:13px}
+.icon-btn:hover{background:#F8FAFC;color:#1A202E}
+
+/* ─── MODAL ─── */
+.modal-overlay{position:relative;background:rgba(15,23,42,.45);border-radius:10px;padding:40px 20px;display:flex;align-items:center;justify-content:center;min-height:420px}
+.modal{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);padding:24px;max-width:560px;width:100%}
+.modal-title{font-size:16px;font-weight:700;color:#1A202E;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.modal-close-btn{width:30px;height:30px;border-radius:6px;border:1px solid #E2E8F0;background:#fff;font-size:16px;color:#64748B;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
+.form-input{width:100%;padding:8px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#fff}
+.form-input::placeholder{color:#94A3B8}
+.form-textarea{width:100%;padding:8px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#fff;resize:vertical;min-height:72px}
+.form-textarea::placeholder{color:#94A3B8}
+.form-input.highlight{border-color:#F59E0B;background:#FFFBEB}
+.modal-footer-row{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #E2E8F0}
+.modal-annotation{background:#FFFBEB;border:1px dashed #FCD34D;border-radius:6px;padding:8px 12px;font-size:11px;color:#78350F;line-height:1.5;margin-top:6px}
+
+/* ANNOTATION HIGHLIGHT (on NEW column) */
+.col-highlight{background:#FFFBEB !important}
+.th-highlight{background:#17325A !important;border-bottom:2px solid #F59E0B}
+
+/* TABLE FOOTER */
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-top:1px solid #E2E8F0;background:#fff;flex-wrap:wrap;gap:8px}
+.table-summary{font-size:12px;color:#64748B}
+
+/* SECTION DIVIDER */
+.section-divider{height:1px;background:#E2E8F0;margin:36px 0 8px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">← Prototypes</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3898</span>
+  <span class="title">Partner Code Tracking — Finances + We Monitor Invites</span>
+  <span class="spacer"></span>
+  <span class="nav-note">Scroll to see all four sections ↓</span>
+</nav>
+
+<!-- ══════════════════════════════════════ PAGE BODY -->
+<div class="page">
+
+  <!-- ─── INFO ANNOTATION ─── -->
+  <div class="info-block">
+    <div class="info-pill">QP-3898 — Partner Code Tracking</div>
+    <p>
+      <strong>Adds a <code>partner_code</code> field to Q-Audit Finances and the We Monitor Invites flow.</strong>
+      When an invited company converts to a paid subscription, the partner code propagates to the finances record —
+      enabling revenue attribution back to the referring processor or ISO (FlexPay, Westtown, etc.).
+      Sections A and C show the current state; Sections B and D show the proposed changes.
+    </p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION A — CURRENT STATE: Q-Audit Finances Tab
+  ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section-label">Section A — Current State — Q-Audit Finances Tab</div>
+
+  <div class="app-shell">
+
+    <!-- Q-Audit product-level tab bar -->
+    <div class="product-nav">
+      <div class="product-logo">Q-Audit<sup>™</sup></div>
+      <div class="product-tab">Audit</div>
+      <div class="product-tab">Global Settings</div>
+      <div class="product-tab">Payroll</div>
+      <div class="product-tab">Import</div>
+      <div class="product-tab active">Finances</div>
+      <div class="product-tab">Companies</div>
+      <div class="product-tab">Prospects</div>
+      <div class="product-tab">Sales</div>
+      <div class="product-tab">Promotions</div>
+      <div class="product-tab">Q-Comply</div>
+      <div class="product-tab">Activity Log</div>
+      <div class="product-tab">Q-All Settings</div>
+      <div class="product-tab">Display Settings</div>
+    </div>
+
+    <!-- Metric cards -->
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="icon-box blue">📅</div>
+        <div class="metric-label">Monthly</div>
+        <div class="metric-value">$36,465.32</div>
+        <div class="metric-sub">102 monthly subscriptions</div>
+        <div class="metric-sub2">30 new subscriptions this month</div>
+      </div>
+      <div class="metric-card">
+        <div class="icon-box green">📆</div>
+        <div class="metric-label">Yearly</div>
+        <div class="metric-value">$28,349</div>
+        <div class="metric-sub">1,005 annual subscriptions</div>
+        <div class="metric-sub2">83 new subscriptions this month</div>
+      </div>
+      <div class="metric-card">
+        <div class="icon-box amber">💰</div>
+        <div class="metric-label">Total</div>
+        <div class="metric-value">$64,814.32</div>
+        <div class="metric-sub">1,519 total subscriptions</div>
+        <div class="metric-sub2">201 new subscriptions this month</div>
+      </div>
+    </div>
+
+    <!-- Retention cards -->
+    <div class="retention-row">
+      <div class="retention-card">
+        <div class="ret-label">3-Month Retention</div>
+        <div class="ret-sub">Data loading…</div>
+      </div>
+      <div class="retention-card">
+        <div class="ret-label">Monthly Retention</div>
+        <div class="ret-sub">Data loading…</div>
+      </div>
+      <div class="retention-card">
+        <div class="ret-label">Weekly Retention</div>
+        <div class="ret-sub">Data loading…</div>
+      </div>
+    </div>
+
+    <!-- Date filter row -->
+    <div class="filter-row">
+      <span class="filter-label">Start Date</span>
+      <input class="filter-input" type="text" placeholder="Start Date">
+      <span class="filter-label">End Date</span>
+      <input class="filter-input" type="text" placeholder="End Date">
+      <button class="filter-chip-btn">This Month</button>
+      <button class="filter-chip-btn">Last Month</button>
+      <button class="filter-chip-btn">Last 3 Months</button>
+      <button class="filter-chip-btn">This Year</button>
+      <span class="filter-clear">Clear all</span>
+      <div class="filter-spacer"></div>
+      <button class="btn btn-secondary">⬇ Export CSV</button>
+    </div>
+
+    <!-- Table — no Partner Code column -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Description</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="co-name">Nodal Store 5</div><div class="co-sub">NDS-00005</div></td>
+            <td>Monthly Silver Plan **11</td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">JAC A</div><div class="co-sub">JAC-0001</div></td>
+            <td>Monthly Test Free Plan</td>
+            <td class="amount">$0</td>
+            <td><span style="color:#94A3B8;font-style:italic;font-size:12px">—</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">Joey's Cannabis</div><div class="co-sub">JC-00042</div></td>
+            <td>Monthly MyCOA Plan **11</td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">Nodal Store 4</div><div class="co-sub">NDS-00004</div></td>
+            <td>Monthly Silver Plan **11</td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">Nodal Store</div><div class="co-sub">NDS-00001</div></td>
+            <td>Monthly Silver Plan **11</td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span class="table-summary">Showing 5 of 1,519 records</span>
+    </div>
+
+  </div><!-- /app-shell -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION B — AFTER QP-3898: Partner Code column in Finances
+  ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <div class="section-label">Section B — After QP-3898 — Partner Code Column in Finances</div>
+
+  <div class="app-shell">
+
+    <!-- Q-Audit product-level tab bar -->
+    <div class="product-nav">
+      <div class="product-logo">Q-Audit<sup>™</sup></div>
+      <div class="product-tab">Audit</div>
+      <div class="product-tab">Global Settings</div>
+      <div class="product-tab">Payroll</div>
+      <div class="product-tab">Import</div>
+      <div class="product-tab active">Finances</div>
+      <div class="product-tab">Companies</div>
+      <div class="product-tab">Prospects</div>
+      <div class="product-tab">Sales</div>
+      <div class="product-tab">Promotions</div>
+      <div class="product-tab">Q-Comply</div>
+      <div class="product-tab">Activity Log</div>
+      <div class="product-tab">Q-All Settings</div>
+      <div class="product-tab">Display Settings</div>
+    </div>
+
+    <!-- Metric cards (same numbers) -->
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="icon-box blue">📅</div>
+        <div class="metric-label">Monthly</div>
+        <div class="metric-value">$36,465.32</div>
+        <div class="metric-sub">102 monthly subscriptions</div>
+        <div class="metric-sub2">30 new subscriptions this month</div>
+      </div>
+      <div class="metric-card">
+        <div class="icon-box green">📆</div>
+        <div class="metric-label">Yearly</div>
+        <div class="metric-value">$28,349</div>
+        <div class="metric-sub">1,005 annual subscriptions</div>
+        <div class="metric-sub2">83 new subscriptions this month</div>
+      </div>
+      <div class="metric-card">
+        <div class="icon-box amber">💰</div>
+        <div class="metric-label">Total</div>
+        <div class="metric-value">$64,814.32</div>
+        <div class="metric-sub">1,519 total subscriptions</div>
+        <div class="metric-sub2">201 new subscriptions this month</div>
+      </div>
+    </div>
+
+    <!-- Retention cards -->
+    <div class="retention-row">
+      <div class="retention-card">
+        <div class="ret-label">3-Month Retention</div>
+        <div class="ret-sub">Data loading…</div>
+      </div>
+      <div class="retention-card">
+        <div class="ret-label">Monthly Retention</div>
+        <div class="ret-sub">Data loading…</div>
+      </div>
+      <div class="retention-card">
+        <div class="ret-label">Weekly Retention</div>
+        <div class="ret-sub">Data loading…</div>
+      </div>
+    </div>
+
+    <!-- Date filter row -->
+    <div class="filter-row">
+      <span class="filter-label">Start Date</span>
+      <input class="filter-input" type="text" placeholder="Start Date">
+      <span class="filter-label">End Date</span>
+      <input class="filter-input" type="text" placeholder="End Date">
+      <button class="filter-chip-btn">This Month</button>
+      <button class="filter-chip-btn">Last Month</button>
+      <button class="filter-chip-btn">Last 3 Months</button>
+      <button class="filter-chip-btn">This Year</button>
+      <span class="filter-clear">Clear all</span>
+      <div class="filter-spacer"></div>
+      <button class="btn btn-secondary">⬇ Export CSV</button>
+    </div>
+
+    <!-- Table — WITH Partner Code column -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Description</th>
+            <th class="th-highlight">Partner Code <span class="new-pill">NEW</span></th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="co-name">Nodal Store 5</div><div class="co-sub">NDS-00005</div></td>
+            <td>Monthly Silver Plan **11</td>
+            <td class="col-highlight"><span class="partner-code">WEST-042</span></td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">JAC A</div><div class="co-sub">JAC-0001</div></td>
+            <td>Monthly Test Free Plan</td>
+            <td class="col-highlight"><span class="partner-dash">—</span></td>
+            <td class="amount">$0</td>
+            <td><span style="color:#94A3B8;font-style:italic;font-size:12px">—</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">Joey's Cannabis</div><div class="co-sub">JC-00042</div></td>
+            <td>Monthly MyCOA Plan **11</td>
+            <td class="col-highlight"><span class="partner-code">FLEXPAY-001</span></td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">Nodal Store 4</div><div class="co-sub">NDS-00004</div></td>
+            <td>Monthly Silver Plan **11</td>
+            <td class="col-highlight"><span class="partner-dash">—</span></td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+          <tr>
+            <td><div class="co-name">Nodal Store</div><div class="co-sub">NDS-00001</div></td>
+            <td>Monthly Silver Plan **11</td>
+            <td class="col-highlight"><span class="partner-code">WEST-042</span></td>
+            <td class="amount">$0.00</td>
+            <td><span class="badge-paid">Paid</span></td>
+            <td class="date-mono">05/20/2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span class="table-summary">Showing 5 of 1,519 records</span>
+    </div>
+
+  </div><!-- /app-shell -->
+
+  <!-- inline annotation for section B -->
+  <div class="info-block" style="margin-top:10px">
+    <div class="info-pill">Change</div>
+    <p>
+      New <code>Partner Code</code> column inserted after Description. Populated when a subscription originates via a referral partner.
+      Blank (<code>—</code>) for unattributed rows. Values are stored as a free-form code (e.g. <code>FLEXPAY-001</code>, <code>WEST-042</code>)
+      linked to the partner registry. Column is sortable and filterable.
+    </p>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION C — CURRENT STATE: We Monitor Invites Tab
+  ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <div class="section-label">Section C — Current State — We Monitor Invites Tab</div>
+
+  <div class="app-shell">
+
+    <!-- G-Monitor header -->
+    <div class="gm-header">
+      <div class="gm-title">Gredible Enterprises Monitors</div>
+      <div class="gm-sub">Search a Company that you are monitoring / Search by Company or State</div>
+    </div>
+
+    <!-- Action row -->
+    <div class="gm-actions">
+      <button class="gm-action-btn">
+        <span class="act-title">Add Company</span>
+        <span class="act-sub">Search Companies in Qredible</span>
+      </button>
+      <button class="gm-action-btn">
+        <span class="act-title">Upload Companies</span>
+        <span class="act-sub">Upload Companies with a Template</span>
+      </button>
+      <button class="gm-action-btn">
+        <span class="act-title">Assign Team Members</span>
+        <span class="act-sub">Assign team members to companies</span>
+      </button>
+      <button class="gm-action-btn">
+        <span class="act-title">Upload Contact and Referral</span>
+        <span class="act-sub">Upload Contact and Referral information</span>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="gm-tabs">
+      <div class="gm-tab">Active Companies</div>
+      <div class="gm-tab">Pending Companies</div>
+      <div class="gm-tab">Archived Companies</div>
+      <div class="gm-tab active">Invites</div>
+    </div>
+
+    <!-- Summary pills -->
+    <div class="summary-pills">
+      <span class="sum-pill"><span class="dot blue"></span>84 Total Invites</span>
+      <span class="sum-pill"><span class="dot green"></span>9 Opened (13%)</span>
+      <span class="sum-pill"><span class="dot green"></span>7 Active (9%)</span>
+      <span class="sum-pill"><span class="dot amber"></span>18 Not Joined (21%)</span>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="invite-toolbar">
+      <input class="search-input" type="text" placeholder="Search by company or email...">
+      <div class="invite-spacer"></div>
+      <button class="btn btn-secondary">⬇ Export</button>
+      <button class="btn btn-secondary">⚙ Configure Invite Template</button>
+      <button class="btn btn-blue">+ Send Invite</button>
+    </div>
+
+    <!-- Invite table — no Partner Code -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px"><input type="checkbox" style="accent-color:#1E3A5F;cursor:pointer"></th>
+            <th>Legal Name</th>
+            <th>Email Invite Status</th>
+            <th>Company Status</th>
+            <th>Activity Dates</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" style="accent-color:#1E3A5F;cursor:pointer"></td>
+            <td>
+              <div class="co-name">39754 LLC DBA ARC BUD DEPOT</div>
+              <div class="email-cell">arcbuddepot@example.com</div>
+              <div style="display:flex;gap:4px;margin-top:3px"><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Hemp / CBD</span><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Retailer</span></div>
+            </td>
+            <td><span class="badge-opened">Opened</span></td>
+            <td><span class="badge-not-joined">Has Not Joined</span></td>
+            <td>
+              <div style="font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace">Sent 05/14/2026</div>
+              <div style="font-size:11px;color:#94A3B8;font-family:'IBM Plex Mono',monospace">Joined: —</div>
+              <div style="font-size:11px;color:#94A3B8;font-family:'IBM Plex Mono',monospace">Last Active: —</div>
+            </td>
+            <td><div style="display:flex;gap:4px"><button class="icon-btn">✏</button><button class="icon-btn">✉</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="accent-color:#1E3A5F;cursor:pointer"></td>
+            <td>
+              <div class="co-name">AAA</div>
+              <div class="email-cell">contact@aaa-cannabis.com</div>
+              <div style="display:flex;gap:4px;margin-top:3px"><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Cannabis / CBD</span><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Distributor</span></div>
+            </td>
+            <td><span class="badge-opened">Opened</span></td>
+            <td><span class="badge-not-joined">Has Not Joined</span></td>
+            <td>
+              <div style="font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace">Sent 05/02/2026</div>
+              <div style="font-size:11px;color:#94A3B8;font-family:'IBM Plex Mono',monospace">Joined: 10/02/2025</div>
+            </td>
+            <td><div style="display:flex;gap:4px"><button class="icon-btn">✏</button><button class="icon-btn">✉</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="accent-color:#1E3A5F;cursor:pointer"></td>
+            <td>
+              <div class="co-name">AAA Quim</div>
+              <div class="email-cell">quim@aaacannabis.net</div>
+              <div style="display:flex;gap:4px;margin-top:3px"><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Cannabis / CBD</span><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Distributor</span></div>
+            </td>
+            <td><span class="badge-sent">Sent</span></td>
+            <td><span class="badge-not-joined">Has Not Joined</span></td>
+            <td>
+              <div style="font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace">Sent 05/02/2026</div>
+              <div style="font-size:11px;color:#94A3B8;font-family:'IBM Plex Mono',monospace">Joined: 09/30/2025</div>
+            </td>
+            <td><div style="display:flex;gap:4px"><button class="icon-btn">✏</button><button class="icon-btn">✉</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="accent-color:#1E3A5F;cursor:pointer"></td>
+            <td>
+              <div class="co-name">AAAA-5500</div>
+              <div class="email-cell">hello@aaaa5500.com</div>
+              <div style="display:flex;gap:4px;margin-top:3px"><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Other</span><span style="background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px">Other</span></div>
+            </td>
+            <td><span class="badge-sent">Sent</span></td>
+            <td><span class="badge-not-joined">Has Not Joined</span></td>
+            <td>
+              <div style="font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace">Sent 05/04/2026</div>
+              <div style="font-size:11px;color:#94A3B8;font-family:'IBM Plex Mono',monospace">Joined: 11/12/2025</div>
+            </td>
+            <td><div style="display:flex;gap:4px"><button class="icon-btn">✏</button><button class="icon-btn">✉</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span class="table-summary">Showing 4 of 84 invites</span>
+    </div>
+
+  </div><!-- /app-shell -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION D — AFTER QP-3898: Send Invite modal with Partner Code
+  ═══════════════════════════════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <div class="section-label">Section D — After QP-3898 — Send Invite Modal with Partner Code</div>
+
+  <div class="app-shell">
+
+    <!-- G-Monitor header (same background) -->
+    <div class="gm-header">
+      <div class="gm-title">Gredible Enterprises Monitors</div>
+      <div class="gm-sub">Search a Company that you are monitoring / Search by Company or State</div>
+    </div>
+
+    <!-- Action row -->
+    <div class="gm-actions">
+      <button class="gm-action-btn">
+        <span class="act-title">Add Company</span>
+        <span class="act-sub">Search Companies in Qredible</span>
+      </button>
+      <button class="gm-action-btn">
+        <span class="act-title">Upload Companies</span>
+        <span class="act-sub">Upload Companies with a Template</span>
+      </button>
+      <button class="gm-action-btn">
+        <span class="act-title">Assign Team Members</span>
+        <span class="act-sub">Assign team members to companies</span>
+      </button>
+      <button class="gm-action-btn">
+        <span class="act-title">Upload Contact and Referral</span>
+        <span class="act-sub">Upload Contact and Referral information</span>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="gm-tabs">
+      <div class="gm-tab">Active Companies</div>
+      <div class="gm-tab">Pending Companies</div>
+      <div class="gm-tab">Archived Companies</div>
+      <div class="gm-tab active">Invites</div>
+    </div>
+
+    <!-- Summary pills -->
+    <div class="summary-pills">
+      <span class="sum-pill"><span class="dot blue"></span>84 Total Invites</span>
+      <span class="sum-pill"><span class="dot green"></span>9 Opened (13%)</span>
+      <span class="sum-pill"><span class="dot green"></span>7 Active (9%)</span>
+      <span class="sum-pill"><span class="dot amber"></span>18 Not Joined (21%)</span>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="invite-toolbar">
+      <input class="search-input" type="text" placeholder="Search by company or email...">
+      <div class="invite-spacer"></div>
+      <button class="btn btn-secondary">⬇ Export</button>
+      <button class="btn btn-secondary">⚙ Configure Invite Template</button>
+      <button class="btn btn-blue">+ Send Invite</button>
+    </div>
+
+    <!-- Modal overlay (inline, simulating open modal over dimmed table) -->
+    <div class="modal-overlay">
+
+      <!-- Dimmed table behind modal (partially visible) -->
+      <div style="position:absolute;inset:0;overflow:hidden;border-radius:0 0 10px 10px">
+        <table style="width:100%;border-collapse:collapse;opacity:.35;pointer-events:none">
+          <thead>
+            <tr style="background:#1E3A5F">
+              <th style="color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left;width:36px"></th>
+              <th style="color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left">Legal Name</th>
+              <th style="color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left">Email Invite Status</th>
+              <th style="color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left">Company Status</th>
+              <th style="color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left">Activity Dates</th>
+              <th style="color:#fff;font-size:12px;font-weight:600;padding:10px 14px;text-align:left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #F1F5F9">
+              <td style="padding:10px 14px"></td>
+              <td style="padding:10px 14px;font-size:13px;font-weight:600">39754 LLC DBA ARC BUD DEPOT</td>
+              <td style="padding:10px 14px"><span style="background:#DCFCE7;color:#166534;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;border:1px solid #BBF7D0">Opened</span></td>
+              <td style="padding:10px 14px"><span style="background:#FEF3C7;color:#92400E;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;border:1px solid #FDE68A">Has Not Joined</span></td>
+              <td style="padding:10px 14px;font-size:11px;color:#64748B;font-family:'IBM Plex Mono',monospace">Sent 05/14/2026</td>
+              <td style="padding:10px 14px"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal">
+        <div class="modal-title">
+          Send Invite
+          <button class="modal-close-btn">×</button>
+        </div>
+
+        <!-- Company Name -->
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input class="form-input" type="text" placeholder="e.g. Green Valley Dispensary">
+        </div>
+
+        <!-- Email Address -->
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" type="email" placeholder="contact@company.com">
+        </div>
+
+        <!-- Partner Code — NEW -->
+        <div class="form-group">
+          <label class="form-label">
+            Partner Code
+            <span class="new-pill">NEW</span>
+          </label>
+          <input class="form-input highlight" type="text" placeholder="e.g. FLEXPAY-001">
+          <div class="modal-annotation">
+            (Optional) Partner code links this invite's subscription revenue to the referring partner for attribution.
+          </div>
+        </div>
+
+        <!-- Message -->
+        <div class="form-group">
+          <label class="form-label">Message <span style="color:#94A3B8;font-weight:400">(optional)</span></label>
+          <textarea class="form-textarea" placeholder="Add a personal message to the invite email…"></textarea>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer-row">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-blue">Send Invite</button>
+        </div>
+      </div>
+    </div><!-- /modal-overlay -->
+
+  </div><!-- /app-shell -->
+
+  <!-- inline annotation for section D -->
+  <div class="info-block" style="margin-top:10px">
+    <div class="info-pill">Change</div>
+    <p>
+      The "Send Invite" modal gains a <code>Partner Code</code> field (optional).
+      When provided, the code is stored on the invite record and propagates to the Q-Audit Finances row
+      when the invited company converts to a paid subscription.
+      This enables revenue attribution back to the referring processor or ISO.
+    </p>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
