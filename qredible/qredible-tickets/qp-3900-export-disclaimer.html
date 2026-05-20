@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3900 — Configurable Export Disclaimer</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+.topnav .nav-note{font-size:11px;color:#64748B;font-style:italic}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:40px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+
+/* SECTION */
+.section{display:flex;flex-direction:column;gap:8px}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block;line-height:14px}
+
+/* MODAL SCENE */
+.modal-scene{position:relative;background:rgba(15,23,42,.45);border-radius:10px;padding:40px 24px;display:flex;align-items:flex-start;justify-content:center;min-height:560px}
+
+/* MODAL CARD */
+.modal-card{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);width:100%;max-width:480px;overflow:hidden}
+
+/* MODAL HEADER */
+.modal-hdr{padding:16px 20px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:10px}
+.modal-hdr-title{font-size:15px;font-weight:700;color:#1A202E;flex:1}
+.btn-close{background:none;border:none;font-size:18px;color:#64748B;cursor:pointer;padding:4px;line-height:1}
+
+/* MODAL BODY */
+.modal-body{padding:0}
+
+/* SECTION WITHIN MODAL */
+.modal-section{padding:14px 20px;border-bottom:1px solid #F1F5F9}
+.modal-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94A3B8;margin-bottom:8px}
+
+/* PRESET ROW */
+.preset-row{display:flex;align-items:center;gap:8px}
+.select-field{flex:1;padding:7px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;color:#374151;background:#fff;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394A3B8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit;white-space:nowrap}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-add{background:#fff;border:1px solid #CBD5E1;color:#374151;padding:6px 12px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* COLUMNS LIST */
+.columns-scroll{max-height:200px;overflow-y:auto;border:1px solid #E2E8F0;border-radius:6px}
+.col-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid #F1F5F9}
+.col-row:last-child{border-bottom:none}
+.col-row:hover{background:#F8FAFC}
+.col-cb{width:14px;height:14px;accent-color:#1E3A5F;cursor:pointer;flex-shrink:0}
+.col-name{flex:1;font-size:12px;font-weight:500;color:#1A202E}
+.col-name.unchecked{color:#94A3B8}
+.export-as-label{font-size:11px;color:#94A3B8;white-space:nowrap;flex-shrink:0}
+.export-as-input{width:100px;padding:4px 8px;border:1px solid #E2E8F0;border-radius:4px;font-size:11px;font-family:inherit;color:#374151;background:#fff}
+.add-col-row{display:flex;gap:8px;margin-top:8px}
+
+/* CERTIFICATION BLOCK */
+.cert-block{padding:12px 14px;border:1px solid #E2E8F0;border-radius:8px;margin-top:2px}
+.cert-block.active{background:#EFF6FF;border-color:#BFDBFE}
+.cert-toggle-row{display:flex;align-items:center;gap:10px}
+.cert-toggle-label{flex:1;font-size:12px;font-weight:500;color:#374151}
+.cert-toggle-label.muted{color:#94A3B8}
+
+/* TOGGLE SWITCH */
+.toggle-switch{position:relative;display:inline-block;width:34px;height:20px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#CBD5E1;border-radius:20px;transition:.2s}
+.toggle-track.on{background:#2563EB}
+.toggle-knob{position:absolute;content:'';height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle-track.on .toggle-knob{transform:translateX(14px)}
+
+/* DISABLED TEXT */
+.cert-disabled-text{margin-top:8px;font-size:11px;color:#94A3B8;font-style:italic;padding:6px 10px;background:#F8FAFC;border-radius:4px;border:1px dashed #E2E8F0}
+
+/* CERT TEXTAREA */
+.cert-textarea{width:100%;margin-top:8px;padding:8px 10px;border:1px solid #BFDBFE;border-radius:6px;font-size:12px;font-family:inherit;color:#374151;background:#fff;resize:vertical;line-height:1.5}
+.cert-helper{margin-top:6px;font-size:11px;color:#64748B;font-style:italic}
+
+/* FORM FIELDS */
+.form-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.form-row:last-child{margin-bottom:0}
+.form-label{font-size:11px;font-weight:600;color:#374151;white-space:nowrap;min-width:80px}
+.form-input{flex:1;padding:7px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:#374151;background:#fff}
+
+/* SCOPE */
+.scope-row{display:flex;align-items:center;gap:10px}
+.radio-label{display:flex;align-items:center;gap:6px;font-size:12px;color:#374151;cursor:pointer}
+.radio-label input{accent-color:#1E3A5F}
+.scope-picker{flex:1;padding:7px 10px;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;color:#CBD5E1;background:#F8FAFC;cursor:not-allowed}
+
+/* MODAL FOOTER */
+.modal-footer{padding:12px 20px;border-top:1px solid #E2E8F0;display:flex;align-items:center;justify-content:flex-end;gap:8px;background:#fff}
+
+/* SCROLLBAR STYLING */
+.columns-scroll::-webkit-scrollbar{width:5px}
+.columns-scroll::-webkit-scrollbar-track{background:#F1F5F9}
+.columns-scroll::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/qredible-tickets/">← Prototypes</a>
+  <span class="sep">/</span>
+  <span class="badge">QP-3900</span>
+  <span class="title">Configurable Export Disclaimer</span>
+  <span class="spacer"></span>
+  <span class="nav-note">Sections A–C below ↓</span>
+</nav>
+
+<div class="page">
+
+  <!-- INFO ANNOTATION -->
+  <div class="info-block">
+    <div class="info-pill">QP-3900</div>
+    <p><strong>QP-3900 — Configurable Export Disclaimer.</strong> Adds a Certification Block/disclaimer section to the Export Settings panel. When enabled, the disclaimer text renders in both Excel and PDF exports. The toggle and text are saved as part of the export configuration.</p>
+  </div>
+
+  <!-- ═══════════════════════════════ SECTION A -->
+  <div class="section">
+    <div class="section-label">Section A — Current State — Export Settings Modal (no disclaimer)</div>
+    <div class="modal-scene">
+      <div class="modal-card">
+        <div class="modal-hdr">
+          <div class="modal-hdr-title">Export Settings</div>
+          <button class="btn-close">×</button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Preset -->
+          <div class="modal-section">
+            <div class="modal-section-label">Preset</div>
+            <div class="preset-row">
+              <select class="select-field">
+                <option>None (default columns)</option>
+              </select>
+              <button class="btn btn-secondary btn-sm">Save as New</button>
+            </div>
+          </div>
+
+          <!-- Columns -->
+          <div class="modal-section">
+            <div class="modal-section-label">Columns</div>
+            <div class="columns-scroll">
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Parent Product</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">SKU</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Product Definition</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Price</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Classification</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Company</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb">
+                <span class="col-name unchecked">Tax Change</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="" disabled style="background:#F8FAFC;color:#CBD5E1">
+              </div>
+            </div>
+            <div class="add-col-row">
+              <button class="btn-add">+ Add Computed Column</button>
+              <button class="btn-add">+ Add Blank Column</button>
+            </div>
+          </div>
+
+          <!-- File Name + Date Format -->
+          <div class="modal-section">
+            <div class="form-row">
+              <span class="form-label">File Name</span>
+              <input type="text" class="form-input" value="Product_Compliance_Product_Colde">
+              <select class="select-field" style="max-width:80px">
+                <option>XLSX</option>
+                <option>CSV</option>
+              </select>
+              <select class="select-field" style="max-width:110px">
+                <option>MM/DD/YYYY</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Scope -->
+          <div class="modal-section" style="border-bottom:none">
+            <div class="modal-section-label">Scope</div>
+            <div class="scope-row">
+              <label class="radio-label">
+                <input type="radio" name="scope-a" checked>
+                All Filtered (31)
+              </label>
+              <input type="text" class="scope-picker" value="Associated Company" readonly>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ SECTION B -->
+  <div class="section">
+    <div class="section-label">Section B — After QP-3900 — Certification Block (Disabled)</div>
+    <div class="modal-scene">
+      <div class="modal-card">
+        <div class="modal-hdr">
+          <div class="modal-hdr-title">Export Settings</div>
+          <button class="btn-close">×</button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Preset -->
+          <div class="modal-section">
+            <div class="modal-section-label">Preset</div>
+            <div class="preset-row">
+              <select class="select-field">
+                <option>None (default columns)</option>
+              </select>
+              <button class="btn btn-secondary btn-sm">Save as New</button>
+            </div>
+          </div>
+
+          <!-- Columns -->
+          <div class="modal-section">
+            <div class="modal-section-label">Columns</div>
+            <div class="columns-scroll">
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Parent Product</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">SKU</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Product Definition</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Price</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Classification</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Company</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb">
+                <span class="col-name unchecked">Tax Change</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="" disabled style="background:#F8FAFC;color:#CBD5E1">
+              </div>
+            </div>
+            <div class="add-col-row">
+              <button class="btn-add">+ Add Computed Column</button>
+              <button class="btn-add">+ Add Blank Column</button>
+            </div>
+          </div>
+
+          <!-- CERTIFICATION BLOCK — NEW, DISABLED -->
+          <div class="modal-section">
+            <div class="modal-section-label">
+              Certification Block <span class="new-pill">NEW</span>
+            </div>
+            <div class="cert-block">
+              <div class="cert-toggle-row">
+                <span class="cert-toggle-label muted">Include certification/disclaimer in export</span>
+                <!-- Toggle OFF -->
+                <div class="toggle-switch">
+                  <div class="toggle-track">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="cert-disabled-text">(Disabled — will not appear in export)</div>
+            </div>
+          </div>
+
+          <!-- File Name + Date Format -->
+          <div class="modal-section">
+            <div class="form-row">
+              <span class="form-label">File Name</span>
+              <input type="text" class="form-input" value="Product_Compliance_Product_Colde">
+              <select class="select-field" style="max-width:80px">
+                <option>XLSX</option>
+                <option>CSV</option>
+              </select>
+              <select class="select-field" style="max-width:110px">
+                <option>MM/DD/YYYY</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Scope -->
+          <div class="modal-section" style="border-bottom:none">
+            <div class="modal-section-label">Scope</div>
+            <div class="scope-row">
+              <label class="radio-label">
+                <input type="radio" name="scope-b" checked>
+                All Filtered (31)
+              </label>
+              <input type="text" class="scope-picker" value="Associated Company" readonly>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ SECTION C -->
+  <div class="section">
+    <div class="section-label">Section C — After QP-3900 — Certification Block (Enabled)</div>
+    <div class="modal-scene" style="min-height:680px">
+      <div class="modal-card">
+        <div class="modal-hdr">
+          <div class="modal-hdr-title">Export Settings</div>
+          <button class="btn-close">×</button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Preset -->
+          <div class="modal-section">
+            <div class="modal-section-label">Preset</div>
+            <div class="preset-row">
+              <select class="select-field">
+                <option>None (default columns)</option>
+              </select>
+              <button class="btn btn-secondary btn-sm">Save as New</button>
+            </div>
+          </div>
+
+          <!-- Columns -->
+          <div class="modal-section">
+            <div class="modal-section-label">Columns</div>
+            <div class="columns-scroll">
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Parent Product</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">SKU</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Product Definition</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Price</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Classification</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb" checked>
+                <span class="col-name">Company</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="">
+              </div>
+              <div class="col-row">
+                <input type="checkbox" class="col-cb">
+                <span class="col-name unchecked">Tax Change</span>
+                <span class="export-as-label">Export As:</span>
+                <input type="text" class="export-as-input" placeholder="" disabled style="background:#F8FAFC;color:#CBD5E1">
+              </div>
+            </div>
+            <div class="add-col-row">
+              <button class="btn-add">+ Add Computed Column</button>
+              <button class="btn-add">+ Add Blank Column</button>
+            </div>
+          </div>
+
+          <!-- CERTIFICATION BLOCK — NEW, ENABLED -->
+          <div class="modal-section">
+            <div class="modal-section-label">
+              Certification Block <span class="new-pill">NEW</span>
+            </div>
+            <div class="cert-block active">
+              <div class="cert-toggle-row">
+                <span class="cert-toggle-label">Include certification/disclaimer in export</span>
+                <!-- Toggle ON -->
+                <div class="toggle-switch">
+                  <div class="toggle-track on">
+                    <div class="toggle-knob"></div>
+                  </div>
+                </div>
+              </div>
+              <textarea class="cert-textarea" rows="4">I certify that all information contained in this export is accurate and complete as of the export date. This report is generated by the Qredible compliance platform and reflects data as configured by the exporting user.</textarea>
+              <div class="cert-helper">Renders in both Excel and PDF exports when enabled.</div>
+            </div>
+          </div>
+
+          <!-- File Name + Date Format -->
+          <div class="modal-section">
+            <div class="form-row">
+              <span class="form-label">File Name</span>
+              <input type="text" class="form-input" value="Product_Compliance_Product_Colde">
+              <select class="select-field" style="max-width:80px">
+                <option>XLSX</option>
+                <option>CSV</option>
+              </select>
+              <select class="select-field" style="max-width:110px">
+                <option>MM/DD/YYYY</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Scope -->
+          <div class="modal-section" style="border-bottom:none">
+            <div class="modal-section-label">Scope</div>
+            <div class="scope-row">
+              <label class="radio-label">
+                <input type="radio" name="scope-c" checked>
+                All Filtered (31)
+              </label>
+              <input type="text" class="scope-picker" value="Associated Company" readonly>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
