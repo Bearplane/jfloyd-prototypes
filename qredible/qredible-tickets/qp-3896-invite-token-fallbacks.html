@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3896 — Invite Token Fallbacks</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+
+/* PAGE */
+.page{max-width:1360px;margin:0 auto;padding:24px 24px 64px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px;margin-bottom:24px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+.info-block ul{padding-left:18px;margin-top:4px}
+.info-block li{font-size:12px;color:#78350F;line-height:1.7}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06);margin-bottom:40px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-black{background:#1A202E;border-color:#1A202E;color:#fff;padding:8px 16px;font-size:13px;font-weight:600;border-radius:6px;cursor:pointer;font-family:inherit}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px}
+
+/* MODAL OVERLAY MOCK */
+.modal-overlay{background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:40px;border-radius:10px}
+
+/* MODAL */
+.modal{background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(15,23,42,.22);padding:24px;max-width:900px;width:100%}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.modal-subtitle{font-size:12px;color:#64748B}
+.modal-close{color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;background:none;border:none;font-family:inherit}
+
+/* FORM FIELD */
+.field-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
+.field-input{width:100%;padding:8px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;color:#1A202E;background:#fff}
+.field-row{margin-bottom:14px}
+
+/* MERGE TAG CHIPS */
+.merge-tags-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.merge-label{font-size:12px;color:#64748B}
+.token-chip{display:inline-flex;align-items:center;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;font-size:12px;font-weight:500;padding:3px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.token-chip-avail{display:inline-flex;align-items:center;background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;font-size:12px;font-weight:500;padding:3px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+
+/* EDITOR TOOLBAR */
+.editor-wrap{border:1px solid #CBD5E1;border-radius:6px;overflow:hidden;margin-bottom:14px}
+.editor-viewtab{background:#F8FAFC;border-bottom:1px solid #CBD5E1;padding:6px 12px;font-size:12px;color:#374151;font-weight:500}
+.editor-toolbar{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:6px 10px;display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.toolbar-btn{width:26px;height:26px;border:none;background:transparent;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#374151;font-family:'Plus Jakarta Sans',sans-serif}
+.toolbar-btn:hover{background:#E2E8F0}
+.toolbar-btn.bold{font-weight:700}
+.toolbar-btn.italic{font-style:italic}
+.toolbar-btn.underline{text-decoration:underline}
+.toolbar-btn.strike{text-decoration:line-through}
+.toolbar-select{height:26px;border:1px solid #CBD5E1;border-radius:4px;background:#fff;font-size:12px;font-family:inherit;color:#374151;padding:0 6px;cursor:pointer}
+.toolbar-sep{width:1px;height:20px;background:#E2E8F0;margin:0 4px}
+.toolbar-icon{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;color:#374151}
+.toolbar-icon:hover{background:#E2E8F0}
+.editor-toolbar-row2{background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:4px 10px;display:flex;align-items:center;gap:2px}
+.editor-body{padding:20px;min-height:180px;background:#fff}
+.editor-body-inner{display:flex;flex-direction:column;align-items:flex-start}
+.logos-row{display:flex;align-items:center;gap:32px;margin-bottom:16px;width:100%;justify-content:center}
+.logo-covalent{display:flex;align-items:center;gap:8px}
+.logo-covalent-icon{width:40px;height:40px;background:radial-gradient(circle,#60A5FA,#3B82F6,#1D4ED8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff}
+.logo-covalent-text{font-size:15px;font-weight:700;color:#1A202E;line-height:1.2}
+.logo-covalent-sub{font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em}
+.logo-qredible{font-size:22px;font-weight:700;color:#1A202E;display:flex;align-items:center;gap:2px}
+.logo-qredible span{color:#4F46E5}
+.editor-company-name{font-size:13px;font-weight:700;color:#1A202E}
+.editor-footer{display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;border-top:1px solid #E2E8F0;padding:5px 12px}
+.editor-footer-left{font-size:12px;color:#94A3B8}
+.editor-footer-right{display:flex;align-items:center;gap:6px;font-size:12px;color:#94A3B8}
+.tiny-logo{font-size:10px;font-weight:700;color:#64748B;background:#E2E8F0;padding:1px 5px;border-radius:3px}
+
+/* AVAILABLE TOKENS ROW */
+.avail-tokens-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.avail-label{font-size:12px;color:#64748B}
+
+/* FALLBACK TABLE */
+.fallback-table{width:100%;border-collapse:collapse;margin-bottom:10px}
+.fallback-table td{padding:6px 8px;vertical-align:middle}
+.fallback-input{padding:6px 10px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:#374151;background:#fff;width:180px}
+.fallback-note{font-size:11px;color:#94A3B8;font-style:italic;margin-bottom:14px}
+
+/* DNS SECTION */
+.dns-section{border-top:1px solid #E2E8F0;padding-top:16px;margin-top:4px}
+.dns-title{font-size:14px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.dns-subtitle{font-size:12px;color:#64748B;margin-bottom:10px}
+.dns-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.verified-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#166534;font-weight:600}
+.verified-dot{width:8px;height:8px;background:#16a34a;border-radius:50%}
+.cnames-text{font-size:12px;color:#64748B}
+
+/* MODAL FOOTER */
+.modal-footer{display:flex;justify-content:space-between;align-items:center;padding-top:16px;margin-top:16px;border-top:1px solid #E2E8F0}
+.modal-footer-right{display:flex;gap:10px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/">qredible-prototypes</a>
+  <span class="sep">/</span>
+  <a href="/qredible-tickets/">qredible-tickets</a>
+  <span class="sep">/</span>
+  <span class="title">Invite Token Fallbacks</span>
+  <span class="badge">QP-3896</span>
+</nav>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION A — CURRENT STATE                                   -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label">Section A — Current State</div>
+
+  <div class="app-shell">
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Email Template</div>
+            <div class="modal-subtitle">Send an email invite to all of your monitored companies that have not received an invite yet</div>
+          </div>
+          <button class="modal-close">✕</button>
+        </div>
+
+        <!-- Subject -->
+        <div class="field-row">
+          <div class="field-label">Subject</div>
+          <input class="field-input" type="text" value="Welcome to Qredible from Covalent - by Joseph" readonly>
+        </div>
+
+        <!-- Supports merge tags -->
+        <div class="merge-tags-row">
+          <span class="merge-label">Supports merge tags:</span>
+          <span class="token-chip">{{sender_name}}</span>
+          <span class="token-chip">{{company_name}}</span>
+        </div>
+
+        <!-- Body label -->
+        <div class="field-label" style="margin-bottom:5px">Body</div>
+
+        <!-- Editor -->
+        <div class="editor-wrap">
+          <div class="editor-viewtab">View</div>
+          <!-- Toolbar row 1 -->
+          <div class="editor-toolbar">
+            <button class="toolbar-btn">↩</button>
+            <button class="toolbar-btn">↪</button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn bold">B</button>
+            <button class="toolbar-btn italic">I</button>
+            <button class="toolbar-btn underline">U</button>
+            <button class="toolbar-btn strike">S</button>
+            <div class="toolbar-sep"></div>
+            <select class="toolbar-select">
+              <option>Uber Move</option>
+            </select>
+            <select class="toolbar-select" style="width:58px">
+              <option>12px</option>
+            </select>
+            <select class="toolbar-select" style="width:90px">
+              <option>Paragraph</option>
+            </select>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">≡</span>
+            <span class="toolbar-icon" style="border-bottom:2px solid #3B82F6">≡</span>
+            <span class="toolbar-icon">≡</span>
+            <span class="toolbar-icon">≡</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">⇤</span>
+            <span class="toolbar-icon">⇥</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">≔</span>
+            <span class="toolbar-icon">≔▾</span>
+            <span class="toolbar-icon">≔</span>
+            <span class="toolbar-icon">≔▾</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">🖼</span>
+            <span class="toolbar-icon">🎬</span>
+            <span class="toolbar-icon">🔗</span>
+            <span class="toolbar-icon">{}</span>
+            <span class="toolbar-icon" style="font-weight:700;text-decoration:underline;font-size:11px">A</span>
+            <span class="toolbar-icon">🖊</span>
+            <span class="toolbar-icon" style="font-style:italic;font-size:11px">I</span>
+          </div>
+          <!-- Toolbar row 2 -->
+          <div class="editor-toolbar-row2">
+            <span class="toolbar-icon" title="Omega">Ω</span>
+            <span class="toolbar-icon">😊</span>
+            <span class="toolbar-icon">⛶</span>
+            <span class="toolbar-icon">👁</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">📷</span>
+            <span class="toolbar-icon">▶</span>
+            <span class="toolbar-icon">🔗</span>
+            <span class="toolbar-icon">&lt;/&gt;</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon" style="font-size:11px;font-weight:700">LTR</span>
+            <span class="toolbar-icon" style="font-size:11px;font-weight:700">RTL</span>
+          </div>
+          <!-- Editor body -->
+          <div class="editor-body">
+            <div class="editor-body-inner">
+              <div class="logos-row">
+                <div class="logo-covalent">
+                  <div class="logo-covalent-icon">C</div>
+                  <div>
+                    <div class="logo-covalent-text">COVALENT</div>
+                    <div class="logo-covalent-sub">Custom Cannabinoids</div>
+                  </div>
+                </div>
+                <div class="logo-qredible">Q<span>r</span>edible<span style="color:#F05252">®</span></div>
+              </div>
+              <div class="editor-company-name">Covalent Custom Cannabinoids &amp; Nutraceuticals</div>
+            </div>
+          </div>
+          <!-- Editor footer -->
+          <div class="editor-footer">
+            <span class="editor-footer-left">p</span>
+            <div class="editor-footer-right">
+              Press Alt+0 for help
+              <span style="margin:0 8px">488 words</span>
+              <span class="tiny-logo">tiny</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available tokens (current — no fallbacks) -->
+        <div class="avail-tokens-row">
+          <span class="avail-label">Available tokens:</span>
+          <span class="token-chip-avail">{{sender_name}}</span>
+          <span class="token-chip-avail">{{recipient_first_name}}</span>
+          <span class="token-chip-avail">{{company_name}}</span>
+        </div>
+
+        <!-- Restore button -->
+        <div style="margin-bottom:16px">
+          <button class="btn-black">Restore Email to Default</button>
+        </div>
+
+        <!-- DNS Section -->
+        <div class="dns-section">
+          <div class="dns-title">Update DNS Records</div>
+          <div class="dns-subtitle">Domain should match the email address above.<br>Please click here for further instructions</div>
+          <div class="dns-row">
+            <button class="btn-black">Instructions</button>
+            <span class="verified-badge">
+              <span style="color:#16a34a;font-size:14px">✓</span>
+              Verified
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:5px">
+              <span style="width:8px;height:8px;background:#60A5FA;border-radius:50%;display:inline-block"></span>
+              <span class="cnames-text">Cnames added to DNS records</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <div></div>
+          <div class="modal-footer-right">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Save Template</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SECTION B — AFTER QP-3896: Token fallbacks                 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-label">Section B — After QP-3896 — Token Fallbacks</div>
+
+  <div class="app-shell">
+    <div class="modal-overlay">
+      <div class="modal">
+
+        <!-- Annotation block -->
+        <div class="info-block" style="margin-bottom:20px">
+          <div class="info-pill">QP-3896 · NEW FEATURE</div>
+          <p>Each merge token now accepts a <strong>fallback value</strong>. When a token is empty at send time (e.g. the sender has no name set, or the recipient company name is blank), the fallback text is rendered in its place. This prevents broken-looking emails like "Hello ," or "Welcome to , ."</p>
+        </div>
+
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Email Template</div>
+            <div class="modal-subtitle">Send an email invite to all of your monitored companies that have not received an invite yet</div>
+          </div>
+          <button class="modal-close">✕</button>
+        </div>
+
+        <!-- Subject -->
+        <div class="field-row">
+          <div class="field-label">Subject</div>
+          <input class="field-input" type="text" value="Welcome to Qredible from Covalent - by Joseph" readonly>
+        </div>
+
+        <!-- Supports merge tags -->
+        <div class="merge-tags-row">
+          <span class="merge-label">Supports merge tags:</span>
+          <span class="token-chip">{{sender_name}}</span>
+          <span class="token-chip">{{company_name}}</span>
+        </div>
+
+        <!-- Body label -->
+        <div class="field-label" style="margin-bottom:5px">Body</div>
+
+        <!-- Editor (same as above) -->
+        <div class="editor-wrap">
+          <div class="editor-viewtab">View</div>
+          <div class="editor-toolbar">
+            <button class="toolbar-btn">↩</button>
+            <button class="toolbar-btn">↪</button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn bold">B</button>
+            <button class="toolbar-btn italic">I</button>
+            <button class="toolbar-btn underline">U</button>
+            <button class="toolbar-btn strike">S</button>
+            <div class="toolbar-sep"></div>
+            <select class="toolbar-select"><option>Uber Move</option></select>
+            <select class="toolbar-select" style="width:58px"><option>12px</option></select>
+            <select class="toolbar-select" style="width:90px"><option>Paragraph</option></select>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">≡</span>
+            <span class="toolbar-icon" style="border-bottom:2px solid #3B82F6">≡</span>
+            <span class="toolbar-icon">≡</span>
+            <span class="toolbar-icon">≡</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">⇤</span>
+            <span class="toolbar-icon">⇥</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">≔</span>
+            <span class="toolbar-icon">≔▾</span>
+            <span class="toolbar-icon">≔</span>
+            <span class="toolbar-icon">≔▾</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">🖼</span>
+            <span class="toolbar-icon">🎬</span>
+            <span class="toolbar-icon">🔗</span>
+            <span class="toolbar-icon">{}</span>
+            <span class="toolbar-icon" style="font-weight:700;text-decoration:underline;font-size:11px">A</span>
+            <span class="toolbar-icon">🖊</span>
+            <span class="toolbar-icon" style="font-style:italic;font-size:11px">I</span>
+          </div>
+          <div class="editor-toolbar-row2">
+            <span class="toolbar-icon">Ω</span>
+            <span class="toolbar-icon">😊</span>
+            <span class="toolbar-icon">⛶</span>
+            <span class="toolbar-icon">👁</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon">📷</span>
+            <span class="toolbar-icon">▶</span>
+            <span class="toolbar-icon">🔗</span>
+            <span class="toolbar-icon">&lt;/&gt;</span>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-icon" style="font-size:11px;font-weight:700">LTR</span>
+            <span class="toolbar-icon" style="font-size:11px;font-weight:700">RTL</span>
+          </div>
+          <div class="editor-body">
+            <div class="editor-body-inner">
+              <div class="logos-row">
+                <div class="logo-covalent">
+                  <div class="logo-covalent-icon">C</div>
+                  <div>
+                    <div class="logo-covalent-text">COVALENT</div>
+                    <div class="logo-covalent-sub">Custom Cannabinoids</div>
+                  </div>
+                </div>
+                <div class="logo-qredible">Q<span>r</span>edible<span style="color:#F05252">®</span></div>
+              </div>
+              <div class="editor-company-name">Covalent Custom Cannabinoids &amp; Nutraceuticals</div>
+            </div>
+          </div>
+          <div class="editor-footer">
+            <span class="editor-footer-left">p</span>
+            <div class="editor-footer-right">
+              Press Alt+0 for help
+              <span style="margin:0 8px">488 words</span>
+              <span class="tiny-logo">tiny</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available tokens — NOW WITH FALLBACK INPUTS -->
+        <div style="margin-bottom:6px">
+          <span class="avail-label">Available tokens:</span>
+          <span class="new-pill">NEW</span>
+        </div>
+        <table class="fallback-table">
+          <tbody>
+            <tr>
+              <td style="width:200px"><span class="token-chip-avail">{{sender_name}}</span></td>
+              <td style="font-size:12px;color:#64748B;white-space:nowrap;padding-right:10px">Fallback:</td>
+              <td><input class="fallback-input" type="text" value="Qredible" placeholder="Enter fallback…"></td>
+              <td style="padding-left:8px"><span class="new-pill">NEW</span></td>
+            </tr>
+            <tr>
+              <td><span class="token-chip-avail">{{recipient_first_name}}</span></td>
+              <td style="font-size:12px;color:#64748B;white-space:nowrap;padding-right:10px">Fallback:</td>
+              <td><input class="fallback-input" type="text" value="Valued Client" placeholder="Enter fallback…"></td>
+              <td style="padding-left:8px"><span class="new-pill">NEW</span></td>
+            </tr>
+            <tr>
+              <td><span class="token-chip-avail">{{company_name}}</span></td>
+              <td style="font-size:12px;color:#64748B;white-space:nowrap;padding-right:10px">Fallback:</td>
+              <td><input class="fallback-input" type="text" value="Your Company" placeholder="Enter fallback…"></td>
+              <td style="padding-left:8px"><span class="new-pill">NEW</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="fallback-note">Fallback renders when the token value is empty at send time.</p>
+
+        <!-- Restore button -->
+        <div style="margin-bottom:16px">
+          <button class="btn-black">Restore Email to Default</button>
+        </div>
+
+        <!-- DNS Section -->
+        <div class="dns-section">
+          <div class="dns-title">Update DNS Records</div>
+          <div class="dns-subtitle">Domain should match the email address above.<br>Please click here for further instructions</div>
+          <div class="dns-row">
+            <button class="btn-black">Instructions</button>
+            <span class="verified-badge">
+              <span style="color:#16a34a;font-size:14px">✓</span>
+              Verified
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:5px">
+              <span style="width:8px;height:8px;background:#60A5FA;border-radius:50%;display:inline-block"></span>
+              <span class="cnames-text">Cnames added to DNS records</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <div></div>
+          <div class="modal-footer-right">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Save Template</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
