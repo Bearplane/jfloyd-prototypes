@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3917 — Peptide COA Details Modal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+code,.mono{font-family:'IBM Plex Mono',monospace;font-size:11px}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+
+/* PAGE */
+.page{max-width:1200px;margin:0 auto;padding:28px 24px 80px;display:flex;flex-direction:column;gap:48px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.7}
+.info-block ul{font-size:12px;color:#78350F;line-height:1.7;margin-left:16px;margin-top:4px}
+.info-block code{background:#FEF3C7;padding:0 3px;border-radius:3px;font-size:11px;color:#92400E}
+
+/* SECTION */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+.section-heading{font-size:15px;font-weight:700;color:#1A202E;margin-bottom:3px}
+.section-sub{font-size:12px;color:#64748B;margin-bottom:14px}
+
+/* NEW PILL */
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block}
+.delta-pill{background:#7C3AED;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block}
+
+/* ─────────────────────────── MODAL ─────────────────────────── */
+.modal-wrap{background:rgba(15,23,42,.45);border-radius:12px;padding:28px;display:flex;align-items:flex-start;justify-content:center}
+.modal{background:#fff;border-radius:10px;width:100%;max-width:860px;box-shadow:0 24px 64px rgba(0,0,0,.28);overflow:hidden;display:flex;flex-direction:column}
+
+/* Header */
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 22px 12px;border-bottom:1px solid #E2E8F0}
+.modal-header-left h2{font-size:16px;font-weight:700;color:#1A202E}
+.modal-header-left .subtitle{font-size:11px;color:#64748B;margin-top:3px;line-height:1.5}
+.btn-close{width:28px;height:28px;border-radius:5px;border:1px solid #E2E8F0;background:#fff;font-size:16px;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1}
+
+/* Body: split left/right */
+.modal-body{display:flex;flex:1;min-height:0}
+
+/* LEFT pane — PDF preview */
+.modal-left{width:300px;flex-shrink:0;border-right:1px solid #E2E8F0;background:#F1F5F9;display:flex;flex-direction:column}
+.pdf-toolbar{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid #E2E8F0;background:#fff}
+.pdf-toolbar-btn{width:24px;height:24px;border:1px solid #E2E8F0;border-radius:4px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748B;font-size:14px}
+.pdf-toolbar-page{font-size:11px;color:#64748B;flex:1;text-align:center}
+.pdf-preview{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.pdf-page{background:#fff;border:1px solid #DDE1E7;border-radius:4px;padding:10px;min-height:200px;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.pdf-page-inner{background:#f9f9f9;border:1px solid #E8ECF0;border-radius:2px;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+.pdf-page-label{font-size:10px;color:#94A3B8;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.pdf-page-sub{font-size:10px;color:#CBD5E1;text-align:center;line-height:1.5}
+.pdf-page-icon{font-size:28px;opacity:.25}
+
+/* RIGHT pane */
+.modal-right{flex:1;min-width:0;display:flex;flex-direction:column;overflow-y:auto;max-height:640px}
+
+/* Tabs + match badge row */
+.tab-row{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #E2E8F0;flex-shrink:0}
+.tabs{display:flex;gap:0}
+.tab{padding:11px 14px;font-size:12px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab.active{color:#1E3A5F;border-bottom-color:#1E3A5F}
+.match-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.match-badge.matched{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+.match-badge.unmatched{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+
+/* Overview content */
+.overview-content{flex:1;padding:14px 18px 0;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+
+/* ─── DISPOSITION BANNER ─── */
+.disp-banner{border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;flex-shrink:0}
+.disp-banner.compliant{background:#F0FDF4;border:1.5px solid #86EFAC}
+.disp-banner.violative{background:#FEF2F2;border:1.5px solid #FECACA}
+.disp-banner.manual-review{background:#FFFBEB;border:1.5px solid #FDE68A}
+.disp-banner-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.disp-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.disp-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.disp-chip.compliant{background:#16A34A;color:#fff}
+.disp-chip.violative{background:#DC2626;color:#fff}
+.disp-chip.manual-review{background:#D97706;color:#fff}
+.disp-reason{font-size:12px;color:#1A202E;font-weight:600}
+.disp-mode{font-size:11px;color:#64748B;margin-top:1px}
+.disp-mode strong{font-weight:700;color:#374151}
+.disp-conf{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.conf-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8}
+.conf-value{font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
+.conf-value.high{color:#16A34A}
+.conf-value.medium{color:#D97706}
+.conf-value.low{color:#DC2626}
+.conf-bar{width:60px;height:4px;border-radius:2px;background:#E2E8F0;margin-top:2px;overflow:hidden}
+.conf-bar-fill{height:100%;border-radius:2px}
+.conf-bar-fill.high{background:#16A34A}
+.conf-bar-fill.medium{background:#D97706}
+.conf-bar-fill.low{background:#DC2626}
+
+/* ─── SECTION HEADERS IN RIGHT PANE ─── */
+.section-header{font-size:12px;font-weight:700;color:#1A202E;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.section-header .section-pill{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em}
+.section-header .pill-unchanged{background:#E2E8F0;color:#64748B}
+.section-header .pill-delta{background:#EDE9FE;color:#6D28D9}
+
+/* ─── FORM FIELDS ─── */
+.field-grid{display:grid;gap:10px}
+.field-grid-2{grid-template-columns:1fr 1fr}
+.field-grid-3{grid-template-columns:1fr 1fr 1fr}
+.field-grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8}
+.field-input{padding:7px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;color:#1A202E;background:#fff;line-height:1.4}
+.field-input.error{border-color:#F87171;background:#FFF5F5}
+.field-input.mono{font-family:'IBM Plex Mono',monospace}
+.field-date-wrap{position:relative}
+.field-date-wrap .field-input{padding-right:30px}
+.field-date-icon{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:14px;pointer-events:none}
+.field-error-msg{font-size:10px;color:#DC2626;font-weight:600;display:flex;align-items:center;gap:3px;margin-top:1px}
+.field-input-date-error{border-color:#F87171;background:#FFF5F5;color:#DC2626;font-weight:600}
+.field-input-date-error-suffix{font-size:10px;color:#DC2626;font-weight:600;margin-top:2px;display:block}
+
+/* Dropdown */
+.field-select-wrap{position:relative}
+.field-select{width:100%;padding:7px 28px 7px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:inherit;color:#1A202E;background:#fff;appearance:none;cursor:pointer}
+.field-select-icon{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#94A3B8;pointer-events:none;font-size:11px}
+
+/* ─── CONTENT ANALYSIS / PEPTIDE ─── */
+.content-analysis-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.content-analysis-title{font-size:12px;font-weight:700;color:#1A202E;display:flex;align-items:center;gap:6px}
+.toggle-wrap{display:flex;align-items:center;gap:6px;cursor:pointer}
+.toggle-label{font-size:11px;font-weight:600;color:#64748B}
+.toggle{width:32px;height:18px;background:#CBD5E1;border-radius:9px;position:relative;cursor:pointer;transition:background .15s;flex-shrink:0}
+.toggle.on{background:#1E3A5F}
+.toggle::after{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle.on::after{left:16px}
+
+/* Purity-peptide pair rows */
+.peptide-pairs{display:flex;flex-direction:column;gap:0;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;margin-bottom:10px}
+.peptide-pairs-header{display:grid;grid-template-columns:1fr 100px 90px 28px;gap:8px;padding:7px 10px;background:#F8FAFC;border-bottom:1px solid #E2E8F0}
+.peptide-pairs-header-cell{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8}
+.peptide-row{display:grid;grid-template-columns:1fr 100px 90px 28px;gap:8px;padding:8px 10px;border-bottom:1px solid #F1F5F9;align-items:center;background:#fff;transition:background .1s}
+.peptide-row:last-child{border-bottom:none}
+.peptide-row.fail{background:#FFF5F5}
+.peptide-row.flag{background:#FFFBEB}
+.peptide-input{padding:6px 8px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:inherit;color:#1A202E;width:100%}
+.peptide-input.fail{border-color:#F87171;background:#FEF2F2;color:#DC2626}
+.purity-input-wrap{position:relative}
+.purity-input{padding:6px 22px 6px 8px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:#1A202E;width:100%;text-align:right}
+.purity-input.pass{border-color:#86EFAC;background:#F0FDF4;color:#166534}
+.purity-input.fail{border-color:#F87171;background:#FEF2F2;color:#DC2626;font-weight:700}
+.purity-pct{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:11px;color:#94A3B8;pointer-events:none}
+.purity-pct.pass{color:#16A34A}
+.purity-pct.fail{color:#DC2626}
+
+/* Per-row confidence badge */
+.row-conf{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+.row-conf.high{background:#F0FDF4;color:#166534;border:1px solid #86EFAC}
+.row-conf.low{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A}
+.row-conf.fail{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA}
+
+/* Pass/fail indicator for purity */
+.purity-status{font-size:10px;font-weight:700}
+.purity-status.pass{color:#16A34A}
+.purity-status.fail{color:#DC2626}
+
+/* Row remove btn */
+.row-remove{width:22px;height:22px;border:1px solid #E2E8F0;border-radius:4px;background:#fff;color:#94A3B8;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
+.row-remove:hover{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
+
+/* Add row button */
+.add-pair-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1.5px dashed #CBD5E1;border-radius:6px;background:transparent;font-size:11px;font-weight:600;color:#64748B;cursor:pointer;font-family:inherit;margin-top:4px}
+.add-pair-btn:hover{border-color:#94A3B8;color:#374151}
+
+/* Extracted field rows (method, lab) */
+.ext-fields{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.ext-field-row{display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:start}
+.ext-field-row-3{display:grid;grid-template-columns:1fr 1fr 90px;gap:8px;align-items:start}
+
+/* Confidence badge on individual fields */
+.field-conf-wrap{display:flex;flex-direction:column;gap:3px}
+.field-conf{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.field-conf.high{background:#F0FDF4;color:#166534;border:1px solid #86EFAC}
+.field-conf.low{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A}
+
+/* Flagged field */
+.field-flagged{border-color:#FDE68A !important;background:#FFFBEB !important}
+.flag-label{font-size:10px;color:#92400E;font-weight:600;display:flex;align-items:center;gap:3px}
+
+/* Not-on-COA (null field) */
+.not-on-coa{font-size:12px;color:#CBD5E1;font-style:italic;padding:7px 10px;border:1px dashed #E2E8F0;border-radius:6px;background:#FAFCFF;cursor:default}
+
+/* Verbatim non-detect */
+.verbatim-nd{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#64748B;font-weight:600;padding:7px 10px;border:1px solid #E2E8F0;border-radius:6px;background:#F8FAFC}
+
+/* Show-all-fields section (hidden fields) */
+.hidden-fields-section{border-top:1px dashed #E2E8F0;margin-top:12px;padding-top:12px}
+.hidden-fields-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.hidden-fields-label::after{content:'';flex:1;height:1px;background:#E2E8F0}
+
+/* Footer */
+.modal-footer{padding:12px 18px;border-top:1px solid #E2E8F0;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-shrink:0;background:#fff}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit;white-space:nowrap}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+
+/* ─── DIVIDER between pane sections ─── */
+.overview-divider{height:1px;background:#F1F5F9;margin:2px 0}
+
+/* ─── ANNOTATION CALLOUT ─── */
+.callout{background:#EDE9FE;border-left:3px solid #7C3AED;border-radius:0 6px 6px 0;padding:8px 12px;font-size:11px;color:#4C1D95;line-height:1.6;margin-top:4px}
+.callout strong{font-weight:700}
+.callout.green{background:#F0FDF4;border-left-color:#16A34A;color:#166534}
+.callout.red{background:#FEF2F2;border-left-color:#DC2626;color:#991B1B}
+.callout.yellow{background:#FFFBEB;border-left-color:#D97706;color:#92400E}
+
+/* ─── LEGEND ─── */
+.legend{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 0;font-size:11px;color:#64748B}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-swatch{width:14px;height:14px;border-radius:3px;border:1px solid}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html">QTrust</a>
+  <span class="sep">›</span>
+  <a href="index.html">Tickets</a>
+  <span class="sep">›</span>
+  <span class="title">COA Details Modal — Peptide Track B</span>
+  <span class="badge">QP-3917</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- TICKET HEADER -->
+  <div>
+    <div class="section-label">QP-3917 · Track B · UI Mockup</div>
+    <div class="section-heading">Peptide COA Details Modal <span class="delta-pill">Delta</span></div>
+    <div class="section-sub">Parent: QP-3784 — Peptide Track B COA workflow. Delta to the existing COA Details modal: disposition+confidence banner + peptide field set in Content Analysis. Everything else unchanged.</div>
+
+    <div class="info-block" style="margin-top:10px">
+      <div class="info-pill">Delta Summary</div>
+      <p><strong>Unchanged:</strong> modal shell, header, PDF preview, Overview/Conversation/History tabs, Product Assignment, COA Information, match badge, footer, and all cannabis rendering.</p>
+      <p style="margin-top:4px"><strong>New (this ticket):</strong></p>
+      <ul>
+        <li><strong>Disposition + confidence banner</strong> — Compliant / Violative / Manual Review chip; specific failed reason on Violative; overall extraction confidence.</li>
+        <li><strong>Peptide field set in Content Analysis</strong> — repeatable Purity↔Peptide pair rows (never split), Method, Lab. Replaces cannabinoid grid when industry = Peptides.</li>
+        <li><strong>Extracted-only default + "Show all fields" toggle</strong> — only fields actually on the COA appear by default.</li>
+        <li><strong>Three-state values</strong> — <em>Not on COA</em> (null, muted) vs. verbatim non-detect (<code>ND</code> / <code>&lt;LOQ</code> / <code>&lt;LOD</code>) vs. real <code>0</code> — all visually distinct; no blank→0 coercion.</li>
+        <li><strong>Per-field confidence flagging</strong> — low-confidence fields flagged even in the default view.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div>
+    <div class="section-label">Value States — Three-state distinction</div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#FAFCFF;border-color:#E2E8F0;border-style:dashed"></div>
+        <span><em>Not on COA</em> — null; hidden in default view (unless low-conf flagged)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#F8FAFC;border-color:#E2E8F0"></div>
+        <span><code>ND</code> / <code>&lt;LOQ</code> / <code>&lt;LOD</code> — verbatim non-detect; field is present on COA, value = not detected</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:#fff;border-color:#CBD5E1"></div>
+        <span><code>0</code> — real measured zero; present on COA; counts as extracted value</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       STATE 1 — AUTO-COMPLIANT, HIGH CONFIDENCE (single peptide)
+       ═══════════════════════════════════════════════════════════════ -->
+  <div>
+    <div class="section-label" style="margin-bottom:5px">State 1 of 2</div>
+    <div class="section-heading">Auto-Compliant — High confidence</div>
+    <div class="section-sub">Single-peptide COA: BPC-157 at 98.6% purity. All fields extracted with high confidence → disposition computed automatically.</div>
+    <div class="callout green" style="margin-bottom:14px">
+      <strong>Read-through:</strong> Banner shows Compliant chip + <strong>Confidence 0.94</strong> with "Auto-computed" label. Content Analysis shows only the extracted fields (BPC-157 purity pair, Method, Lab). "Show all fields" toggle is OFF.
+    </div>
+
+    <div class="modal-wrap">
+      <div class="modal">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <h2>COA Details</h2>
+            <div class="subtitle">Peptide Sciences LLC &nbsp;•&nbsp; BPC-157-5mg-lot2024-0311.pdf &nbsp;•&nbsp; Added 05/14/2025 by Manual Upload</div>
+          </div>
+          <div class="btn-close">✕</div>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+
+          <!-- LEFT PANE — PDF preview -->
+          <div class="modal-left">
+            <div class="pdf-toolbar">
+              <div class="pdf-toolbar-btn">−</div>
+              <div class="pdf-toolbar-btn">+</div>
+              <div class="pdf-toolbar-page">Page 1 / 1</div>
+              <div class="pdf-toolbar-btn" title="Download">↓</div>
+            </div>
+            <div class="pdf-preview">
+              <div class="pdf-page">
+                <div class="pdf-page-inner">
+                  <div class="pdf-page-icon">📄</div>
+                  <div class="pdf-page-label">Certificate of Analysis</div>
+                  <div class="pdf-page-sub">Peptide Sciences LLC<br>BPC-157 · Lot 2024-0311<br>Purity: 98.6% · Method: HPLC<br>ISO 17025 Accredited</div>
+                </div>
+              </div>
+              <div class="pdf-page">
+                <div class="pdf-page-inner" style="height:160px">
+                  <div class="pdf-page-label">Page 2</div>
+                  <div class="pdf-page-sub">Lab methods &amp; chromatogram</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT PANE -->
+          <div class="modal-right">
+
+            <!-- Tabs + match badge -->
+            <div class="tab-row">
+              <div class="tabs">
+                <div class="tab active">Overview</div>
+                <div class="tab">Conversation</div>
+                <div class="tab">History</div>
+              </div>
+              <div class="match-badge matched">✓ Manually matched</div>
+            </div>
+
+            <div class="overview-content">
+
+              <!-- ─── DISPOSITION BANNER [DELTA] ─── -->
+              <div class="disp-banner compliant">
+                <div class="disp-banner-left">
+                  <div class="disp-row">
+                    <div class="disp-chip compliant">✓ Compliant</div>
+                  </div>
+                  <div class="disp-mode">Disposition <strong>auto-computed</strong> — all fields extracted above confidence threshold (0.85).</div>
+                </div>
+                <div class="disp-conf">
+                  <div class="conf-label">Confidence</div>
+                  <div class="conf-value high">0.94</div>
+                  <div class="conf-bar"><div class="conf-bar-fill high" style="width:94%"></div></div>
+                </div>
+              </div>
+
+              <!-- Product Assignment [CURRENT] -->
+              <div>
+                <div class="section-header">Product Assignment <span class="section-pill pill-unchanged">Unchanged</span></div>
+                <div class="field-grid field-grid-2" style="margin-bottom:8px">
+                  <div class="field">
+                    <div class="field-label">Product Name from COA</div>
+                    <div class="field-input" style="color:#94A3B8;font-style:italic;min-height:32px"></div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Date Added (Product)</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">05/14/2025</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Assigned Product</div>
+                  <div class="field-select-wrap">
+                    <select class="field-select">
+                      <option>BPC-157 5mg Vial — SKU PEP-BPC-5MG</option>
+                    </select>
+                    <div class="field-select-icon">▾</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overview-divider"></div>
+
+              <!-- COA Information [CURRENT] -->
+              <div>
+                <div class="section-header">COA Information <span class="section-pill pill-unchanged">Unchanged</span></div>
+                <div class="field-grid field-grid-4" style="margin-bottom:8px">
+                  <div class="field">
+                    <div class="field-label">Sample ID</div>
+                    <div class="field-input mono">PSL-2024-0311</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Batch Number</div>
+                    <div class="field-input mono">2024-0311</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Lot Number</div>
+                    <div class="field-input mono">L0311-A</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Number of Units</div>
+                    <div class="field-input mono">50</div>
+                  </div>
+                </div>
+                <div class="field-grid field-grid-4" style="margin-bottom:8px">
+                  <div class="field">
+                    <div class="field-label">Collected Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">03/11/2024</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Received Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">03/14/2024</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Completed Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">03/22/2024</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Expiration Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">03/22/2025</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                    <div class="field-input-date-error-suffix">Expired 60 days ago</div>
+                  </div>
+                </div>
+                <div class="field-grid field-grid-2">
+                  <div class="field">
+                    <div class="field-label">Valid for (Months)</div>
+                    <div class="field-input mono">12</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overview-divider"></div>
+
+              <!-- CONTENT ANALYSIS [DELTA] -->
+              <div style="padding-bottom:14px">
+                <div class="content-analysis-header">
+                  <div class="content-analysis-title">
+                    Content Analysis — Peptides
+                    <span class="delta-pill">Delta</span>
+                  </div>
+                  <!-- Show all fields toggle -->
+                  <div class="toggle-wrap" title="Toggle to reveal full Track-B field schema">
+                    <div class="toggle"></div>
+                    <div class="toggle-label">Show all fields</div>
+                  </div>
+                </div>
+
+                <!-- Purity ↔ Peptide pairs -->
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:6px">Purity ↔ Peptide Pairs</div>
+                <div class="peptide-pairs">
+                  <div class="peptide-pairs-header">
+                    <div class="peptide-pairs-header-cell">Peptide</div>
+                    <div class="peptide-pairs-header-cell">Purity %</div>
+                    <div class="peptide-pairs-header-cell">Confidence</div>
+                    <div class="peptide-pairs-header-cell"></div>
+                  </div>
+                  <!-- Row 1: BPC-157, pass -->
+                  <div class="peptide-row">
+                    <div>
+                      <input class="peptide-input" type="text" value="BPC-157" readonly>
+                    </div>
+                    <div class="purity-input-wrap">
+                      <input class="purity-input pass" type="text" value="98.6" readonly>
+                      <span class="purity-pct pass">%</span>
+                    </div>
+                    <div>
+                      <span class="row-conf high">✓ 0.93</span>
+                    </div>
+                    <div><div class="row-remove">✕</div></div>
+                  </div>
+                </div>
+                <button class="add-pair-btn">+ Add peptide:purity pair</button>
+
+                <!-- Extracted fields: Method + Lab -->
+                <div class="ext-fields" style="margin-top:12px">
+                  <div class="ext-field-row">
+                    <div class="field">
+                      <div class="field-label">Method</div>
+                      <div class="field-input">HPLC (USP &lt;621&gt;)</div>
+                    </div>
+                    <div class="field-conf-wrap" style="padding-top:18px">
+                      <span class="field-conf high">✓ 0.91</span>
+                    </div>
+                  </div>
+                  <div class="ext-field-row">
+                    <div class="field">
+                      <div class="field-label">Lab</div>
+                      <div class="field-input">Peptide Sciences Lab (ISO 17025)</div>
+                    </div>
+                    <div class="field-conf-wrap" style="padding-top:18px">
+                      <span class="field-conf high">✓ 0.95</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Show all fields = OFF → hidden fields not rendered, just a callout note -->
+                <div style="margin-top:12px;font-size:11px;color:#94A3B8;text-align:center;padding:6px 0;border-top:1px dashed #E2E8F0">
+                  3 fields not on this COA (Batch ID, Contaminants, Heavy Metals) — toggle <em>Show all fields</em> to review or add.
+                </div>
+              </div>
+            </div><!-- /overview-content -->
+
+            <!-- Footer -->
+            <div class="modal-footer">
+              <button class="btn btn-secondary">Cancel</button>
+              <button class="btn btn-primary">Save</button>
+            </div>
+
+          </div><!-- /modal-right -->
+        </div><!-- /modal-body -->
+      </div><!-- /modal -->
+    </div><!-- /modal-wrap -->
+
+    <div class="callout green" style="margin-top:10px">
+      <strong>State 1 notes:</strong> Disposition = Compliant; auto-computed (all fields ≥ 0.85 confidence threshold). Single extracted BPC-157 purity pair (98.6% ≥ 98% pass). Method and Lab extracted with high confidence. Toggle off → "not on COA" fields for Contaminants, Heavy Metals, Batch ID are hidden (their count is surfaced in the footer note). No flagged fields.
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       STATE 2 — VIOLATIVE + LOW-CONFIDENCE BLEND
+       ═══════════════════════════════════════════════════════════════ -->
+  <div>
+    <div class="section-label" style="margin-bottom:5px">State 2 of 2</div>
+    <div class="section-heading">Violative + Low-confidence flags</div>
+    <div class="section-sub">Blend COA: BPC-157 (96.4%, <span style="color:#DC2626;font-weight:700">FAIL</span>) + TB-500 (99.1%, pass). Method extraction low-confidence, flagged. Disposition = Violative with specific reason. "Show all fields" is ON to display the full field schema.</div>
+    <div class="callout red" style="margin-bottom:14px">
+      <strong>Read-through:</strong> Banner shows Violative chip with inline reason <em>"Purity 96.4% &lt; 98% (BPC-157)"</em> + Confidence 0.71 ("Manual review required"). BPC-157 row highlighted red. Method field flagged (⚠ low confidence, shown even in default). "Show all fields" ON — null/not-on-COA fields visible in the full schema area.
+    </div>
+
+    <div class="modal-wrap">
+      <div class="modal">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <h2>COA Details</h2>
+            <div class="subtitle">BioBlend Research &nbsp;•&nbsp; blend-bpc157-tb500-lot0044.pdf &nbsp;•&nbsp; Added 05/18/2025 by Scan</div>
+          </div>
+          <div class="btn-close">✕</div>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+
+          <!-- LEFT PANE — PDF preview -->
+          <div class="modal-left">
+            <div class="pdf-toolbar">
+              <div class="pdf-toolbar-btn">−</div>
+              <div class="pdf-toolbar-btn">+</div>
+              <div class="pdf-toolbar-page">Page 1 / 2</div>
+              <div class="pdf-toolbar-btn" title="Download">↓</div>
+            </div>
+            <div class="pdf-preview">
+              <div class="pdf-page">
+                <div class="pdf-page-inner">
+                  <div class="pdf-page-icon">📄</div>
+                  <div class="pdf-page-label">Certificate of Analysis</div>
+                  <div class="pdf-page-sub">BioBlend Research<br>BPC-157 + TB-500 Blend · Lot 0044<br>BPC-157 Purity: 96.4%<br>TB-500 Purity: 99.1%</div>
+                </div>
+              </div>
+              <div class="pdf-page">
+                <div class="pdf-page-inner" style="height:160px">
+                  <div class="pdf-page-label">Page 2</div>
+                  <div class="pdf-page-sub">Lab report (partial — low scan quality)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT PANE -->
+          <div class="modal-right">
+
+            <!-- Tabs + match badge -->
+            <div class="tab-row">
+              <div class="tabs">
+                <div class="tab active">Overview</div>
+                <div class="tab">Conversation</div>
+                <div class="tab">History</div>
+              </div>
+              <div class="match-badge unmatched">⚠ Unmatched</div>
+            </div>
+
+            <div class="overview-content">
+
+              <!-- ─── DISPOSITION BANNER [DELTA] — Violative ─── -->
+              <div class="disp-banner violative">
+                <div class="disp-banner-left">
+                  <div class="disp-row">
+                    <div class="disp-chip violative">✕ Violative</div>
+                    <div class="disp-reason">Purity 96.4% &lt; 98% (BPC-157)</div>
+                  </div>
+                  <div class="disp-mode"><strong>Low confidence</strong> — manual review required. One or more extracted fields flagged below threshold (0.85).</div>
+                </div>
+                <div class="disp-conf">
+                  <div class="conf-label">Confidence</div>
+                  <div class="conf-value low">0.71</div>
+                  <div class="conf-bar"><div class="conf-bar-fill low" style="width:71%"></div></div>
+                </div>
+              </div>
+
+              <!-- Product Assignment [CURRENT] -->
+              <div>
+                <div class="section-header">Product Assignment <span class="section-pill pill-unchanged">Unchanged</span></div>
+                <div class="field-grid field-grid-2" style="margin-bottom:8px">
+                  <div class="field">
+                    <div class="field-label">Product Name from COA</div>
+                    <div class="field-input">BPC-157 / TB-500 Blend</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Date Added (Product)</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">05/18/2025</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Assigned Product</div>
+                  <div class="field-select-wrap">
+                    <select class="field-select">
+                      <option>— Search or select a product —</option>
+                    </select>
+                    <div class="field-select-icon">▾</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overview-divider"></div>
+
+              <!-- COA Information [CURRENT] -->
+              <div>
+                <div class="section-header">COA Information <span class="section-pill pill-unchanged">Unchanged</span></div>
+                <div class="field-grid field-grid-4" style="margin-bottom:8px">
+                  <div class="field">
+                    <div class="field-label">Sample ID</div>
+                    <div class="field-input mono">BBR-0044</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Batch Number</div>
+                    <div class="field-input mono">LOT0044</div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Lot Number</div>
+                    <div class="field-input mono" style="color:#94A3B8;font-style:italic"></div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Number of Units</div>
+                    <div class="field-input mono">25</div>
+                  </div>
+                </div>
+                <div class="field-grid field-grid-4" style="margin-bottom:8px">
+                  <div class="field">
+                    <div class="field-label">Collected Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">01/10/2025</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Received Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">01/14/2025</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Completed Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">01/22/2025</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="field-label">Expiration Date</div>
+                    <div class="field-date-wrap">
+                      <div class="field-input">01/22/2026</div>
+                      <div class="field-date-icon">📅</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="field-grid field-grid-2">
+                  <div class="field">
+                    <div class="field-label">Valid for (Months)</div>
+                    <div class="field-input mono">12</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overview-divider"></div>
+
+              <!-- CONTENT ANALYSIS [DELTA] — Show all fields ON -->
+              <div style="padding-bottom:14px">
+                <div class="content-analysis-header">
+                  <div class="content-analysis-title">
+                    Content Analysis — Peptides
+                    <span class="delta-pill">Delta</span>
+                  </div>
+                  <!-- Toggle ON -->
+                  <div class="toggle-wrap" title="Showing all fields">
+                    <div class="toggle on"></div>
+                    <div class="toggle-label" style="color:#1E3A5F;font-weight:700">Show all fields</div>
+                  </div>
+                </div>
+
+                <!-- Purity ↔ Peptide pairs — blend, row 1 fails -->
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:6px">Purity ↔ Peptide Pairs</div>
+                <div class="peptide-pairs">
+                  <div class="peptide-pairs-header">
+                    <div class="peptide-pairs-header-cell">Peptide</div>
+                    <div class="peptide-pairs-header-cell">Purity %</div>
+                    <div class="peptide-pairs-header-cell">Confidence</div>
+                    <div class="peptide-pairs-header-cell"></div>
+                  </div>
+                  <!-- Row 1: BPC-157, FAIL -->
+                  <div class="peptide-row fail">
+                    <div>
+                      <input class="peptide-input fail" type="text" value="BPC-157" readonly>
+                    </div>
+                    <div class="purity-input-wrap">
+                      <input class="purity-input fail" type="text" value="96.4" readonly>
+                      <span class="purity-pct fail">%</span>
+                    </div>
+                    <div>
+                      <span class="row-conf fail">✕ FAIL</span>
+                    </div>
+                    <div><div class="row-remove">✕</div></div>
+                  </div>
+                  <!-- Row 2: TB-500, pass -->
+                  <div class="peptide-row">
+                    <div>
+                      <input class="peptide-input" type="text" value="TB-500" readonly>
+                    </div>
+                    <div class="purity-input-wrap">
+                      <input class="purity-input pass" type="text" value="99.1" readonly>
+                      <span class="purity-pct pass">%</span>
+                    </div>
+                    <div>
+                      <span class="row-conf high">✓ 0.88</span>
+                    </div>
+                    <div><div class="row-remove">✕</div></div>
+                  </div>
+                </div>
+                <button class="add-pair-btn">+ Add peptide:purity pair</button>
+
+                <!-- Extracted fields: Method (LOW CONF flagged) + Lab -->
+                <div class="ext-fields" style="margin-top:12px">
+                  <!-- Method — flagged low confidence -->
+                  <div class="ext-field-row">
+                    <div class="field">
+                      <div class="field-label">Method <span style="color:#D97706;font-size:10px;font-weight:700">⚠ Flagged for review</span></div>
+                      <input class="field-input field-flagged" type="text" value="HPLC" style="width:100%">
+                      <div class="flag-label">⚠ Low confidence — verify against COA document</div>
+                    </div>
+                    <div class="field-conf-wrap" style="padding-top:18px">
+                      <span class="field-conf low">⚠ 0.52</span>
+                    </div>
+                  </div>
+                  <!-- Lab — high confidence -->
+                  <div class="ext-field-row">
+                    <div class="field">
+                      <div class="field-label">Lab</div>
+                      <input class="field-input" type="text" value="BioAnalytical Labs" style="width:100%">
+                    </div>
+                    <div class="field-conf-wrap" style="padding-top:18px">
+                      <span class="field-conf high">✓ 0.87</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Show all fields = ON → full schema, null fields visible -->
+                <div class="hidden-fields-section">
+                  <div class="hidden-fields-label">Full field schema — not extracted from this COA</div>
+                  <div class="ext-fields">
+                    <!-- Contaminants: ND verbatim (on COA, tested, not detected) -->
+                    <div class="ext-field-row-3">
+                      <div class="field">
+                        <div class="field-label">Microbial Contaminants</div>
+                        <div class="verbatim-nd">ND</div>
+                        <div style="font-size:10px;color:#64748B;margin-top:2px">Verbatim — tested, not detected</div>
+                      </div>
+                      <div class="field">
+                        <div class="field-label">Heavy Metals (Total)</div>
+                        <div class="verbatim-nd">&lt;LOQ</div>
+                        <div style="font-size:10px;color:#64748B;margin-top:2px">Verbatim — below limit of quantitation</div>
+                      </div>
+                      <div class="field-conf-wrap" style="padding-top:18px">
+                        <span class="field-conf high">✓ 0.90</span>
+                      </div>
+                    </div>
+                    <!-- Residual Solvents: not on COA (null) -->
+                    <div class="ext-field-row">
+                      <div class="field">
+                        <div class="field-label">Residual Solvents</div>
+                        <div class="not-on-coa">Not on COA</div>
+                        <div style="font-size:10px;color:#CBD5E1;margin-top:2px">Field not found in document — null; not 0</div>
+                      </div>
+                      <div class="field-conf-wrap" style="padding-top:18px">
+                        <span style="font-size:10px;color:#CBD5E1">—</span>
+                      </div>
+                    </div>
+                    <!-- Endotoxins: real 0 (measured, genuine zero) -->
+                    <div class="ext-field-row">
+                      <div class="field">
+                        <div class="field-label">Endotoxins (EU/mg)</div>
+                        <div class="field-input mono">0</div>
+                        <div style="font-size:10px;color:#64748B;margin-top:2px">Real measured 0 — present on COA; not "not on COA"</div>
+                      </div>
+                      <div class="field-conf-wrap" style="padding-top:18px">
+                        <span class="field-conf high">✓ 0.92</span>
+                      </div>
+                    </div>
+                    <!-- MyCOA URL: not on COA -->
+                    <div class="ext-field-row">
+                      <div class="field">
+                        <div class="field-label">MyCOA Public URL</div>
+                        <div class="not-on-coa">Not on COA</div>
+                      </div>
+                      <div class="field-conf-wrap" style="padding-top:18px">
+                        <span style="font-size:10px;color:#CBD5E1">—</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- /overview-content -->
+
+            <!-- Footer -->
+            <div class="modal-footer">
+              <button class="btn btn-secondary">Cancel</button>
+              <button class="btn btn-primary">Save</button>
+            </div>
+
+          </div><!-- /modal-right -->
+        </div><!-- /modal-body -->
+      </div><!-- /modal -->
+    </div><!-- /modal-wrap -->
+
+    <div class="callout red" style="margin-top:10px">
+      <strong>State 2 notes:</strong> Disposition = Violative; reason surfaced inline: <em>"Purity 96.4% &lt; 98% (BPC-157)"</em>. Overall confidence 0.71 — below threshold → "Manual review required" shown. BPC-157 row red; TB-500 passes. Method field low-confidence (0.52) — flagged and shown even in default view. "Show all fields" ON reveals full schema: verbatim <code>ND</code> / <code>&lt;LOQ</code> (tested, not detected — on COA), real <code>0</code> Endotoxins (genuine zero, present), and two <em>Not on COA</em> fields (Residual Solvents, MyCOA URL) shown as dashed null.
+    </div>
+  </div>
+
+
+  <!-- UNCHANGED-CANNABIS CALLOUT -->
+  <div>
+    <div class="section-label">Regression guard</div>
+    <div class="section-heading">Cannabis COA — Unchanged</div>
+    <div class="section-sub">Opening a cannabis COA must continue to render the existing cannabinoid Content Analysis. This mockup only covers the peptide delta.</div>
+    <div class="callout" style="background:#F8FAFC;border-left-color:#CBD5E1;color:#374151">
+      Cannabis COA Content Analysis (current, no change): <strong>Delta-9 THC %</strong>, <strong>THC-A %</strong>, <strong>Total THC</strong> (auto-calculated), <strong>Delta-8 THC %</strong>, <strong>Delta-10 THC %</strong>, <strong>THC-O %</strong> (hard "Must be 0%" rule), <strong>Laboratory</strong>, <strong>COA URL</strong>. No disposition banner on cannabis path (separate ticket if needed). The peptide delta is fully isolated to when <code>industry === "Peptides"</code> / Track-B scan profile.
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+</body>
+</html>
