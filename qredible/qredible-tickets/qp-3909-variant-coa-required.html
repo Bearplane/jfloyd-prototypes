@@ -143,6 +143,13 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
 .img-upload{border:1.5px dashed #CBD5E1;border-radius:6px;padding:20px;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:12px;margin-bottom:14px;background:#F8FAFC}
 
 .form-textarea{width:100%;padding:7px 10px;border:1px solid #CBD5E1;border-radius:5px;font-size:12px;font-family:inherit;color:#1A202E;min-height:60px;resize:vertical;margin-bottom:14px}
+
+/* AI TRIGGER BUTTON */
+.btn-ai-trigger{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #2563EB;background:#EFF6FF;color:#1D4ED8;font-family:inherit;line-height:1}
+.btn-ai-trigger .ai-star{font-size:13px}
+.btn-ai-trigger.loaded{background:#F0FDF4;border-color:#16A34A;color:#166534;cursor:default}
+.ai-trigger-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ai-trigger-hint{font-size:11px;color:#94A3B8;font-style:italic}
 </style>
 </head>
 <body>
@@ -161,7 +168,7 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
   <!-- INFO ANNOTATION -->
   <div class="info-block">
     <div class="info-pill">QP-3909</div>
-    <p><strong>QP-3909 — Variant COA Required: AI Advisory Determination.</strong> Adds an AI-assisted advisory to the COA Requirement field on product classifications. When the system detects a variant classification context, AI analyzes the variation pattern (weight-only vs. strain/color/composition) and suggests whether a separate COA is typically required. The human radio selection always takes precedence — AI advisory is informational only. Extends QP-3829's smokable flower variant logic to be configurable across all classifications.</p>
+    <p><strong>QP-3909 — Variant COA Required: AI Advisory Determination.</strong> Adds a <strong>manual</strong> AI advisory trigger to the COA Requirement field on product classifications. An analyst clicks "Get AI Advisory" inside the Edit Product Classification modal — the AI evaluates the classification name, type, and keywords once at the product level (not per-variant), returning a suggestion and confidence score. The human radio selection always takes precedence. Manual trigger preferred over auto-trigger to keep AI costs down.</p>
   </div>
 
   <!-- ═══════════════════════════════════════════════════ SECTION A -->
@@ -365,8 +372,8 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
   <!-- ═══════════════════════════════════════════════════ SECTION C -->
   <div>
     <div class="section-label">Section C</div>
-    <div class="section-heading">AFTER QP-3909 — AI Advisory: weight-only variant — COA NOT required</div>
-    <div class="section-sub">Same modal structure. AI advisory card inserted between COA Requirement radios and Mapping Keywords. Pet Products / weight-only variant context detected.</div>
+    <div class="section-heading">AFTER QP-3909 — Manual AI Advisory button: idle state <span class="new-pill">NEW</span></div>
+    <div class="section-sub">A "Get AI Advisory" button appears below the COA Requirement radios. Nothing auto-triggers — the analyst clicks when they want a suggestion. No advisory panel shown until triggered.</div>
 
     <div class="modal-overlay">
       <div class="modal">
@@ -376,7 +383,6 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
         </div>
         <div class="modal-body">
 
-          <!-- Type + Priority -->
           <div class="field-row">
             <div class="field-group">
               <label>Type</label>
@@ -413,34 +419,12 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
             </div>
           </div>
 
-          <!-- ★ AI ADVISORY — NEW -->
-          <div class="ai-advisory">
-            <div class="ai-advisory-header">
-              <div class="ai-advisory-title">
-                <span class="star">✦</span>
-                AI Advisory — variant context detected
-                <span class="new-pill">NEW</span>
-              </div>
-            </div>
-            <div class="ai-grid">
-              <span class="ai-label">Determination:</span>
-              <span class="ai-value"><span class="det-badge-green">Weight-only variants — COA NOT typically required</span></span>
-
-              <span class="ai-label">Confidence:</span>
-              <span class="ai-value">
-                <div class="conf-row">
-                  <span class="conf-pct">87%</span>
-                  <div class="conf-bar-wrap"><div class="conf-bar" style="width:87%"></div></div>
-                </div>
-              </span>
-
-              <span class="ai-label">Reason:</span>
-              <span class="ai-value ai-reason">"Weight-only size variants (e.g. 1oz, 4oz, 8oz) reference the parent product's formulation. A separate COA is redundant unless composition differs."</span>
-            </div>
-            <hr class="ai-divider">
-            <div class="ai-override" style="margin-bottom:5px">"Your radio selection above takes precedence. This advisory is informational only."</div>
-            <div class="ai-current">Current selection: <strong style="margin-left:4px">Conditional</strong> <span style="color:#94A3B8;font-size:11px">(reflects the radio above)</span></div>
+          <!-- ★ MANUAL TRIGGER BUTTON — idle (not yet clicked) -->
+          <div class="ai-trigger-row">
+            <button class="btn-ai-trigger">✦ Get AI Advisory</button>
+            <span class="ai-trigger-hint">Ask AI to evaluate the COA requirement for this classification</span>
           </div>
+          <!-- No advisory panel until button is clicked -->
 
           <!-- Mapping Keywords -->
           <div class="form-section-label">Mapping Keywords</div>
@@ -473,8 +457,8 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
   <!-- ═══════════════════════════════════════════════════ SECTION D -->
   <div>
     <div class="section-label">Section D</div>
-    <div class="section-heading">AFTER QP-3909 — AI Advisory: composition variant — COA IS required</div>
-    <div class="section-sub">Same modal, different classification context (Smokable Flower — Strain Variety). AI determines distinct strain/formulation composition requires its own COA.</div>
+    <div class="section-heading">AFTER QP-3909 — AI Advisory triggered: Pet Products → COA NOT typically required <span class="new-pill">NEW</span></div>
+    <div class="section-sub">User clicked "Get AI Advisory". AI evaluates classification name, type, and keywords at the product level — one call covers all variants. Advisory panel appears; human radio still takes precedence.</div>
 
     <div class="modal-overlay">
       <div class="modal">
@@ -484,7 +468,118 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
         </div>
         <div class="modal-body">
 
-          <!-- Type + Priority -->
+          <div class="field-row">
+            <div class="field-group">
+              <label>Type</label>
+              <select class="form-select"><option selected>Product</option></select>
+            </div>
+            <div class="field-group" style="flex:0 0 auto">
+              <label>Priority</label>
+              <input class="form-input-narrow" type="number" value="44">
+            </div>
+          </div>
+          <div style="font-size:11px;color:#94A3B8;margin-top:-10px;margin-bottom:14px;font-style:italic">Lower number = Guarded first in classification</div>
+
+          <div class="auto-class-row">
+            <input type="checkbox" id="ac-d" checked>
+            <label for="ac-d">Auto-Classification</label>
+          </div>
+
+          <div class="field-group" style="margin-bottom:14px">
+            <label>Product Classification</label>
+            <input class="form-input" type="text" value="Pet Products" style="width:100%">
+          </div>
+
+          <!-- COA Requirement -->
+          <div class="form-section-label">COA Requirement</div>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" name="coa-d" id="coa-d-req"> <label for="coa-d-req">Required</label>
+            </div>
+            <div class="radio-item selected">
+              <input type="radio" name="coa-d" id="coa-d-cond" checked> <label for="coa-d-cond">Conditional</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" name="coa-d" id="coa-d-not"> <label for="coa-d-not">Not Required</label>
+            </div>
+          </div>
+
+          <!-- ★ TRIGGER BUTTON — loaded state -->
+          <div class="ai-trigger-row">
+            <button class="btn-ai-trigger loaded">✦ Advisory loaded</button>
+          </div>
+
+          <!-- ★ AI ADVISORY RESULT -->
+          <div class="ai-advisory">
+            <div class="ai-advisory-header">
+              <div class="ai-advisory-title">
+                <span class="star">✦</span>
+                AI Advisory — Pet Products
+                <span class="new-pill">NEW</span>
+              </div>
+            </div>
+            <div class="ai-grid">
+              <span class="ai-label">Determination:</span>
+              <span class="ai-value"><span class="det-badge-green">Weight-only variants — COA NOT typically required</span></span>
+
+              <span class="ai-label">Confidence:</span>
+              <span class="ai-value">
+                <div class="conf-row">
+                  <span class="conf-pct">87%</span>
+                  <div class="conf-bar-wrap"><div class="conf-bar" style="width:87%"></div></div>
+                </div>
+              </span>
+
+              <span class="ai-label">Reason:</span>
+              <span class="ai-value ai-reason">"Weight-only size variants (e.g. 1oz, 4oz, 8oz) reference the parent product's formulation. A separate COA is redundant unless composition differs."</span>
+            </div>
+            <hr class="ai-divider">
+            <div class="ai-override" style="margin-bottom:5px">Your radio selection above takes precedence. This advisory is informational only.</div>
+            <div class="ai-current">Current selection: <strong style="margin-left:4px">Conditional</strong> <span style="color:#94A3B8;font-size:11px">(reflects the radio above)</span></div>
+          </div>
+
+          <!-- Mapping Keywords -->
+          <div class="form-section-label">Mapping Keywords</div>
+          <div class="chip-input-area">
+            <div class="chip-list">
+              <span class="chip">for pets <span class="chip-x">×</span></span>
+              <span class="chip">cat treats <span class="chip-x">×</span></span>
+              <span class="chip">pet oil <span class="chip-x">×</span></span>
+              <span class="chip">pet biscuits <span class="chip-x">×</span></span>
+              <span class="chip">for dogs <span class="chip-x">×</span></span>
+              <span class="chip">for cats <span class="chip-x">×</span></span>
+              <span class="chip">dog treats <span class="chip-x">×</span></span>
+              <span class="chip">canine <span class="chip-x">×</span></span>
+            </div>
+            <div class="chip-input-row">
+              <input type="text" placeholder="Type a keyword and press Enter or click +">
+              <div class="chip-add-btn">+</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-save">Save</button>
+          <button class="btn btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION E -->
+  <div>
+    <div class="section-label">Section E</div>
+    <div class="section-heading">AFTER QP-3909 — AI Advisory triggered: Smokable Flower → COA IS required <span class="new-pill">NEW</span></div>
+    <div class="section-sub">Same manual trigger pattern, different classification. Strain/composition context gets a different determination — COA required at 91% confidence.</div>
+
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Edit Product Classification</h3>
+          <div class="modal-close">×</div>
+        </div>
+        <div class="modal-body">
+
           <div class="field-row">
             <div class="field-group">
               <label>Type</label>
@@ -498,8 +593,8 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
           <div style="font-size:11px;color:#94A3B8;margin-top:-10px;margin-bottom:14px;font-style:italic">Lower number = Guarded first in classification</div>
 
           <div class="auto-class-row">
-            <input type="checkbox" id="ac-d" checked>
-            <label for="ac-d">Auto-Classification</label>
+            <input type="checkbox" id="ac-e" checked>
+            <label for="ac-e">Auto-Classification</label>
           </div>
 
           <div class="field-group" style="margin-bottom:14px">
@@ -511,22 +606,27 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
           <div class="form-section-label">COA Requirement</div>
           <div class="radio-group">
             <div class="radio-item selected">
-              <input type="radio" name="coa-d" id="coa-d-req" checked> <label for="coa-d-req">Required</label>
+              <input type="radio" name="coa-e" id="coa-e-req" checked> <label for="coa-e-req">Required</label>
             </div>
             <div class="radio-item">
-              <input type="radio" name="coa-d" id="coa-d-cond"> <label for="coa-d-cond">Conditional</label>
+              <input type="radio" name="coa-e" id="coa-e-cond"> <label for="coa-e-cond">Conditional</label>
             </div>
             <div class="radio-item">
-              <input type="radio" name="coa-d" id="coa-d-not"> <label for="coa-d-not">Not Required</label>
+              <input type="radio" name="coa-e" id="coa-e-not"> <label for="coa-e-not">Not Required</label>
             </div>
           </div>
 
-          <!-- ★ AI ADVISORY — NEW (composition variant) -->
+          <!-- ★ TRIGGER BUTTON — loaded state -->
+          <div class="ai-trigger-row">
+            <button class="btn-ai-trigger loaded">✦ Advisory loaded</button>
+          </div>
+
+          <!-- ★ AI ADVISORY RESULT -->
           <div class="ai-advisory">
             <div class="ai-advisory-header">
               <div class="ai-advisory-title">
                 <span class="star">✦</span>
-                AI Advisory — variant context detected
+                AI Advisory — Smokable Flower — Strain Variety
                 <span class="new-pill">NEW</span>
               </div>
             </div>
@@ -546,7 +646,7 @@ tbody td{padding:10px 14px;font-size:12px;color:#1A202E;vertical-align:middle}
               <span class="ai-value ai-reason">"Distinct strain or formulation composition indicates a unique product requiring its own Certificate of Analysis for accurate compliance verification."</span>
             </div>
             <hr class="ai-divider">
-            <div class="ai-override" style="margin-bottom:5px">"Your radio selection above takes precedence."</div>
+            <div class="ai-override" style="margin-bottom:5px">Your radio selection above takes precedence. This advisory is informational only.</div>
             <div class="ai-current">Current selection: <strong style="margin-left:4px">Required</strong> <span style="color:#94A3B8;font-size:11px">(reflects radio above)</span></div>
           </div>
 
