@@ -139,6 +139,21 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 .industry-drop-ro{display:inline-flex;align-items:center;gap:6px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:7px 12px;font-size:12px;font-weight:600;color:#64748B;cursor:not-allowed;margin:10px 16px}
 
 .new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px;display:inline-block}
+
+/* SCOPE-GROUPED CHIP LAYOUT */
+.scope-group{}
+.scope-group-hdr{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151;margin-bottom:5px}
+.scope-group-hdr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.scope-group-hdr-count{font-size:10px;font-weight:500;color:#9CA3AF;margin-left:2px}
+.scope-chips{display:flex;flex-wrap:wrap;gap:4px 5px}
+.scope-chip{display:inline-flex;align-items:center;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;padding:2px 7px;font-size:11px;color:#1A202E;font-weight:500;white-space:nowrap}
+.scope-chip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.dot-processor{background:#1E3A5F}
+.dot-industry{background:#1D4ED8}
+.dot-company-type{background:#0D9488}
+.dot-company{background:#7C3AED}
+.scope-group+.scope-group{border-top:1px solid #F1F5F9;padding-top:8px}
+.resolved-body{display:flex;flex-direction:column;gap:8px;padding:14px 16px}
 </style>
 </head>
 <body>
@@ -335,109 +350,68 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 
           <!-- Resolved list — NO scope tabs, NO interactive checkboxes -->
           <div class="resolved-section">
-            <div class="resolved-table">
-              <!-- Compliance Checks group -->
-              <div class="resolved-group-header">Compliance Checks</div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">FDA Disclaimer</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Terms of Use</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Privacy Policy</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Return/Refund Policy</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Contact &amp; Business Info</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Age &amp; Access Controls</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Accepted Payment Methods</span>
-                <span class="scope-badge sb-type-co">Type of Company — Retailer</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">SSL/TLS Security &amp; Integrity</span>
-                <span class="scope-badge sb-processor">Processor</span>
+            <div class="resolved-body">
+
+              <div class="scope-group">
+                <div class="scope-group-hdr">
+                  <span class="scope-group-hdr-dot dot-processor"></span>
+                  Processor
+                  <span class="scope-group-hdr-count">12</span>
+                </div>
+                <div class="scope-chips">
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>FDA Disclaimer</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Terms of Use</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Privacy Policy</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Return/Refund Policy</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Contact &amp; Business Info</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Age &amp; Access Controls</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>SSL/TLS Security &amp; Integrity</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>No Hidden Fees</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Checkboxes Unchecked by Default</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>No Auto-Checked Boxes</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Terms Checkbox Pre-Purchase</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Shipping/Billing Address Match</span>
+                </div>
               </div>
 
-              <!-- Analyst Review Checks group -->
-              <div class="resolved-group-header" style="border-top:1px solid #E2E8F0">Analyst Review Checks</div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">THC Disclaimer</span>
-                <span class="scope-badge sb-industry">Industry Type — Hemp/CBD</span>
+              <div class="scope-group">
+                <div class="scope-group-hdr">
+                  <span class="scope-group-hdr-dot dot-industry"></span>
+                  Industry Type — Hemp/CBD
+                  <span class="scope-group-hdr-count">3</span>
+                </div>
+                <div class="scope-chips">
+                  <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>THC Disclaimer</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Product Subscription Model</span>
+                  <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Shipping to Prohibited States</span>
+                </div>
               </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Product Subscription Model</span>
-                <span class="scope-badge sb-industry">Industry Type — Hemp/CBD</span>
+
+              <div class="scope-group">
+                <div class="scope-group-hdr">
+                  <span class="scope-group-hdr-dot dot-company-type"></span>
+                  Type of Company — Retailer
+                  <span class="scope-group-hdr-count">1</span>
+                </div>
+                <div class="scope-chips">
+                  <span class="scope-chip"><span class="scope-chip-dot dot-company-type"></span>Accepted Payment Methods</span>
+                </div>
               </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">No Hidden Fees</span>
-                <span class="scope-badge sb-processor">Processor</span>
+
+              <div class="scope-group">
+                <div class="scope-group-hdr">
+                  <span class="scope-group-hdr-dot dot-company"></span>
+                  Company Override
+                  <span class="scope-group-hdr-count">1</span>
+                </div>
+                <div class="scope-chips">
+                  <span class="scope-chip"><span class="scope-chip-dot dot-company"></span>No Free Trials (Unless Disclosed)</span>
+                </div>
               </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">No Free Trials (Unless Disclosed)</span>
-                <span class="scope-badge sb-company">Company Override</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Checkboxes Unchecked by Default</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">No Auto-Checked Boxes</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Terms Checkbox Pre-Purchase</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Shipping to Prohibited States</span>
-                <span class="scope-badge sb-industry">Industry Type — Hemp/CBD</span>
-              </div>
-              <div class="resolved-row">
-                <span class="resolved-check">✓</span>
-                <span class="resolved-name">Shipping/Billing Address Match</span>
-                <span class="scope-badge sb-processor">Processor</span>
-              </div>
+
             </div>
 
-            <!-- Badge legend -->
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
-              <span style="font-size:11px;color:#94A3B8;font-weight:600">Scope:</span>
-              <span class="scope-badge sb-processor" style="font-size:10px;padding:2px 8px;border-radius:3px">Processor</span>
-              <span class="scope-badge sb-industry" style="font-size:10px;padding:2px 8px;border-radius:3px">Industry Type</span>
-              <span class="scope-badge sb-type-co" style="font-size:10px;padding:2px 8px;border-radius:3px">Type of Company</span>
-              <span class="scope-badge sb-company" style="font-size:10px;padding:2px 8px;border-radius:3px">Company Override</span>
-            </div>
-
-            <div class="resolved-footer" style="margin-top:10px;border-radius:6px;border:1px solid #E2E8F0">
+            <div class="resolved-footer" style="margin:0 16px 14px;border-radius:6px;border:1px solid #E2E8F0">
               Resolved from: <strong>Processor</strong> (FLEX Payment Solutions) → <strong>Industry Type</strong> (Hemp/CBD) → <strong>Type of Company</strong> (Retailer) → <strong>Company</strong> (3rd Coast Blends LLC). Most-specific scope wins.
             </div>
           </div>
@@ -527,35 +501,36 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
             </div>
           </div>
 
-          <!-- Check columns — NON-INTERACTIVE styled divs -->
-          <div class="check-cols">
-            <div>
-              <div class="check-col-title">Compliance Checks</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> FDA Disclaimer</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> Terms of Use</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> Privacy Policy</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> Return/Refund Policy</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> Contact &amp; Business Info</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> Age &amp; Access Controls</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> Accepted Payment Methods</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> SSL/TLS Security &amp; Integrity</div>
+          <!-- Check chips — NON-INTERACTIVE, compact scope-grouped layout -->
+          <div class="resolved-body" style="border-top:1px solid #F1F5F9">
+            <div class="scope-group">
+              <div class="scope-group-hdr">
+                <span class="scope-group-hdr-dot dot-industry"></span>
+                Compliance Checks
+                <span class="scope-group-hdr-count">8 enabled</span>
+              </div>
+              <div class="scope-chips">
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>FDA Disclaimer</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Terms of Use</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Privacy Policy</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Return/Refund Policy</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Contact &amp; Business Info</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Age &amp; Access Controls</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Accepted Payment Methods</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>SSL/TLS Security &amp; Integrity</span>
+              </div>
             </div>
-            <div>
-              <div class="check-col-title">Analyst Review Checks</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> THC Disclaimer</div>
-              <div class="check-ro"><div class="check-ro-box checked"></div> Product Subscription Model</div>
-              <div class="check-ro"><div class="check-ro-box"></div> Product/Service Match</div>
-              <div class="check-ro"><div class="check-ro-box"></div> Price Points Match</div>
-              <div class="check-ro"><div class="check-ro-box"></div> Prohibited Products Search</div>
-              <div class="check-ro"><div class="check-ro-box"></div> No Hidden Fees</div>
-              <div class="check-ro"><div class="check-ro-box"></div> No Free Trials (Unless Disclosed)</div>
-              <div class="check-ro"><div class="check-ro-box"></div> GMP Certificate for Supplements</div>
-              <div class="check-ro"><div class="check-ro-box"></div> Checkboxes Unchecked by Default</div>
-              <div class="check-ro"><div class="check-ro-box"></div> External Links Review</div>
-              <div class="check-ro"><div class="check-ro-box"></div> No Auto-Checked Boxes</div>
-              <div class="check-ro"><div class="check-ro-box"></div> Terms Checkbox Pre-Purchase</div>
-              <div class="check-ro"><div class="check-ro-box"></div> Shipping to Prohibited States</div>
-              <div class="check-ro"><div class="check-ro-box"></div> Shipping/Billing Address Match</div>
+            <div class="scope-group">
+              <div class="scope-group-hdr">
+                <span class="scope-group-hdr-dot dot-industry"></span>
+                Analyst Review Checks
+                <span class="scope-group-hdr-count">2 of 14 enabled</span>
+              </div>
+              <div class="scope-chips">
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>THC Disclaimer</span>
+                <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Product Subscription Model</span>
+              </div>
+              <div style="margin-top:5px;font-size:11px;color:#9CA3AF;font-style:italic">12 checks not enabled at this scope — other scopes may contribute additional checks</div>
             </div>
           </div>
 
