@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3904 — Company Dropdown: We Monitor + Cases | Qredible Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/*
+  Design tokens:
+  - Font: 'Plus Jakarta Sans', 13px base
+  - Body bg: #F7F5FF  Nav: #1A202E  Ticket badge: #F05252  Tab indicator: #F05252
+  - Table head: #1E3A5F  Annotation: bg #FFFBEB, border 2px dashed #FCD34D
+*/
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .spacer{flex:1}
+
+/* PAGE */
+.page{max-width:1400px;margin:0 auto;padding:24px 24px 64px;display:flex;flex-direction:column;gap:44px}
+
+/* SECTION LABELS */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px}
+.section-heading{font-size:15px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.section-sub{font-size:12px;color:#64748B;margin-bottom:14px}
+
+/* INFO / ANNOTATION BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px;margin-bottom:18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.new-pill{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;vertical-align:middle;margin-left:4px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.6}
+.info-block ul{padding-left:18px;margin-top:4px}
+.info-block li{font-size:12px;color:#78350F;line-height:1.7}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+
+/* SIMULATED GLOBAL TOP BAR (inside app shell) */
+.global-topbar{background:#fff;border-bottom:1px solid #E2E8F0;padding:10px 20px;display:flex;align-items:center;gap:10px;font-size:13px}
+.global-topbar .g-nav-item{color:#64748B;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap}
+.global-topbar .g-nav-item.active{color:#1A202E;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#F05252}
+.global-topbar .g-nav-spacer{flex:1}
+.global-topbar .select-co-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #D1D5DB;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;color:#374151;background:#fff;cursor:pointer;white-space:nowrap}
+.global-topbar .avatar-badge{background:#2563EB;color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:4px 9px;white-space:nowrap}
+.global-topbar .user-btn{display:inline-flex;align-items:center;gap:5px;color:#374151;font-size:12px;font-weight:600;cursor:pointer}
+.global-topbar .bell-btn{position:relative;cursor:pointer}
+.global-topbar .bell-count{position:absolute;top:-5px;right:-6px;background:#F05252;color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:1px 4px;line-height:1.2}
+.global-topbar .qr-logo{font-size:16px;font-weight:800;color:#2563EB;letter-spacing:-0.5px}
+
+/* SUB-NAV TABS */
+.sub-nav{background:#fff;border-bottom:1px solid #E2E8F0;padding:0 20px;display:flex;align-items:stretch;gap:0}
+.sub-tab{padding:12px 15px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.sub-tab.active{color:#1A202E;border-bottom-color:#F05252}
+.sub-nav-right{margin-left:auto;display:flex;align-items:center;padding:8px 0}
+.team-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #D1D5DB;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;color:#374151;background:#fff;cursor:pointer}
+
+/* CONTENT AREA */
+.content{padding:20px 20px 28px}
+
+/* CONTENT TOOLBAR */
+.content-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.content-toolbar h2{font-size:18px;font-weight:700;color:#1A202E}
+.content-toolbar .spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
+.btn-blue{background:#2563EB;border-color:#2563EB;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+
+/* HEADING AREA */
+.heading-area{margin-bottom:14px}
+.heading-area h2{font-size:18px;font-weight:700;color:#1A202E;margin-bottom:3px}
+.heading-area .subtitle{font-size:12px;color:#2563EB}
+
+/* COMPANY FILTER BAR */
+.company-filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.company-dropdown-trigger{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #D1D5DB;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;color:#1A202E;cursor:pointer}
+.company-dropdown-trigger.has-selection{border-color:#3B82F6;background:#EFF6FF;color:#1D4ED8}
+
+/* COMPANY DROPDOWN PANEL */
+.company-dropdown-panel{background:#fff;border:1px solid #E5E7EB;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);width:340px;overflow:hidden;margin-bottom:14px}
+.company-dropdown-search{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #E5E7EB}
+.company-dropdown-search input{border:none;outline:none;font-size:13px;width:100%;color:#6B7280;font-family:inherit}
+.company-option{padding:8px 14px;cursor:pointer;border-bottom:1px solid #F3F4F6}
+.company-option:last-child{border-bottom:none}
+.company-option.all{color:#2563EB;font-weight:600;font-size:13px;background:#EFF6FF}
+.company-option.selected{background:#EFF6FF}
+.company-option .co-name{font-weight:600;font-size:13px;color:#1A202E}
+.company-option .co-dba{font-size:11px;color:#6B7280}
+.company-option .co-url{font-size:11px;color:#9CA3AF}
+.dropdown-separator{height:1px;background:#E5E7EB;margin:2px 0}
+
+/* CASE SUB-TABS */
+.case-tabs{display:flex;gap:0;border-bottom:1px solid #E2E8F0;margin-bottom:14px}
+.case-tab{padding:8px 14px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.case-tab.active{color:#2563EB;border-bottom-color:#2563EB}
+.case-tab-count{font-size:11px;background:#EDF2F7;color:#4A5568;padding:1px 6px;border-radius:10px;margin-left:4px;font-weight:700}
+.case-tab.active .case-tab-count{background:#DBEAFE;color:#1E40AF}
+
+/* SEARCH INPUT */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94A3B8}
+.search-input{width:100%;padding:7px 12px 7px 34px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;background:#fff;color:#1A202E}
+.search-input::placeholder{color:#94A3B8}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:1000px}
+thead tr{background:#1E3A5F}
+thead th{color:#fff;font-size:12px;font-weight:600;padding:10px 12px;text-align:left;white-space:nowrap;letter-spacing:.02em}
+tbody tr{border-bottom:1px solid #F1F5F9}
+tbody tr:hover{background:#FAFCFF}
+tbody td{padding:9px 12px;font-size:13px;color:#1A202E;vertical-align:middle}
+
+/* CASE ID CELL */
+.case-id{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#2563EB}
+.case-title{font-size:11px;color:#64748B;margin-top:2px}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.badge-open{background:#FFF3CD;color:#856404;border:1px solid #ffc107}
+.badge-inreview{background:#D1ECF1;color:#0c5460;border:1px solid #bee5eb}
+.badge-closed{background:#E2E3E5;color:#383d41;border:1px solid #d6d8db}
+.badge-draft{background:#E2E3E5;color:#383d41;border:1px solid #d6d8db}
+
+/* PRIORITY */
+.priority-med{color:#D97706;font-size:12px;font-weight:600;white-space:nowrap}
+.priority-low{color:#9CA3AF;font-size:12px;font-weight:600;white-space:nowrap}
+
+/* SLA */
+.sla-warn{color:#D97706;font-size:12px;font-weight:600}
+.sla-ok{color:#16A34A;font-size:12px;font-weight:600}
+.sla-none{color:#CBD5E1;font-size:12px}
+
+/* WE MONITOR TABLE */
+.sub-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.sub-active{background:#DCFCE7;color:#166534}
+.sub-inactive{background:#F1F5F9;color:#64748B}
+.lic-compliant{background:#DCFCE7;color:#166534;border:1px solid #bbf7d0;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600}
+.lic-violative{background:#FEE2E2;color:#991B1B;border:1px solid #fecaca;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600}
+.lic-pending{background:#FEF3C7;color:#92400E;border:1px solid #E7E1C5;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600}
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #CBD5E1;background:#fff;color:#374151}
+
+/* FOOTER */
+.app-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:10px 20px;display:flex;gap:16px;font-size:11px;color:#94A3B8}
+.app-footer a{color:#94A3B8}
+
+/* INLINE ANNOTATION (within app shell) */
+.inline-annotation{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:#78350F;display:flex;align-items:flex-start;gap:8px}
+.inline-annotation .ann-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.inline-annotation strong{color:#92400E}
+
+/* PERSIST NOTE */
+.persist-note{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:#1D4ED8;display:flex;align-items:center;gap:8px}
+
+/* WE MONITOR CONTENT HEADER */
+.wm-content-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<!-- MOCKUP TOPNAV -->
+<nav class="topnav">
+  <a href="../index.html">Qredible Prototypes</a>
+  <span class="sep">/</span>
+  <span class="title">QP-3904 — Company Dropdown: We Monitor + Cases</span>
+  <span class="badge">QP-3904</span>
+  <span class="spacer"></span>
+  <span style="font-size:11px;color:#64748B;font-style:italic">T9 · Persist merchant context across We Monitor &amp; Cases</span>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE INTRO -->
+  <div>
+    <div class="section-label">QP-3904 — Company Dropdown Persistence</div>
+    <div class="section-heading">T9: Add Company Dropdown to We Monitor &amp; Cases</div>
+    <div class="section-sub">Product Compliance, Findings, and Documents already have a per-merchant company dropdown. This ticket adds the same control to <strong>We Monitor</strong> and <strong>Cases</strong>, and makes the selection persistent across all tabs so users never have to re-search when navigating.</div>
+
+    <div class="info-block">
+      <div class="info-pill">&#128203; Context</div>
+      <p>Three sections below: <strong>Section 1</strong> — Current state of Cases tab (no dropdown). <strong>Section 2</strong> — Cases tab AFTER QP-3904 with company dropdown added and company selected. <strong>Section 3</strong> — We Monitor tab AFTER QP-3904 with dropdown added. Annotations call out every delta element.</p>
+    </div>
+  </div>
+
+
+  <!-- ================================================================
+       SECTION 1 — CURRENT STATE: Cases Tab (no company dropdown)
+       ================================================================ -->
+  <div>
+    <div class="section-label">Section 1 — Current State</div>
+    <div class="section-heading">Cases Tab — Today (no company dropdown)</div>
+    <div class="section-sub">Users see all cases across all monitored companies. There is no way to filter to a specific merchant, and no dropdown in the tab header.</div>
+
+    <div class="app-shell">
+
+      <!-- Global top bar -->
+      <div class="global-topbar">
+        <span class="g-nav-item">Qredibility</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item active">G-Monitor</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">Report</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">G-Vault &#9660;</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">MyCOA</span>
+        <span class="g-nav-spacer"></span>
+        <button class="select-co-btn">Select a Company &#9660;</button>
+        <span class="avatar-badge">FLEX Payment Solutions</span>
+        <button class="user-btn">JF Joseph Floyd &#9660;</button>
+        <span class="bell-btn">
+          &#128276;
+          <span class="bell-count">16</span>
+        </span>
+        <span class="qr-logo">Q</span>
+      </div>
+
+      <!-- Sub-nav -->
+      <div class="sub-nav">
+        <span class="sub-tab">Pipeline</span>
+        <span class="sub-tab">Findings</span>
+        <span class="sub-tab">Product Compliance</span>
+        <span class="sub-tab">We Monitor</span>
+        <span class="sub-tab active">Cases</span>
+        <span class="sub-tab">Monitoring Us</span>
+        <span class="sub-tab">Documents</span>
+        <span class="sub-tab">COAs</span>
+        <div class="sub-nav-right">
+          <button class="team-btn">&#128101; All Team Members &#9660;</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px">
+          <div>
+            <h2 style="font-size:18px;font-weight:700;color:#1A202E;margin-bottom:3px">Cases</h2>
+            <div style="font-size:12px;color:#2563EB">Compliance resolution cases sent to merchants &mdash; across all monitored companies</div>
+          </div>
+          <button class="btn btn-blue">+ New Case</button>
+        </div>
+
+        <!-- Case sub-tabs -->
+        <div class="case-tabs">
+          <span class="case-tab active">All <span class="case-tab-count">5</span></span>
+          <span class="case-tab">Open <span class="case-tab-count">2</span></span>
+          <span class="case-tab">Disputed <span class="case-tab-count">0</span></span>
+          <span class="case-tab">Drafts <span class="case-tab-count">1</span></span>
+          <span class="case-tab">Resolved <span class="case-tab-count">0</span></span>
+          <span class="case-tab">Closed <span class="case-tab-count">2</span></span>
+        </div>
+
+        <!-- Search -->
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" type="text" placeholder="Search by case #, title, legal name, DBA, website, or M..." readonly>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Case</th>
+                <th>Legal Name</th>
+                <th>DBA</th>
+                <th>Website</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th>Priority</th>
+                <th>SLA</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0012</div>
+                  <div class="case-title">Colorado Seeds — 2026-05-20</div>
+                </td>
+                <td>Colorado Seeds</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">coloradoseedinc.com</a></td>
+                <td><span class="badge badge-open">OPEN</span></td>
+                <td>1</td>
+                <td><span class="priority-med">&#9671; MEDIUM</span></td>
+                <td><span class="sla-warn">7d left</span></td>
+                <td>5/20/2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0010</div>
+                  <div class="case-title">Compliance review — 3 products</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-inreview">IN REVIEW</span></td>
+                <td>7</td>
+                <td><span class="priority-med">&#9671; MEDIUM</span></td>
+                <td><span class="sla-ok">12d left</span></td>
+                <td>5/20/2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0003</div>
+                  <div class="case-title">Compliance review — 2 products</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-closed">FORCE CLOSED</span></td>
+                <td>4</td>
+                <td><span class="priority-low">&#9671; LOW</span></td>
+                <td><span class="sla-none">—</span></td>
+                <td>5/19/2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0002</div>
+                  <div class="case-title">3rd Coast Blends — 2026-05-15</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-closed">FORCE CLOSED</span></td>
+                <td>3</td>
+                <td><span class="priority-med">&#9671; MEDIUM</span></td>
+                <td><span class="sla-none">—</span></td>
+                <td>5/19/2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0011</div>
+                  <div class="case-title">Compliance review — 5 products — 3rd Coast Blends</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-draft">DRAFT</span></td>
+                <td>3</td>
+                <td><span class="priority-med">&#9671; MEDIUM</span></td>
+                <td><span class="sla-none">—</span></td>
+                <td>12/31/1969</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /.content -->
+
+      <div class="app-footer">
+        <a href="#">Support</a>
+        <a href="#">Privacy Policy &amp; EULA</a>
+      </div>
+
+    </div><!-- /.app-shell -->
+  </div><!-- /section 1 -->
+
+
+  <!-- ================================================================
+       SECTION 2 — AFTER QP-3904: Cases Tab WITH company dropdown
+       ================================================================ -->
+  <div>
+    <div class="section-label">Section 2 — After QP-3904</div>
+    <div class="section-heading">Cases Tab — After QP-3904 (company dropdown added)</div>
+    <div class="section-sub">The company dropdown now appears above the Cases heading. Selecting "3rd Coast Blends" filters the table and changes the subtitle. The selection persists when navigating to other tabs.</div>
+
+    <!-- Annotation block -->
+    <div class="info-block">
+      <div class="info-pill">&#9998; Delta — QP-3904</div>
+      <ul>
+        <li><strong>Company dropdown added</strong> above the Cases heading — same component used in Product Compliance, Findings, and Documents. <span class="new-pill">NEW</span></li>
+        <li><strong>Subtitle updates</strong> from "across all monitored companies" &rarr; "for 3rd Coast Blends" when a company is selected.</li>
+        <li><strong>Table filters</strong> to only show cases for the selected company (3rd Coast Blends — 4 rows shown, Colorado Seeds row hidden).</li>
+        <li><strong>Persistence</strong>: the selection carries over to Product Compliance, Findings, Documents, We Monitor, and back. No re-search needed.</li>
+      </ul>
+    </div>
+
+    <div class="app-shell">
+
+      <!-- Global top bar -->
+      <div class="global-topbar">
+        <span class="g-nav-item">Qredibility</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item active">G-Monitor</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">Report</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">G-Vault &#9660;</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">MyCOA</span>
+        <span class="g-nav-spacer"></span>
+        <button class="select-co-btn">Select a Company &#9660;</button>
+        <span class="avatar-badge">FLEX Payment Solutions</span>
+        <button class="user-btn">JF Joseph Floyd &#9660;</button>
+        <span class="bell-btn">
+          &#128276;
+          <span class="bell-count">16</span>
+        </span>
+        <span class="qr-logo">Q</span>
+      </div>
+
+      <!-- Sub-nav -->
+      <div class="sub-nav">
+        <span class="sub-tab">Pipeline</span>
+        <span class="sub-tab">Findings</span>
+        <span class="sub-tab">Product Compliance</span>
+        <span class="sub-tab">We Monitor</span>
+        <span class="sub-tab active">Cases</span>
+        <span class="sub-tab">Monitoring Us</span>
+        <span class="sub-tab">Documents</span>
+        <span class="sub-tab">COAs</span>
+        <div class="sub-nav-right">
+          <button class="team-btn">&#128101; All Team Members &#9660;</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+
+        <!-- Persistence note -->
+        <div class="persist-note">
+          &#128204; <strong>Persistence:</strong>&nbsp;selecting a company here also filters Product Compliance, Findings, Documents, and We Monitor &mdash; context follows you across tabs.
+        </div>
+
+        <!-- Company filter bar — NEW -->
+        <div class="inline-annotation">
+          <span class="ann-icon">&#128203;</span>
+          <div><strong>NEW <span class="new-pill">QP-3904</span></strong> — Company dropdown added above the page heading. Trigger shows the selected company name; clicking opens the dropdown panel (shown open below for illustration).</div>
+        </div>
+
+        <!-- Company dropdown trigger (has-selection state) -->
+        <div class="company-filter-bar">
+          <span style="font-size:12px;font-weight:600;color:#64748B">Filter by company:</span>
+          <button class="company-dropdown-trigger has-selection">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Company: 3rd Coast Blends &#9660;
+          </button>
+        </div>
+
+        <!-- Dropdown panel (shown open for illustration) -->
+        <div class="company-dropdown-panel" style="margin-bottom:18px">
+          <div class="company-dropdown-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search companies, DBAs, or websites..." value="" style="border:none;outline:none;font-size:13px;width:100%;color:#6B7280;font-family:inherit">
+          </div>
+          <div class="company-option all">All Companies</div>
+          <div class="dropdown-separator"></div>
+          <div class="company-option">
+            <div class="co-name">FLEX Payment Solutions</div>
+            <div class="co-url">https://flexpaymentsolutions.com</div>
+          </div>
+          <div class="company-option selected">
+            <div class="co-name">3rd Coast Blends &#10003;</div>
+            <div class="co-url">https://www.3rdcoastblends.com</div>
+          </div>
+          <div class="company-option">
+            <div class="co-name">BTB Brands LLC</div>
+            <div class="co-dba">Beach Break</div>
+            <div class="co-url">https://www.btbbrands.com</div>
+          </div>
+          <div class="company-option">
+            <div class="co-name">Meadowview Farms</div>
+            <div class="co-url">https://www.meadowviewfarms.net</div>
+          </div>
+          <div class="company-option">
+            <div class="co-name">420 Science</div>
+            <div class="co-dba">GRAV &bull; Gravitron LLC</div>
+            <div class="co-url">https://www.420science.com</div>
+          </div>
+          <div class="company-option">
+            <div class="co-name">CannaCurator</div>
+            <div class="co-url">http://www.cannacurator.com</div>
+          </div>
+          <div class="company-option">
+            <div class="co-name">Colorado Seeds</div>
+            <div class="co-url">https://coloradoseedinc.com</div>
+          </div>
+        </div>
+
+        <!-- Heading — subtitle now says "for 3rd Coast Blends" -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px">
+          <div>
+            <h2 style="font-size:18px;font-weight:700;color:#1A202E;margin-bottom:3px">Cases</h2>
+            <div style="font-size:12px;color:#2563EB">
+              Compliance resolution cases sent to merchants &mdash;
+              <span style="font-weight:700">for 3rd Coast Blends</span>
+              <span class="new-pill">QP-3904</span>
+            </div>
+          </div>
+          <button class="btn btn-blue">+ New Case</button>
+        </div>
+
+        <!-- Case sub-tabs (filtered counts) -->
+        <div class="case-tabs">
+          <span class="case-tab active">All <span class="case-tab-count">4</span></span>
+          <span class="case-tab">Open <span class="case-tab-count">1</span></span>
+          <span class="case-tab">Disputed <span class="case-tab-count">0</span></span>
+          <span class="case-tab">Drafts <span class="case-tab-count">1</span></span>
+          <span class="case-tab">Resolved <span class="case-tab-count">0</span></span>
+          <span class="case-tab">Closed <span class="case-tab-count">2</span></span>
+        </div>
+
+        <!-- Search -->
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" type="text" placeholder="Search by case #, title, legal name, DBA, website, or M..." readonly>
+        </div>
+
+        <!-- Table — filtered to 3rd Coast Blends only -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Case</th>
+                <th>Legal Name</th>
+                <th>DBA</th>
+                <th>Website</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th>Priority</th>
+                <th>SLA</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0010</div>
+                  <div class="case-title">Compliance review — 3 products</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-inreview">IN REVIEW</span></td>
+                <td>7</td>
+                <td><span class="priority-med">&#9671; MEDIUM</span></td>
+                <td><span class="sla-ok">12d left</span></td>
+                <td>5/20/2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0003</div>
+                  <div class="case-title">Compliance review — 2 products</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-closed">FORCE CLOSED</span></td>
+                <td>4</td>
+                <td><span class="priority-low">&#9671; LOW</span></td>
+                <td><span class="sla-none">—</span></td>
+                <td>5/19/2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0002</div>
+                  <div class="case-title">3rd Coast Blends — 2026-05-15</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-closed">FORCE CLOSED</span></td>
+                <td>3</td>
+                <td><span class="priority-med">&#9671; MEDIUM</span></td>
+                <td><span class="sla-none">—</span></td>
+                <td>5/19/2026</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="case-id">CR-2026-0011</div>
+                  <div class="case-title">Compliance review — 5 products — 3rd Coast Blends</div>
+                </td>
+                <td>3rd Coast Blends</td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="badge badge-draft">DRAFT</span></td>
+                <td>3</td>
+                <td><span class="priority-med">&#9671; MEDIUM</span></td>
+                <td><span class="sla-none">—</span></td>
+                <td>12/31/1969</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /.content -->
+
+      <div class="app-footer">
+        <a href="#">Support</a>
+        <a href="#">Privacy Policy &amp; EULA</a>
+      </div>
+
+    </div><!-- /.app-shell -->
+  </div><!-- /section 2 -->
+
+
+  <!-- ================================================================
+       SECTION 3 — AFTER QP-3904: We Monitor Tab WITH company dropdown
+       ================================================================ -->
+  <div>
+    <div class="section-label">Section 3 — After QP-3904</div>
+    <div class="section-heading">We Monitor Tab — After QP-3904 (company dropdown added)</div>
+    <div class="section-sub">The We Monitor tab gains the same company dropdown. Company context ("3rd Coast Blends") was set in the Cases tab and persists here automatically — no re-search needed.</div>
+
+    <!-- Annotation block -->
+    <div class="info-block">
+      <div class="info-pill">&#9998; Delta — QP-3904</div>
+      <ul>
+        <li><strong>Company dropdown added</strong> to We Monitor tab — matching the same component used in Cases (and Product Compliance / Findings / Documents). <span class="new-pill">NEW</span></li>
+        <li><strong>Pre-selected to "3rd Coast Blends"</strong> because the user selected it in Cases — no extra click required.</li>
+        <li><strong>Table filtered</strong> to show only the monitored merchant matching the selected company.</li>
+        <li><strong>Persistence note</strong> shown inline to orient users to the cross-tab context feature.</li>
+      </ul>
+    </div>
+
+    <div class="app-shell">
+
+      <!-- Global top bar -->
+      <div class="global-topbar">
+        <span class="g-nav-item">Qredibility</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item active">G-Monitor</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">Report</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">G-Vault &#9660;</span>
+        <span style="color:#D1D5DB">|</span>
+        <span class="g-nav-item">MyCOA</span>
+        <span class="g-nav-spacer"></span>
+        <button class="select-co-btn">Select a Company &#9660;</button>
+        <span class="avatar-badge">FLEX Payment Solutions</span>
+        <button class="user-btn">JF Joseph Floyd &#9660;</button>
+        <span class="bell-btn">
+          &#128276;
+          <span class="bell-count">16</span>
+        </span>
+        <span class="qr-logo">Q</span>
+      </div>
+
+      <!-- Sub-nav -->
+      <div class="sub-nav">
+        <span class="sub-tab">Pipeline</span>
+        <span class="sub-tab">Findings</span>
+        <span class="sub-tab">Product Compliance</span>
+        <span class="sub-tab active">We Monitor</span>
+        <span class="sub-tab">Cases</span>
+        <span class="sub-tab">Monitoring Us</span>
+        <span class="sub-tab">Documents</span>
+        <span class="sub-tab">COAs</span>
+        <div class="sub-nav-right">
+          <button class="team-btn">&#128101; All Team Members &#9660;</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+
+        <!-- Persistence note -->
+        <div class="persist-note">
+          &#128204; <strong>Persistence:</strong>&nbsp;"3rd Coast Blends" was selected in the Cases tab — it carried over here automatically. Applies across Product Compliance, Findings, Documents, and Cases too.
+        </div>
+
+        <!-- Annotation -->
+        <div class="inline-annotation">
+          <span class="ann-icon">&#128203;</span>
+          <div><strong>NEW <span class="new-pill">QP-3904</span></strong> — Company dropdown added to We Monitor. Context pre-populated from Cases tab selection — user sees their previously selected merchant without any extra interaction.</div>
+        </div>
+
+        <!-- Company filter bar -->
+        <div class="company-filter-bar">
+          <span style="font-size:12px;font-weight:600;color:#64748B">Filter by company:</span>
+          <button class="company-dropdown-trigger has-selection">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Company: 3rd Coast Blends &#9660;
+          </button>
+        </div>
+
+        <!-- Heading -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+          <div>
+            <h2 style="font-size:18px;font-weight:700;color:#1A202E;margin-bottom:3px">We Monitor</h2>
+            <div style="font-size:12px;color:#2563EB">
+              Merchants being monitored &mdash;
+              <span style="font-weight:700">for 3rd Coast Blends</span>
+              <span class="new-pill">QP-3904</span>
+            </div>
+          </div>
+          <button class="btn btn-blue">+ Monitor Merchant</button>
+        </div>
+
+        <!-- Search -->
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" type="text" placeholder="Search by merchant name, DBA, or website..." readonly>
+        </div>
+
+        <!-- We Monitor table -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Merchant</th>
+                <th>DBA</th>
+                <th>Website</th>
+                <th>License Status</th>
+                <th>Subscription</th>
+                <th>Last Monitored</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div style="font-weight:700;color:#1A202E;font-size:13px">3rd Coast Blends</div>
+                  <div style="font-size:11px;color:#94A3B8">MID: 7821-3304</div>
+                </td>
+                <td style="color:#CBD5E1;font-style:italic">—</td>
+                <td><a href="#">3rdcoastblends.com</a></td>
+                <td><span class="lic-compliant">Compliant</span></td>
+                <td><span class="sub-active">&#9679; Active</span></td>
+                <td>5/20/2026 08:41 AM</td>
+                <td>
+                  <button class="act-btn">View</button>
+                  <button class="act-btn" style="margin-left:4px">Scan</button>
+                </td>
+              </tr>
+              <!-- Other merchants visible only in "All Companies" view — greyed out hint row -->
+              <tr style="opacity:.35">
+                <td colspan="7" style="font-size:12px;color:#94A3B8;font-style:italic;text-align:center;padding:10px">
+                  Other monitored merchants hidden — showing results for <strong>3rd Coast Blends</strong> only. Switch to <span style="color:#2563EB">All Companies</span> to see all merchants.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Additional We Monitor rows for All Companies reference (shown faded/collapsed context) -->
+        <details style="margin-top:14px">
+          <summary style="font-size:12px;font-weight:600;color:#2563EB;cursor:pointer;user-select:none">&#9656; Show All Companies view (reference — 6 merchants)</summary>
+          <div class="table-wrap" style="margin-top:10px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Merchant</th>
+                  <th>DBA</th>
+                  <th>Website</th>
+                  <th>License Status</th>
+                  <th>Subscription</th>
+                  <th>Last Monitored</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div style="font-weight:700">FLEX Payment Solutions</div></td>
+                  <td style="color:#CBD5E1;font-style:italic">—</td>
+                  <td><a href="#">flexpaymentsolutions.com</a></td>
+                  <td><span class="lic-compliant">Compliant</span></td>
+                  <td><span class="sub-active">&#9679; Active</span></td>
+                  <td>5/20/2026 07:15 AM</td>
+                  <td><button class="act-btn">View</button> <button class="act-btn" style="margin-left:4px">Scan</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:700">3rd Coast Blends</div></td>
+                  <td style="color:#CBD5E1;font-style:italic">—</td>
+                  <td><a href="#">3rdcoastblends.com</a></td>
+                  <td><span class="lic-compliant">Compliant</span></td>
+                  <td><span class="sub-active">&#9679; Active</span></td>
+                  <td>5/20/2026 08:41 AM</td>
+                  <td><button class="act-btn">View</button> <button class="act-btn" style="margin-left:4px">Scan</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:700">BTB Brands LLC</div><div style="font-size:11px;color:#94A3B8">Beach Break</div></td>
+                  <td><span style="font-size:11px;background:#EDE9FE;color:#4C1D95;padding:2px 6px;border-radius:10px;font-weight:600">Beach Break</span></td>
+                  <td><a href="#">btbbrands.com</a></td>
+                  <td><span class="lic-violative">Violative</span></td>
+                  <td><span class="sub-active">&#9679; Active</span></td>
+                  <td>5/19/2026 11:22 PM</td>
+                  <td><button class="act-btn">View</button> <button class="act-btn" style="margin-left:4px">Scan</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:700">Meadowview Farms</div></td>
+                  <td style="color:#CBD5E1;font-style:italic">—</td>
+                  <td><a href="#">meadowviewfarms.net</a></td>
+                  <td><span class="lic-pending">Pending</span></td>
+                  <td><span class="sub-active">&#9679; Active</span></td>
+                  <td>5/19/2026 06:00 PM</td>
+                  <td><button class="act-btn">View</button> <button class="act-btn" style="margin-left:4px">Scan</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:700">420 Science</div><div style="font-size:11px;color:#94A3B8">GRAV / Gravitron LLC</div></td>
+                  <td><span style="font-size:11px;background:#EDE9FE;color:#4C1D95;padding:2px 6px;border-radius:10px;font-weight:600">GRAV</span></td>
+                  <td><a href="#">420science.com</a></td>
+                  <td><span class="lic-compliant">Compliant</span></td>
+                  <td><span class="sub-active">&#9679; Active</span></td>
+                  <td>5/18/2026 03:10 PM</td>
+                  <td><button class="act-btn">View</button> <button class="act-btn" style="margin-left:4px">Scan</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:700">CannaCurator</div></td>
+                  <td style="color:#CBD5E1;font-style:italic">—</td>
+                  <td><a href="#">cannacurator.com</a></td>
+                  <td><span class="lic-compliant">Compliant</span></td>
+                  <td><span class="sub-inactive">&#9679; Inactive</span></td>
+                  <td>5/15/2026 09:00 AM</td>
+                  <td><button class="act-btn">View</button> <button class="act-btn" style="margin-left:4px">Scan</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+      </div><!-- /.content -->
+
+      <div class="app-footer">
+        <a href="#">Support</a>
+        <a href="#">Privacy Policy &amp; EULA</a>
+      </div>
+
+    </div><!-- /.app-shell -->
+  </div><!-- /section 3 -->
+
+</div><!-- /.page -->
+
+</body>
+</html>
