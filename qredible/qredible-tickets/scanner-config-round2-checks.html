@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-ScanAI Scanner Config — Round 2 Checks (Peptides + Online Lending)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET ─── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Uber Move','Plus Jakarta Sans',-apple-system,sans-serif;background:#F7F5FF;color:#1a202e;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace;font-size:11px}
+
+/* ─── NAV ─── */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:300}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.topnav .spacer{flex:1}
+
+/* ─── PAGE ─── */
+.page{max-width:1100px;margin:0 auto;padding:28px 20px 80px;display:flex;flex-direction:column;gap:32px}
+
+/* ─── INFO BLOCK ─── */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:12px 18px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.7}
+.info-block ul{font-size:12px;color:#78350F;line-height:1.7;margin-left:16px;margin-top:4px}
+.info-block code{background:#FEF3C7;padding:0 3px;border-radius:3px}
+
+/* ─── SECTION ─── */
+.section-heading{font-size:15px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.section-sub{font-size:12px;color:#64748B;margin-bottom:0}
+
+/* ─── MODAL CHROME ─── */
+.modal-chrome{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);max-width:980px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #e5e7eb}
+.modal-header h2{font-size:15px;font-weight:700;font-family:'Uber Move','Plus Jakarta Sans',sans-serif}
+.modal-header .subtitle{font-size:11px;color:#6b7280;margin-top:2px}
+.modal-close{width:28px;height:28px;border-radius:5px;border:1px solid #e5e7eb;background:#fff;font-size:16px;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.modal-body{padding:20px 24px 24px}
+
+/* ─── TIER PICKER ─── */
+.tier-picker{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;background:#f8fafc;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:16px}
+.tier-btn{height:40px;border-radius:8px;font-family:'Uber Move','Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e5e7eb;background:#fff;color:#1a202e;transition:all 120ms}
+.tier-btn.active{border-color:#3b82f6;background:#3b82f6;color:#fff}
+.tier-btn:hover:not(.active){background:#f9fafb}
+
+/* ─── INDUSTRY TOGGLE ─── */
+.industry-toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.industry-toggle-label{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+.ind-btn{height:32px;padding:0 14px;border-radius:20px;font-family:'Uber Move','Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all 100ms;display:inline-flex;align-items:center;gap:5px}
+.ind-btn.peptide-active{background:#EDE9FE;border-color:#7C3AED;color:#5B21B6}
+.ind-btn.lending-active{background:#DBEAFE;border-color:#1D4ED8;color:#1e40af}
+.ind-btn:not(.peptide-active):not(.lending-active){background:#fff;border-color:#e5e7eb;color:#64748B}
+.ind-btn:hover:not(.peptide-active):not(.lending-active){background:#f8fafc;border-color:#cbd5e1}
+
+/* ─── SCOPE CARD ─── */
+.scope-card{padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:14px;font-size:12px;color:#374151}
+.scope-card .scope-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.scope-chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;font-size:11px;font-weight:600}
+.scope-chip.purple{background:#ede9fe;color:#5b21b6}
+.scope-chip.blue{background:#dbeafe;color:#1e40af}
+
+/* ─── TRI-STATE HELPER ─── */
+.tristate-helper{font-size:12px;font-style:italic;color:#4b5563;background:#f1f5f9;border-left:3px solid #cbd5e1;padding:10px 14px;border-radius:6px;margin-bottom:14px;line-height:1.7}
+.tristate-helper b{font-weight:600;color:#111827}
+
+/* ─── FORM GRID ─── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:16px}
+@media(max-width:700px){.form-grid{grid-template-columns:1fr}}
+
+/* ─── SECTION LABEL ─── */
+.section-label{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+
+/* ─── CHECK ROW (baseline) ─── */
+.check-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#1a202e;padding:4px 0;font-family:'Uber Move','Plus Jakarta Sans',sans-serif}
+
+/* ─── NEW CHECK ROW ─── */
+.check-row-new{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1a202e;padding:6px 10px;border-radius:7px;margin-bottom:3px;position:relative;font-family:'Uber Move','Plus Jakarta Sans',sans-serif}
+.check-row-new.peptide-new{background:#FAF5FF;border:1px solid #DDD6FE}
+.check-row-new.lending-new{background:#EFF6FF;border:1px solid #BFDBFE}
+.check-row-new.reuse-enabled{background:#F0FDF4;border:1px solid #BBF7D0}
+.check-row-new .check-label-col{flex:1;min-width:0}
+.check-row-new .check-label{font-size:13px;font-weight:600;color:#1a202e;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.check-row-new .check-code{font-size:10px;color:#94A3B8;font-family:'IBM Plex Mono',monospace;margin-top:1px;display:block}
+.check-row-new .check-meta{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.check-row-new .check-badges{display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:wrap;padding-top:1px}
+
+/* ─── TRI-STATE CHECKBOX ─── */
+.tristate{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;border:2px solid #cbd5e1;background:#fff;cursor:pointer;font-size:11px;font-weight:700;flex-shrink:0;user-select:none;transition:all 100ms;line-height:1}
+.tristate.on{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.tristate.off{background:#fff;border-color:#9ca3af;color:#9ca3af}
+.tristate.inh{background:#f3f4f6;border-color:#d1d5db;color:#6b7280}
+/* analyst = regular checkbox style */
+.checkmark{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;border:2px solid #3b82f6;background:#fff;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;color:#3b82f6;line-height:1}
+
+/* ─── PILLS ─── */
+.pill-new{background:#F05252;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill-flagship{background:#D97706;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill-behavioral{background:#0891B2;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill-presence{background:#16A34A;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill-reuse{background:#0891B2;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill-oq{background:#D97706;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill-migrate{background:#6B7280;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+
+/* ─── RISK CHIPS ─── */
+.risk-chip{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:8px;font-size:10px;font-weight:700;white-space:nowrap}
+.risk-high{background:#FEE2E2;color:#991B1B}
+.risk-medium{background:#FEF3C7;color:#92400E}
+.risk-low{background:#F0FDF4;color:#166534}
+
+/* ─── QP BADGE ─── */
+.qp-badge{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:3px;font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace;background:#1E3A5F;color:#fff;white-space:nowrap;text-decoration:none;letter-spacing:.02em}
+.qp-badge:hover{background:#2563EB;color:#fff;text-decoration:none}
+
+/* ─── RESULT CHIP ─── */
+.result-chip{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:8px;font-size:10px;font-weight:600;white-space:nowrap}
+.result-violative{background:#FEE2E2;color:#991B1B}
+.result-compliant{background:#DCFCE7;color:#166534}
+.result-presence{background:#DCFCE7;color:#166534}
+.result-behavioral{background:#E0F2FE;color:#0369A1}
+.result-analyst{background:#F3E8FF;color:#6D28D9}
+.result-cleanup{background:#F3F4F6;color:#6B7280}
+
+/* ─── DIVIDER between sections ─── */
+.check-section-divider{height:1px;background:#f1f5f9;margin:6px 0 8px}
+
+/* ─── KEYWORDS AREA ─── */
+.keywords-area{display:flex;flex-direction:column;gap:10px;padding:14px 0 0}
+.kw-section{display:flex;flex-direction:column;gap:6px}
+.kw-chips{display:flex;flex-wrap:wrap;gap:6px}
+.kw-chip-green{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:500;background:#ecfdf5;color:#065f46;gap:5px}
+.kw-chip-blue{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:500;background:#eff6ff;color:#1e40af;gap:5px}
+.kw-chip-add-green{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:13px;font-size:12px;font-weight:500;border:1px dashed #6ee7b7;color:#059669;background:transparent;cursor:pointer}
+.kw-chip-add-blue{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:13px;font-size:12px;font-weight:500;border:1px dashed #93c5fd;color:#1d4ed8;background:transparent;cursor:pointer}
+
+/* ─── MIGRATION BANNER ─── */
+.migration-banner{background:#F8FAFC;border:1px solid #E2E8F0;border-left:4px solid #6B7280;border-radius:6px;padding:10px 14px;font-size:12px;color:#374151;line-height:1.6;margin-top:6px;margin-bottom:4px}
+.migration-banner strong{font-weight:700;color:#1a202e}
+
+/* ─── LEGEND ─── */
+.legend{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 18px}
+.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+@media(max-width:600px){.legend-grid{grid-template-columns:1fr}}
+.legend-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#374151;line-height:1.5}
+.legend-item-swatch{display:flex;align-items:center;gap:4px;flex-shrink:0;padding-top:1px}
+
+/* ─── COUNT BADGES ─── */
+.count-badge{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:10px;font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.count-peptide{background:#EDE9FE;color:#5B21B6}
+.count-lending{background:#DBEAFE;color:#1e40af}
+
+/* ─── MODAL FOOTER ─── */
+.modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 24px;border-top:1px solid #e5e7eb;background:#f8fafc}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:'Uber Move','Plus Jakarta Sans',sans-serif}
+.btn-primary{background:#1A202E;border-color:#1A202E;color:#fff}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#374151}
+
+/* ─── HIDDEN/SHOWN PANELS ─── */
+.industry-panel{display:none}
+.industry-panel.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html">QTrust</a>
+  <span class="sep">›</span>
+  <a href="index.html">Tickets</a>
+  <span class="sep">›</span>
+  <span class="title">Q-ScanAI Scanner Config — Round 2 Checks</span>
+  <span class="badge">QP-3920–3942</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:6px">Q-ScanAI · Round 2 · Scanner Config Mockup</div>
+    <div class="section-heading">Scanner Configuration — Round 2 Compliance Checks <span style="font-size:11px;font-weight:600;color:#9CA3AF">(Peptides + Online Lending)</span></div>
+    <div class="section-sub" style="margin-top:4px">Faithful reproduction of the Edit Configuration modal showing every NEW check that the 23 Round-2 tickets will add. Each new row is tagged with its QP ticket key (click to open in Jira) and highlighted. Toggle between industry contexts using the buttons inside the modal.</div>
+
+    <div class="info-block" style="margin-top:12px">
+      <div class="info-pill">23 Tickets · 2 Industries</div>
+      <p><strong>Peptides (QP-3920–3934):</strong> 13 new compliance checks + 2 analyst-review checks + 1 migration/cleanup ticket (QP-3933 P-MIGRATE).</p>
+      <p style="margin-top:3px"><strong>Online Lending (QP-3935–3942):</strong> 10 new compliance checks + 3 existing checks enabled for lending + 1 analyst-review check.</p>
+      <p style="margin-top:3px"><strong>Baseline 8</strong> (existing in both contexts): FDA Disclaimer, Terms of Use, Privacy Policy, Return/Refund Policy, Contact &amp; Business Info, Age &amp; Access Controls, Accepted Payment Methods, SSL/TLS Security.</p>
+    </div>
+  </div>
+
+  <!-- THE MODAL -->
+  <div class="modal-chrome">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div>
+        <h2>Edit Configuration</h2>
+        <div class="subtitle">Scanner configuration · Industry Type tier</div>
+      </div>
+      <div class="modal-close">✕</div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- Tier picker -->
+      <div class="tier-picker">
+        <button class="tier-btn">Processor</button>
+        <button class="tier-btn">Company</button>
+        <button class="tier-btn active">Industry Type</button>
+        <button class="tier-btn">Type of Company</button>
+      </div>
+
+      <!-- Industry toggle -->
+      <div class="industry-toggle-row">
+        <span class="industry-toggle-label">Industry context:</span>
+        <button class="ind-btn peptide-active" onclick="showIndustry('peptide')" id="btn-peptide">🧪 Research Peptides</button>
+        <button class="ind-btn" onclick="showIndustry('lending')" id="btn-lending">🏦 Online Lending</button>
+        <span style="font-size:11px;color:#94A3B8;margin-left:6px">— toggle to switch between industry check sets</span>
+      </div>
+
+      <!-- PEPTIDE PANEL -->
+      <div class="industry-panel active" id="panel-peptide">
+
+        <!-- Scope card -->
+        <div class="scope-card">
+          <div class="scope-row">
+            <span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Industry Type:</span>
+            <span class="scope-chip purple">Peptides (Track B)</span>
+            <span style="font-size:11px;color:#6b7280;margin-left:4px">·</span>
+            <span class="scope-chip purple">Research Peptide classification</span>
+            <span style="font-size:11px;color:#6b7280;margin-left:4px">·</span>
+            <span style="font-size:11px;color:#374151">COA required (Track B default)</span>
+          </div>
+        </div>
+
+        <!-- Tri-state helper -->
+        <div class="tristate-helper">
+          Each check is tri-state: <b>✓ On</b> overrides lower tiers, <b>☐ Off</b> overrides lower tiers, and <b>– Inherit</b> defers to the next lower tier. Click to cycle. New checks shown as <b>On</b> for this industry.
+        </div>
+
+        <!-- 2-column grid -->
+        <div class="form-grid">
+
+          <!-- LEFT: Compliance Checks -->
+          <div>
+            <div class="section-label">
+              Compliance Checks
+              <span class="count-badge count-peptide" style="margin-left:6px">+13 new</span>
+            </div>
+
+            <!-- BASELINE 8 -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:4px">Baseline — existing</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> FDA Disclaimer</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> Terms of Use</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> Privacy Policy</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> Return/Refund Policy</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> Contact &amp; Business Info</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> Age &amp; Access Controls</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> Accepted Payment Methods</div>
+            <div class="check-row"><div class="tristate on" onclick="cycleTristate(this)">✓</div> SSL/TLS Security &amp; Integrity</div>
+
+            <div class="check-section-divider"></div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7C3AED;margin-bottom:6px">Round 2 New — Peptides</div>
+
+            <!-- QP-3920 TKT1 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">High-tier V3 Watchlist Peptide Detection
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3920" target="_blank" class="qp-badge">QP-3920</a>
+                </div>
+                <code class="check-code">PEPTIDE_HIGH_TIER_WATCHLIST</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">BPC-157, CJC-1295, Melanotan II, Ipamorelin, TB-500, Tesamorelin, Hexarelin, GHRP-6, MK-677 + 9 more</span>
+                </div>
+                <div style="font-size:10px;color:#94A3B8;margin-top:2px">Consolidates 9 existing violative_term elements (CSV #8–16). B2B-gate exception embedded.</div>
+              </div>
+            </div>
+
+            <!-- QP-3921 TKT2 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Enhanced-Scrutiny Watchlist Detection
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3921" target="_blank" class="qp-badge">QP-3921</a>
+                </div>
+                <code class="check-code">PEPTIDE_ENHANCED_SCRUTINY_WATCHLIST</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">TA-1, KP-10, MOTS-c, Epithalon (PCAC review Jul 2026)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3922 TKT3 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Disease / Treatment Claim
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3922" target="_blank" class="qp-badge">QP-3922</a>
+                </div>
+                <code class="check-code">PEPTIDE_DISEASE_TREATMENT_CLAIM</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">Absorbs CSV #20–23 (disease, bodybuilding, weight loss, anti-aging claims)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3923 TKT4 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Human Dosing / Administration Instruction
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3923" target="_blank" class="qp-badge">QP-3923</a>
+                </div>
+                <code class="check-code">PEPTIDE_HUMAN_DOSING_INSTRUCTION</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">Absorbs CSV #17, #24 (reconstitution calculators, dosing instructions)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3924 TKT5 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Bundled Injection Accessory
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3924" target="_blank" class="qp-badge">QP-3924</a>
+                </div>
+                <code class="check-code">PEPTIDE_BUNDLED_INJECTION_ACCESSORY</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">BAC water, syringes, needles bundled with peptide vials — absorbs CSV #18, #19</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3925 TKT6 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Non-Compliant Payment Rail
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3925" target="_blank" class="qp-badge">QP-3925</a>
+                </div>
+                <code class="check-code">PEPTIDE_NON_COMPLIANT_PAYMENT_RAIL</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">Sole P2P (Venmo/CashApp/Zelle) + Visa/MC card acceptance — absorbs CSV #29. Closes OQ-2.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3926 TKT7 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Open Consumer Checkout / B2B Gate Enforcement
+                  <span class="pill-new">New</span>
+                  <span class="pill-behavioral">Behavioral</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3926" target="_blank" class="qp-badge">QP-3926</a>
+                </div>
+                <code class="check-code">PEPTIDE_B2B_BUYER_GATE</code>
+                <div class="check-meta">
+                  <span class="result-chip result-behavioral">Presence / behavioral</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">Gate enforced ⇒ Compliant; open checkout ⇒ Violative. Absorbs CSV #3, half of #1.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3927 TKT8 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Clinical / Pharma-Grade Branding Without COA
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3927" target="_blank" class="qp-badge">QP-3927</a>
+                </div>
+                <code class="check-code">PEPTIDE_CLINICAL_BRANDING_NO_COA</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">"99% purity / pharmaceutical grade" claim without COA link adjacency. Absorbs CSV #27.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3928 TKT9 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Personal-Use Review / Testimonial
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3928" target="_blank" class="qp-badge">QP-3928</a>
+                </div>
+                <code class="check-code">PEPTIDE_PERSONAL_USE_TESTIMONIAL</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">First-person health-outcome reviews. Absorbs CSV #25.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3929 TKT10 ⭐ flagship -->
+            <div class="check-row-new peptide-new" style="border-color:#D97706;background:#FFFBEB">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Research-Use-Only / NFHC Disclaimer Presence ⭐
+                  <span class="pill-flagship">Flagship</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3929" target="_blank" class="qp-badge">QP-3929</a>
+                </div>
+                <code class="check-code">PEPTIDE_RESEARCH_USE_ONLY_DISCLAIMER</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant when found / Violative absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                </div>
+                <div style="font-size:10px;color:#92400E;margin-top:2px;font-weight:600">⭐ Converts violative→presence. NFHC was wired as a violative term — converts to FDA-disclaimer pattern (found ⇒ Compliant). Absorbs RUO half of CSV #1.</div>
+              </div>
+            </div>
+
+            <!-- QP-3930 TKT11 ⭐ migration flagship -->
+            <div class="check-row-new peptide-new" style="border-color:#D97706;background:#FFFBEB">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">FDA / DSHEA Disclosure on Product Pages ⭐
+                  <span class="pill-flagship">Flagship</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3930" target="_blank" class="qp-badge">QP-3930</a>
+                </div>
+                <code class="check-code">PEPTIDE_FDA_DSHEA_DISCLOSURE</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant when found / Violative absent</span>
+                  <span class="risk-chip risk-medium">Medium</span>
+                </div>
+                <div style="font-size:10px;color:#92400E;margin-top:2px;font-weight:600">⭐ Migration flagship — converts CSV #30 from violative_term to presence. CSV's own AI instructions call this a presence check.</div>
+              </div>
+            </div>
+
+            <!-- QP-3931 TKT12 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">B2B Declaration / 503A–503B Disavowal
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3931" target="_blank" class="qp-badge">QP-3931</a>
+                </div>
+                <code class="check-code">PEPTIDE_B2B_503_DISAVOWAL</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant when found / silence absent</span>
+                  <span class="risk-chip risk-low">Low</span>
+                  <span style="font-size:10px;color:#64748B">Positive signal only — no absence row emitted.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3932 TKT13 -->
+            <div class="check-row-new peptide-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Business Identity + Institutional Buyer Eligibility
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3932" target="_blank" class="qp-badge">QP-3932</a>
+                </div>
+                <code class="check-code">PEPTIDE_INSTITUTIONAL_BUYER_ELIGIBILITY</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative per element</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">Legal name, physical address (PO Box ⇒ Violative), phone, institutional-eligibility statement. Reuses CONTACT_INFO.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3933 P-MIGRATE -->
+            <div class="migration-banner">
+              <span class="pill-migrate" style="margin-right:6px">QP-3933 P-MIGRATE</span>
+              <strong>No new check row.</strong> DB cleanup ticket — soft-deletes 21 consolidated <code>pl_compliance_element</code> violative_term rows after each absorbing ticket passes side-by-side smoke. 8 Track-A rows remain on violative_term. <a href="https://qredible.atlassian.net/browse/QP-3933" target="_blank" class="qp-badge" style="margin-left:4px">QP-3933</a>
+            </div>
+
+          </div><!-- /left col -->
+
+          <!-- RIGHT: Analyst Review Checks -->
+          <div>
+            <div class="section-label">
+              Analyst Review Checks
+              <span class="count-badge count-peptide" style="margin-left:6px">+2 new</span>
+            </div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:4px">Existing — baseline</div>
+            <div class="check-row" style="color:#94A3B8;font-style:italic;font-size:12px">No baseline analyst checks for this tier</div>
+
+            <div class="check-section-divider" style="margin-top:8px"></div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7C3AED;margin-bottom:6px">Round 2 New — Peptides</div>
+
+            <!-- QP-3934 Before/After imagery -->
+            <div class="check-row-new peptide-new">
+              <div class="checkmark">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Before/After Imagery Review
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3934" target="_blank" class="qp-badge">QP-3934</a>
+                </div>
+                <code class="check-code">PEPTIDE_BEFORE_AFTER_IMAGERY_REVIEW</code>
+                <div class="check-meta">
+                  <span class="result-chip result-analyst">Analyst review</span>
+                  <span style="font-size:10px;color:#64748B">Image classification not automatable by June 1. Seeds placeholder per scan.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3934 Off-site social -->
+            <div class="check-row-new peptide-new">
+              <div class="checkmark">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Off-site / Social Media Scan
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3934" target="_blank" class="qp-badge">QP-3934</a>
+                </div>
+                <code class="check-code">PEPTIDE_OFFSITE_SOCIAL_REVIEW</code>
+                <div class="check-meta">
+                  <span class="result-chip result-analyst">Analyst review</span>
+                  <span style="font-size:10px;color:#64748B">Instagram, TikTok, Facebook, YouTube, Reddit, Trustpilot, Google/Meta Ads.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Keywords -->
+            <div style="margin-top:20px">
+              <div class="section-label">Custom Keywords</div>
+              <div class="kw-chips">
+                <div class="kw-chip-green">bpc-157 <span style="color:#6ee7b7;cursor:pointer">✕</span></div>
+                <div class="kw-chip-green">tb-500 <span style="color:#6ee7b7;cursor:pointer">✕</span></div>
+                <div class="kw-chip-green">peptide vial <span style="color:#6ee7b7;cursor:pointer">✕</span></div>
+                <div class="kw-chip-green">research peptide <span style="color:#6ee7b7;cursor:pointer">✕</span></div>
+                <button class="kw-chip-add-green">+ Add keyword</button>
+              </div>
+            </div>
+
+            <!-- Whitelist Keywords -->
+            <div style="margin-top:14px">
+              <div class="section-label">Whitelist Keywords</div>
+              <div class="kw-chips">
+                <div class="kw-chip-blue">for research use only <span style="color:#93c5fd;cursor:pointer">✕</span></div>
+                <div class="kw-chip-blue">in vitro <span style="color:#93c5fd;cursor:pointer">✕</span></div>
+                <button class="kw-chip-add-blue">+ Add whitelist</button>
+              </div>
+            </div>
+
+          </div><!-- /right col -->
+        </div><!-- /form-grid -->
+      </div><!-- /panel-peptide -->
+
+
+      <!-- LENDING PANEL -->
+      <div class="industry-panel" id="panel-lending">
+
+        <!-- Scope card -->
+        <div class="scope-card">
+          <div class="scope-row">
+            <span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Industry Type:</span>
+            <span class="scope-chip blue">Online Lending</span>
+            <span style="font-size:11px;color:#6b7280;margin-left:4px">·</span>
+            <span class="scope-chip blue">MCC 6012</span>
+            <span style="font-size:11px;color:#6b7280;margin-left:4px">·</span>
+            <span style="font-size:11px;color:#374151">Net-new — no prior lending scanner config</span>
+          </div>
+        </div>
+
+        <!-- Tri-state helper -->
+        <div class="tristate-helper">
+          Each check is tri-state: <b>✓ On</b> overrides lower tiers, <b>☐ Off</b> overrides lower tiers, and <b>– Inherit</b> defers to the next lower tier. Click to cycle. New checks shown as <b>On</b> for this industry. Reused baseline checks called out by their enabling ticket.
+        </div>
+
+        <!-- 2-column grid -->
+        <div class="form-grid">
+
+          <!-- LEFT: Compliance Checks -->
+          <div>
+            <div class="section-label">
+              Compliance Checks
+              <span class="count-badge count-lending" style="margin-left:6px">+10 new · +3 reused</span>
+            </div>
+
+            <!-- BASELINE — enabled for lending -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:4px">Baseline — existing</div>
+            <div class="check-row"><div class="tristate inh" onclick="cycleTristate(this)">–</div> FDA Disclaimer</div>
+            <div class="check-row"><div class="tristate inh" onclick="cycleTristate(this)">–</div> Return/Refund Policy</div>
+            <div class="check-row"><div class="tristate inh" onclick="cycleTristate(this)">–</div> Age &amp; Access Controls</div>
+            <div class="check-row"><div class="tristate inh" onclick="cycleTristate(this)">–</div> Accepted Payment Methods</div>
+            <div class="check-row"><div class="tristate inh" onclick="cycleTristate(this)">–</div> Contact &amp; Business Info</div>
+
+            <!-- Reused/enabled checks -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0891B2;margin:8px 0 4px">Baseline — enabled by lending tickets</div>
+
+            <div class="check-row-new reuse-enabled">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">SSL/TLS Security &amp; Integrity
+                  <span class="pill-reuse">Reused</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3939" target="_blank" class="qp-badge">QP-3939</a>
+                </div>
+                <code class="check-code">INVALID_SSL_CERTIFICATE</code>
+                <div class="check-meta"><span class="result-chip result-violative">Violative absent</span><span class="risk-chip risk-high">High</span><span style="font-size:10px;color:#64748B">Enabled for lending via industry-type config (no new code needed)</span></div>
+              </div>
+            </div>
+
+            <div class="check-row-new reuse-enabled">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Privacy Policy
+                  <span class="pill-reuse">Reused</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3939" target="_blank" class="qp-badge">QP-3939</a>
+                </div>
+                <code class="check-code">PRIVACY_POLICY</code>
+                <div class="check-meta"><span class="result-chip result-presence">Compliant / Violative absent</span><span class="risk-chip risk-medium">Medium</span></div>
+              </div>
+            </div>
+
+            <div class="check-row-new reuse-enabled">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Terms of Use
+                  <span class="pill-reuse">Reused</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3941" target="_blank" class="qp-badge">QP-3941</a>
+                </div>
+                <code class="check-code">TERMS_OF_USE</code>
+                <div class="check-meta"><span class="result-chip result-presence">Compliant / Violative absent</span><span class="risk-chip risk-medium">Medium</span></div>
+              </div>
+            </div>
+
+            <div class="check-section-divider"></div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1D4ED8;margin-bottom:6px">Round 2 New — Online Lending</div>
+
+            <!-- QP-3935 TKT16 -->
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Prohibited Approval-Guarantee Language
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3935" target="_blank" class="qp-badge">QP-3935</a>
+                </div>
+                <code class="check-code">LENDING_PROHIBITED_APPROVAL_GUARANTEE</code>
+                <div class="check-meta">
+                  <span class="result-chip result-violative">Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">"Guaranteed approval / 100% approval / no credit check guaranteed…" — full family + paraphrase AI</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3936 TKT17 — two codes -->
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">State Restriction Enforcement (Behavioral Probe)
+                  <span class="pill-new">New</span>
+                  <span class="pill-behavioral">Behavioral</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3936" target="_blank" class="qp-badge">QP-3936</a>
+                </div>
+                <code class="check-code">LENDING_STATE_RESTRICTION_ENFORCEMENT</code>
+                <div class="check-meta">
+                  <span class="result-chip result-behavioral">Gate blocked ⇒ Compliant / reachable ⇒ Violative</span>
+                  <span class="risk-chip risk-high">High</span>
+                </div>
+                <div style="font-size:10px;color:#64748B;margin-top:2px">Probe restricted-state ZIPs (AR, CT, NY, PA, VT, VA, WV). Behavioral + ZIP probe.</div>
+              </div>
+            </div>
+
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Served States List Presence
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3936" target="_blank" class="qp-badge">QP-3936</a>
+                </div>
+                <code class="check-code">LENDING_SERVED_STATES_LIST</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3937 TKT18 — three codes -->
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">NMLS ID in Footer
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3937" target="_blank" class="qp-badge">QP-3937</a>
+                </div>
+                <code class="check-code">LENDING_NMLS_FOOTER</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">Pattern: NMLS #\d+ in every-page footer</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Consumer Lending License Display
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3937" target="_blank" class="qp-badge">QP-3937</a>
+                </div>
+                <code class="check-code">LENDING_CONSUMER_LENDING_LICENSE</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">State consumer lending license reference</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">CAB / Credit Access Business License (TX-conditional)
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3937" target="_blank" class="qp-badge">QP-3937</a>
+                </div>
+                <code class="check-code">LENDING_CAB_LICENSE_TX</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">Only Violative if TX is in served states and no CAB reference found</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3938 TKT19 — four codes -->
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Legal Entity Name
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3938" target="_blank" class="qp-badge">QP-3938</a>
+                </div>
+                <code class="check-code">LENDING_LEGAL_ENTITY_NAME</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-medium">Medium</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">DBA Disclosed (if used)
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3938" target="_blank" class="qp-badge">QP-3938</a>
+                </div>
+                <code class="check-code">LENDING_DBA_DISCLOSED</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / conditional Violative</span>
+                  <span class="risk-chip risk-low">Low</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Contact / Support Page Exists (not 404)
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3938" target="_blank" class="qp-badge">QP-3938</a>
+                </div>
+                <code class="check-code">LENDING_CONTACT_PAGE_EXISTS</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-medium">Medium</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Business Model Clearly Defined
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3938" target="_blank" class="qp-badge">QP-3938</a>
+                </div>
+                <code class="check-code">LENDING_BUSINESS_MODEL_DECLARATION</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-medium">Medium</span>
+                  <span style="font-size:10px;color:#64748B">Licensed lender / CAB / tribal entity declaration</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3939 TKT20 — cookie banner only (SSL + Privacy are reuse above) -->
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Cookie Consent Banner
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3939" target="_blank" class="qp-badge">QP-3939</a>
+                </div>
+                <code class="check-code">LENDING_COOKIE_CONSENT_BANNER</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-medium">Medium</span>
+                  <span style="font-size:10px;color:#64748B">Interactive banner on first load</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3940 TKT21 — two codes -->
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Complaint Process — Specific Response Timeframe
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3940" target="_blank" class="qp-badge">QP-3940</a>
+                </div>
+                <code class="check-code">LENDING_COMPLAINT_RESPONSE_TIMEFRAME</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant specific / Violative vague or absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                  <span style="font-size:10px;color:#64748B">AI semantic judge: "{N} business days" = specific; "soon / ASAP" = Violative</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="check-row-new lending-new">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Business Hours of Operation Listed
+                  <span class="pill-new">New</span>
+                  <span class="pill-presence">Presence</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3940" target="_blank" class="qp-badge">QP-3940</a>
+                </div>
+                <code class="check-code">LENDING_BUSINESS_HOURS_LISTED</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- QP-3941 TKT22 — High Cost Disclosure (OQ-6) -->
+            <div class="check-row-new lending-new" style="border-color:#D97706;background:#FFFBEB">
+              <div class="tristate on" onclick="cycleTristate(this)" style="margin-top:2px">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">High Cost Disclosure
+                  <span class="pill-new">New</span>
+                  <span class="pill-oq">⚠ OQ-6 pending</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3941" target="_blank" class="qp-badge">QP-3941</a>
+                </div>
+                <code class="check-code">LENDING_HIGH_COST_DISCLOSURE</code>
+                <div class="check-meta">
+                  <span class="result-chip result-presence">Compliant / Violative absent</span>
+                  <span class="risk-chip risk-high">High</span>
+                </div>
+                <div style="font-size:10px;color:#92400E;margin-top:2px;font-weight:600">⚠ OQ-6: Exact required disclosure language + APR threshold pending FLEX confirmation. Ships with concept-flexible match until resolved.</div>
+              </div>
+            </div>
+
+          </div><!-- /left col -->
+
+          <!-- RIGHT: Analyst Review Checks -->
+          <div>
+            <div class="section-label">
+              Analyst Review Checks
+              <span class="count-badge count-lending" style="margin-left:6px">+1 new</span>
+            </div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin-bottom:4px">Existing — baseline</div>
+            <div class="check-row" style="color:#94A3B8;font-style:italic;font-size:12px">No baseline analyst checks for this tier</div>
+
+            <div class="check-section-divider" style="margin-top:8px"></div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1D4ED8;margin-bottom:6px">Round 2 New — Online Lending</div>
+
+            <!-- QP-3942 -->
+            <div class="check-row-new lending-new">
+              <div class="checkmark">✓</div>
+              <div class="check-label-col">
+                <div class="check-label">Off-site / Social Media Scan (+ L-A1 off-site)
+                  <span class="pill-new">New</span>
+                  <a href="https://qredible.atlassian.net/browse/QP-3942" target="_blank" class="qp-badge">QP-3942</a>
+                </div>
+                <code class="check-code">LENDING_OFFSITE_SOCIAL_REVIEW</code>
+                <div class="check-meta">
+                  <span class="result-chip result-analyst">Analyst review</span>
+                  <span style="font-size:10px;color:#64748B">Instagram, TikTok, Facebook, Google/Meta Ads, Reddit, Trustpilot, BBB, Google reviews. Includes off-site approval-guarantee scan.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Keywords -->
+            <div style="margin-top:20px">
+              <div class="section-label">Custom Keywords</div>
+              <div class="kw-chips">
+                <div class="kw-chip-green">guaranteed approval <span style="color:#6ee7b7;cursor:pointer">✕</span></div>
+                <div class="kw-chip-green">no credit check <span style="color:#6ee7b7;cursor:pointer">✕</span></div>
+                <div class="kw-chip-green">instant approval <span style="color:#6ee7b7;cursor:pointer">✕</span></div>
+                <button class="kw-chip-add-green">+ Add keyword</button>
+              </div>
+            </div>
+
+            <!-- Whitelist Keywords -->
+            <div style="margin-top:14px">
+              <div class="section-label">Whitelist Keywords</div>
+              <div class="kw-chips">
+                <div class="kw-chip-blue">subject to approval <span style="color:#93c5fd;cursor:pointer">✕</span></div>
+                <div class="kw-chip-blue">credit check required <span style="color:#93c5fd;cursor:pointer">✕</span></div>
+                <button class="kw-chip-add-blue">+ Add whitelist</button>
+              </div>
+            </div>
+
+          </div><!-- /right col -->
+        </div><!-- /form-grid -->
+      </div><!-- /panel-lending -->
+
+    </div><!-- /modal-body -->
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary">Cancel</button>
+      <button class="btn btn-primary">Save Configuration</button>
+    </div>
+  </div><!-- /modal-chrome -->
+
+
+  <!-- LEGEND -->
+  <div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:8px">Legend</div>
+    <div class="legend">
+      <div class="legend-grid">
+        <div class="legend-item">
+          <div class="legend-item-swatch"><div style="width:14px;height:14px;border-radius:3px;background:#FAF5FF;border:1px solid #DDD6FE"></div></div>
+          Purple row = new Peptide check
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><div style="width:14px;height:14px;border-radius:3px;background:#EFF6FF;border:1px solid #BFDBFE"></div></div>
+          Blue row = new Lending check
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><div style="width:14px;height:14px;border-radius:3px;background:#F0FDF4;border:1px solid #BBF7D0"></div></div>
+          Green row = existing baseline check enabled for this industry
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><div style="width:14px;height:14px;border-radius:3px;background:#FFFBEB;border:1px solid #D97706"></div></div>
+          Amber row = flagship / open question (OQ-6)
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch">
+            <div class="tristate on" style="pointer-events:none">✓</div>
+          </div>
+          <b>✓ On</b> — check enabled; overrides lower tiers
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch">
+            <div class="tristate inh" style="pointer-events:none">–</div>
+          </div>
+          <b>– Inherit</b> — defers to next lower tier
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch">
+            <div class="tristate off" style="pointer-events:none">☐</div>
+          </div>
+          <b>☐ Off</b> — check disabled; overrides lower tiers
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><span class="checkmark" style="pointer-events:none">✓</span></div>
+          Regular checkbox = Analyst Review (not tri-state)
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><span class="pill-new">New</span></div>
+          New code introduced by the QP ticket — click badge to open Jira
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><span class="pill-presence">Presence</span></div>
+          FDA-disclaimer-style: found ⇒ Compliant; absent ⇒ Violative
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><span class="pill-behavioral">Behavioral</span></div>
+          Behavioral probe (WebCrawler.service.ts) — gate/block detection
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><span class="pill-oq">⚠ OQ-6 pending</span></div>
+          Open question — exact language/threshold awaiting FLEX confirmation
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><span class="qp-badge" style="pointer-events:none">QP-XXXX</span></div>
+          QP badge = click to open Jira ticket in new tab
+        </div>
+        <div class="legend-item">
+          <div class="legend-item-swatch"><span class="pill-flagship">Flagship</span></div>
+          ⭐ Flagship conversion — violative_term → presence fix (CSV #1, #30)
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ─── INDUSTRY TOGGLE ───
+function showIndustry(ind) {
+  document.getElementById('panel-peptide').classList.remove('active');
+  document.getElementById('panel-lending').classList.remove('active');
+  document.getElementById('btn-peptide').classList.remove('peptide-active','lending-active');
+  document.getElementById('btn-lending').classList.remove('peptide-active','lending-active');
+  document.getElementById('panel-' + ind).classList.add('active');
+  if (ind === 'peptide') {
+    document.getElementById('btn-peptide').classList.add('peptide-active');
+  } else {
+    document.getElementById('btn-lending').classList.add('lending-active');
+  }
+}
+
+// ─── TRI-STATE CHECKBOX CYCLING ───
+function cycleTristate(el) {
+  if (el.classList.contains('on')) {
+    el.classList.remove('on');
+    el.classList.add('off');
+    el.textContent = '☐';
+  } else if (el.classList.contains('off')) {
+    el.classList.remove('off');
+    el.classList.add('inh');
+    el.textContent = '–';
+  } else {
+    el.classList.remove('inh');
+    el.classList.add('on');
+    el.textContent = '✓';
+  }
+}
+</script>
+</body>
+</html>
