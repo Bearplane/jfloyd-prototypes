@@ -289,7 +289,7 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 
     <div class="callout-red" style="background:#EFF6FF;border-color:#93C5FD;margin-bottom:16px">
       <div class="icon" style="font-size:15px">ℹ️</div>
-      <p style="color:#1D4ED8">The "Cave Creek Relief" DBA entry now expands into a structured card. Each DBA gets its own location (defaulting to the corporate address) and type of company. Industry type is always inherited from the legal name (read-only).</p>
+      <p style="color:#1D4ED8">The "Cave Creek Relief" DBA entry now expands into a structured card. Each DBA gets its own location (defaulting to the corporate address) and a Function of Location (e.g. Retail Store, Corporate Office) so license lookups can target the right jurisdiction and location type.</p>
     </div>
 
     <div class="modal-card">
@@ -363,27 +363,20 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
               </div>
             </div>
 
-            <!-- Type of Company — NEW -->
+            <!-- Function of Location — NEW -->
             <div class="dba-field-group">
               <div class="dba-field-label">
-                Type of Company for this DBA:
+                Function of Location for this DBA:
                 <span class="new-pill">NEW</span>
               </div>
               <select class="form-select" style="max-width:280px">
-                <option selected>Retailer</option>
-                <option>Manufacturer</option>
-                <option>Distributor</option>
-                <option>Wholesaler</option>
+                <option selected>Retail Store</option>
+                <option>Corporate Office</option>
+                <option>Warehouse</option>
+                <option>Processing Facility</option>
+                <option>Distribution Center</option>
+                <option>Online Only</option>
               </select>
-            </div>
-
-            <!-- Industry inherited — NEW -->
-            <div class="dba-field-group">
-              <div class="dba-field-label">
-                Industry Type (inherited from legal name):
-                <span class="new-pill">NEW</span>
-              </div>
-              <div class="industry-readonly">Hemp / CBD &nbsp;—&nbsp; <span style="font-size:11px;color:#9CA3AF">read-only, set on legal name</span></div>
             </div>
           </div>
 
@@ -466,28 +459,21 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
               </div>
             </div>
 
-            <!-- Type of Company — NEW -->
+            <!-- Function of Location — NEW -->
             <div class="dba-field-group">
               <div class="dba-field-label">
-                Type of Company for this DBA:
+                Function of Location for this DBA:
                 <span class="new-pill">NEW</span>
               </div>
               <select class="form-select" style="max-width:280px">
-                <option value="" selected disabled>Select type…</option>
-                <option>Retailer</option>
-                <option>Manufacturer</option>
-                <option>Distributor</option>
-                <option>Wholesaler</option>
+                <option value="" selected disabled>Select function…</option>
+                <option>Retail Store</option>
+                <option>Corporate Office</option>
+                <option>Warehouse</option>
+                <option>Processing Facility</option>
+                <option>Distribution Center</option>
+                <option>Online Only</option>
               </select>
-            </div>
-
-            <!-- Industry inherited — NEW -->
-            <div class="dba-field-group">
-              <div class="dba-field-label">
-                Industry Type (inherited from legal name):
-                <span class="new-pill">NEW</span>
-              </div>
-              <div class="industry-readonly">Hemp / CBD &nbsp;—&nbsp; <span style="font-size:11px;color:#9CA3AF">read-only, set on legal name</span></div>
             </div>
 
             <div class="dba-add-form-btns">
