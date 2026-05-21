@@ -83,12 +83,12 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 .loaded-badge{display:inline-flex;align-items:center;background:#DBEAFE;color:#1D4ED8;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:4px}
 .grey-banner{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:9px 12px;margin-bottom:12px;font-size:12px;color:#64748B;font-style:italic}
 
-/* CHECKS GRID */
-.checks-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-bottom:16px}
-.checks-col-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;padding-bottom:6px;margin-bottom:4px;border-bottom:1px solid #F1F5F9}
-.check-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F8FAFC}
+/* CHECKS GRID — 3 columns, compact */
+.checks-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 20px;margin-bottom:16px}
+.checks-col-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;padding-bottom:5px;margin-bottom:3px;border-bottom:1px solid #F1F5F9}
+.check-row{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid #F8FAFC}
 .check-row:last-child{border-bottom:none}
-.check-cb{width:14px;height:14px;accent-color:#2563EB;flex-shrink:0}
+.check-cb{width:13px;height:13px;accent-color:#2563EB;flex-shrink:0}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit}
@@ -108,16 +108,27 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
 .scope-company-type{background:#0D9488;color:#fff}
 .scope-company{background:#7C3AED;color:#fff}
 
-/* RESOLVED CHECKS */
+/* RESOLVED CHECKS — scope-grouped chip layout */
 .resolved-section{border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;margin-top:0}
-.resolved-header{background:#1E3A5F;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.resolved-header{background:#1E3A5F;padding:9px 16px;display:flex;align-items:center;gap:10px}
 .resolved-header h4{font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.06em}
-.resolved-body{padding:14px 16px}
-.resolved-check-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F8FAFC}
-.resolved-check-row:last-child{border-bottom:none}
-.resolved-check-icon{width:18px;height:18px;border-radius:4px;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.resolved-check-name{font-size:12px;color:#1A202E;font-weight:500}
-.resolved-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:10px 16px;font-size:11px;color:#64748B;line-height:1.7}
+.resolved-body{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+/* each scope group */
+.scope-group{}
+.scope-group-hdr{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#374151;margin-bottom:5px}
+.scope-group-hdr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.scope-group-hdr-count{font-size:10px;font-weight:500;color:#9CA3AF;margin-left:2px}
+.scope-chips{display:flex;flex-wrap:wrap;gap:4px 5px}
+.scope-chip{display:inline-flex;align-items:center;gap:4px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;padding:2px 7px;font-size:11px;color:#1A202E;font-weight:500;white-space:nowrap}
+.scope-chip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+/* dot colours */
+.dot-processor{background:#1E3A5F}
+.dot-industry{background:#1D4ED8}
+.dot-company-type{background:#0D9488}
+.dot-company{background:#7C3AED}
+/* divider between groups */
+.scope-group+.scope-group{border-top:1px solid #F1F5F9;padding-top:8px}
+.resolved-footer{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:8px 14px;font-size:11px;color:#64748B;line-height:1.7}
 .resolved-footer strong{color:#374151}
 
 /* FINDING BADGE */
@@ -221,34 +232,37 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
                 </div>
                 <!-- Contradictory grey banner -->
                 <div class="grey-banner">Toggle individual checks below — values shown reflect the aggregated config and can be overridden before the scan. The edited config is sent in the scan request.</div>
-                <!-- Checks (all unchecked, interactive) -->
+                <!-- Checks (all unchecked, interactive) — 3-column layout -->
                 <div class="checks-grid">
                   <div>
                     <div class="checks-col-header">Compliance Checks</div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">FDA Disclaimer</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Terms of Use</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Privacy Policy</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Return/Refund Policy</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Contact &amp; Business Info</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Age &amp; Access Controls</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Accepted Payment Methods</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">SSL/TLS Security &amp; Integrity</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">FDA Disclaimer</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Terms of Use</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Privacy Policy</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Return/Refund Policy</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Contact &amp; Business Info</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Age &amp; Access Controls</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Accepted Payment Methods</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">SSL/TLS Security &amp; Integrity</span></div>
                   </div>
                   <div>
                     <div class="checks-col-header">Analyst Review Checks</div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">THC Disclaimer</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Product Subscription Model</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Product/Service Match</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Price Points Match</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Prohibited Products Search</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">No Hidden Fees</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">No Free Trials (Unless Disclosed)</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">GMP Certificate for Supplements</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Checkboxes Unchecked by Default</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">External Links Review</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">No Auto-Checked Boxes</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Terms Checkbox Pre-Purchase</span></div>
-                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:12px;">Shipping to Prohibited States</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">THC Disclaimer</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Product Subscription Model</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Product/Service Match</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Price Points Match</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Prohibited Products Search</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">No Hidden Fees</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">No Free Trials (Unless Disclosed)</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">GMP Cert for Supplements</span></div>
+                  </div>
+                  <div>
+                    <div class="checks-col-header">&nbsp;</div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Checkboxes Unchecked by Default</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">External Links Review</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">No Auto-Checked Boxes</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Terms Checkbox Pre-Purchase</span></div>
+                    <div class="check-row"><input type="checkbox" class="check-cb"> <span style="font-size:11px;">Shipping to Prohibited States</span></div>
                   </div>
                 </div>
                 <div class="findings-badge">
@@ -335,55 +349,64 @@ code,.mono{font-family:'IBM Plex Mono',monospace}
                     <h4>Checks That Will Run — 3rd Coast Blends LLC</h4>
                   </div>
                   <div class="resolved-body">
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">FDA Disclaimer</span>
-                      <span class="scope-badge scope-processor">Processor</span>
+                    <!-- Group 1: Processor -->
+                    <div class="scope-group">
+                      <div class="scope-group-hdr">
+                        <span class="scope-group-hdr-dot dot-processor"></span>
+                        Processor — FLEX Payment Solutions
+                        <span class="scope-group-hdr-count">(8)</span>
+                      </div>
+                      <div class="scope-chips">
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>FDA Disclaimer</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Terms of Use</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Privacy Policy</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Return/Refund Policy</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Contact &amp; Business Info</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>Age &amp; Access Controls</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>SSL/TLS Security</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-processor"></span>No Hidden Fees</span>
+                      </div>
                     </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">Terms of Use</span>
-                      <span class="scope-badge scope-processor">Processor</span>
+                    <!-- Group 2: Industry Type -->
+                    <div class="scope-group">
+                      <div class="scope-group-hdr">
+                        <span class="scope-group-hdr-dot dot-industry"></span>
+                        Industry Type — Hemp/CBD
+                        <span class="scope-group-hdr-count">(5)</span>
+                      </div>
+                      <div class="scope-chips">
+                        <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>THC Disclaimer</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Product Subscription Model</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Prohibited Products Search</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>GMP Cert for Supplements</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-industry"></span>Shipping to Prohibited States</span>
+                      </div>
                     </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">Privacy Policy</span>
-                      <span class="scope-badge scope-processor">Processor</span>
+                    <!-- Group 3: Type of Company -->
+                    <div class="scope-group">
+                      <div class="scope-group-hdr">
+                        <span class="scope-group-hdr-dot dot-company-type"></span>
+                        Type of Company — Retailer
+                        <span class="scope-group-hdr-count">(4)</span>
+                      </div>
+                      <div class="scope-chips">
+                        <span class="scope-chip"><span class="scope-chip-dot dot-company-type"></span>Accepted Payment Methods</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-company-type"></span>Price Points Match</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-company-type"></span>Product/Service Match</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-company-type"></span>Terms Checkbox Pre-Purchase</span>
+                      </div>
                     </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">Return/Refund Policy</span>
-                      <span class="scope-badge scope-processor">Processor</span>
-                    </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">Contact &amp; Business Info</span>
-                      <span class="scope-badge scope-processor">Processor</span>
-                    </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">Age &amp; Access Controls</span>
-                      <span class="scope-badge scope-processor">Processor</span>
-                    </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">THC Disclaimer</span>
-                      <span class="scope-badge scope-industry">Industry Type — Hemp/CBD</span>
-                    </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">Product Subscription Model</span>
-                      <span class="scope-badge scope-industry">Industry Type — Hemp/CBD</span>
-                    </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">Accepted Payment Methods</span>
-                      <span class="scope-badge scope-company-type">Type of Company — Retailer</span>
-                    </div>
-                    <div class="resolved-check-row">
-                      <div class="resolved-check-icon">✓</div>
-                      <span class="resolved-check-name">No Free Trials (Unless Disclosed)</span>
-                      <span class="scope-badge scope-company">Company Override</span>
+                    <!-- Group 4: Company Override -->
+                    <div class="scope-group">
+                      <div class="scope-group-hdr">
+                        <span class="scope-group-hdr-dot dot-company"></span>
+                        Company Override — 3rd Coast Blends LLC
+                        <span class="scope-group-hdr-count">(2)</span>
+                      </div>
+                      <div class="scope-chips">
+                        <span class="scope-chip"><span class="scope-chip-dot dot-company"></span>No Free Trials (Unless Disclosed)</span>
+                        <span class="scope-chip"><span class="scope-chip-dot dot-company"></span>External Links Review</span>
+                      </div>
                     </div>
                   </div>
                   <div class="resolved-footer">
