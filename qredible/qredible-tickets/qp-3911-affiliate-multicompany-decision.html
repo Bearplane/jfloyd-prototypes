@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QP-3911 — Affiliate Signup + Multi-Company Strategy · Decision Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --panel:#ffffff;
+    --panel-soft:#f8fafc;
+    --text:#0f172a;
+    --muted:#64748b;
+    --line:#dbe3ee;
+    --navy:#173252;
+    --blue:#2563eb;
+    --blue-soft:#eff6ff;
+    --green:#15803d;
+    --green-soft:#f0fdf4;
+    --amber:#b45309;
+    --amber-soft:#fff7ed;
+    --red:#b91c1c;
+    --red-soft:#fef2f2;
+    --violet:#7c3aed;
+    --violet-soft:#f5f3ff;
+    --accent:#F05252;
+    --shadow:0 20px 60px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:linear-gradient(180deg,#f8fbff 0%,#f5f7fb 50%,#eef3fa 100%);color:var(--text);font-size:13px;line-height:1.5}
+  code,.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+
+  .nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;padding:12px 22px;border-bottom:1px solid rgba(219,227,238,.8);backdrop-filter:blur(10px);background:rgba(255,255,255,.86)}
+  .nav a{color:var(--blue);text-decoration:none;font-size:13px}
+  .nav span{font-size:13px;color:#94a3b8}
+  .nav .ticket-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+
+  .page{max-width:1400px;margin:0 auto;padding:28px 24px 80px}
+
+  .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;margin-bottom:24px}
+  .hero-card,.side-card,.section,.option-card,.mini-card,.decision-card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+  .hero-card{padding:28px 30px;position:relative;overflow:hidden}
+  .hero-card:before{content:"";position:absolute;inset:auto -80px -80px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at center, rgba(37,99,235,.16), rgba(37,99,235,0))}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:var(--blue-soft);color:#1d4ed8;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  h1{margin:16px 0 10px;font-size:30px;line-height:1.15;letter-spacing:-.03em;max-width:880px}
+  .lead{max-width:880px;font-size:14.5px;line-height:1.75;color:#475569}
+
+  .hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+  .stat{padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--panel-soft)}
+  .stat-label{font-size:11px;font-weight:800;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .stat-value{font-size:13.5px;font-weight:600;color:#0f172a;line-height:1.5}
+  .stat-value strong{font-weight:800}
+
+  .side-stack{display:flex;flex-direction:column;gap:16px}
+  .side-card{padding:20px}
+  .side-card h3{margin:0 0 10px;font-size:15px}
+  .bullets{display:flex;flex-direction:column;gap:10px}
+  .bullet{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.55;color:#334155}
+  .dot{width:10px;height:10px;border-radius:999px;flex:0 0 auto;margin-top:5px}
+  .dot.blue{background:#3b82f6}.dot.red{background:#ef4444}.dot.amber{background:#f59e0b}.dot.green{background:#22c55e}.dot.violet{background:#8b5cf6}.dot.navy{background:#173252}
+
+  .section{padding:22px 24px 26px;margin-top:22px}
+  .section-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .section-title h2{margin:0;font-size:21px;letter-spacing:-.02em}
+  .section-title p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;white-space:nowrap}
+  .badge.blue{background:var(--blue-soft);color:#1d4ed8}
+  .badge.green{background:var(--green-soft);color:var(--green)}
+  .badge.red{background:var(--red-soft);color:var(--red)}
+  .badge.amber{background:var(--amber-soft);color:var(--amber)}
+  .badge.violet{background:var(--violet-soft);color:var(--violet)}
+  .badge.navy{background:#e2e8f0;color:#173252}
+
+  .state-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .mini-card{padding:18px;border-radius:18px;background:linear-gradient(180deg,#fff,#fbfdff)}
+  .mini-card h3{margin:0 0 10px;font-size:15px}
+  .mini-card ul{margin:0;padding-left:18px;color:#334155;font-size:13px;line-height:1.7}
+  .mini-card ul li{margin-bottom:6px}
+  .mini-card ul li:last-child{margin-bottom:0}
+
+  /* SIGNUP FLOW DIAGRAM */
+  .flow-block{margin-top:18px;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .flow-row{display:grid;grid-template-columns:140px 1fr;gap:0;border-bottom:1px solid var(--line)}
+  .flow-row:last-child{border-bottom:none}
+  .flow-label{padding:16px 18px;background:var(--panel-soft);font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;border-right:1px solid var(--line)}
+  .flow-label .sublabel{font-weight:500;color:var(--muted);font-size:11px;margin-top:2px}
+  .flow-label-block{display:flex;flex-direction:column;gap:2px}
+  .flow-steps-row{display:flex;align-items:center;padding:14px 16px;gap:8px;flex-wrap:wrap}
+  .flow-pill{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:12px;color:#1A202E;font-weight:600;line-height:1.3}
+  .flow-pill.start{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+  .flow-pill.action{background:#fff}
+  .flow-pill.gap{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+  .flow-pill.new{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+  .flow-pill.exists{background:#fffbeb;border-color:#fcd34d;color:#92400e}
+  .flow-arrow{color:#94a3b8;font-size:14px}
+
+  /* TWO-PROBLEM GRID */
+  .problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .problem{padding:20px;border:1px solid var(--line);border-radius:18px;background:#fff;position:relative;overflow:hidden}
+  .problem .problem-num{position:absolute;top:14px;right:18px;font-size:38px;font-weight:800;color:rgba(15,23,42,.06);font-family:'IBM Plex Mono',monospace;line-height:1}
+  .problem h4{margin:0 0 10px;font-size:15.5px;font-weight:700}
+  .problem .lede{margin:0 0 12px;font-size:13px;line-height:1.65;color:#334155}
+  .problem .what-it-touches{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag{display:inline-flex;align-items:center;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;background:#f1f5f9;color:#334155}
+  .tag.blue{background:var(--blue-soft);color:#1d4ed8}
+  .tag.amber{background:var(--amber-soft);color:var(--amber)}
+  .tag.green{background:var(--green-soft);color:var(--green)}
+
+  /* DECISION QUESTIONS */
+  .question-grid{display:grid;grid-template-columns:1fr;gap:16px}
+  .question-card{padding:20px;border:1px solid var(--line);border-radius:18px;background:#fff}
+  .question-card h4{margin:0 0 6px;font-size:15.5px;color:var(--navy)}
+  .question-card .qtag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;background:var(--navy);color:#fff;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:8px;letter-spacing:.02em}
+  .question-card .qlede{margin:0 0 14px;font-size:13px;line-height:1.6;color:#475569}
+  .consequences{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .consequence{padding:12px 14px;border-radius:12px;font-size:12.5px;line-height:1.6;color:#334155;border:1px solid transparent;background:#f8fafc}
+  .consequence strong{display:block;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  .consequence.path-a{background:#eff6ff;border-color:#bfdbfe}.consequence.path-a strong{color:#1d4ed8}
+  .consequence.path-b{background:#f5f3ff;border-color:#ddd6fe}.consequence.path-b strong{color:#6d28d9}
+  .consequence.path-c{background:#fff7ed;border-color:#fed7aa}.consequence.path-c strong{color:#b45309}
+  .consequence.path-rec{background:#f0fdf4;border-color:#bbf7d0}.consequence.path-rec strong{color:#166534}
+  .consequence .check{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;background:#16a34a;color:#fff;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
+
+  /* OPTIONS MATRIX */
+  .options-axis{margin-top:16px}
+  .axis-row{margin-bottom:18px;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .axis-row:last-child{margin-bottom:0}
+  .axis-header{padding:14px 18px;background:linear-gradient(90deg,#fafbff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .axis-header h3{margin:0;font-size:15px;font-weight:700}
+  .axis-header .axis-id{font-family:'IBM Plex Mono',monospace;font-size:11px;background:#1A202E;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700;letter-spacing:.02em}
+  .axis-options{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .axis-option{padding:18px;border-right:1px solid var(--line);position:relative}
+  .axis-option:last-child{border-right:none}
+  .axis-option.rec{background:linear-gradient(180deg,#f6fff8 0%,#ffffff 100%)}
+  .axis-option.rec:before{content:"Default pick";position:absolute;top:14px;right:14px;background:#16a34a;color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+  .opt-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;padding-right:74px;min-height:34px}
+  .opt-sub{font-size:12.5px;color:#475569;line-height:1.6;margin-bottom:12px}
+  .opt-list{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+  .opt-list li{display:flex;gap:8px;font-size:12.5px;line-height:1.55;color:#334155}
+  .opt-list li .mark{font-weight:900;flex-shrink:0;width:14px}
+  .mark.good{color:#16a34a}.mark.bad{color:#dc2626}.mark.warn{color:#d97706}
+
+  /* SUBSCRIPTION-PLAN IMPLICATIONS TABLE */
+  .impl-table{margin-top:6px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+  .impl-row{display:grid;grid-template-columns:200px 1fr 1fr 1fr;border-bottom:1px solid var(--line);font-size:12.5px}
+  .impl-row:last-child{border-bottom:none}
+  .impl-row.head{background:linear-gradient(90deg,#f8fafc,#fff);font-size:11px;text-transform:uppercase;font-weight:800;color:#64748b;letter-spacing:.06em}
+  .impl-cell{padding:14px 16px;border-right:1px solid var(--line);line-height:1.6;color:#334155}
+  .impl-cell:last-child{border-right:none}
+  .impl-row.head .impl-cell{padding:11px 16px}
+  .impl-cell.dim{color:#94a3b8;font-style:italic}
+  .impl-cell strong{color:#173252;font-weight:700}
+  .impl-cell .dep{display:inline-block;margin-top:6px;font-size:11px;background:#f1f5f9;padding:3px 8px;border-radius:4px;color:#475569;font-family:'IBM Plex Mono',monospace}
+  .impl-cell .dep.warn{background:#fff7ed;color:#b45309}
+  .impl-cell .dep.ok{background:#f0fdf4;color:#166534}
+
+  /* CALLOUTS */
+  .callout{padding:16px 18px;border-radius:16px;margin-top:14px;font-size:13px;line-height:1.65;color:#334155}
+  .callout.blue{background:var(--blue-soft);border-left:4px solid #3b82f6}
+  .callout.amber{background:var(--amber-soft);border-left:4px solid #f59e0b}
+  .callout.red{background:var(--red-soft);border-left:4px solid #ef4444}
+  .callout.green{background:var(--green-soft);border-left:4px solid #22c55e}
+  .callout.violet{background:var(--violet-soft);border-left:4px solid #8b5cf6}
+  .callout strong{font-weight:700}
+  .callout .tech-note{margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.06);font-size:11.5px;color:#64748b;font-family:'IBM Plex Mono',monospace;line-height:1.55}
+
+  /* RECOMMENDATION CARD */
+  .decision-card{padding:26px 28px;background:linear-gradient(135deg,#173252 0%,#1e3a5f 100%);color:white;border:none;margin-top:22px}
+  .decision-card h2{margin:0 0 12px;font-size:24px;letter-spacing:-.02em}
+  .decision-card p{margin:0 0 14px;font-size:14px;line-height:1.75;color:#d7e6ff}
+  .decision-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:start}
+  .decision-box{padding:16px 18px;border:1px solid rgba(255,255,255,.16);border-radius:16px;background:rgba(255,255,255,.06)}
+  .decision-box h4{margin:0 0 10px;font-size:13px;color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .decision-box ul{margin:0;padding-left:18px;color:#d7e6ff;font-size:13px;line-height:1.7}
+  .recommended-combo{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 6px}
+  .combo-pick{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px}
+  .combo-pick .combo-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;background:rgba(34,197,94,.2);color:#bbf7d0;padding:3px 8px;border-radius:4px;font-weight:700;letter-spacing:.04em;display:inline-block;margin-bottom:8px}
+  .combo-pick .combo-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;line-height:1.35}
+  .combo-pick .combo-why{font-size:12px;color:#bbcde6;line-height:1.55}
+
+  /* CRITERIA */
+  .criteria-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
+  .criterion{padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  .criterion .crit-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--navy);color:#fff;font-size:11px;font-weight:800;margin-right:8px;vertical-align:middle}
+  .criterion h4{margin:0 0 6px;font-size:13.5px;font-weight:700;color:var(--navy);display:inline-flex;align-items:center}
+  .criterion p{margin:0;font-size:12.5px;color:#475569;line-height:1.6}
+
+  /* SUMMARY CARDS */
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .summary-card{padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:#fff;border-left-width:4px}
+  .summary-card.blue{border-left-color:#3b82f6}
+  .summary-card.amber{border-left-color:#f59e0b}
+  .summary-card.green{border-left-color:#22c55e}
+  .summary-card.violet{border-left-color:#8b5cf6}
+  .summary-card h4{margin:0 0 6px;font-size:14px;color:var(--navy)}
+  .summary-card p{margin:0;font-size:12.5px;color:#475569;line-height:1.65}
+
+  .footer-note{margin-top:24px;font-size:11.5px;color:#64748b;text-align:center;line-height:1.7}
+
+  @media (max-width: 1100px){
+    .hero,.state-grid,.problem-grid,.decision-grid,.recommended-combo,.criteria-grid,.summary-grid,.axis-options,.consequences{grid-template-columns:1fr}
+    .impl-row{grid-template-columns:1fr}
+    .impl-cell{border-right:none;border-bottom:1px solid var(--line)}
+    .impl-cell:last-child{border-bottom:none}
+    .axis-option{border-right:none;border-bottom:1px solid var(--line)}
+    .axis-option:last-child{border-bottom:none}
+    .flow-row{grid-template-columns:1fr}
+    .flow-label{border-right:none;border-bottom:1px solid var(--line)}
+  }
+  @media (max-width: 640px){
+    h1{font-size:24px}
+    .page{padding:18px 14px 60px}
+  }
+</style>
+</head>
+<body>
+  <div class="nav">
+    <a href="../index.html">Qredible Prototypes</a>
+    <span>&rsaquo;</span>
+    <span>QP-3911 &mdash; Affiliate Signup + Multi-Company &mdash; Decision Board</span>
+    <span class="ticket-badge">QP-3911</span>
+  </div>
+
+  <div class="page">
+
+    <!-- ================== HERO ================== -->
+    <div class="hero">
+      <div class="hero-card">
+        <span class="eyebrow">Decision required &middot; please review before our next sync</span>
+        <h1>Affiliate Signup Link + Multi-Company-per-User &mdash; the strategic call we need to make together</h1>
+        <p class="lead">
+          <strong>Why you&rsquo;re reading this:</strong> Two linked future capabilities are decision-blocked. One is acquisition &mdash; a public <span class="mono">/join/{affiliate}</span> signup link so partners can refer merchants without an invite, including a &ldquo;claim your profile&rdquo; path when the merchant already exists. The other is commercial &mdash; one user managing <strong>multiple companies</strong>, with subscription tiers gated on how many. Today&rsquo;s platform supports multi-company, but every user has a single subscription with <strong>no limiting factors</strong>, so we cannot yet tier on company count. This page lays out today&rsquo;s state, the three commercial calls, and a recommended default so the team can decide together.
+        </p>
+
+        <div class="hero-grid">
+          <div class="stat">
+            <div class="stat-label">Public signup today</div>
+            <div class="stat-value"><strong>Doesn&rsquo;t exist.</strong> Invites only &mdash; every merchant arrives via We Monitor Invites or admin add.</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Multi-company today</div>
+            <div class="stat-value"><strong>Supported, untiered.</strong> One subscription per user, regardless of how many companies they manage.</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Commercial calls open</div>
+            <div class="stat-value"><strong>Three.</strong> Affiliate free-vs-paid, subscription tiering factor, claim-profile match rule.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <div class="side-card">
+          <h3>The three decisions on the table</h3>
+          <div class="bullets">
+            <div class="bullet"><span class="dot blue"></span><span><strong>D1 &mdash; Affiliate access:</strong> is the <span class="mono">/join/{affiliate}</span> link free, paid, or partner-configurable?</span></div>
+            <div class="bullet"><span class="dot violet"></span><span><strong>D2 &mdash; Tiering factor:</strong> what does the subscription gate on &mdash; companies per account, products per company, or both?</span></div>
+            <div class="bullet"><span class="dot amber"></span><span><strong>D3 &mdash; Claim-profile rule:</strong> how do we reconcile when a signup matches an existing company on DBA / legal name / address / email?</span></div>
+          </div>
+        </div>
+        <div class="side-card">
+          <h3>Related work this must align with</h3>
+          <div class="bullets">
+            <div class="bullet"><span class="dot green"></span><span><strong>QP-3898 &mdash; Partner code:</strong> already gives us revenue attribution per partner. Affiliate link plugs straight into this.</span></div>
+            <div class="bullet"><span class="dot green"></span><span><strong>QP-3876 &mdash; Q-Config plan limiting factors:</strong> exposes product-count gates on plans. We need the same primitive for company-count.</span></div>
+            <div class="bullet"><span class="dot green"></span><span><strong>QP-3906 &mdash; DBA &harr; location/type:</strong> the identifier set claim-profile must match against.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== SECTION 1: TODAY ================== -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>1. How signup &amp; subscriptions work today</h2>
+          <p>An honest baseline of what works, what doesn&rsquo;t, and the single technical constraint that&rsquo;s blocking tiering.</p>
+        </div>
+        <span class="badge red">Current reality</span>
+      </div>
+
+      <div class="state-grid">
+        <div class="mini-card">
+          <h3>What works today</h3>
+          <ul>
+            <li><strong>Multi-company per user:</strong> A single user can already be linked to N companies and switch between them.</li>
+            <li><strong>Invite-based onboarding:</strong> Processors send invites from We Monitor Invites; new users land in the platform under a chosen company.</li>
+            <li><strong>Partner-code attribution (QP-3898):</strong> Each partner has a code; revenue routes through it. Ready to receive affiliate-link traffic.</li>
+            <li><strong>Subscription billing:</strong> Plans, paywall, and the plan catalog are in place &mdash; usable for paid signups.</li>
+            <li><strong>Duplicate signals exist:</strong> DBA names, legal name, locations/addresses, and email domain are all captured &mdash; the data needed for a match is there.</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h3>What&rsquo;s blocking us</h3>
+          <ul>
+            <li><strong>No public signup URL:</strong> The platform has no <span class="mono">/join/{affiliate}</span> route. Every signup today is invite-mediated.</li>
+            <li><strong>One subscription per user, regardless of companies:</strong> A user with 3 companies pays the same as a user with 1. There is no per-company-count metering and no tier limit to compare against.</li>
+            <li><strong>No company-count limiting factor on plans:</strong> Plans have feature toggles but no numeric cap on companies. The same gap QP-3876 closes for product count.</li>
+            <li><strong>No claim-profile flow:</strong> If a new signup matches an existing company on DBA / address / email, there is no reconciliation UI. The user either creates a duplicate or gets an error.</li>
+            <li><strong>No affiliate routing rules:</strong> Even if a partner had a link, the platform has nothing to read the affiliate slug, attribute the visit, or scope the plan picker.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout blue">
+        <strong>How signup works under the hood today:</strong> A processor (or admin) creates an invite tied to a company in We Monitor Invites; the merchant clicks the link, lands on the platform, and is added as a user of <em>that</em> company. Subscription is created at the user level, not the company level, and carries no &ldquo;max companies&rdquo; ceiling. Switching companies is just a context toggle &mdash; nothing is metered.
+        <div class="tech-note">Subscription = pl_subscription &harr; user. Company memberships = pl_company_user (many-to-many, no count constraint). No /join route exists; no affiliate slug is read; no claim-match table exists.</div>
+      </div>
+
+      <div class="callout red">
+        <strong>Why we can&rsquo;t tier today:</strong> A tier (&ldquo;up to 3 companies&rdquo;, &ldquo;up to 25 products&rdquo;) requires <strong>(a)</strong> a numeric cap field on the plan, <strong>(b)</strong> server-side enforcement on every path that creates the metered thing, and <strong>(c)</strong> visible usage so the user knows when they&rsquo;re hitting the limit. <strong>None of these exist for company count.</strong> QP-3876 is building this primitive for product count; the same machinery would extend to company count, but it has to be designed in.
+      </div>
+    </div>
+
+    <!-- ================== SECTION 2: WHAT WE'RE SOLVING ================== -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>2. What we&rsquo;re solving</h2>
+          <p>Two linked future needs. Either one alone is incomplete; both depend on the same plan-tier primitive.</p>
+        </div>
+        <span class="badge violet">Problem space</span>
+      </div>
+
+      <div class="problem-grid">
+        <div class="problem">
+          <div class="problem-num">01</div>
+          <h4>A public affiliate signup link &mdash; with claim-profile reconciliation</h4>
+          <p class="lede">Partners (FlexPay, Westtown, ISOs, POS partners) want a URL they can hand a merchant &mdash; <span class="mono">/join/flexpay</span>, <span class="mono">/join/westtown</span> &mdash; that bypasses the invite step. The merchant fills in their business, gets matched against companies already in our system, and either <em>claims</em> the existing profile or creates a new one. Revenue attributes to the partner via the existing QP-3898 partner code.</p>
+          <div class="what-it-touches">
+            <span class="tag blue">/join/{affiliate} route</span>
+            <span class="tag blue">QP-3898 partner code</span>
+            <span class="tag amber">Claim-profile match UI</span>
+            <span class="tag amber">Duplicate-detection rules</span>
+          </div>
+        </div>
+        <div class="problem">
+          <div class="problem-num">02</div>
+          <h4>One user managing multiple companies &mdash; with subscription tiers</h4>
+          <p class="lede">Power users (agencies, holding companies, family-owned merchant groups) want one login that manages 2-N companies. The current data model already supports this &mdash; the gap is commercial: today the user pays the same regardless. Plans must gate on <em>how many</em> companies a user can manage so the revenue scales with usage.</p>
+          <div class="what-it-touches">
+            <span class="tag blue">pl_company_user already supports N</span>
+            <span class="tag amber">Plan: max-companies field</span>
+            <span class="tag amber">Server enforcement on add-company</span>
+            <span class="tag amber">Usage display in account UI</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIGNUP FLOW: TODAY VS PROPOSED -->
+      <div class="flow-block">
+        <div class="flow-row">
+          <div class="flow-label">
+            <div class="flow-label-block">
+              <span>Today</span>
+              <span class="sublabel">Invite-mediated</span>
+            </div>
+          </div>
+          <div class="flow-steps-row">
+            <span class="flow-pill exists">Processor opens We&nbsp;Monitor Invites</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill exists">Creates invite tied to company</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill exists">Merchant clicks email link</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill exists">Lands as user of that company</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill exists">Subscription = single, untiered</span>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-label">
+            <div class="flow-label-block">
+              <span>Proposed</span>
+              <span class="sublabel">Affiliate + claim</span>
+            </div>
+          </div>
+          <div class="flow-steps-row">
+            <span class="flow-pill new">Partner shares <span class="mono">/join/&#123;affiliate&#125;</span></span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill new">Merchant fills business info</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill gap">Match against existing companies</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill gap">Claim existing OR create new</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill new">Plan picker (tier-aware)</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill new">Partner code attributes revenue</span>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-label">
+            <div class="flow-label-block">
+              <span>Power user</span>
+              <span class="sublabel">Add another company</span>
+            </div>
+          </div>
+          <div class="flow-steps-row">
+            <span class="flow-pill start">Signed-in user</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill action">&ldquo;Add another company&rdquo; in account menu</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill gap">Check plan&rsquo;s max-companies limit</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill gap">If at limit &rarr; upgrade prompt</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-pill new">New company onboarded under same login</span>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:11.5px;color:#64748b;margin-top:10px;text-align:right">
+        <span class="flow-pill exists" style="font-size:10.5px;padding:2px 7px">Exists</span>&nbsp;
+        <span class="flow-pill new" style="font-size:10.5px;padding:2px 7px">New build</span>&nbsp;
+        <span class="flow-pill gap" style="font-size:10.5px;padding:2px 7px">Decision-blocked</span>
+      </p>
+    </div>
+
+    <!-- ================== SECTION 3: THE 3 DECISIONS ================== -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>3. The three commercial decisions we need to make</h2>
+          <p>Each one is a yes/no that shapes the build. Picking the wrong default is reversible but expensive after launch.</p>
+        </div>
+        <span class="badge amber">Decisions needed</span>
+      </div>
+
+      <div class="question-grid">
+
+        <!-- D1 -->
+        <div class="question-card">
+          <span class="qtag">D1</span>
+          <h4>Affiliate access &mdash; free, paid, or partner-configurable?</h4>
+          <p class="qlede">When a merchant lands via <span class="mono">/join/{affiliate}</span>, does the platform let them in for free (and monetize on growth), force a paid plan up front, or let the partner choose per deal?</p>
+          <div class="consequences">
+            <div class="consequence path-a">
+              <strong>A · Free entry</strong>
+              Lowest funnel friction. Merchant lands, sets up a company, hits limits, upgrades. Partner attributes revenue at the upgrade event. Cheaper for partners to send traffic &mdash; but free infra cost on us, and revenue attribution lags.
+            </div>
+            <div class="consequence path-b">
+              <strong>B · Paid up front</strong>
+              Plan picker at signup, partner code applies, revenue is immediate &amp; cleanly attributed. Cleaner books, but partners may resist sending traffic to a paywall and conversion drops.
+            </div>
+            <div class="consequence path-c">
+              <strong>C · Partner-configurable</strong>
+              Each affiliate slug has its own setting: FlexPay paid, generic referral free, internal team free. Most flexibility, but moves the choice (and the support cost) onto every partner deal.
+            </div>
+          </div>
+        </div>
+
+        <!-- D2 -->
+        <div class="question-card">
+          <span class="qtag">D2</span>
+          <h4>Subscription tiering &mdash; what does the plan gate on?</h4>
+          <p class="qlede">If we want plans to scale with usage, what&rsquo;s the metered unit? Companies-per-account, products-per-company, or both? This determines the data model we add to <span class="mono">pl_plan</span> and which paths need enforcement.</p>
+          <div class="consequences">
+            <div class="consequence path-a">
+              <strong>A · Companies per account</strong>
+              Free = 1 company, Growth = up to 5, Enterprise = unlimited. Matches the multi-company use case head-on; clean upgrade trigger. Doesn&rsquo;t cap a user with 1 huge company.
+            </div>
+            <div class="consequence path-b">
+              <strong>B · Products per company</strong>
+              Already being designed for QP-3876. Caps catalog size per company but lets a user own unlimited shell companies. Easier to ship today &mdash; doesn&rsquo;t require new primitives.
+            </div>
+            <div class="consequence path-c">
+              <strong>C · Both (compound)</strong>
+              Plans carry <em>both</em> caps. Most accurate metering, scales with both axes of value. Highest build effort and more nuanced upgrade prompts to design.
+            </div>
+          </div>
+        </div>
+
+        <!-- D3 -->
+        <div class="question-card">
+          <span class="qtag">D3</span>
+          <h4>Claim-profile reconciliation &mdash; how strict is the match?</h4>
+          <p class="qlede">When the affiliate signup form submits a merchant that <em>might</em> already be in our system (entered under a different DBA, address, or email by a processor), what do we do? Auto-match? Show candidates? Require exact match? Wrong call here either creates duplicates or leaks processor-collected data.</p>
+          <div class="consequences">
+            <div class="consequence path-a">
+              <strong>A · Strict exact match</strong>
+              Match only on legal name + address (or EIN if collected). Lowest false-positive; highest false-negative &rarr; the user creates a duplicate. Long-term, we end up with many duplicate companies to merge.
+            </div>
+            <div class="consequence path-b">
+              <strong>B · Fuzzy candidates &rarr; user confirms</strong>
+              Run a multi-signal match (DBA, address, email domain, phone). Show 0-5 likely candidates. User picks &ldquo;this is me, claim it&rdquo; or &ldquo;none, create new.&rdquo; Balanced; requires a candidate-display UI and an ops review queue for sensitive claims.
+            </div>
+            <div class="consequence path-c">
+              <strong>C · Auto-claim on multi-signal</strong>
+              If 3+ signals match (email + DBA + zip), auto-attach the new user to the existing company. Lowest friction; highest risk &mdash; a wrong claim hands a stranger access to a processor&rsquo;s collected scans &amp; COAs.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout amber">
+        <strong>The three decisions are coupled.</strong> A free affiliate (D1·A) only makes sense if there&rsquo;s a tier the merchant can actually hit (D2 &mdash; ideally B or C). A claim-profile that hands over processor data (D3·C) is a much bigger risk if affiliate access is free and unauthenticated. Pick them as a set, not in isolation.
+      </div>
+    </div>
+
+    <!-- ================== SECTION 4: OPTIONS MATRIX ================== -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>4. The options, side-by-side</h2>
+          <p>For each axis, what each option ships, what it costs to build, and the trade-offs.</p>
+        </div>
+        <span class="badge blue">Options matrix</span>
+      </div>
+
+      <div class="options-axis">
+
+        <!-- AXIS 1: AFFILIATE -->
+        <div class="axis-row">
+          <div class="axis-header">
+            <span class="axis-id">D1</span>
+            <h3>Affiliate access model</h3>
+          </div>
+          <div class="axis-options">
+            <div class="axis-option">
+              <div class="opt-name">A · Free entry, monetize on growth</div>
+              <p class="opt-sub">Land &rarr; set up &rarr; hit a limit &rarr; upgrade. Partner attribution fires at the upgrade event.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Lowest top-of-funnel friction</span></li>
+                <li><span class="mark good">+</span><span>Lets the product sell itself</span></li>
+                <li><span class="mark good">+</span><span>Partners love sending free-trial traffic</span></li>
+                <li><span class="mark warn">~</span><span>Requires tiers that bite (D2)</span></li>
+                <li><span class="mark bad">&minus;</span><span>Revenue lag; free-tier infra cost</span></li>
+              </ul>
+            </div>
+            <div class="axis-option rec">
+              <div class="opt-name">B · Paid up front, plan picker at signup</div>
+              <p class="opt-sub">Plan picker on the affiliate landing page; partner code routes attribution; merchant pays before landing in-product.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Immediate, cleanly-attributed revenue</span></li>
+                <li><span class="mark good">+</span><span>Self-selects committed merchants</span></li>
+                <li><span class="mark good">+</span><span>Simplest commercial story</span></li>
+                <li><span class="mark warn">~</span><span>Higher friction &mdash; conversion drops</span></li>
+                <li><span class="mark warn">~</span><span>Partners may resist paywalled links</span></li>
+              </ul>
+            </div>
+            <div class="axis-option">
+              <div class="opt-name">C · Partner-configurable per slug</div>
+              <p class="opt-sub">Each affiliate has a free/paid setting (and could even pin a starting plan). FlexPay paid, ISO trials free.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Maximum flexibility per deal</span></li>
+                <li><span class="mark good">+</span><span>A/B-able by partner</span></li>
+                <li><span class="mark bad">&minus;</span><span>Most build effort (config UI + routing)</span></li>
+                <li><span class="mark bad">&minus;</span><span>Operational complexity per partner</span></li>
+                <li><span class="mark warn">~</span><span>Easy to add <em>later</em> on top of A or B</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- AXIS 2: MULTI-COMPANY -->
+        <div class="axis-row">
+          <div class="axis-header">
+            <span class="axis-id">D2</span>
+            <h3>Multi-company subscription structure</h3>
+          </div>
+          <div class="axis-options">
+            <div class="axis-option">
+              <div class="opt-name">A · Cap companies per account</div>
+              <p class="opt-sub">Plan has a <code>max_companies</code> field. Free = 1, Growth = 5, Enterprise = unlimited. Enforced on add-company.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Matches the multi-company use case</span></li>
+                <li><span class="mark good">+</span><span>Clear upgrade trigger</span></li>
+                <li><span class="mark good">+</span><span>Single new primitive to design</span></li>
+                <li><span class="mark warn">~</span><span>Doesn&rsquo;t scale revenue with catalog size</span></li>
+                <li><span class="mark warn">~</span><span>1-company power users pay flat</span></li>
+              </ul>
+            </div>
+            <div class="axis-option">
+              <div class="opt-name">B · Cap products per company (only)</div>
+              <p class="opt-sub">Use QP-3876&rsquo;s product-count limit as the sole metering. Unlimited companies; each company carries its own product cap.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Ships fastest &mdash; primitive already in flight</span></li>
+                <li><span class="mark good">+</span><span>Caps the high-cost axis (scans, COAs)</span></li>
+                <li><span class="mark bad">&minus;</span><span>Power users own N shell companies for free</span></li>
+                <li><span class="mark bad">&minus;</span><span>Misses the multi-company use case entirely</span></li>
+              </ul>
+            </div>
+            <div class="axis-option rec">
+              <div class="opt-name">C · Compound &mdash; both caps</div>
+              <p class="opt-sub">Plans carry both <code>max_companies</code> and <code>max_products_per_company</code>. Tier = both axes scale together.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Meters both axes of customer value</span></li>
+                <li><span class="mark good">+</span><span>Reuses QP-3876&rsquo;s limiting-factor primitive</span></li>
+                <li><span class="mark good">+</span><span>Most defensible pricing story</span></li>
+                <li><span class="mark warn">~</span><span>Two enforcement points to maintain</span></li>
+                <li><span class="mark warn">~</span><span>Upgrade UX needs both axes shown</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- AXIS 3: CLAIM-PROFILE -->
+        <div class="axis-row">
+          <div class="axis-header">
+            <span class="axis-id">D3</span>
+            <h3>Claim-profile reconciliation</h3>
+          </div>
+          <div class="axis-options">
+            <div class="axis-option">
+              <div class="opt-name">A · Strict exact match</div>
+              <p class="opt-sub">Match only on legal name + address (or EIN). Anything else &rarr; create new company.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Lowest false-positive risk</span></li>
+                <li><span class="mark good">+</span><span>Minimal build &mdash; pure equality check</span></li>
+                <li><span class="mark bad">&minus;</span><span>High duplicate rate (we&rsquo;ll merge later)</span></li>
+                <li><span class="mark bad">&minus;</span><span>Misses obvious matches via DBA/email</span></li>
+              </ul>
+            </div>
+            <div class="axis-option rec">
+              <div class="opt-name">B · Fuzzy candidates &rarr; user confirms</div>
+              <p class="opt-sub">Multi-signal scoring (DBA, address, email domain, phone). Show 0-5 candidates. User picks one or &ldquo;none.&rdquo; Sensitive claims (cross-processor data) gated by ops review.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Balanced friction vs. accuracy</span></li>
+                <li><span class="mark good">+</span><span>User stays in control of claim decision</span></li>
+                <li><span class="mark good">+</span><span>Ops review queue gates risky claims</span></li>
+                <li><span class="mark warn">~</span><span>Needs candidate-list UI + scoring config</span></li>
+                <li><span class="mark warn">~</span><span>Match rules tunable, not hard-coded</span></li>
+              </ul>
+            </div>
+            <div class="axis-option">
+              <div class="opt-name">C · Auto-claim on multi-signal</div>
+              <p class="opt-sub">If &ge;3 signals agree (email + DBA + zip), attach the new user to the existing company silently.</p>
+              <ul class="opt-list">
+                <li><span class="mark good">+</span><span>Lowest user friction by far</span></li>
+                <li><span class="mark bad">&minus;</span><span>Data-leak risk &mdash; a wrong claim hands a stranger processor scans &amp; COAs</span></li>
+                <li><span class="mark bad">&minus;</span><span>Hard to undo cleanly</span></li>
+                <li><span class="mark bad">&minus;</span><span>Conflicts with policy-first auditability</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== SECTION 5: SUBSCRIPTION-PLAN IMPLICATIONS ================== -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>5. Subscription-plan implications &mdash; what each call costs to build</h2>
+          <p>For every metered concept, where the cap lives, where it has to be enforced, and the dependency chain.</p>
+        </div>
+        <span class="badge navy">Plan model</span>
+      </div>
+
+      <div class="impl-table">
+        <div class="impl-row head">
+          <div class="impl-cell">Metered concept</div>
+          <div class="impl-cell">Where the cap lives</div>
+          <div class="impl-cell">Where it must be enforced</div>
+          <div class="impl-cell">Dependencies / status</div>
+        </div>
+
+        <div class="impl-row">
+          <div class="impl-cell"><strong>Companies per account</strong><br><span style="font-size:11.5px;color:#64748b">D2·A or D2·C</span></div>
+          <div class="impl-cell">New field on <code>pl_plan</code> &mdash; <code>max_companies</code>. Resolved via the same limiting-factor primitive QP-3876 is shipping.</div>
+          <div class="impl-cell">&bull; &ldquo;Add company&rdquo; flow in account menu<br>&bull; Affiliate signup when claiming a 2nd profile<br>&bull; Admin bulk-link of company to user</div>
+          <div class="impl-cell"><span class="dep warn">Needs QP-3876 primitive extended</span><br><span class="dep">Net-new field</span></div>
+        </div>
+
+        <div class="impl-row">
+          <div class="impl-cell"><strong>Products per company</strong><br><span style="font-size:11.5px;color:#64748b">D2·B or D2·C</span></div>
+          <div class="impl-cell">Field already being added to <code>pl_plan</code> via QP-3876&rsquo;s Q-Config limiting-factor work.</div>
+          <div class="impl-cell">&bull; Direct product upload<br>&bull; Product scans<br>&bull; COA extraction-driven creates<br>&bull; Bulk import</div>
+          <div class="impl-cell"><span class="dep ok">In flight: QP-3876</span><br><span class="dep">Reuse for affiliate path</span></div>
+        </div>
+
+        <div class="impl-row">
+          <div class="impl-cell"><strong>Public signup route</strong><br><span style="font-size:11.5px;color:#64748b">All D1 options</span></div>
+          <div class="impl-cell"><code>/join/{affiliate}</code> route + affiliate-slug table mapped to QP-3898 partner codes.</div>
+          <div class="impl-cell">&bull; Route resolves slug<br>&bull; Reads affiliate config (free/paid, default plan, claim rules)<br>&bull; Persists partner code on the resulting subscription</div>
+          <div class="impl-cell"><span class="dep ok">QP-3898 partner code ready</span><br><span class="dep warn">Net-new public route</span></div>
+        </div>
+
+        <div class="impl-row">
+          <div class="impl-cell"><strong>Affiliate config</strong><br><span style="font-size:11.5px;color:#64748b">D1·C only</span></div>
+          <div class="impl-cell">Per-affiliate row carrying: free/paid, default plan, claim-rule strictness, branding.</div>
+          <div class="impl-cell">&bull; Admin UI to create/edit affiliates<br>&bull; Signup route reads it at request time</div>
+          <div class="impl-cell"><span class="dep warn">Add-on if D1·C picked</span><br><span class="dep">Easy to bolt on later</span></div>
+        </div>
+
+        <div class="impl-row">
+          <div class="impl-cell"><strong>Claim-profile match</strong><br><span style="font-size:11.5px;color:#64748b">D3·B or D3·C</span></div>
+          <div class="impl-cell">Match-scoring service: signals = legal name, DBA names (QP-3906), addresses, email domain, phone, EIN. Versioned scoring config.</div>
+          <div class="impl-cell">&bull; Signup form submit<br>&bull; Admin-initiated &ldquo;link existing&rdquo; flow<br>&bull; Bulk merge tool (cleanup)</div>
+          <div class="impl-cell"><span class="dep warn">Depends on QP-3906 DBA &harr; location</span><br><span class="dep">Net-new scoring layer</span></div>
+        </div>
+
+        <div class="impl-row">
+          <div class="impl-cell"><strong>Claim ops review</strong><br><span style="font-size:11.5px;color:#64748b">D3·B (high-risk path)</span></div>
+          <div class="impl-cell">Review queue + audit log. Claims that touch processor-collected data require human approval.</div>
+          <div class="impl-cell">&bull; Claim &ldquo;requested&rdquo; state<br>&bull; Ops approves or rejects<br>&bull; Audit trail on the resulting attachment</div>
+          <div class="impl-cell"><span class="dep">Net-new queue UI</span><br><span class="dep">Reuse Q-Audit To-Do pattern</span></div>
+        </div>
+
+        <div class="impl-row">
+          <div class="impl-cell"><strong>Usage display</strong><br><span style="font-size:11.5px;color:#64748b">Required for any tiering</span></div>
+          <div class="impl-cell">Account-menu badge: &ldquo;3 of 5 companies, 412 of 500 products.&rdquo; Plan-detail page shows full breakdown.</div>
+          <div class="impl-cell">&bull; Account dropdown<br>&bull; Plan settings page<br>&bull; Upgrade-prompt modal</div>
+          <div class="impl-cell"><span class="dep">Shared with QP-3876 UI work</span></div>
+        </div>
+      </div>
+
+      <div class="callout violet">
+        <strong>The single biggest dependency:</strong> the plan-limiting-factor primitive itself. QP-3876 is building it for product count. If we extend that <em>same</em> primitive to cover company count (adding <code>max_companies</code> alongside <code>max_products</code>), then D2 is mostly &ldquo;define the tiers and wire the enforcement points&rdquo; rather than &ldquo;invent new architecture.&rdquo; If we ship product-count limits without considering this extension, we&rsquo;ll rebuild it later.
+      </div>
+    </div>
+
+    <!-- ================== SECTION 6: RECOMMENDATION FRAMEWORK ================== -->
+    <div class="decision-card">
+      <div class="decision-grid">
+        <div>
+          <h2>Recommended default &mdash; for discussion, not decided</h2>
+          <p>If we had to pick today, the combo below balances revenue clarity, top-of-funnel friction, build cost, and reversibility. Each pick is independently revisable, and we can ship the affiliate route on top of <em>any</em> D2/D3 combination &mdash; so D1 doesn&rsquo;t have to wait on the others.</p>
+
+          <div class="recommended-combo">
+            <div class="combo-pick">
+              <span class="combo-label">D1 &middot; Default</span>
+              <div class="combo-name">B &mdash; Paid up front</div>
+              <p class="combo-why">Plan picker at signup. Cleanest revenue attribution via partner code. Add D1·C (partner-configurable free/paid) later if a deal demands it.</p>
+            </div>
+            <div class="combo-pick">
+              <span class="combo-label">D2 &middot; Default</span>
+              <div class="combo-name">C &mdash; Compound caps</div>
+              <p class="combo-why">Plans gate on both companies-per-account and products-per-company. Reuses QP-3876&rsquo;s primitive; meters both axes of customer value.</p>
+            </div>
+            <div class="combo-pick">
+              <span class="combo-label">D3 &middot; Default</span>
+              <div class="combo-name">B &mdash; Fuzzy + confirm</div>
+              <p class="combo-why">Multi-signal candidates, user confirms, ops review for cross-processor claims. Avoids both the data-leak risk of auto-claim and the duplicate spam of strict-match.</p>
+            </div>
+          </div>
+
+          <p style="margin-top:6px">
+            <strong>Net effect:</strong> a partner sends <span class="mono" style="color:#fff">/join/flexpay</span>, the merchant picks a plan, the signup form runs a match and shows candidates (or creates new), and the resulting subscription carries the FlexPay partner code. A power user can upgrade to add a 2nd company; the same plan caps their per-company catalog. Nothing in this combo conflicts with QP-3876 or QP-3898.
+          </p>
+        </div>
+        <div class="decision-box">
+          <h4>Why this combo</h4>
+          <ul>
+            <li><strong>Revenue clarity:</strong> paid-up-front + partner code = an attributed transaction every time.</li>
+            <li><strong>Build economy:</strong> reuses QP-3876&rsquo;s primitive instead of inventing a parallel one.</li>
+            <li><strong>Lowest data-risk:</strong> human-confirmed claim with ops review for the dangerous cases.</li>
+            <li><strong>Reversible:</strong> we can flip D1 to free per-partner later without touching D2 or D3.</li>
+            <li><strong>Policy-first compatible:</strong> claim decisions become versioned scoring config + audit trail, not hard-coded rules.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== SECTION 7: CRITERIA TO EVALUATE ================== -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>6. How to evaluate any alternative the team proposes</h2>
+          <p>If the default doesn&rsquo;t fit, score the alternative against these five lenses. The combo that wins on the most lenses wins.</p>
+        </div>
+        <span class="badge violet">Evaluation framework</span>
+      </div>
+
+      <div class="criteria-grid">
+        <div class="criterion">
+          <h4><span class="crit-num">1</span>Revenue clarity</h4>
+          <p>Can a finance person look at a transaction and say which partner earned it, and which plan triggered it? Paid-up-front and explicit caps both score high here; free-trial with delayed upgrade scores lower.</p>
+        </div>
+        <div class="criterion">
+          <h4><span class="crit-num">2</span>Top-of-funnel friction</h4>
+          <p>Would a partner happily send their merchants through this link? Every form field and paywall step costs conversion. Use the partner&rsquo;s point of view as the tiebreaker.</p>
+        </div>
+        <div class="criterion">
+          <h4><span class="crit-num">3</span>Build economy</h4>
+          <p>Does this reuse a primitive already on the roadmap (QP-3876, QP-3898, QP-3906), or does it invent a parallel system? Parallel systems double the maintenance bill.</p>
+        </div>
+        <div class="criterion">
+          <h4><span class="crit-num">4</span>Data-risk &amp; compliance fit</h4>
+          <p>Does this expose processor-collected data to the wrong user? Does it preserve the policy-first audit story (versioned config, not hard-coded rules)? Auto-claim fails here; human-confirm passes.</p>
+        </div>
+        <div class="criterion">
+          <h4><span class="crit-num">5</span>Reversibility</h4>
+          <p>If we&rsquo;re wrong about any of D1/D2/D3, how expensive is it to change later? Prefer additive moves (start strict, loosen later) over destructive ones (start permissive, tighten later).</p>
+        </div>
+        <div class="criterion">
+          <h4><span class="crit-num">6</span>Compatibility with existing tickets</h4>
+          <p>Does the pick stay aligned with QP-3898 (partner code attribution), QP-3876 (plan limiting factors), and QP-3906 (DBA &harr; location)? If we drift, those tickets have to absorb the cost.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================== SECTION 8: SUMMARY FOR DISCUSSION ================== -->
+    <div class="section">
+      <div class="section-title">
+        <div>
+          <h2>7. Summary &mdash; what to come ready to discuss</h2>
+          <p>Use these four points to frame your perspective when we sync.</p>
+        </div>
+        <span class="badge green">Discussion guide</span>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card blue">
+          <h4>What ships immediately after the decision</h4>
+          <p>The <span class="mono">/join/{affiliate}</span> route + plan picker (D1), tier definitions on <code>pl_plan</code> (D2), and the claim-profile candidate UI (D3). Partner code attribution is already in place via QP-3898.</p>
+        </div>
+        <div class="summary-card amber">
+          <h4>What this <em>doesn&rsquo;t</em> need (yet)</h4>
+          <p>Cross-company permissions, multi-tenant billing splits, or merchant-vs-processor data sharing. Those are separate decisions tied to the MyCOA shared-workflow ticket &mdash; explicitly out of scope here.</p>
+        </div>
+        <div class="summary-card green">
+          <h4>Why the default exists</h4>
+          <p>The combo above is the lowest-risk, highest-revenue-clarity path that reuses architecture already on the roadmap. If the team prefers free entry or stricter matching, the framework in &sect;6 says how to swap.</p>
+        </div>
+        <div class="summary-card violet">
+          <h4>What we need from this meeting</h4>
+          <p>An answer on each of D1, D2, D3 &mdash; together, not in isolation. Once we land those, this ticket becomes buildable and we can size it against the next sprint.</p>
+        </div>
+      </div>
+
+      <div class="callout green" style="margin-top:14px">
+        <strong>Next step:</strong> review the three decisions in &sect;3, scan the options in &sect;4, and come ready with a perspective. The recommended default in the dark-blue card is the starting point &mdash; redirect freely.
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Prepared for the QP-3911 strategy discussion &middot; <em>Affiliate Signup Link + Multi-Company-per-User</em><br>
+      Source: T15 in the 2026-05-20 Compliance Portal ticket breakdown &middot; related work: QP-3898 (partner code), QP-3876 (plan limiting factors), QP-3906 (DBA &harr; location/type)
+    </div>
+  </div>
+</body>
+</html>
