@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compliance Cases — View Optimization Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET ─── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Uber Move','Plus Jakarta Sans',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+code{font-family:'IBM Plex Mono',monospace;font-size:11px}
+
+/* ─── TOP NAV ─── */
+.topnav{background:#1A202E;padding:11px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:400}
+.topnav a{color:#CBD5E1;text-decoration:none}.topnav a:hover{color:#fff}
+.topnav .sep{color:#475569}
+.topnav .title{color:#fff;font-weight:600}
+.topnav .spacer{flex:1}
+
+/* ─── PAGE ─── */
+.page{max-width:1280px;margin:0 auto;padding:24px 20px 80px;display:flex;flex-direction:column;gap:20px}
+
+/* ─── SURFACE TOGGLE ─── */
+.surface-toggle-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.surface-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748B}
+.surf-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all 120ms;font-family:inherit;line-height:1}
+.surf-btn.active{background:#1A202E;border-color:#1A202E;color:#fff}
+.surf-btn:not(.active){background:#fff;border-color:#CBD5E1;color:#374151}
+.surf-btn:hover:not(.active){background:#F8FAFC;border-color:#94A3B8}
+.surface{display:none}.surface.active{display:block}
+
+/* ─── INFO CALLOUT ─── */
+.info-callout{background:#FFFBEB;border:1.5px dashed #FCD34D;border-radius:8px;padding:10px 16px;font-size:12px;color:#78350F;line-height:1.6}
+.info-callout strong{font-weight:700}
+
+/* ─────────────────────────── SURFACE 1 — SIDE PANEL ─────────────────────────── */
+.panel-mock{background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;max-width:580px;box-shadow:0 4px 20px rgba(0,0,0,.10);display:flex;flex-direction:column;min-height:600px}
+
+/* panel header */
+.panel-header{padding:14px 16px 12px;border-bottom:1px solid #E2E8F0}
+.panel-header-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.back-btn{width:28px;height:28px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748B;font-size:14px;flex-shrink:0}
+.case-num{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#657496}
+.header-actions{margin-left:auto;display:flex;gap:6px}
+.btn-sm{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;line-height:1;font-family:inherit;white-space:nowrap}
+.btn-outline{background:#fff;border-color:#CBD5E1;color:#374151}
+.btn-outline:hover{background:#F8FAFC}
+.btn-red-outline{background:#fff;border-color:#FECACA;color:#DC2626}
+.btn-red-outline:hover{background:#FEF2F2}
+.panel-case-title{font-size:15px;font-weight:700;color:#1A202E;margin-bottom:6px}
+.panel-meta{display:flex;align-items:center;gap:12px;font-size:11px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:4px;color:#657496}
+.meta-item strong{font-weight:700;color:#1A202E}
+.meta-item.sla-overdue strong{color:#B91C1C}
+.meta-item.sla-warn strong{color:#92400E}
+
+/* Panel tab bar */
+.panel-tabs{display:flex;border-bottom:1px solid #EBEDF2;padding:0 16px}
+.panel-tab{padding:10px 12px;font-size:13px;font-weight:600;color:#657496;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.panel-tab.active{color:#1A202E;border-bottom-color:#2563EB}
+
+/* Items toolbar */
+.items-toolbar{padding:8px 12px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#FAFCFF}
+.expand-btns{display:flex;gap:4px}
+.expand-btn{padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #E2E8F0;background:#fff;color:#374151;font-family:inherit}
+.expand-btn:hover{background:#F8FAFC}
+.toolbar-divider{width:1px;height:20px;background:#E2E8F0;flex-shrink:0}
+.filter-group{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.filter-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-right:2px;white-space:nowrap}
+.filter-chip{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #E2E8F0;background:#fff;color:#64748B;font-family:inherit;transition:all 100ms}
+.filter-chip.active{background:#1E3A5F;border-color:#1E3A5F;color:#fff}
+.filter-chip:hover:not(.active){background:#F8FAFC}
+.filter-chip .cnt{font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+
+/* Items list */
+.items-list{flex:1;overflow-y:auto;padding:0}
+
+/* Collapsed row */
+.item-row{border-bottom:1px solid #F1F5F9}
+.item-row[data-hidden="true"]{display:none}
+.item-row-header{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;transition:background 100ms;user-select:none}
+.item-row-header:hover{background:#FAFCFF}
+.item-row.expanded .item-row-header{background:#F0F7FF;border-bottom:1px solid #DCEEFF}
+.item-chevron{font-size:10px;color:#94A3B8;flex-shrink:0;width:14px;text-align:center;transition:transform 120ms}
+.item-row.expanded .item-chevron{transform:rotate(90deg)}
+.item-name{flex:1;font-size:12px;font-weight:600;color:#1A202E;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.violation-tags{display:flex;gap:3px;flex-wrap:wrap;flex-shrink:0}
+.vtag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;font-size:10px;font-weight:600;background:#FEE2E2;color:#991B1B;white-space:nowrap}
+.vtag.potency{background:#FEF3C7;color:#92400E}
+.response-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.response-dot.responded{background:#16A34A}
+.response-dot.awaiting{background:#D97706}
+
+/* STATUS PILLS — exact from real code */
+.spill{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.spill-DRAFT{background:#F1F5F9;color:#475569;border:1px dashed #94A3B8}
+.spill-OPEN{background:#FEF3C7;color:#92400E}
+.spill-AWAITING{background:#FEF3C7;color:#92400E}
+.spill-INREVIEW{background:#DCEEFF;color:#376fd0}
+.spill-DISPUTED{background:#FEE2E2;color:#991B1B}
+.spill-RESOLVED{background:#DCFCE7;color:#166534}
+.spill-CLOSED{background:#E5E7EB;color:#374151}
+.spill-FORCECLOSED{background:#FEF9C3;color:#854D0E}
+/* item adjudication pills */
+.adj-pending{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.adj-accepted{background:#DCFCE7;color:#166534;border:1px solid #86EFAC}
+.adj-rejected{background:#FEE2E2;color:#991B1B;border:1px solid #FECACA}
+
+/* Expanded item detail */
+.item-detail{padding:12px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;display:none}
+.item-row.expanded .item-detail{display:block}
+
+/* Product card (from CaseItemProductDetail) */
+.product-card{border:1px solid #E2E8F0;border-radius:8px;padding:12px;background:#fff;margin-bottom:10px}
+.product-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.product-img-placeholder{width:64px;height:64px;border-radius:8px;border:1px solid #E2E8F0;background:#F1F5F9;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#CBD5E1;font-size:22px}
+.product-card-info{flex:1;min-width:0}
+.field-label-sm{font-size:10px;font-weight:700;color:#9BA09C;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.product-url-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#2563EB;word-break:break-all}
+.coa-section{margin-top:8px}
+.coa-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.coa-filename{font-size:12px;font-weight:500;color:#374151}
+.coa-pill-viol{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:6px;font-size:10px;font-weight:700;background:#FEE2E2;color:#991B1B}
+.coa-pill-ok{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:6px;font-size:10px;font-weight:700;background:#DCFCE7;color:#166534}
+.coa-why-box{border:1px solid #FECACA;border-radius:6px;background:#FFF5F5;padding:8px 10px;margin-top:6px;margin-bottom:6px}
+.coa-why-title{font-size:10px;font-weight:700;color:#991B1B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.violation-line{margin-bottom:4px}
+.violation-cause{font-size:11px;font-weight:700;color:#7F1D1D}
+.violation-detail{font-size:11px;font-family:'IBM Plex Mono',monospace;color:#991B1B}
+.violation-msg{font-size:11px;color:#6B7280;line-height:1.4;margin-top:1px}
+
+/* Merchant note + file */
+.merchant-note-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;font-size:12px;color:#374151;line-height:1.6;margin-bottom:8px}
+.merchant-note-label{font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.file-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;font-size:12px;color:#374151;margin-bottom:8px}
+.file-icon{font-size:16px}
+.response-state{font-size:12px;color:#657496;font-style:italic;margin-top:4px}
+.response-state.responded{color:#16A34A;font-style:normal;font-weight:600}
+.response-state.awaiting{color:#D97706;font-style:italic}
+
+/* Item adjudication buttons */
+.item-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid #F1F5F9}
+.btn-accept{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:#F0FDF4;border:1.5px solid #86EFAC;color:#166534;font-family:inherit}
+.btn-accept:hover{background:#DCFCE7}
+.btn-reject{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:#FEF2F2;border:1.5px solid #FECACA;color:#DC2626;font-family:inherit}
+.btn-reject:hover{background:#FEE2E2}
+.btn-submit-item{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:#1A202E;border:1px solid #1A202E;color:#fff;font-family:inherit;margin-left:auto}
+
+/* Sticky footer */
+.panel-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid #E2E8F0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 -2px 8px rgba(0,0,0,.06);flex-shrink:0}
+.submit-all-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:#1A202E;border:1px solid #1A202E;color:#fff;font-family:inherit}
+.submit-all-btn:hover{background:#374151}
+.footer-cancel{display:inline-flex;align-items:center;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;border:1px solid #CBD5E1;color:#374151;font-family:inherit}
+
+/* ─────────────────────────── SURFACE 2 — CASES LIST ─────────────────────────── */
+.cases-wrap{background:#fff;border-radius:10px;border:1px solid #E2E8F0;overflow:hidden}
+.cases-header{padding:20px 24px 14px;border-bottom:1px solid #EBEDF2}
+.cases-title{font-size:20px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.cases-sub{font-size:13px;color:#657496}
+.cases-header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.btn-new-case{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:#2563EB;border:1px solid #2563EB;color:#fff;font-family:inherit}
+.btn-new-case:hover{background:#1D4ED8}
+
+/* Sub-tabs */
+.subtabs{display:flex;align-items:center;gap:2px;border-bottom:1px solid #EBEDF2;padding:0 24px;overflow-x:auto}
+.stab{display:flex;align-items:center;gap:5px;padding:10px 12px;font-size:13px;font-weight:500;color:#657496;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color 120ms}
+.stab.active{font-weight:700;color:#1A202E;border-bottom-color:#2563EB}
+.stab:hover:not(.active){color:#1A202E}
+.tab-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:700}
+.stab.active .tab-cnt{background:#DCEEFF;color:#1D4ED8}
+.stab:not(.active) .tab-cnt{background:#E5E7EB;color:#475569}
+
+/* Search */
+.cases-search-wrap{padding:10px 24px;border-bottom:1px solid #F1F5F9}
+.search-box{display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;max-width:380px}
+.search-box input{border:none;outline:none;font-size:12px;color:#1A202E;font-family:inherit;flex:1;background:transparent}
+.search-box input::placeholder{color:#94A3B8}
+
+/* Table */
+.cases-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.cases-table thead tr{background:#F8FAFC}
+.cases-table thead th{padding:9px 12px;font-size:12px;font-weight:700;color:#475569;text-align:left;border-bottom:1px solid #EBEDF2;white-space:nowrap}
+.cases-table thead th.new-col{color:#2563EB;background:#EFF6FF}
+.cases-table tbody tr{border-bottom:1px solid #F1F5F9;cursor:pointer;transition:background 100ms}
+.cases-table tbody tr:hover{background:#FBFCFE}
+.cases-table tbody td{padding:10px 12px;font-size:12px;color:#1A202E;vertical-align:top}
+.cases-table tbody td.new-col-cell{background:#F8FBFF}
+
+/* Case cell */
+.case-num{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#657496;margin-bottom:2px}
+.case-title{font-size:13px;font-weight:600;color:#1A202E;line-height:1.3}
+/* Priority */
+.pri-high{font-size:11px;font-weight:600;color:#B91C1C}
+.pri-med{font-size:11px;font-weight:600;color:#92400E}
+.pri-low{font-size:11px;font-weight:600;color:#64748B}
+/* SLA */
+.sla-overdue{font-size:11px;font-weight:700;color:#B91C1C}
+.sla-warn{font-size:11px;font-weight:700;color:#92400E}
+.sla-ok{font-size:11px;font-weight:600;color:#047857}
+.sla-none{font-size:11px;color:#94A3B8}
+
+/* NEW column: violation chips */
+.viol-chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px}
+.vc{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;font-size:10px;font-weight:600;white-space:nowrap;cursor:default}
+.vc-expired{background:#FEE2E2;color:#991B1B}
+.vc-potency{background:#FEF3C7;color:#92400E}
+.vc-license{background:#EDE9FE;color:#5B21B6}
+.vc-claims{background:#E0F2FE;color:#0369A1}
+
+/* NEW column: progress bar */
+.prog-wrap{display:flex;flex-direction:column;gap:3px}
+.prog-label{font-size:11px;font-weight:600;color:#374151}
+.prog-bar{height:4px;border-radius:2px;background:#E2E8F0;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;background:#16A34A}
+.prog-fill.mid{background:#D97706}
+.prog-fill.zero{background:#E2E8F0}
+
+/* NEW column: whose court */
+.court-awaiting-merchant{font-size:11px;color:#D97706;font-weight:600;display:flex;align-items:center;gap:4px}
+.court-responded{font-size:11px;color:#2563EB;font-weight:600;display:flex;align-items:center;gap:4px}
+.court-awaiting-you{font-size:11px;color:#7C3AED;font-weight:600;display:flex;align-items:center;gap:4px}
+.court-done{font-size:11px;color:#64748B}
+
+/* NEW column: severity */
+.sev-high{font-size:11px;font-weight:700;color:#B91C1C;white-space:nowrap}
+.sev-med{font-size:11px;font-weight:700;color:#92400E;white-space:nowrap}
+.sev-none{font-size:11px;color:#94A3B8}
+
+/* LEGEND */
+.legend-box{margin:16px 24px;padding:12px 16px;background:#EFF6FF;border-radius:8px;border:1px solid #BFDBFE}
+.legend-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1D4ED8;margin-bottom:8px}
+.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 24px}
+.legend-row{display:flex;align-items:baseline;gap:8px;font-size:12px;color:#374151}
+.legend-new{color:#1D4ED8;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;background:#DCEEFF;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.legend-existing{color:#64748B;font-size:10px;font-weight:600}
+
+/* PAGINATION */
+.cases-pagination{padding:12px 24px;border-top:1px solid #EBEDF2;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#657496}
+.page-info{font-size:12px;color:#657496}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a href="../index.html">QTrust</a>
+  <span class="sep">›</span>
+  <a href="index.html">Tickets</a>
+  <span class="sep">›</span>
+  <span class="title">Compliance Cases — View Optimization</span>
+  <span class="spacer"></span>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:5px">We Monitor · Q-Monitor · UI Mockup</div>
+    <div style="font-size:15px;font-weight:700;color:#1A202E;margin-bottom:3px">Compliance Cases — Optimized View</div>
+    <div style="font-size:12px;color:#64748B">Faithful reproduction of the real Compliance Cases UI with two proposed enhancements. Toggle between the two surfaces below.</div>
+  </div>
+
+  <!-- SURFACE TOGGLE -->
+  <div class="surface-toggle-row">
+    <span class="surface-label">Surface:</span>
+    <button class="surf-btn active" onclick="showSurface('panel')" id="btn-panel">📋 Surface 1 — Case Side Panel</button>
+    <button class="surf-btn" onclick="showSurface('list')" id="btn-list">📊 Surface 2 — Cases List</button>
+  </div>
+
+  <!-- ═══════════════════ SURFACE 1 — SIDE PANEL ═══════════════════ -->
+  <div class="surface active" id="surf-panel">
+    <div class="info-callout" style="margin-bottom:14px;max-width:580px">
+      <strong>What's new vs today:</strong> Items are collapsed by default. Quick-filter bar (Status + Response) and Expand All/Collapse All toggle added above the list. "Submit All (n ready)" sticky footer — items that are Pending and have merchant responses are "ready". Sort: needs-action (Pending + awaiting) float to top. Click any collapsed row to expand it.
+    </div>
+
+    <div class="panel-mock">
+      <!-- Header -->
+      <div class="panel-header">
+        <div class="panel-header-top">
+          <div class="back-btn">←</div>
+          <div class="case-num">CR-2026-0010</div>
+          <span class="spill spill-AWAITING">AWAITING</span>
+          <div class="header-actions">
+            <button class="btn-sm btn-outline">🔔 Send Reminder</button>
+            <button class="btn-sm btn-red-outline">⊗ Force Close</button>
+          </div>
+        </div>
+        <div class="panel-case-title">Compliance review — 14 products</div>
+        <div class="panel-meta">
+          <div class="meta-item sla-overdue"><span>SLA</span><strong>2 days overdue</strong></div>
+          <div class="meta-item"><span>Priority</span><strong style="color:#B91C1C">● HIGH</strong></div>
+          <div class="meta-item"><span>Updated</span><strong>2 hours ago</strong></div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="panel-tabs">
+        <div class="panel-tab active">Items</div>
+        <div class="panel-tab">Activity</div>
+      </div>
+
+      <!-- Items toolbar [NEW] -->
+      <div class="items-toolbar">
+        <div class="expand-btns">
+          <button class="expand-btn" onclick="expandAll()">Expand all</button>
+          <button class="expand-btn" onclick="collapseAll()">Collapse all</button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="filter-group">
+          <span class="filter-label">Status:</span>
+          <button class="filter-chip active" onclick="setFilter('status','all',this)">All <span class="cnt">14</span></button>
+          <button class="filter-chip" onclick="setFilter('status','pending',this)">Pending <span class="cnt">9</span></button>
+          <button class="filter-chip" onclick="setFilter('status','accepted',this)">Accepted <span class="cnt">4</span></button>
+          <button class="filter-chip" onclick="setFilter('status','rejected',this)">Rejected <span class="cnt">1</span></button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="filter-group">
+          <span class="filter-label">Response:</span>
+          <button class="filter-chip" onclick="setFilter('response','awaiting',this)">Awaiting merchant <span class="cnt">4</span></button>
+          <button class="filter-chip" onclick="setFilter('response','responded',this)">Responded <span class="cnt">10</span></button>
+        </div>
+      </div>
+
+      <!-- Items list -->
+      <div class="items-list" id="items-list">
+
+        <!-- ── NEEDS ACTION HEADER ── -->
+        <div style="padding:5px 12px 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#D97706;background:#FFFBEB;border-bottom:1px solid #FEF3C7">Pending · Awaiting merchant response (4)</div>
+
+        <!-- Item 4 — Pending, Awaiting -->
+        <div class="item-row" data-adj="pending" data-response="awaiting">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Coast Life 25mg Delta-8 Gummies — Peach Ring</span>
+            <div class="violation-tags"><span class="vtag potency">THC-O 0.3%</span></div>
+            <span class="spill spill-OPEN adj-pending" style="font-size:9px;height:17px;padding:0 6px">PENDING</span>
+            <span class="response-dot awaiting" title="Awaiting merchant response"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🍑</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/coast-life-delta8-gummies-peach</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">gummies_d8_peach_2024-06-COA.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">THC-O Detected</span>&nbsp;<span class="violation-detail">0.3% / Max allowed: 0%</span>
+                    <div class="violation-msg">THC-O acetate detected above zero. All THC-O variants are federally non-compliant; max allowed is 0%.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="response-state awaiting">⏳ No response submitted yet — awaiting merchant</div>
+          </div>
+        </div>
+
+        <!-- Item 7 — Pending, Awaiting -->
+        <div class="item-row" data-adj="pending" data-response="awaiting">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Tropic Drop Delta-9 Seltzers — Pineapple Passion</span>
+            <div class="violation-tags"><span class="vtag potency">THC-O 0.3%</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot awaiting" title="Awaiting merchant response"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🍍</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/tropic-drop-delta9-pineapple</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">COA #6502 — seltzer_d9_pineapple_2024-08.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">THC-O Detected</span>&nbsp;<span class="violation-detail">0.3% / Max allowed: 0%</span>
+                    <div class="violation-msg">THC-O acetate present. Not permitted in compliant hemp products.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="response-state awaiting">⏳ No response submitted yet — awaiting merchant</div>
+          </div>
+        </div>
+
+        <!-- Item 8 — Pending, Awaiting -->
+        <div class="item-row" data-adj="pending" data-response="awaiting">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Coast Guard 5mg Delta-9 Gummies — Watermelon</span>
+            <div class="violation-tags"><span class="vtag">Expired COA</span><span class="vtag potency">THC-O 0.3%</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot awaiting" title="Awaiting merchant response"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🍉</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/coast-guard-d9-gummies-watermelon</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">COA #179 — gummies_d9_wm_2021-09.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">Expired COA (2-year)</span>&nbsp;<span class="violation-detail">Exp: 2023-09-14</span>
+                    <div class="violation-msg">COA is over 2 years old. A current, batch-specific COA is required.</div>
+                  </div>
+                  <div class="violation-line" style="margin-top:6px">
+                    <span class="violation-cause">THC-O Detected</span>&nbsp;<span class="violation-detail">0.3% / Max: 0%</span>
+                    <div class="violation-msg">THC-O acetate detected above threshold.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="response-state awaiting">⏳ No response submitted yet — awaiting merchant</div>
+          </div>
+        </div>
+
+        <!-- Item 13 — Pending, Awaiting -->
+        <div class="item-row" data-adj="pending" data-response="awaiting">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Barrier Island 10mg THC Chocolate — Dark</span>
+            <div class="violation-tags"><span class="vtag">Expired COA</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot awaiting" title="Awaiting merchant response"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🍫</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/barrier-island-chocolate-dark</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">chocolate_dark_COA_2022-01.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">Expired COA (2-year)</span>&nbsp;<span class="violation-detail">Exp: 2024-01-22</span>
+                    <div class="violation-msg">COA is over 2 years old. Current batch-specific COA required.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="response-state awaiting">⏳ No response submitted yet — awaiting merchant</div>
+          </div>
+        </div>
+
+        <!-- ── READY TO REVIEW HEADER ── -->
+        <div style="padding:5px 12px 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#2563EB;background:#EFF6FF;border-bottom:1px solid #DCEEFF">Pending · Merchant responded · Ready to submit (5)</div>
+
+        <!-- Item 1 — Pending, Responded — EXPANDED -->
+        <div class="item-row expanded" data-adj="pending" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Beach Break THC Seltzer 4-pack — Swell Berry</span>
+            <div class="violation-tags"><span class="vtag">Expired COA</span><span class="vtag potency">THC-O 0.3%</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🫐</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/beach-break-seltzer-swell-berry-4pk</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">COA #178 — gummies_d9_passionfruit_2023-05.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">Expired COA (2-year)</span>&nbsp;<span class="violation-detail">Exp: 2025-05-12</span>
+                    <div class="violation-msg">COA expired 463 days ago. A current, batch-specific COA is required within the last 2 years.</div>
+                  </div>
+                  <div class="violation-line" style="margin-top:6px">
+                    <span class="violation-cause">THC-O Detected</span>&nbsp;<span class="violation-detail">THC-O: 0.3% / Max allowed: 0%</span>
+                    <div class="violation-msg">THC-O acetate is not permitted. Any detection above 0% is a violation.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="merchant-note-label">Merchant note</div>
+            <div class="merchant-note-box">
+              "We're aware of this issue and have already placed a new order with our testing lab. The replacement COA will be uploaded by end of week. The THC-O result is a third-party lab error we're disputing."
+            </div>
+            <div class="file-row">
+              <span class="file-icon">📎</span>
+              <span>lab_dispute_letter_2025-04-18.pdf</span>
+              <span style="margin-left:auto;font-size:10px;color:#2563EB;cursor:pointer">View</span>
+            </div>
+            <div class="response-state responded">✓ Merchant response submitted — under review</div>
+            <div class="item-actions">
+              <button class="btn-accept">✓ Accept</button>
+              <button class="btn-reject">✕ Reject</button>
+              <button class="btn-submit-item">Submit →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 2 — Pending, Responded -->
+        <div class="item-row" data-adj="pending" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Beach Break THC Seltzer 4-pack — Watermelon</span>
+            <div class="violation-tags"><span class="vtag">Expired COA</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🍉</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/beach-break-seltzer-watermelon-4pk</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">COA #173 — seltzer_wm_2023-04.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">Expired COA (2-year)</span>&nbsp;<span class="violation-detail">Exp: 2025-04-07</span>
+                    <div class="violation-msg">COA expired over 2 years ago. Replacement batch-specific COA required.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="merchant-note-label">Merchant note</div>
+            <div class="merchant-note-box">"New COA incoming — same batch, updated test date. Should be uploaded by Friday."</div>
+            <div class="response-state responded">✓ Merchant response submitted — under review</div>
+            <div class="item-actions">
+              <button class="btn-accept">✓ Accept</button>
+              <button class="btn-reject">✕ Reject</button>
+              <button class="btn-submit-item">Submit →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 5 — Pending, Responded -->
+        <div class="item-row" data-adj="pending" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Sunrise Wellness CBD Tincture 1000mg</span>
+            <div class="violation-tags"><span class="vtag">Expired COA</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🌅</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/sunrise-wellness-tincture-1000mg</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">tincture_1000mg_COA_2022-11.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">Expired COA (2-year)</span>&nbsp;<span class="violation-detail">Exp: 2024-11-03</span>
+                    <div class="violation-msg">COA is over 2 years old.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="merchant-note-label">Merchant note</div>
+            <div class="merchant-note-box">"Uploaded new COA from our testing lab — same formula, fresh batch test from last month."</div>
+            <div class="file-row"><span class="file-icon">📎</span><span>tincture_coa_2025-04-NEW.pdf</span><span style="margin-left:auto;font-size:10px;color:#2563EB;cursor:pointer">View</span></div>
+            <div class="response-state responded">✓ Merchant response submitted — under review</div>
+            <div class="item-actions">
+              <button class="btn-accept">✓ Accept</button>
+              <button class="btn-reject">✕ Reject</button>
+              <button class="btn-submit-item">Submit →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 10 — Pending, Responded -->
+        <div class="item-row" data-adj="pending" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Deep Blue THC Seltzer — Lemon Twist</span>
+            <div class="violation-tags"><span class="vtag">Expired COA</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🍋</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/deep-blue-seltzer-lemon</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">deepblue_lemon_COA_2022-08.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">Expired COA (2-year)</span>&nbsp;<span class="violation-detail">Exp: 2024-08-17</span>
+                    <div class="violation-msg">COA older than 2 years. New batch-specific COA required.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="merchant-note-label">Merchant note</div>
+            <div class="merchant-note-box">"Batch has been reformulated. New COA attached below."</div>
+            <div class="file-row"><span class="file-icon">📎</span><span>deepblue_lemon_COA_2025-03.pdf</span><span style="margin-left:auto;font-size:10px;color:#2563EB;cursor:pointer">View</span></div>
+            <div class="response-state responded">✓ Merchant response submitted — under review</div>
+            <div class="item-actions">
+              <button class="btn-accept">✓ Accept</button>
+              <button class="btn-reject">✕ Reject</button>
+              <button class="btn-submit-item">Submit →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 12 — Pending, Responded -->
+        <div class="item-row" data-adj="pending" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Tidal Wave 50mg CBD Gummies — Raspberry</span>
+            <div class="violation-tags"><span class="vtag potency">THC-O 0.3%</span></div>
+            <span class="spill adj-pending" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">PENDING</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🫐</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/tidal-wave-gummies-raspberry</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row">
+                  <span class="coa-filename">tidalwave_raspberry_COA_2024-07.pdf</span>
+                  <span class="coa-pill-viol">Violative</span>
+                </div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line">
+                    <span class="violation-cause">THC-O Detected</span>&nbsp;<span class="violation-detail">0.3% / Max: 0%</span>
+                    <div class="violation-msg">THC-O acetate detected. Not permitted in compliant hemp products.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="merchant-note-label">Merchant note</div>
+            <div class="merchant-note-box">"This was a lab contamination issue. We've switched labs and the new COA shows 0% THC-O."</div>
+            <div class="file-row"><span class="file-icon">📎</span><span>tidalwave_raspberry_NEWLAB_2025-04.pdf</span><span style="margin-left:auto;font-size:10px;color:#2563EB;cursor:pointer">View</span></div>
+            <div class="response-state responded">✓ Merchant response submitted — under review</div>
+            <div class="item-actions">
+              <button class="btn-accept">✓ Accept</button>
+              <button class="btn-reject">✕ Reject</button>
+              <button class="btn-submit-item">Submit →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ACCEPTED ── -->
+        <div style="padding:5px 12px 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#166534;background:#F0FDF4;border-bottom:1px solid #BBF7D0">Accepted (4)</div>
+
+        <!-- Item 3 — Accepted -->
+        <div class="item-row" data-adj="accepted" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Coast Life 25mg Delta-8 Gummies — Mango</span>
+            <div class="violation-tags"><span class="vtag">Expired COA (2yr)</span></div>
+            <span class="spill adj-accepted" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">ACCEPTED</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🥭</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/coast-life-d8-gummies-mango</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row"><span class="coa-filename">gummies_d8_mango_COA_2025-02.pdf</span><span class="coa-pill-ok">Non-violative</span></div>
+              </div>
+            </div>
+            <div class="merchant-note-label">Merchant note</div>
+            <div class="merchant-note-box">"Replacement COA uploaded. New batch tested clean."</div>
+            <div class="response-state responded">✓ Response accepted</div>
+          </div>
+        </div>
+
+        <!-- Item 6 — Accepted -->
+        <div class="item-row" data-adj="accepted" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Tropic Drop Delta-9 Seltzers — Cherry Lime</span>
+            <div class="violation-tags"></div>
+            <span class="spill adj-accepted" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">ACCEPTED</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🍒</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/tropic-drop-d9-cherry-lime</a>
+                </div>
+              </div>
+            </div>
+            <div class="response-state responded">✓ Response accepted</div>
+          </div>
+        </div>
+
+        <!-- Item 9 — Accepted -->
+        <div class="item-row" data-adj="accepted" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Shoreline CBD Capsules 25mg</span>
+            <div class="violation-tags"></div>
+            <span class="spill adj-accepted" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">ACCEPTED</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">💊</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/shoreline-cbd-capsules-25mg</a>
+                </div>
+              </div>
+            </div>
+            <div class="response-state responded">✓ Response accepted</div>
+          </div>
+        </div>
+
+        <!-- Item 11 — Accepted -->
+        <div class="item-row" data-adj="accepted" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Gulf Coast Hemp Balm — Cooling Menthol</span>
+            <div class="violation-tags"></div>
+            <span class="spill adj-accepted" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">ACCEPTED</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🌿</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/gulf-coast-hemp-balm-menthol</a>
+                </div>
+              </div>
+            </div>
+            <div class="response-state responded">✓ Response accepted</div>
+          </div>
+        </div>
+
+        <!-- ── REJECTED ── -->
+        <div style="padding:5px 12px 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#991B1B;background:#FEF2F2;border-bottom:1px solid #FECACA">Rejected (1)</div>
+
+        <!-- Item 14 — Rejected -->
+        <div class="item-row" data-adj="rejected" data-response="responded">
+          <div class="item-row-header" onclick="toggleItem(this)">
+            <span class="item-chevron">›</span>
+            <span class="item-name">Oceanside Full Spectrum Oil 2000mg</span>
+            <div class="violation-tags"><span class="vtag potency">THC-O 0.3%</span><span class="vtag potency">Max exceeded</span></div>
+            <span class="spill adj-rejected" style="font-size:9px;height:17px;padding:0 6px;border-radius:999px">REJECTED</span>
+            <span class="response-dot responded" title="Merchant responded"></span>
+          </div>
+          <div class="item-detail">
+            <div class="product-card">
+              <div class="product-card-top">
+                <div class="product-img-placeholder">🌊</div>
+                <div class="product-card-info">
+                  <div class="field-label-sm">Product URL</div>
+                  <a class="product-url-link" href="#" onclick="return false">↗ 3rdcoastblends.com/products/oceanside-full-spectrum-2000mg</a>
+                </div>
+              </div>
+              <div class="coa-section">
+                <div class="field-label-sm">Attached COAs</div>
+                <div class="coa-row"><span class="coa-filename">COA #178 — oceanside_fs_2024-10.pdf</span><span class="coa-pill-viol">Violative</span></div>
+                <div class="coa-why-box">
+                  <div class="coa-why-title">Why this COA was flagged</div>
+                  <div class="violation-line"><span class="violation-cause">THC-O Detected</span>&nbsp;<span class="violation-detail">0.3% / Max: 0%</span><div class="violation-msg">THC-O acetate present. Product is non-compliant.</div></div>
+                  <div class="violation-line" style="margin-top:6px"><span class="violation-cause">Total THC Exceeded</span>&nbsp;<span class="violation-detail">0.36% / Max: 0.3%</span><div class="violation-msg">Total THC exceeds federal 0.3% limit.</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="merchant-note-label">Merchant note</div>
+            <div class="merchant-note-box">"We dispute this result. Lab error on both findings."</div>
+            <div class="response-state responded" style="color:#DC2626">✕ Response rejected</div>
+          </div>
+        </div>
+
+      </div><!-- /items-list -->
+
+      <!-- Sticky footer -->
+      <div class="panel-footer">
+        <div style="font-size:11px;color:#64748B">5 items ready · 4 awaiting merchant</div>
+        <div style="display:flex;gap:8px">
+          <button class="footer-cancel">Cancel</button>
+          <button class="submit-all-btn">Submit All <span style="background:rgba(255,255,255,.2);border-radius:10px;padding:1px 7px;font-size:11px;font-family:'IBM Plex Mono',monospace">(5 ready)</span></button>
+        </div>
+      </div>
+    </div><!-- /panel-mock -->
+  </div><!-- /surf-panel -->
+
+
+  <!-- ═══════════════════ SURFACE 2 — CASES LIST ═══════════════════ -->
+  <div class="surface" id="surf-list">
+    <div class="info-callout" style="margin-bottom:14px">
+      <strong>What's new vs today:</strong> Four new columns added to each row (highlighted blue): <strong>Violations</strong> (chip summary replacing generic case title), <strong>Progress</strong> (x/N resolved + bar), <strong>Court</strong> (whose turn it is), <strong>Severity</strong> (highest risk rollup). Existing columns unchanged.
+    </div>
+    <div class="cases-wrap">
+      <!-- Header -->
+      <div class="cases-header">
+        <div class="cases-header-row">
+          <div>
+            <div class="cases-title">Cases</div>
+            <div class="cases-sub">Compliance resolution cases sent to merchants — across all monitored companies</div>
+          </div>
+          <button class="btn-new-case">+ New Case</button>
+        </div>
+      </div>
+      <!-- Sub-tabs -->
+      <div class="subtabs">
+        <div class="stab active">All <span class="tab-cnt">8</span></div>
+        <div class="stab">Open <span class="tab-cnt">3</span></div>
+        <div class="stab">Disputed <span class="tab-cnt">1</span></div>
+        <div class="stab">Drafts <span class="tab-cnt">1</span></div>
+        <div class="stab">Resolved <span class="tab-cnt">1</span></div>
+        <div class="stab">Closed <span class="tab-cnt">0</span></div>
+      </div>
+      <!-- Search -->
+      <div class="cases-search-wrap">
+        <div class="search-box">
+          <span style="color:#94A3B8;font-size:12px">🔍</span>
+          <input type="text" placeholder="Search by case #, title, legal name, DBA, website, or MID">
+        </div>
+      </div>
+      <!-- Table -->
+      <div style="overflow-x:auto">
+        <table class="cases-table">
+          <thead>
+            <tr>
+              <th style="width:14%">Case</th>
+              <th style="width:11%">Legal Name</th>
+              <th style="width:8%">DBA</th>
+              <th style="width:10%">Website</th>
+              <th style="width:7%">Status</th>
+              <th style="width:4%;text-align:right">Items</th>
+              <th style="width:6%">Priority</th>
+              <th style="width:6%">SLA</th>
+              <th style="width:7%">Updated</th>
+              <th class="new-col" style="width:12%">Violations ✦</th>
+              <th class="new-col" style="width:8%">Progress ✦</th>
+              <th class="new-col" style="width:11%">Court ✦</th>
+              <th class="new-col" style="width:6%">Severity ✦</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- CR-2026-0010 — 3rd Coast Blends — AWAITING -->
+            <tr>
+              <td><div class="case-num">CR-2026-0010</div><div class="case-title">Potency + Expiry review</div></td>
+              <td style="font-size:12px">3rd Coast Blends LLC</td>
+              <td style="font-size:12px;color:#657496">3rd Coast</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">3rdcoastblends.com</a></td>
+              <td><span class="spill spill-AWAITING">AWAITING</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">14</td>
+              <td><span class="pri-high">● HIGH</span></td>
+              <td><span class="sla-overdue">2d overdue</span></td>
+              <td style="font-size:11px;color:#657496">2h ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-expired">Expired ×9</span><span class="vc vc-potency">THC-O ×6</span></div></td>
+              <td class="new-col-cell">
+                <div class="prog-wrap">
+                  <div class="prog-label">5/14</div>
+                  <div class="prog-bar"><div class="prog-fill mid" style="width:36%"></div></div>
+                </div>
+              </td>
+              <td class="new-col-cell"><div class="court-awaiting-merchant">⏳ Awaiting merchant (9)</div></td>
+              <td class="new-col-cell"><span class="sev-high">● HIGH ×9</span></td>
+            </tr>
+
+            <!-- CR-2026-0009 — Kush County — IN REVIEW -->
+            <tr>
+              <td><div class="case-num">CR-2026-0009</div><div class="case-title">THC potency + licensing</div></td>
+              <td style="font-size:12px">Kush County Cannabis</td>
+              <td style="font-size:12px;color:#657496">Kush County</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">kushcounty.com</a></td>
+              <td><span class="spill spill-INREVIEW">IN REVIEW</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">4</td>
+              <td><span class="pri-high">● HIGH</span></td>
+              <td><span class="sla-warn">1d left</span></td>
+              <td style="font-size:11px;color:#657496">4h ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-potency">THC-O ×3</span><span class="vc vc-license">License ×1</span></div></td>
+              <td class="new-col-cell">
+                <div class="prog-wrap">
+                  <div class="prog-label">1/4</div>
+                  <div class="prog-bar"><div class="prog-fill" style="width:25%;background:#D97706"></div></div>
+                </div>
+              </td>
+              <td class="new-col-cell"><div class="court-awaiting-you">🔵 Awaiting your review</div></td>
+              <td class="new-col-cell"><span class="sev-high">● HIGH ×4</span></td>
+            </tr>
+
+            <!-- CR-2026-0008 — Elevated Extracts — AWAITING -->
+            <tr>
+              <td><div class="case-num">CR-2026-0008</div><div class="case-title">Bulk COA expiry sweep</div></td>
+              <td style="font-size:12px">Elevated Extracts Inc</td>
+              <td style="font-size:12px;color:#657496">Elevated</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">elevatedextracts.com</a></td>
+              <td><span class="spill spill-AWAITING">AWAITING</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">12</td>
+              <td><span class="pri-med">○ MEDIUM</span></td>
+              <td><span class="sla-ok">5d left</span></td>
+              <td style="font-size:11px;color:#657496">1d ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-expired">Expired ×8</span><span class="vc vc-potency">Potency ×4</span></div></td>
+              <td class="new-col-cell">
+                <div class="prog-wrap">
+                  <div class="prog-label">6/12</div>
+                  <div class="prog-bar"><div class="prog-fill mid" style="width:50%"></div></div>
+                </div>
+              </td>
+              <td class="new-col-cell"><div class="court-responded">💬 Merchant responded (7/12)</div></td>
+              <td class="new-col-cell"><span class="sev-high">● HIGH ×8</span></td>
+            </tr>
+
+            <!-- CR-2026-0007 — Green Valley Hemp — OPEN -->
+            <tr>
+              <td><div class="case-num">CR-2026-0007</div><div class="case-title">License + claims review</div></td>
+              <td style="font-size:12px">Green Valley Hemp Co</td>
+              <td style="font-size:12px;color:#657496">GV Hemp</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">greenvalleyhemp.com</a></td>
+              <td><span class="spill spill-OPEN">OPEN</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">3</td>
+              <td><span class="pri-high">● HIGH</span></td>
+              <td><span class="sla-ok">3d left</span></td>
+              <td style="font-size:11px;color:#657496">3d ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-license">License ×2</span><span class="vc vc-claims">Claims ×1</span></div></td>
+              <td class="new-col-cell">
+                <div class="prog-wrap">
+                  <div class="prog-label">0/3</div>
+                  <div class="prog-bar"><div class="prog-fill zero" style="width:0%"></div></div>
+                </div>
+              </td>
+              <td class="new-col-cell"><div class="court-awaiting-merchant">⏳ Awaiting merchant (3)</div></td>
+              <td class="new-col-cell"><span class="sev-high">● HIGH ×2</span></td>
+            </tr>
+
+            <!-- CR-2026-0006 — Pacific Coast Botanicals — DISPUTED -->
+            <tr>
+              <td><div class="case-num">CR-2026-0006</div><div class="case-title">THC-O detection dispute</div></td>
+              <td style="font-size:12px">Pacific Coast Botanicals</td>
+              <td style="font-size:12px;color:#657496">PCB</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">pcbotanicals.com</a></td>
+              <td><span class="spill spill-DISPUTED">DISPUTED</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">5</td>
+              <td><span class="pri-high">● HIGH</span></td>
+              <td><span class="sla-overdue">3d overdue</span></td>
+              <td style="font-size:11px;color:#657496">5h ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-potency">THC-O ×5</span></div></td>
+              <td class="new-col-cell">
+                <div class="prog-wrap">
+                  <div class="prog-label">0/5</div>
+                  <div class="prog-bar"><div class="prog-fill zero" style="width:0%"></div></div>
+                </div>
+              </td>
+              <td class="new-col-cell"><div class="court-awaiting-you">🔵 Awaiting your review</div></td>
+              <td class="new-col-cell"><span class="sev-high">● HIGH ×5</span></td>
+            </tr>
+
+            <!-- CR-2026-0005 — Coastal Hemp — RESOLVED -->
+            <tr style="opacity:.75">
+              <td><div class="case-num">CR-2026-0005</div><div class="case-title">Annual COA renewal</div></td>
+              <td style="font-size:12px">Coastal Hemp Co LLC</td>
+              <td style="font-size:12px;color:#657496">Coastal</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">coastalhemp.com</a></td>
+              <td><span class="spill spill-RESOLVED">RESOLVED</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">8</td>
+              <td><span class="pri-low">— LOW</span></td>
+              <td><span class="sla-none">—</span></td>
+              <td style="font-size:11px;color:#657496">2d ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-expired">Expired ×3</span><span class="vc vc-potency">Potency ×2</span></div></td>
+              <td class="new-col-cell">
+                <div class="prog-wrap">
+                  <div class="prog-label">8/8</div>
+                  <div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div>
+                </div>
+              </td>
+              <td class="new-col-cell"><div class="court-done" style="color:#166534;font-weight:600">✓ Resolved</div></td>
+              <td class="new-col-cell"><span class="sev-none">—</span></td>
+            </tr>
+
+            <!-- CR-2026-0004 — Bluegrass Botanicals — OPEN -->
+            <tr>
+              <td><div class="case-num">CR-2026-0004</div><div class="case-title">Marketing claims</div></td>
+              <td style="font-size:12px">Bluegrass Botanicals</td>
+              <td style="font-size:12px;color:#657496">Bluegrass</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">bluegrassbotanicals.com</a></td>
+              <td><span class="spill spill-OPEN">OPEN</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">2</td>
+              <td><span class="pri-med">○ MEDIUM</span></td>
+              <td><span class="sla-ok">7d left</span></td>
+              <td style="font-size:11px;color:#657496">6d ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-claims">Claims ×2</span></div></td>
+              <td class="new-col-cell">
+                <div class="prog-wrap">
+                  <div class="prog-label">0/2</div>
+                  <div class="prog-bar"><div class="prog-fill zero" style="width:0%"></div></div>
+                </div>
+              </td>
+              <td class="new-col-cell"><div class="court-awaiting-merchant">⏳ Awaiting merchant (2)</div></td>
+              <td class="new-col-cell"><span class="sev-med">○ MED ×2</span></td>
+            </tr>
+
+            <!-- CR-2026-0003 — Delta Wellness — DRAFT -->
+            <tr style="opacity:.7">
+              <td><div class="case-num">CR-2026-0003</div><div class="case-title">Q2 COA sweep — draft</div></td>
+              <td style="font-size:12px">Delta Wellness LLC</td>
+              <td style="font-size:12px;color:#657496">Delta Wellness</td>
+              <td><a href="#" onclick="return false" style="font-size:11px">deltawellness.com</a></td>
+              <td><span class="spill spill-DRAFT">DRAFT</span></td>
+              <td style="text-align:right;font-size:12px;font-weight:600">6</td>
+              <td><span class="sla-none">—</span></td>
+              <td><span class="sla-none">—</span></td>
+              <td style="font-size:11px;color:#657496">1w ago</td>
+              <td class="new-col-cell"><div class="viol-chips"><span class="vc vc-expired">Expired ×4</span><span class="vc vc-potency">Potency ×2</span></div></td>
+              <td class="new-col-cell"><div class="prog-label" style="font-size:11px;color:#94A3B8">Not sent</div></td>
+              <td class="new-col-cell"><div class="court-done">Draft — not sent</div></td>
+              <td class="new-col-cell"><span class="sev-high">● HIGH ×4</span></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-box">
+        <div class="legend-title">✦ New columns vs today</div>
+        <div class="legend-grid">
+          <div class="legend-row"><span class="legend-new">Violations</span> Chip summary of flagged finding types + count — e.g. "Expired ×5 · THC-O ×2". Replaces the generic case title as the primary scan-time signal. Tooltip shows full list.</div>
+          <div class="legend-row"><span class="legend-new">Progress</span> "x/N resolved" + mini progress bar. Shows how far through adjudication the case is at a glance without opening it.</div>
+          <div class="legend-row"><span class="legend-new">Court</span> Whose turn it is: ⏳ Awaiting merchant (chase) / 💬 Merchant responded (processor to review) / 🔵 Awaiting your review (your action needed).</div>
+          <div class="legend-row"><span class="legend-new">Severity</span> Highest risk tier present in the case + count of that tier. Lets you triage HIGH-risk rows without clicking in.</div>
+          <div class="legend-row"><span class="legend-existing">Existing</span> Case · Legal Name · DBA · Website · Status · Items · Priority · SLA · Updated — unchanged.</div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="cases-pagination">
+        <div class="page-info">Showing 8 of 8 cases</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button style="padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#fff;font-size:12px;color:#374151;cursor:pointer">← Prev</button>
+          <span style="font-size:12px;font-weight:600;color:#1A202E">1</span>
+          <button style="padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#fff;font-size:12px;color:#374151;cursor:pointer">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /surf-list -->
+
+</div><!-- /page -->
+
+<script>
+// ─── SURFACE TOGGLE ───
+function showSurface(s) {
+  document.getElementById('surf-panel').classList.remove('active');
+  document.getElementById('surf-list').classList.remove('active');
+  document.getElementById('btn-panel').classList.remove('active');
+  document.getElementById('btn-list').classList.remove('active');
+  document.getElementById('surf-' + s).classList.add('active');
+  document.getElementById('btn-' + s).classList.add('active');
+}
+
+// ─── ITEM EXPAND/COLLAPSE ───
+function toggleItem(header) {
+  header.parentElement.classList.toggle('expanded');
+}
+function expandAll() {
+  document.querySelectorAll('#items-list .item-row:not([data-hidden="true"])').forEach(r => r.classList.add('expanded'));
+}
+function collapseAll() {
+  document.querySelectorAll('#items-list .item-row').forEach(r => r.classList.remove('expanded'));
+}
+
+// ─── ITEM FILTER ───
+let activeStatus = 'all';
+let activeResponse = null;
+
+function setFilter(type, value, btn) {
+  const group = btn.closest('.filter-group');
+  group.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+
+  if (type === 'status') {
+    if (activeStatus === value && value !== 'all') {
+      activeStatus = 'all';
+      group.querySelectorAll('.filter-chip')[0].classList.add('active');
+    } else {
+      activeStatus = value;
+      btn.classList.add('active');
+    }
+  } else {
+    if (activeResponse === value) {
+      activeResponse = null;
+    } else {
+      activeResponse = value;
+      btn.classList.add('active');
+    }
+  }
+
+  applyFilters();
+}
+
+function applyFilters() {
+  const rows = document.querySelectorAll('#items-list .item-row');
+  rows.forEach(row => {
+    const adj = row.dataset.adj;
+    const resp = row.dataset.response;
+    let show = true;
+    if (activeStatus !== 'all' && adj !== activeStatus) show = false;
+    if (activeResponse !== null && resp !== activeResponse) show = false;
+    row.dataset.hidden = show ? 'false' : 'true';
+  });
+}
+</script>
+</body>
+</html>
