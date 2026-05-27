@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-3963 — MyCOA: View COAs embed · Qredible Prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/*
+  Qredible proto tokens (matches existing mockup family):
+  Body bg: #F7F5FF · text: #1A202E · 13px base
+  Primary btn: #1A202E · indicator: #F05252 · modal wash: #F7F5FF
+  Section label: #EDE9FE / #4C1D95 · info block: amber dashed
+  Callout: purple left-border
+  Font: Plus Jakarta Sans + IBM Plex Mono
+
+  Merchant shell (deliberately different — signals "third-party site"):
+  bg: #FAFBFC · font: system-ui stack (no PJS) · CTA: #1C6EF2 blue
+*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── QREDIBLE PROTO CHROME ── */
+body{font-family:'Plus Jakarta Sans','Uber Move',-apple-system,sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+
+.topnav{background:#1A202E;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:600}
+.topnav a{color:#94A3B8}.topnav .sep{color:#475569}
+.topnav .ticket-badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .title{color:#fff;font-weight:600}
+
+.page{max-width:1240px;margin:0 auto;padding:28px 24px 80px}
+.page-header{margin-bottom:24px}
+.ticket-badge-lg{display:inline-flex;align-items:center;gap:6px;background:#F05252;color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;margin-bottom:10px}
+.page-header h1{font-size:20px;font-weight:700;color:#1A202E;margin-bottom:8px}
+.page-header p{color:#4A5568;font-size:13px;line-height:1.6;max-width:820px}
+
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:14px 18px;margin-bottom:28px}
+.info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.info-block p{font-size:12px;color:#78350F;line-height:1.65}
+.info-block strong{color:#92400E}
+.info-block code{background:#FEF3C7;padding:1px 5px;border-radius:3px;font-size:11px;font-family:'IBM Plex Mono',monospace}
+
+.section-block{margin-bottom:52px}
+.section-label{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:3px;margin-bottom:12px;background:#EDE9FE;color:#4C1D95}
+.section-title{font-size:16px;font-weight:700;color:#1A202E;margin-bottom:6px}
+.section-sub{font-size:13px;color:#4A5568;margin-bottom:20px;max-width:720px;line-height:1.6}
+
+.state-label{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.state-badge{display:inline-flex;background:#805AD5;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;font-family:'IBM Plex Mono',monospace}
+.state-desc{font-size:12px;color:#4A5568;line-height:1.6}
+
+.callout{border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.65;margin-top:12px;background:#F7F5FF;border:1px solid #E9D8FD;border-left:3px solid #805AD5;color:#44337A}
+
+/* ── CODE CARD ── */
+.code-card{background:#1A202E;border-radius:10px;overflow:hidden;max-width:760px;margin-bottom:12px}
+.code-card-header{display:flex;align-items:center;gap:7px;padding:9px 16px;background:#151B26;border-bottom:1px solid rgba(255,255,255,.07)}
+.cc-dot{width:11px;height:11px;border-radius:50%}
+.cc-dot.r{background:#FF5F57}.cc-dot.y{background:#FEBC2E}.cc-dot.g{background:#28C840}
+.cc-filename{color:#94A3B8;font-size:11px;font-family:'IBM Plex Mono',monospace;margin-left:auto}
+.code-card pre{padding:20px 22px;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.8;color:#E2E8F0;overflow-x:auto}
+.ht{color:#93C5FD}.ha{color:#A5B4FC}.hv{color:#86EFAC}
+
+/* ── BROWSER CHROME ── */
+.browser-wrap{border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);margin-bottom:0}
+.browser-bar{background:#DEE1E6;padding:8px 12px;display:flex;align-items:center;gap:8px;border-radius:10px 10px 0 0;border:1px solid #C8CDD6;border-bottom:none}
+.bdot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.bdot.r{background:#FF5F57}.bdot.y{background:#FEBC2E}.bdot.g{background:#28C840}
+.burl{flex:1;max-width:520px;margin:0 auto;background:#fff;border:1px solid #C8CDD6;border-radius:20px;padding:5px 14px;font-size:12px;color:#3C4043;font-family:'IBM Plex Mono',monospace;display:flex;align-items:center;gap:5px}
+.burl .lock{color:#1E8E3E;font-size:11px}
+
+/* ── MERCHANT SHELL ── */
+/* DIFFERENT from Qredible: system font, white bg, blue CTA */
+.merchant-shell{
+  background:#FAFBFC;
+  border:1px solid #C8CDD6;
+  border-top:none;
+  border-radius:0 0 10px 10px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:14px;
+  color:#1C1C1C;
+  overflow:hidden
+}
+.m-header{background:#fff;border-bottom:2px solid #E5E7EB;padding:12px 28px;display:flex;align-items:center;justify-content:space-between}
+.m-logo{font-size:17px;font-weight:700;color:#15803D;letter-spacing:-.3px}
+.m-logo em{font-style:normal;color:#166534}
+.m-nav{display:flex;gap:22px;font-size:13px;color:#4B5563;font-weight:500}
+.m-breadcrumb{background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:8px 28px;font-size:12px;color:#6B7280}
+.m-breadcrumb span{color:#1C1C1C;font-weight:500}
+
+/* Product grid */
+.product-layout{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.prod-img-col{background:#F3F4F6;border-right:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;padding:32px;min-height:320px}
+.prod-img-ph{width:190px;height:190px;background:#E5E7EB;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.prod-img-ph .ph-icon{font-size:44px;opacity:.35}
+.prod-img-ph .ph-label{font-size:10px;color:#9CA3AF;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.prod-details{padding:28px 32px}
+.prod-cat{font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.prod-name{font-size:26px;font-weight:700;color:#111827;line-height:1.15;margin-bottom:8px}
+.prod-rating{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B7280;margin-bottom:10px}
+.prod-stars{color:#F59E0B;letter-spacing:1px;font-size:13px}
+.prod-price{font-size:22px;font-weight:700;color:#111827;margin-bottom:14px}
+.prod-desc{font-size:13px;color:#4B5563;line-height:1.65;margin-bottom:18px}
+.prod-option-label{font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block}
+.prod-select{width:100%;padding:9px 12px;border:1.5px solid #D1D5DB;border-radius:6px;font-size:13px;color:#111827;background:#fff;margin-bottom:14px;font-family:inherit;cursor:pointer}
+.btn-cart{width:100%;padding:13px;background:#1C6EF2;color:#fff;font-size:14px;font-weight:600;border:none;border-radius:7px;cursor:pointer;margin-bottom:10px;font-family:inherit;letter-spacing:-.01em}
+.btn-cart:hover{background:#1558D4}
+.btn-wishlist{width:100%;padding:11px;background:#fff;color:#374151;font-size:13px;border:1.5px solid #D1D5DB;border-radius:7px;cursor:pointer;margin-bottom:18px;font-family:inherit}
+
+/* Qredible embed zone (within merchant page) */
+.embed-zone{border-top:1px solid #E5E7EB;padding-top:16px}
+.embed-zone-label{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.btn-view-coas{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:#1A202E;color:#fff;font-size:13px;font-weight:600;border:none;border-radius:6px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.01em;transition:background .15s}
+.btn-view-coas:hover{background:#2D3748}
+.embed-credit{font-size:10px;color:#9CA3AF;margin-top:6px}
+.embed-credit a{color:#805AD5;font-weight:500}
+
+/* Expanded COA grid (State B, in-page) */
+.coa-grid-section{background:#F9FAFB;border-top:1px solid #E5E7EB;padding:20px 28px 24px}
+.coa-grid-header{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.coa-grid-header h4{font-size:14px;font-weight:600;color:#111827;font-family:'Plus Jakarta Sans',sans-serif}
+.coa-grid-sub{font-size:12px;color:#6B7280;font-family:'Plus Jakarta Sans',sans-serif}
+.coa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.coa-card{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px;cursor:pointer}
+.coa-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:#A78BFA}
+.cc-variant{font-size:13px;font-weight:600;color:#1A202E;margin-bottom:5px;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-batch{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#718096;margin-bottom:3px}
+.cc-date{font-size:11px;color:#4A5568;margin-bottom:8px;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-status{display:inline-flex;align-items:center;gap:3px;background:#D1FAE5;color:#065F46;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-bottom:10px;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-view-btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:7px;background:#F7F5FF;color:#6B46C1;font-size:11px;font-weight:600;border:1px solid #E9D8FD;border-radius:5px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.coa-grid-credit{text-align:right;margin-top:10px;font-size:10px;color:#9CA3AF;font-family:'Plus Jakarta Sans',sans-serif}
+.coa-grid-credit a{color:#805AD5;font-weight:500}
+
+/* Mobile shell */
+.mobile-frame{max-width:390px}
+.mobile-shell{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
+.m-header-mobile{padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.m-hamburger{font-size:20px;color:#374151;cursor:pointer}
+.mobile-product-img{height:200px;background:#F3F4F6;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center}
+.mobile-product-body{padding:16px 18px 24px}
+.mobile-prod-name{font-size:20px;font-weight:700;color:#111827;line-height:1.2;margin-bottom:4px}
+.mobile-prod-price{font-size:16px;font-weight:600;color:#111827;margin-bottom:10px}
+.mobile-prod-desc{font-size:13px;color:#4B5563;line-height:1.6;margin-bottom:14px}
+.mobile-btn-cart{width:100%;padding:13px;background:#1C6EF2;color:#fff;font-size:14px;font-weight:600;border:none;border-radius:7px;cursor:pointer;margin-bottom:10px;font-family:inherit}
+.mobile-embed-zone{border-top:1px solid #E5E7EB;padding-top:14px;margin-top:4px}
+.mobile-embed-label{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+
+/* Single COA card (mobile) */
+.single-coa-card{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px;margin-bottom:8px}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.sc-name{font-size:13px;font-weight:600;color:#1A202E;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.3}
+.sc-badge{display:inline-flex;align-items:center;gap:3px;background:#D1FAE5;color:#065F46;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;flex-shrink:0;margin-left:8px}
+.sc-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.sc-lbl{color:#718096;font-family:'Plus Jakarta Sans',sans-serif}
+.sc-val{color:#1A202E;font-weight:500;font-family:'Plus Jakarta Sans',sans-serif}
+.sc-val.mono{font-family:'IBM Plex Mono',monospace;font-size:11px}
+.sc-view-btn{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:12px;padding:10px;background:#1A202E;color:#fff;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;border:none;width:100%}
+.more-coas{text-align:center;font-size:12px;color:#805AD5;font-family:'Plus Jakarta Sans',sans-serif;padding:6px 0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.mobile-embed-credit{text-align:center;font-size:10px;color:#9CA3AF;margin-top:4px;font-family:'Plus Jakarta Sans',sans-serif}
+.mobile-embed-credit a{color:#805AD5;font-weight:500}
+
+/* ── MODAL (fixed overlay, State A interactive) ── */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:900;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.coa-modal{background:#fff;border-radius:12px;width:440px;max-width:100%;box-shadow:0 24px 64px rgba(0,0,0,.28);overflow:hidden}
+.modal-head{background:#1A202E;padding:16px 20px;display:flex;align-items:flex-start;gap:10px}
+.modal-head .mh-icon{font-size:18px;opacity:.75;margin-top:1px;flex-shrink:0}
+.modal-head .mh-title{color:#fff;font-size:14px;font-weight:600;line-height:1.3}
+.modal-head .mh-sub{color:#94A3B8;font-size:11px;margin-top:3px}
+.modal-head .mh-close{margin-left:auto;background:none;border:none;color:#94A3B8;cursor:pointer;font-size:20px;line-height:1;padding:0;flex-shrink:0}
+.modal-body{padding:20px}
+.detail-row{display:flex;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #F1F5F9;align-items:flex-start}
+.detail-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.dl{font-size:11px;font-weight:600;color:#718096;width:80px;flex-shrink:0;padding-top:1px;font-family:'Plus Jakarta Sans',sans-serif;text-transform:uppercase;letter-spacing:.04em}
+.dv{font-size:13px;color:#1A202E;font-family:'Plus Jakarta Sans',sans-serif;flex:1;line-height:1.4}
+.dv .mono{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#4A5568}
+.dv .ok-badge{display:inline-flex;align-items:center;gap:4px;background:#D1FAE5;color:#065F46;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.modal-foot{padding:14px 20px;background:#F7F5FF;border-top:1px solid #E9D8FD;display:flex;align-items:center;gap:8px}
+.btn-view-doc{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#1A202E;color:#fff;font-size:13px;font-weight:600;border:none;border-radius:6px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.btn-modal-close{padding:8px 14px;background:#fff;color:#4A5568;font-size:13px;font-weight:500;border:1.5px solid #CBD5E1;border-radius:6px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;margin-left:auto}
+.modal-credit{font-size:10px;color:#9CA3AF;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+.modal-credit a{color:#805AD5;font-weight:500}
+
+/* ── AUTO-UPDATE FLOW ── */
+.flow-row{display:flex;align-items:flex-start;gap:0;margin:8px 0}
+.flow-step{flex:1;min-width:0}
+.flow-step-inner{text-align:center;padding:0 8px}
+.flow-num{width:28px;height:28px;border-radius:50%;background:#1A202E;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.flow-title{font-size:12px;font-weight:600;color:#1A202E;margin-bottom:10px;min-height:32px;display:flex;align-items:center;justify-content:center;text-align:center}
+.flow-thumb{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:12px;min-height:110px;overflow:hidden}
+
+/* Mini Qredible UI */
+.mini-qr-top{background:#1A202E;margin:-12px -12px 8px;padding:6px 10px;border-radius:6px 6px 0 0;display:flex;align-items:center;gap:5px}
+.mini-qr-top .mq-logo{color:#fff;font-size:9px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif}
+.mini-qr-top .mq-badge{background:#F05252;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;font-family:'IBM Plex Mono',monospace}
+.mini-tab{font-size:9px;font-weight:600;color:#1A202E;border-bottom:1.5px solid #F05252;padding-bottom:3px;margin-bottom:8px;display:inline-block;font-family:'Plus Jakarta Sans',sans-serif}
+.mini-upload-zone{border:1.5px dashed #CBD5E1;border-radius:5px;padding:8px;text-align:center;font-size:9px;color:#9CA3AF;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:6px}
+.mini-file-new{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:4px;padding:4px 6px;font-size:9px;font-family:'IBM Plex Mono',monospace;color:#065F46;display:flex;align-items:center;gap:4px}
+.mini-prod-row{display:flex;align-items:center;gap:5px;padding:4px 6px;background:#F7F5FF;border-radius:4px;margin-bottom:4px;font-size:9px;font-family:'Plus Jakarta Sans',sans-serif;color:#1A202E}
+.mini-assign-btn{background:#1A202E;color:#fff;font-size:8px;padding:1px 5px;border-radius:3px;margin-left:auto;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif}
+.mini-merchant{background:#FAFBFC;border-radius:5px;border:1px solid #E5E7EB;padding:8px;font-size:9px}
+.mini-m-header{font-size:9px;font-weight:700;color:#15803D;margin-bottom:6px;font-family:-apple-system,sans-serif}
+.mini-m-prod{font-size:9px;font-weight:600;color:#111827;margin-bottom:5px;font-family:-apple-system,sans-serif}
+.mini-embed-btn{display:inline-flex;align-items:center;gap:3px;background:#1A202E;color:#fff;font-size:8px;padding:4px 8px;border-radius:4px;font-family:'Plus Jakarta Sans',sans-serif}
+.mini-updated{background:#D1FAE5;color:#065F46;font-size:8px;padding:2px 6px;border-radius:3px;margin-top:5px;font-family:'Plus Jakarta Sans',sans-serif}
+
+/* Flow connector */
+.flow-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 4px;padding-top:80px;width:56px;flex-shrink:0;gap:4px}
+.flow-arrow .fa-line{flex:none;font-size:22px;color:#CBD5E1;line-height:1}
+.flow-arrow .fa-label{font-size:10px;color:#718096;text-align:center;line-height:1.3;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+
+/* ── BEFORE / AFTER ── */
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ba-col{background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;overflow:hidden}
+.ba-head{padding:14px 20px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #E2E8F0}
+.ba-head.before{background:#FFF5F5;border-bottom-color:#FED7D7}
+.ba-head.after{background:#F0FFF4;border-bottom-color:#C6F6D5}
+.ba-head h3{font-size:14px;font-weight:700;color:#1A202E}
+.ba-body{padding:18px 20px;font-size:13px;color:#4A5568;line-height:1.75}
+.ba-body p+p{margin-top:12px}
+.ba-verdict{margin-top:14px;padding:10px 14px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid}
+.ba-verdict.v-before{background:#FFF5F5;color:#C53030;border-color:#FED7D7}
+.ba-verdict.v-after{background:#F0FFF4;color:#276749;border-color:#C6F6D5}
+
+/* ── FOOTER ── */
+.scope-note{background:#fff;border:1.5px solid #E2E8F0;border-radius:8px;padding:18px 22px;font-size:13px;color:#4A5568;line-height:1.75}
+.scope-note a{color:#805AD5;font-weight:500;text-decoration:underline;text-underline-offset:2px}
+
+/* State divider */
+.state-sep{height:1px;background:#E9D8FD;margin:32px 0}
+</style>
+</head>
+<body>
+
+<!-- ── TOPNAV ── -->
+<nav class="topnav">
+  <a href="index.html">← Prototypes</a>
+  <span class="sep">›</span>
+  <span class="ticket-badge">QP-3963</span>
+  <span class="sep">›</span>
+  <span class="title">MyCOA: View COAs embed</span>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="ticket-badge-lg">QP-3963</div>
+    <h1>MyCOA — drop-in "View COAs" embed for merchant product pages</h1>
+    <p>A two-line JavaScript embed that adds a "View COAs" button to any merchant product page. The embed reads from MyCOA and reflects the current assigned COA automatically — no CMS edits required after initial installation. POC: BlackBear (WordPress + Ecwid), Direct-assignment resolution.</p>
+  </div>
+
+  <!-- INFO BLOCK -->
+  <div class="info-block">
+    <div class="info-pill">📋 Design notes</div>
+    <p>This mockup shows the <strong>merchant-facing UX only</strong> — what a shopper sees on a third-party site. Merchant page renders use a deliberately different visual shell (white bg, system font, blue "Add to cart") to make clear which surface belongs to the merchant and which belongs to Qredible. The Qredible embed element (dark "View COAs" button, COA modal/grid, "Powered by Qredible" attribution) is styled with the standard Qredible token set so it is visually distinct inside the merchant page. MyCOA app-side thumbnails appear only in the auto-update flow diagram.</p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 1: INSTALLATION SNIPPET                -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">01 — Installation</div>
+    <div class="section-title">What the merchant pastes once</div>
+    <p class="section-sub">No plugin, no API key, no webhook configuration. The embed script resolves the correct COA via MyCOA's Direct-assignment table, keyed to the product page URL or a <code>data-mycoa-sku</code> attribute.</p>
+
+    <div class="code-card">
+      <div class="code-card-header">
+        <span class="cc-dot r"></span><span class="cc-dot y"></span><span class="cc-dot g"></span>
+        <span class="cc-filename">product-page.html (or Ecwid / WooCommerce theme)</span>
+      </div>
+      <pre><span class="ht">&lt;script</span> <span class="ha">src</span>=<span class="hv">"https://embed.qredible.com/v1/mycoa.js"</span> <span class="ha">async</span><span class="ht">&gt;&lt;/script&gt;</span>
+<span class="ht">&lt;button</span> <span class="ha">data-mycoa-button</span><span class="ht">&gt;</span>View COAs<span class="ht">&lt;/button&gt;</span></pre>
+    </div>
+
+    <div class="callout">
+      Paste once. Auto-updates every time you change a COA assignment in MyCOA.
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 2: MERCHANT PAGE RENDERS               -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">02 — Merchant page renders</div>
+    <div class="section-title">Three embed states</div>
+    <p class="section-sub">Each render shows a generic Acme Botanicals product page (WordPress + Ecwid template). The Qredible embed is the dark "View COAs" button and everything that follows from it.</p>
+
+    <!-- ── STATE A: Single COA ── -->
+    <div class="state-label">
+      <span class="state-badge">State A</span>
+      <span class="state-desc">Single COA — button click opens a modal with COA details and a link to the document. Click "View COAs" below to see it live.</span>
+    </div>
+
+    <div class="browser-wrap">
+      <div class="browser-bar">
+        <span class="bdot r"></span><span class="bdot y"></span><span class="bdot g"></span>
+        <div class="burl"><span class="lock">🔒</span> www.acmebotanicals.com/products/widget-pro</div>
+      </div>
+      <div class="merchant-shell">
+        <div class="m-header">
+          <div class="m-logo">Acme <em>Botanicals</em></div>
+          <div class="m-nav">
+            <span>Shop</span><span>About</span><span>Blog</span><span>Contact</span>
+          </div>
+        </div>
+        <div class="m-breadcrumb">Home › Shop › <span>Widget Pro</span></div>
+        <div class="product-layout">
+          <div class="prod-img-col">
+            <div class="prod-img-ph">
+              <div class="ph-icon">🖼</div>
+              <div class="ph-label">Product image</div>
+            </div>
+          </div>
+          <div class="prod-details">
+            <div class="prod-cat">Wellness · Supplements</div>
+            <div class="prod-name">Widget Pro</div>
+            <div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 &nbsp;·&nbsp; 127 reviews</div>
+            <div class="prod-price">$34.99</div>
+            <div class="prod-desc">Our flagship Widget Pro formula. Third-party lab tested for purity and potency. Available in 12oz and 30oz sizes.</div>
+            <label class="prod-option-label">Size</label>
+            <select class="prod-select">
+              <option>12oz (30-day supply)</option>
+              <option>30oz (75-day supply)</option>
+            </select>
+            <button class="btn-cart">Add to cart</button>
+            <button class="btn-wishlist">♡ &nbsp;Save to wishlist</button>
+            <div class="embed-zone">
+              <div class="embed-zone-label">Certificate of analysis</div>
+              <button class="btn-view-coas" onclick="document.getElementById('modal-a').classList.add('open')">
+                🛡 &nbsp;View COAs
+              </button>
+              <div class="embed-credit">Verified by <a href="#">Qredible MyCOA</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /browser-wrap state A -->
+
+    <div class="state-sep"></div>
+
+    <!-- ── STATE B: Multiple COAs, desktop ── -->
+    <div class="state-label" style="margin-top:0">
+      <span class="state-badge">State B</span>
+      <span class="state-desc">Multiple COAs, desktop (≥768 px) — after click, a grid of COA cards renders in-page below the product. Shown in the post-click (expanded) state.</span>
+    </div>
+
+    <div class="browser-wrap">
+      <div class="browser-bar">
+        <span class="bdot r"></span><span class="bdot y"></span><span class="bdot g"></span>
+        <div class="burl"><span class="lock">🔒</span> www.acmebotanicals.com/products/widget-pro</div>
+      </div>
+      <div class="merchant-shell">
+        <div class="m-header">
+          <div class="m-logo">Acme <em>Botanicals</em></div>
+          <div class="m-nav">
+            <span>Shop</span><span>About</span><span>Blog</span><span>Contact</span>
+          </div>
+        </div>
+        <div class="m-breadcrumb">Home › Shop › <span>Widget Pro</span></div>
+        <div class="product-layout">
+          <div class="prod-img-col">
+            <div class="prod-img-ph">
+              <div class="ph-icon">🖼</div>
+              <div class="ph-label">Product image</div>
+            </div>
+          </div>
+          <div class="prod-details">
+            <div class="prod-cat">Wellness · Supplements</div>
+            <div class="prod-name">Widget Pro</div>
+            <div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 &nbsp;·&nbsp; 127 reviews</div>
+            <div class="prod-price">From $34.99</div>
+            <div class="prod-desc">Available in multiple sizes and formulas. Each variant has its own third-party certificate of analysis.</div>
+            <button class="btn-cart">Add to cart</button>
+            <div class="embed-zone">
+              <div class="embed-zone-label">Certificates of analysis</div>
+              <!-- button shown in "hide" (post-click) state -->
+              <button class="btn-view-coas" style="background:#2D3748">
+                🛡 &nbsp;Hide COAs &nbsp;▲
+              </button>
+              <div class="embed-credit">Verified by <a href="#">Qredible MyCOA</a></div>
+            </div>
+          </div>
+        </div>
+        <!-- Expanded grid -->
+        <div class="coa-grid-section">
+          <div class="coa-grid-header">
+            <h4>Certificates of analysis &mdash; 6 documents</h4>
+            <div class="coa-grid-sub">All lab-verified · Powered by Qredible MyCOA · Updated automatically</div>
+          </div>
+          <div class="coa-grid">
+            <div class="coa-card">
+              <div class="cc-variant">Widget Pro 12oz</div>
+              <div class="cc-batch">LOT-4471</div>
+              <div class="cc-date">Tested Mar 15, 2025</div>
+              <div class="cc-status">✓ Current</div>
+              <button class="cc-view-btn">📄 &nbsp;View document</button>
+            </div>
+            <div class="coa-card">
+              <div class="cc-variant">Widget Pro 30oz</div>
+              <div class="cc-batch">LOT-4472</div>
+              <div class="cc-date">Tested Mar 15, 2025</div>
+              <div class="cc-status">✓ Current</div>
+              <button class="cc-view-btn">📄 &nbsp;View document</button>
+            </div>
+            <div class="coa-card">
+              <div class="cc-variant">Widget Pro Bundle</div>
+              <div class="cc-batch">LOT-4473</div>
+              <div class="cc-date">Tested Mar 15, 2025</div>
+              <div class="cc-status">✓ Current</div>
+              <button class="cc-view-btn">📄 &nbsp;View document</button>
+            </div>
+            <div class="coa-card">
+              <div class="cc-variant">Widget Pro 12oz (Mint)</div>
+              <div class="cc-batch">LOT-4474</div>
+              <div class="cc-date">Tested Apr 2, 2025</div>
+              <div class="cc-status">✓ Current</div>
+              <button class="cc-view-btn">📄 &nbsp;View document</button>
+            </div>
+            <div class="coa-card">
+              <div class="cc-variant">Widget Pro 30oz (Mint)</div>
+              <div class="cc-batch">LOT-4475</div>
+              <div class="cc-date">Tested Apr 2, 2025</div>
+              <div class="cc-status">✓ Current</div>
+              <button class="cc-view-btn">📄 &nbsp;View document</button>
+            </div>
+            <div class="coa-card">
+              <div class="cc-variant">Widget Pro Bundle (Mint)</div>
+              <div class="cc-batch">LOT-4476</div>
+              <div class="cc-date">Tested Apr 2, 2025</div>
+              <div class="cc-status">✓ Current</div>
+              <button class="cc-view-btn">📄 &nbsp;View document</button>
+            </div>
+          </div>
+          <div class="coa-grid-credit">Powered by <a href="#">Qredible MyCOA</a></div>
+        </div>
+      </div>
+    </div><!-- /browser-wrap state B -->
+
+    <div class="state-sep"></div>
+
+    <!-- ── STATE C: Multiple COAs, mobile ── -->
+    <div class="state-label" style="margin-top:0">
+      <span class="state-badge">State C</span>
+      <span class="state-desc">Multiple COAs, mobile (&lt;768 px) — grid collapses to the single most-recent non-expired COA. "More COAs" affordance lets the shopper expand all documents.</span>
+    </div>
+
+    <div class="mobile-frame">
+      <div class="browser-wrap">
+        <div class="browser-bar" style="padding:7px 10px">
+          <span class="bdot r"></span><span class="bdot y"></span><span class="bdot g"></span>
+          <div class="burl" style="font-size:11px;padding:4px 10px"><span class="lock">🔒</span> acmebotanicals.com/…/widget-pro</div>
+        </div>
+        <div class="merchant-shell mobile-shell">
+          <div class="m-header m-header-mobile">
+            <div class="m-logo" style="font-size:15px">Acme <em>Botanicals</em></div>
+            <div class="m-hamburger">☰</div>
+          </div>
+          <div class="mobile-product-img">
+            <div class="prod-img-ph" style="width:120px;height:120px">
+              <div class="ph-icon" style="font-size:30px">🖼</div>
+              <div class="ph-label">Product image</div>
+            </div>
+          </div>
+          <div class="mobile-product-body">
+            <div class="mobile-prod-name">Widget Pro</div>
+            <div class="mobile-prod-price">From $34.99</div>
+            <div class="mobile-prod-desc">Multiple sizes and formulas. All third-party lab tested.</div>
+            <button class="mobile-btn-cart">Add to cart</button>
+            <div class="mobile-embed-zone">
+              <div class="mobile-embed-label">Certificate of analysis</div>
+              <div class="single-coa-card">
+                <div class="sc-top">
+                  <div class="sc-name">Widget Pro Bundle (Mint)</div>
+                  <div class="sc-badge">✓ Current</div>
+                </div>
+                <div class="sc-row"><span class="sc-lbl">Batch</span><span class="sc-val mono">LOT-4476</span></div>
+                <div class="sc-row"><span class="sc-lbl">Lab</span><span class="sc-val">Green Analytics Lab</span></div>
+                <div class="sc-row"><span class="sc-lbl">Tested</span><span class="sc-val">Apr 2, 2025</span></div>
+                <button class="sc-view-btn">📄 &nbsp;View document</button>
+              </div>
+              <div class="more-coas">5 more COAs available — tap to expand</div>
+              <div class="mobile-embed-credit">Verified by <a href="#">Qredible MyCOA</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /mobile frame -->
+  </div><!-- /section 2 -->
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 3: AUTO-UPDATE STORY                   -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">03 — How it stays current</div>
+    <div class="section-title">Auto-update in three steps</div>
+    <p class="section-sub">No CMS edits. No re-publishing. When you reassign a COA in MyCOA, the embed reflects the change on every merchant page within about 60 seconds.</p>
+
+    <div class="flow-row">
+
+      <!-- Step 1 -->
+      <div class="flow-step">
+        <div class="flow-step-inner">
+          <div class="flow-num">1</div>
+          <div class="flow-title">Merchant uploads new COA in MyCOA</div>
+          <div class="flow-thumb">
+            <div class="mini-qr-top">
+              <span class="mq-logo">Qredible</span>
+              <span class="mq-badge">MyCOA</span>
+            </div>
+            <div class="mini-tab">COAs tab</div>
+            <div class="mini-upload-zone">⬆ &nbsp;Drop PDF here or browse</div>
+            <div class="mini-file-new">✓ &nbsp;Widget_Pro_COA_Q2-2025.pdf &mdash; new</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow 1 -->
+      <div class="flow-arrow">
+        <div class="fa-line">→</div>
+        <div class="fa-label">assigns to product</div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flow-step">
+        <div class="flow-step-inner">
+          <div class="flow-num">2</div>
+          <div class="flow-title">Assigns COA to product in MyCOA</div>
+          <div class="flow-thumb">
+            <div class="mini-qr-top">
+              <span class="mq-logo">Qredible</span>
+              <span class="mq-badge">MyCOA</span>
+            </div>
+            <div class="mini-tab">Products tab</div>
+            <div class="mini-prod-row">📦 Widget Pro Bundle (Mint) <span class="mini-assign-btn">Assign ✓</span></div>
+            <div class="mini-prod-row" style="opacity:.5">📦 Widget Pro 12oz</div>
+            <div class="mini-prod-row" style="opacity:.5">📦 Widget Pro 30oz</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow 2 -->
+      <div class="flow-arrow">
+        <div class="fa-line">→</div>
+        <div class="fa-label">within ~60s</div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="flow-step">
+        <div class="flow-step-inner">
+          <div class="flow-num">3</div>
+          <div class="flow-title">Embed reflects the updated COA</div>
+          <div class="flow-thumb">
+            <div class="mini-merchant">
+              <div class="mini-m-header">Acme Botanicals</div>
+              <div class="mini-m-prod">Widget Pro Bundle (Mint)</div>
+              <div style="font-size:9px;color:#6B7280;margin-bottom:5px;font-family:-apple-system,sans-serif">Certificate of analysis</div>
+              <div class="mini-embed-btn">🛡 View COAs <span style="background:#F05252;color:#fff;font-size:7px;padding:1px 4px;border-radius:2px;margin-left:3px;font-family:'Plus Jakarta Sans',sans-serif">Updated</span></div>
+              <div class="mini-updated">✓ LOT-4477 now live · Q2 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /flow-row -->
+  </div><!-- /section 3 -->
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 4: BEFORE / AFTER PITCH                -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">04 — Merchant pitch</div>
+    <div class="section-title">Before and after</div>
+    <p class="section-sub">What changes for the merchant once the embed is in place.</p>
+
+    <div class="ba-grid">
+      <div class="ba-col">
+        <div class="ba-head before">
+          <span style="font-size:18px">⚠️</span>
+          <h3>Without the embed</h3>
+        </div>
+        <div class="ba-body">
+          <p>Today, every COA update requires several manual steps across systems. The merchant uploads a new COA file, then opens their product CMS, finds each affected product, pastes in the new document URL, and publishes. This sequence repeats for every variant and every new batch — often multiple times a month — and it is straightforward to miss a product, link the wrong file, or let a stale COA remain live while the new one sits in a folder.</p>
+          <p>For a merchant with a dozen SKUs and quarterly batch cycles, this adds up to several hours of manual administrative work per year, with compliance exposure whenever a step is skipped.</p>
+          <div class="ba-verdict v-before">4–6 manual steps per COA update, per product.</div>
+        </div>
+      </div>
+      <div class="ba-col">
+        <div class="ba-head after">
+          <span style="font-size:18px">✅</span>
+          <h3>With the embed</h3>
+        </div>
+        <div class="ba-body">
+          <p>With the embed installed, the merchant pastes the two-line snippet into their product page template once, at setup time. After that, every COA update requires exactly one action: open MyCOA, upload the new document, and assign it to the relevant product. The embed reads the assignment and updates every page that carries the product automatically, within about sixty seconds, with no CMS access, no re-publishing, and no risk of linking the wrong document.</p>
+          <p>For BlackBear's WordPress + Ecwid setup, this means the COA link on every product page is always current by the time the new batch ships, without the merchant touching the site at all.</p>
+          <div class="ba-verdict v-after">1 action in MyCOA. Every product page updates itself.</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /section 4 -->
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 5: SCOPE NOTE                          -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-label">05 — Scope</div>
+    <div class="section-title">v1 scope and POC</div>
+    <div class="scope-note">
+      v1 ships against BlackBear's WordPress + Ecwid stack as the proof-of-concept merchant with Direct-assignment resolution (one COA per product, resolved by product ID or page URL). Shared-assignment resolution — where a single COA covers multiple products or SKUs without a per-product mapping — lands in v1.1 as a separate ticket. See <a href="https://qredible.atlassian.net/browse/QP-3963" target="_blank">QP-3963</a> for the full requirements and acceptance criteria.
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- STATE A MODAL (fixed overlay, toggled by JS)        -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-a" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="coa-modal">
+    <div class="modal-head">
+      <span class="mh-icon">🛡</span>
+      <div>
+        <div class="mh-title">Widget Pro — Certificate of analysis</div>
+        <div class="mh-sub">Third-party lab verified &nbsp;·&nbsp; Qredible MyCOA</div>
+      </div>
+      <button class="mh-close" onclick="document.getElementById('modal-a').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-row">
+        <div class="dl">File</div>
+        <div class="dv">Widget_Pro_COA_LOT-4471.pdf</div>
+      </div>
+      <div class="detail-row">
+        <div class="dl">Batch</div>
+        <div class="dv"><span class="mono">LOT-4471</span></div>
+      </div>
+      <div class="detail-row">
+        <div class="dl">Lab</div>
+        <div class="dv">Green Analytics Laboratory</div>
+      </div>
+      <div class="detail-row">
+        <div class="dl">Tested</div>
+        <div class="dv">March 15, 2025</div>
+      </div>
+      <div class="detail-row">
+        <div class="dl">Status</div>
+        <div class="dv"><span class="ok-badge">✓ Current</span></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-view-doc">📄 &nbsp;View document</button>
+      <div class="modal-credit">Powered by <a href="#">Qredible MyCOA</a></div>
+      <button class="btn-modal-close" onclick="document.getElementById('modal-a').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
