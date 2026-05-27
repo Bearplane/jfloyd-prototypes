@@ -227,6 +227,46 @@ a{color:inherit;text-decoration:none}
 
 /* State divider */
 .state-sep{height:1px;background:#E9D8FD;margin:32px 0}
+
+/* ── ANNOTATED CODE CARD ── */
+.code-card-annotated .code-card{max-width:none;margin-bottom:0}
+.copy-btn{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#94A3B8;font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.copy-btn:hover{background:rgba(255,255,255,.15);color:#E2E8F0}
+.code-card-body{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.annotated-line{display:flex;align-items:baseline;gap:20px;padding:4px 0}
+.annotated-line+.annotated-line{border-top:1px solid rgba(255,255,255,.05);padding-top:14px;margin-top:0}
+.code-line{flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.5;color:#E2E8F0;white-space:pre;background:none;border:none;padding:0;margin:0}
+.line-annotation{font-size:11px;color:#718096;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.4;flex:1}
+.line-annotation::before{content:'← ';color:#475569;font-family:'IBM Plex Mono',monospace}
+
+/* ── INSTALL STEPS (3-col) ── */
+.install-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0 0}
+.install-step{background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;padding:18px 18px 18px;position:relative}
+.install-step-num{position:absolute;top:0;left:18px;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:#1A202E;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif}
+.install-step-icon{font-size:20px;margin-bottom:8px;margin-top:8px;display:block}
+.install-step-title{font-size:14px;font-weight:700;color:#1A202E;margin-bottom:5px}
+.install-step-body{font-size:12px;color:#4A5568;line-height:1.6;margin-bottom:10px}
+.mini-cms-editor{background:#F9FAFB;border:1px solid #D1D5DB;border-radius:6px;overflow:hidden;margin-top:10px}
+.mini-cms-bar{background:#F3F4F6;border-bottom:1px solid #D1D5DB;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;font-family:-apple-system,sans-serif}
+.mini-cms-bar-title{font-size:10px;font-weight:600;color:#374151}
+.mini-cms-tools{font-size:11px;color:#6B7280;letter-spacing:2px}
+.mini-cms-content{padding:8px 10px;font-family:-apple-system,sans-serif}
+.mini-cms-text{font-size:10px;color:#4B5563;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-cms-snippet{background:#1A202E;color:#86EFAC;font-family:'IBM Plex Mono',monospace;font-size:9px;padding:5px 7px;border-radius:4px;line-height:1.55;overflow:hidden}
+.mini-publish-btn{display:inline-flex;align-items:center;gap:5px;background:#1C6EF2;color:#fff;font-size:12px;font-weight:600;padding:8px 14px;border-radius:6px;cursor:pointer;font-family:-apple-system,sans-serif;margin-top:10px}
+
+/* ── SNIPPET VARIANTS ── */
+.variants-section{background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;padding:20px 22px;margin-top:28px}
+.variants-title{font-size:14px;font-weight:700;color:#1A202E;margin-bottom:4px}
+.variants-intro{font-size:12px;color:#4A5568;margin-bottom:16px;line-height:1.5}
+.variants-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.variant-card{background:#F7F5FF;border:1px solid #E9D8FD;border-radius:8px;padding:14px}
+.variant-tag{display:inline-flex;font-size:10px;font-weight:700;color:#6B46C1;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.variant-desc{font-size:12px;color:#4A5568;line-height:1.55;margin-bottom:10px}
+.variant-code{background:#1A202E;border-radius:5px;padding:9px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#E2E8F0;overflow-x:auto;white-space:nowrap;line-height:1.5}
+
+/* ── PAYOFF ── */
+.install-payoff{background:#F7F5FF;border:1px solid #E9D8FD;border-left:3px solid #805AD5;border-radius:6px;padding:12px 16px;font-size:13px;color:#44337A;line-height:1.65;margin-top:24px}
 </style>
 </head>
 <body>
@@ -256,26 +296,104 @@ a{color:inherit;text-decoration:none}
   </div>
 
   <!-- ════════════════════════════════════════════════ -->
-  <!-- SECTION 1: INSTALLATION SNIPPET                -->
+  <!-- SECTION 1: INSTALLATION                        -->
   <!-- ════════════════════════════════════════════════ -->
   <div class="section-block">
     <div class="section-label">01 — Installation</div>
-    <div class="section-title">What the merchant pastes once</div>
-    <p class="section-sub">No plugin, no API key, no webhook configuration. The embed script resolves the correct COA via MyCOA's Direct-assignment table, keyed to the product page URL or a <code>data-mycoa-sku</code> attribute.</p>
+    <div class="section-title">30 seconds to install. Then never touch it again.</div>
+    <p class="section-sub">No plugin, no API key, no webhook configuration. Two lines of HTML, pasted once into a product page template — Shopify, WooCommerce, or Ecwid all work out of the box.</p>
 
-    <div class="code-card">
-      <div class="code-card-header">
-        <span class="cc-dot r"></span><span class="cc-dot y"></span><span class="cc-dot g"></span>
-        <span class="cc-filename">product-page.html (or Ecwid / WooCommerce theme)</span>
+    <!-- Annotated code card -->
+    <div class="code-card-annotated">
+      <div class="code-card">
+        <div class="code-card-header">
+          <span class="cc-dot r"></span><span class="cc-dot y"></span><span class="cc-dot g"></span>
+          <span class="cc-filename">product-page.html · Ecwid / WooCommerce / Shopify theme</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <div class="code-card-body">
+          <div class="annotated-line">
+            <pre class="code-line"><span class="ht">&lt;script</span> <span class="ha">src</span>=<span class="hv">"https://embed.qredible.com/v1/mycoa.js"</span> <span class="ha">async</span><span class="ht">&gt;&lt;/script&gt;</span></pre>
+            <div class="line-annotation">loads the embed — once per page, place in &lt;head&gt; or before &lt;/body&gt;</div>
+          </div>
+          <div class="annotated-line">
+            <pre class="code-line"><span class="ht">&lt;button</span> <span class="ha">data-mycoa-button</span><span class="ht">&gt;</span>View COAs<span class="ht">&lt;/button&gt;</span></pre>
+            <div class="line-annotation">the button — drop it anywhere on the product page, right after "Add to cart"</div>
+          </div>
+        </div>
       </div>
-      <pre><span class="ht">&lt;script</span> <span class="ha">src</span>=<span class="hv">"https://embed.qredible.com/v1/mycoa.js"</span> <span class="ha">async</span><span class="ht">&gt;&lt;/script&gt;</span>
-<span class="ht">&lt;button</span> <span class="ha">data-mycoa-button</span><span class="ht">&gt;</span>View COAs<span class="ht">&lt;/button&gt;</span></pre>
     </div>
 
-    <div class="callout">
-      Paste once. Auto-updates every time you change a COA assignment in MyCOA.
+    <!-- 3-step install flow -->
+    <div class="install-steps">
+
+      <div class="install-step">
+        <div class="install-step-num">1</div>
+        <span class="install-step-icon">📋</span>
+        <div class="install-step-title">Copy</div>
+        <div class="install-step-body">Copy the snippet above. That's the full embed — nothing else needed.</div>
+      </div>
+
+      <div class="install-step">
+        <div class="install-step-num">2</div>
+        <span class="install-step-icon">✏️</span>
+        <div class="install-step-title">Paste</div>
+        <div class="install-step-body">Drop it into your product page template, right after the "Add to cart" block.</div>
+        <div class="mini-cms-editor">
+          <div class="mini-cms-bar">
+            <span class="mini-cms-bar-title">Product description</span>
+            <span class="mini-cms-tools">B &nbsp;I &nbsp;⋯</span>
+          </div>
+          <div class="mini-cms-content">
+            <div class="mini-cms-text">Widget Pro is our flagship formula…</div>
+            <div class="mini-cms-snippet">&lt;script src="…/mycoa.js" async&gt;&lt;/script&gt;<br>&lt;button data-mycoa-button&gt;View COAs&lt;/button&gt;</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="install-step">
+        <div class="install-step-num">3</div>
+        <span class="install-step-icon">✅</span>
+        <div class="install-step-title">Save</div>
+        <div class="install-step-body">Publish the page. The "View COAs" button appears on every product page that carries the template.</div>
+        <div class="mini-publish-btn">💾 &nbsp;Publish changes</div>
+      </div>
+
+    </div><!-- /install-steps -->
+
+    <!-- Snippet variants -->
+    <div class="variants-section">
+      <div class="variants-title">Want it your way?</div>
+      <div class="variants-intro">The snippet above works for most installs. These variants cover edge cases without touching anything else.</div>
+      <div class="variants-grid">
+
+        <div class="variant-card">
+          <div class="variant-tag">Default</div>
+          <div class="variant-desc">Auto-detects the product from the page URL. Uses "View COAs" as the button label. Works for most stores with no changes.</div>
+          <div class="variant-code"><span class="ht">&lt;button</span> <span class="ha">data-mycoa-button</span><span class="ht">&gt;</span>View COAs<span class="ht">&lt;/button&gt;</span></div>
+        </div>
+
+        <div class="variant-card">
+          <div class="variant-tag">Custom label</div>
+          <div class="variant-desc">Change the button text to match your brand voice. The embed behavior is identical — only the visible label changes.</div>
+          <div class="variant-code"><span class="ht">&lt;button</span> <span class="ha">data-mycoa-button</span><span class="ht">&gt;</span>View test reports<span class="ht">&lt;/button&gt;</span></div>
+        </div>
+
+        <div class="variant-card">
+          <div class="variant-tag">Pinned URL</div>
+          <div class="variant-desc">Override auto-detect. Useful for non-product pages, embedded widgets, or anywhere the URL does not match the product page directly.</div>
+          <div class="variant-code"><span class="ht">&lt;div</span> <span class="ha">data-mycoa-product-url</span>=<span class="hv">"https://shop.example.com/widget-pro"</span><span class="ht">&gt;&lt;/div&gt;</span></div>
+        </div>
+
+      </div>
+    </div><!-- /variants -->
+
+    <!-- Payoff line -->
+    <div class="install-payoff">
+      Every COA you upload, reassign, or archive in MyCOA reflects on your product pages automatically. The snippet stays exactly as you pasted it forever.
     </div>
-  </div>
+
+  </div><!-- /section 1 -->
 
   <!-- ════════════════════════════════════════════════ -->
   <!-- SECTION 2: MERCHANT PAGE RENDERS               -->
