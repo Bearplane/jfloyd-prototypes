@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-ScanAI — Findings Tab Optimization</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#292E6F; --navy-hover:#1F2357; --navy-soft:#E5E7F0;
+  --sage:#95BC64; --sage-soft:#EDF3E0;
+  --black:#1A202E; --black-hover:#2A3142;
+  --blue:#50A8FF; --blue-bg:#DCEEFF; --blue-link:#376fd0;
+  --green:#42C17D; --green-soft:#DCFCE7;
+  --yellow:#E4AE3C; --yellow-soft:#FEF3C7; --yellow-dark:#AF9254;
+  --red:#F05452; --red-soft:#FFE4E6; --red-text:#9b1c1c;
+  --g900:#1A202E; --g700:#333; --g600:#657496; --g500:#9BA09C;
+  --g300:#C5C5C5; --g200:#EBEDF2; --g150:#E7EAEF; --g100:#F1F5F9; --g50:#F8FBFD;
+  --font:"Uber Move","Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono","SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#EEF1F6;color:var(--navy);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--blue-link);text-decoration:none}a:hover{text-decoration:underline}
+
+/* ticket nav */
+.topnav{background:var(--navy);padding:11px 24px;display:flex;align-items:center;gap:8px;font-size:12px;color:#A7B2C7}
+.topnav a{color:#93C5FD}.topnav .sep{color:#4b5378}
+.topnav .ticket-badge{background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:var(--mono)}
+.topnav .title{color:#fff;font-weight:600}
+
+.page{max-width:1080px;margin:0 auto;padding:28px 22px 80px}
+.page-header h1{font-size:23px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.page-header p{color:var(--g600);font-size:13px;max-width:760px}
+
+/* annotation callouts */
+.callout{border-radius:8px;padding:12px 16px;font-size:12.5px;line-height:1.6;margin:16px 0}
+.callout.amber{background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid var(--yellow);color:#78350F}
+.callout.blue{background:#EFF6FF;border:1px solid #BFDBFE;border-left:4px solid var(--blue);color:#1E40AF}
+.callout.green{background:#F0FDF4;border:1px solid #BBF7D0;border-left:4px solid #16A34A;color:#14532D}
+.callout b{font-weight:700}
+.callout ul{margin:6px 0 0 18px}
+.callout li{margin:3px 0}
+
+/* before/after strip */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0 8px}
+.ba-card{border-radius:10px;border:1px solid var(--g200);background:#fff;overflow:hidden}
+.ba-card h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:9px 14px}
+.ba-card.before h4{background:var(--red-soft);color:var(--red-text)}
+.ba-card.after h4{background:var(--sage-soft);color:#4d6a2a}
+.ba-body{padding:10px 14px;font-size:11.5px;color:var(--g600)}
+.ba-body .mini{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;margin-bottom:4px;background:var(--g50);border:1px solid var(--g200)}
+.ba-body .mini .dot{width:7px;height:7px;border-radius:99px;background:var(--red);flex:none}
+.ba-body .mini.ok .dot{background:var(--green)}
+.ba-body .mini .t{font-family:var(--mono);font-size:10.5px;color:var(--navy)}
+.ba-count{font-size:11px;font-weight:700;color:var(--g600);margin-top:6px}
+
+/* ====== MODAL MOCKUP ====== */
+.modal{background:#fff;border-radius:14px;box-shadow:0 18px 50px rgba(26,32,46,.18);overflow:hidden;border:1px solid var(--g200);margin-top:8px}
+.qs-head{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:16px;align-items:center;padding:14px 22px;background:linear-gradient(135deg,#F4F0FF 0%,#EEF4FF 100%);border-bottom:1px solid var(--g200)}
+.qs-head .brain{width:36px;height:36px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--blue-link);font-size:18px}
+.qs-head .ttl{font-size:16px;font-weight:800;color:var(--navy)}
+.qs-head .sub{font-size:11px;color:var(--g600)}
+.qs-head .lab{font-size:11px;color:var(--g600);text-align:right}
+.qs-head .scanbox{display:flex;align-items:center;gap:8px;padding:5px 12px;background:#fff;border-radius:8px;border:1px solid var(--g200);font-size:13px;font-weight:700;color:var(--navy)}
+.qs-head .closebtn{width:30px;height:30px;border:none;background:#fff;border-radius:7px;cursor:pointer;color:var(--g600);font-size:16px}
+
+.qs-tabs{display:flex;gap:4px;padding:0 22px;border-bottom:1px solid var(--g200);background:#fff}
+.qs-tab{border:0;background:transparent;padding:11px 14px;cursor:pointer;font-size:13px;font-weight:700;color:var(--g600);border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px}
+.qs-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+.qs-scroll{padding:14px 22px 26px;display:flex;flex-direction:column;gap:12px;background:#fff;max-height:none}
+
+/* compact summary strip */
+.strip{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:10px 14px;background:linear-gradient(180deg,#FAFCFF 0%,#F4F8FF 100%);border:1px solid #D7E5FF;border-radius:10px}
+.strip .scani{width:30px;height:30px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--blue-link);font-size:15px}
+.strip .scanmeta b{font-size:12.5px;font-weight:800;color:var(--navy)}
+.strip .scanmeta div{font-size:10.5px;color:var(--g600)}
+.sevrow{display:flex;align-items:center;gap:14px;font-size:12px;flex-wrap:wrap}
+.sevc{display:flex;align-items:center;gap:6px;color:var(--g600);font-weight:500}
+.sevc b{color:var(--navy);font-weight:800}
+.sevdot{width:9px;height:9px;border-radius:99px}
+.sevdot.s3{background:var(--red)} .sevdot.s2{background:var(--yellow)} .sevdot.s1{background:#F2D024} .sevdot.s0{background:var(--green)}
+.vdiv{width:1px;height:22px;background:var(--g200)}
+.bchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;cursor:pointer}
+.bchip.new{background:var(--sage-soft);color:#4d6a2a} .bchip.flip{background:var(--red-soft);color:var(--red-text)} .bchip.stale{background:var(--g150);color:var(--g700)}
+.btn{font-family:var(--font);font-size:12px;font-weight:700;height:32px;padding:0 14px;border-radius:6px;border:none;background:var(--black);color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 2px 5px rgba(0,0,0,.14);transition:background .12s}
+.btn:hover{background:var(--black-hover)}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--g200);box-shadow:none}
+.btn.ghost:hover{background:var(--g100)}
+.btn.sm{height:28px;padding:0 11px;font-size:11.5px}
+.btn.xs{height:24px;padding:0 9px;font-size:11px}
+.btn.accent{background:var(--blue)} .btn.accent:hover{background:#2e93f5}
+.btn.success{background:var(--green)} .btn.success:hover{background:#39a86c}
+.btn.danger{background:var(--red)} .btn.danger:hover{background:#d83f45}
+.btn:disabled{background:rgba(0,0,0,.1);color:rgba(0,0,0,.3);cursor:not-allowed;box-shadow:none}
+
+/* expanded summary */
+.esum{border:1px solid var(--g200);border-radius:10px;overflow:hidden}
+.esum-head{padding:12px 16px;border-bottom:1px solid var(--g200);background:var(--g50)}
+.esum-head h3{font-size:13px;font-weight:800;color:var(--navy)}
+.esum-head .sh-sub{font-size:11px;color:var(--g600);margin-top:2px}
+.esum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px}
+.scol{padding:14px;background:var(--g50);border-radius:8px}
+.scol-top{display:flex;justify-content:space-between;align-items:center}
+.scol-top .name{font-size:12px;font-weight:800;color:var(--navy)}
+.scol .sub{font-size:10.5px;font-weight:700;color:var(--g600);margin:2px 0 8px}
+.scol .li{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:11px}
+.scol .li span{flex:1}
+
+/* filter toolbar */
+.toolbar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--g50);border-radius:10px;flex-wrap:wrap}
+.search{flex:1;min-width:260px;height:32px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--g200);border-radius:6px;padding:0 10px}
+.search input{flex:1;border:0;outline:0;background:transparent;font-size:12px;font-family:var(--font);color:var(--navy)}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--g200);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:7px 12px;font-size:11.5px;font-weight:700;color:var(--g600);cursor:pointer}
+.seg button.active{background:var(--navy);color:#fff}
+.selshell{display:inline-flex;align-items:center;gap:5px;height:32px;background:#fff;border:1px solid var(--g200);border-radius:6px;padding:0 8px}
+.selshell .lbl{font-size:11px;font-weight:700;color:var(--g600)}
+.selshell select{border:0;outline:0;background:transparent;font-size:11.5px;font-weight:600;font-family:var(--font);color:var(--navy);cursor:pointer}
+
+/* pills + tags */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:800;line-height:18px}
+.pill.bad{background:var(--red-soft);color:var(--red-text)} .pill.warn{background:var(--yellow-soft);color:#92400E}
+.pill.ok{background:var(--green-soft);color:#166534} .pill.info{background:var(--blue-bg);color:#1E40AF}
+.pill.neutral{background:var(--g150);color:var(--g700)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:4px;font-size:9.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}
+.tag.ai{background:#EDE9FE;color:#6D28D9} .tag.new{background:var(--sage-soft);color:#4d6a2a}
+.tag.ongoing{background:var(--g150);color:var(--g700)} .tag.fbad{background:var(--red-soft);color:var(--red-text)}
+.tag.manual{background:#FEF3C7;color:#92400E}
+
+/* section accordion */
+.section{border:1px solid var(--g200);border-radius:12px;overflow:hidden;background:#fff}
+.section.terms{border-color:#F3C9CB}
+.section.checks{border-color:#CFE0F5}
+.section.analyst{border-color:#F5E2B8}
+.sec-head{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;user-select:none}
+.section.terms .sec-head{background:linear-gradient(90deg,#FFF6F6,#fff)}
+.section.checks .sec-head{background:linear-gradient(90deg,#F5F9FF,#fff)}
+.section.analyst .sec-head{background:linear-gradient(90deg,#FFFBF0,#fff)}
+.sec-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+.section.terms .sec-ico{background:var(--red-soft);color:var(--red-text)}
+.section.checks .sec-ico{background:var(--blue-bg);color:var(--blue-link)}
+.section.analyst .sec-ico{background:var(--yellow-soft);color:#92400E}
+.sec-title{font-size:14px;font-weight:800;color:var(--navy)}
+.sec-sub{font-size:11px;color:var(--g600);margin-top:1px}
+.sec-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.chev{transition:transform .15s;color:var(--g500);font-size:13px}
+.section.collapsed .chev{transform:rotate(-90deg)}
+.section.collapsed .sec-body{display:none}
+
+/* group bulk bar */
+.bulkbar{display:flex;align-items:center;gap:10px;padding:9px 16px;background:#FFF8E1;border-top:1px solid #F5E2B8;border-bottom:1px solid #F5E2B8}
+.bulkbar.checks{background:#EAF2FF;border-color:#CFE0F5}
+.bulkbar .cnt{font-size:12px;font-weight:800;color:var(--navy)}
+.bulkbar .spacer{margin-left:auto}
+.bulkbar.hidden{display:none}
+
+/* terms table */
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:12px}
+table.tbl th{text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--g600);padding:9px 12px;border-bottom:1px solid var(--g200);white-space:nowrap;background:var(--g50)}
+table.tbl td{padding:10px 12px;border-bottom:1px solid var(--g150);vertical-align:middle}
+.agg-row{cursor:pointer}
+.agg-row:hover{background:var(--g50)}
+.agg-row.expanded{background:#FFF6F6}
+.agg-row td .rowchev{transition:transform .15s;color:var(--g500);display:inline-block}
+.agg-row.expanded td .rowchev{transform:rotate(90deg)}
+.term-txt{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy)}
+.muted{color:var(--g600)}
+.cell-pages b{color:var(--navy)}
+.detail-row td{padding:0;background:var(--g50)}
+.detail-inner{padding:12px 18px}
+.detail-note{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--g700);margin-bottom:10px}
+.occ-table{background:#fff;border:1px solid var(--g200);border-radius:8px;overflow:hidden}
+.occ-table table{width:100%;border-collapse:collapse;font-size:11.5px}
+.occ-table th{background:var(--g50)}
+.occ-table td{border-bottom:1px solid var(--g150)}
+.occ-table tr:last-child td{border-bottom:none}
+.lnk{font-size:11px;color:var(--blue-link)}
+.ctx{font-style:italic;color:var(--g600);max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cb{accent-color:var(--blue);width:14px;height:14px;cursor:pointer}
+
+/* presence strip */
+.pstrip{display:inline-flex;gap:2px}
+.pstrip i{width:8px;height:13px;border-radius:2px;display:inline-block}
+.pstrip i.p{background:var(--red)} .pstrip i.a{background:var(--green)} .pstrip i.n{background:var(--g200)}
+
+/* finding cards (compliance checks) */
+.fcard{border:1px solid var(--g200);border-radius:9px;margin:8px 12px;overflow:hidden}
+.fcard.violative{border-left:3px solid var(--red)}
+.fcard.compliant{border-left:3px solid var(--green)}
+.frow{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;cursor:pointer}
+.frow:hover{background:var(--g50)}
+.frow .rowchev{transition:transform .15s;color:var(--g500);margin-top:2px}
+.fcard.expanded .rowchev{transform:rotate(90deg)}
+.fc-title{font-size:13px;font-weight:700;color:var(--navy)}
+.fc-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:5px;font-size:11px;color:var(--g600)}
+.fc-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.reviewed-stamp{font-size:11px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px}
+.stale-stamp{font-size:11px;color:var(--yellow-dark);font-weight:700;display:flex;align-items:center;gap:4px}
+.fc-exp{padding:12px 14px 14px 44px;border-top:1px solid var(--g200);background:var(--g50);display:grid;grid-template-columns:1fr 220px;gap:18px}
+.fc-desc{font-size:12px;color:var(--g700);line-height:1.5;margin-bottom:10px}
+.histlabel{font-size:10px;font-weight:800;color:var(--g600);letter-spacing:.4px;margin:6px 0 5px}
+.shot{height:140px;border-radius:8px;border:1px solid var(--g200);overflow:hidden;background:#fff}
+.shot.ok{background:linear-gradient(135deg,#EDF3E0,#DCFCE7);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--green);font-weight:700;font-size:11px}
+.shot .bar{display:flex;gap:4px;padding:6px;background:var(--g100)}
+.shot .bar i{width:8px;height:8px;border-radius:99px}
+.shot .body{padding:8px;font-size:9px}
+.shot .line{height:4px;border-radius:2px;background:var(--g200);margin:4px 0}
+.shot .flag{padding:5px 7px;background:var(--red-soft);border:1px solid #FECACA;border-radius:4px;color:var(--red-text);font-size:9px;font-weight:600}
+
+/* analyst review items */
+.areview{margin:8px 12px;border:1px solid var(--g200);border-radius:9px;border-left:3px solid var(--yellow);padding:11px 13px;display:flex;align-items:flex-start;gap:10px}
+.areview .ai-title{font-size:13px;font-weight:700;color:var(--navy)}
+.areview .ai-desc{font-size:11.5px;color:var(--g600);margin-top:4px;max-width:560px}
+.areview .ai-act{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:11px 18px;border-radius:8px;font-size:12.5px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:all .25s;z-index:300;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .ic{color:var(--green)}
+
+.legend{font-size:11px;color:var(--g600);display:flex;gap:16px;flex-wrap:wrap;margin-top:4px}
+.legend span{display:flex;align-items:center;gap:5px}
+
+/* optimization path */
+.path{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.path .pcard{background:#fff;border:1px solid var(--g200);border-radius:10px;padding:14px 16px}
+.path .pcard h5{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.path .pcard .phase{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:5px}
+.path .tonight{background:var(--sage-soft);color:#4d6a2a}
+.path .next{background:var(--blue-bg);color:#1E40AF}
+.path .later{background:var(--g150);color:var(--g700)}
+.path .pcard ul{margin:9px 0 0 16px;font-size:11.5px;color:var(--g700);line-height:1.7}
+.path .pcard code{font-family:var(--mono);font-size:10.5px;background:var(--g100);padding:1px 5px;border-radius:4px;color:var(--navy)}
+h2.block{font-size:17px;font-weight:800;color:var(--navy);margin:34px 0 4px}
+.block-sub{font-size:12.5px;color:var(--g600);margin-bottom:6px}
+@media(max-width:880px){.ba,.esum-grid,.fc-exp,.path{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topnav">
+  <a href="../index.html">Prototypes</a><span class="sep">/</span>
+  <span class="ticket-badge">Q-ScanAI</span>
+  <span class="title">Findings Tab Optimization — Grouping, Bulk Actions &amp; Expandable Sections</span>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Q-ScanAI Findings — Noise Reduction &amp; Grouping</h1>
+    <p>The current findings tab renders <b>one row per page occurrence</b>, so a single violative term that appears on 5 pages becomes 5 separate cards. This mockup collapses that into <b>one row per unique term</b> with an expandable per-page breakdown, separates analyst-review checks into their own section, and adds group-level bulk actions. Sample data only (fictional <b>Northwind Botanicals LLC</b>).</p>
+  </div>
+
+  <div class="callout blue">
+    <b>The three structural moves in this redesign:</b>
+    <ul>
+      <li><b>1. Group violative terms by keyword</b> — one row per term, with a count + affected pages, expandable to per-page occurrences. <b>Bulk-resolve / dismiss the whole term group</b> in one click.</li>
+      <li><b>2. Split out analyst-review checks</b> — manual-review placeholders (no AI verdict) live in their own collapsible section instead of being mixed into the violation list and adding to the red count.</li>
+      <li><b>3. Collapsible sections everywhere</b> — Violative Terms, Compliance Checks, and Analyst Review each collapse independently so an analyst sees only what they're working on.</li>
+    </ul>
+  </div>
+
+  <!-- before / after -->
+  <div class="ba">
+    <div class="ba-card before">
+      <h4>Before — flat list (today)</h4>
+      <div class="ba-body">
+        <div class="mini"><span class="dot"></span><span class="t">Violative Term | "clinically tested" — /product/recovery-gummies</span></div>
+        <div class="mini"><span class="dot"></span><span class="t">Violative Term | "clinically tested" — /shop</span></div>
+        <div class="mini"><span class="dot"></span><span class="t">Violative Term | "clinically tested" — /blog/wellness</span></div>
+        <div class="mini"><span class="dot"></span><span class="t">Violative Term | "clinically tested" — /faq</span></div>
+        <div class="mini"><span class="dot"></span><span class="t">Violative Term | "FDA approved" — /about-us</span></div>
+        <div class="ba-count">15 rows for 7 unique terms · review each one individually</div>
+      </div>
+    </div>
+    <div class="ba-card after">
+      <h4>After — grouped (this mockup)</h4>
+      <div class="ba-body">
+        <div class="mini ok"><span class="dot"></span><span class="t">"clinically tested" · 4 pages · HIGH · Ongoing ▸</span></div>
+        <div class="mini ok"><span class="dot"></span><span class="t">"FDA approved" · 2 pages · HIGH · Ongoing ▸</span></div>
+        <div class="mini ok"><span class="dot"></span><span class="t">"pregnant" · 3 pages · HIGH · Ongoing ▸</span></div>
+        <div class="mini ok"><span class="dot"></span><span class="t">"marijuana" · 2 pages · MEDIUM · Ongoing ▸</span></div>
+        <div class="mini ok"><span class="dot"></span><span class="t">"cures" · 1 page · HIGH · Resolved ▸</span></div>
+        <div class="ba-count">7 rows · expand any term for pages · bulk-resolve a whole group</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ THE MOCKUP ============ -->
+  <div class="modal">
+    <div class="qs-head">
+      <div class="brain">&#129504;</div>
+      <div>
+        <div class="ttl">Q-ScanAI</div>
+        <div class="sub">AI-Enhanced Compliance Scanning</div>
+      </div>
+      <div class="lab">Scanning</div>
+      <div class="scanbox">Northwind Botanicals LLC &#9662;</div>
+      <button class="closebtn">&times;</button>
+    </div>
+
+    <div class="qs-tabs">
+      <button class="qs-tab">&#9889; Scanner</button>
+      <button class="qs-tab active">&#9888; Findings</button>
+    </div>
+
+    <div class="qs-scroll">
+      <!-- compact summary strip -->
+      <div class="strip">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="scani">&#128737;</div>
+          <div class="scanmeta">
+            <b>Scan #6 · Jun 2, 2026</b>
+            <div>vs Scan #5 · May 14</div>
+          </div>
+        </div>
+        <div class="sevrow">
+          <span class="sevc"><span class="sevdot s3"></span><b>2</b> High</span>
+          <span class="sevc"><span class="sevdot s2"></span><b>3</b> Medium</span>
+          <span class="sevc"><span class="sevdot s1"></span><b>1</b> Low</span>
+          <span class="sevc"><span class="sevdot s0"></span><b>2</b> Compliant</span>
+          <span class="vdiv"></span>
+          <span class="bchip new" onclick="setView('new')"><b>1</b> new since last</span>
+          <span class="bchip flip"><b>1</b> flipped</span>
+          <span class="bchip stale"><b>2</b> stale review</span>
+        </div>
+        <button class="btn ghost sm" onclick="toggleSummary(this)">&#9662; Compliance scan summary</button>
+      </div>
+
+      <!-- expanded summary (collapsed by default) -->
+      <div class="esum" id="esum" style="display:none">
+        <div class="esum-head">
+          <h3>Compliance Scan Summary</h3>
+          <div class="sh-sub">Scan #6 completed Jun 2, 2026 · 8 checks · 7 terms flagged across 15 page occurrences</div>
+        </div>
+        <div class="esum-grid">
+          <div class="scol">
+            <div class="scol-top"><span class="name">Keywords</span><span><span class="pill ok">0</span> <span class="muted">/ 452</span></span></div>
+            <div class="sub">watched / hits</div>
+            <div class="muted" style="font-size:11px">No flagged keywords in latest scan.</div>
+          </div>
+          <div class="scol">
+            <div class="scol-top"><span class="name">Violative Terms</span><span><span class="pill bad">7</span> <span class="muted">/ 15</span></span></div>
+            <div class="sub">unique terms / page hits</div>
+            <div class="li"><span>"clinically tested"</span><span class="pill bad">Ongoing</span></div>
+            <div class="li"><span>"FDA approved"</span><span class="pill bad">Ongoing</span></div>
+            <div class="li"><span>"cures"</span><span class="pill ok">Resolved</span></div>
+          </div>
+          <div class="scol">
+            <div class="scol-top"><span class="name">Compliance Checks</span><span><span class="pill bad">3</span> <span class="muted">/ 8</span></span></div>
+            <div class="sub">issues / total</div>
+            <div class="li"><span>FDA Disclaimer</span><span class="pill bad">Issue</span></div>
+            <div class="li"><span>Age Verification</span><span class="pill ok">OK</span></div>
+            <div class="li"><span>SSL/TLS Security</span><span class="pill ok">OK</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- filter toolbar -->
+      <div class="toolbar">
+        <div class="search">&#128269;<input id="search" placeholder="Search findings, content, or keywords…" oninput="filterTerms(this.value)"></div>
+        <div class="seg">
+          <button class="active" data-v="aggregate" onclick="setView('aggregate')">Aggregate</button>
+          <button data-v="latest" onclick="setView('latest')">Latest scan</button>
+          <button data-v="new" onclick="setView('new')">What's new</button>
+        </div>
+        <label class="selshell"><span class="lbl">Result:</span><select><option>All</option><option>Violative</option><option>Compliant</option></select></label>
+        <label class="selshell"><span class="lbl">Risk:</span><select><option>All</option><option>High</option><option>Medium</option><option>Low</option></select></label>
+        <label class="selshell"><span class="lbl">Review:</span><select><option>All</option><option>Reviewed</option><option>Stale</option><option>Unreviewed</option></select></label>
+      </div>
+
+      <!-- ===== SECTION 1: VIOLATIVE TERMS (grouped) ===== -->
+      <div class="section terms" id="sec-terms">
+        <div class="sec-head" onclick="toggleSection('sec-terms', event)">
+          <div class="sec-ico">&#128270;</div>
+          <div>
+            <div class="sec-title">Violative Terms — grouped by keyword</div>
+            <div class="sec-sub">One row per unique term · expand for per-page occurrences · bulk-resolve whole groups</div>
+          </div>
+          <div class="sec-right">
+            <span class="pill bad">6 ongoing</span>
+            <span class="pill ok">1 resolved</span>
+            <span class="chev">&#9660;</span>
+          </div>
+        </div>
+        <div class="sec-body">
+          <!-- group bulk bar -->
+          <div class="bulkbar hidden" id="terms-bulk">
+            <span class="cb-wrap"><input type="checkbox" class="cb" disabled checked></span>
+            <span class="cnt" id="terms-cnt">0 term groups selected</span>
+            <span class="muted" id="terms-pages">covering 0 page occurrences</span>
+            <span class="spacer"></span>
+            <button class="btn success sm" onclick="bulkTerms('resolve')">&#10003; Mark all reviewed</button>
+            <button class="btn ghost sm" onclick="bulkTerms('compliant')">Mark group compliant</button>
+            <button class="btn danger sm" onclick="bulkTerms('dismiss')">Dismiss group</button>
+            <button class="btn ghost sm" onclick="clearTerms()">Clear</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl" id="terms-table">
+              <thead>
+                <tr>
+                  <th style="width:30px"><input type="checkbox" class="cb" id="terms-all" onclick="toggleAllTerms(this)"></th>
+                  <th style="width:24px"></th>
+                  <th>Term</th><th>Category</th><th>Severity</th><th>Status</th><th>Pages</th>
+                  <th>First seen</th><th>Last seen</th><th>Across scans</th><th>Top page</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="terms-body"><!-- rows injected --></tbody>
+            </table>
+          </div>
+          <div class="legend" style="padding:10px 14px">
+            <span><span class="pstrip"><i class="p"></i></span> present this scan</span>
+            <span><span class="pstrip"><i class="a"></i></span> resolved / absent</span>
+            <span><span class="pstrip"><i class="n"></i></span> not yet scanned</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 2: COMPLIANCE CHECKS (structured, threaded) ===== -->
+      <div class="section checks" id="sec-checks">
+        <div class="sec-head" onclick="toggleSection('sec-checks', event)">
+          <div class="sec-ico">&#129302;</div>
+          <div>
+            <div class="sec-title">Compliance Checks — Q-AI Scan</div>
+            <div class="sec-sub">Structured checks threaded across scans · expand for scan history + screenshot</div>
+          </div>
+          <div class="sec-right">
+            <span class="pill bad">3 issues</span>
+            <span class="pill ok">5 passing</span>
+            <span class="chev">&#9660;</span>
+          </div>
+        </div>
+        <div class="sec-body">
+          <div class="bulkbar checks hidden" id="checks-bulk">
+            <span class="cnt" id="checks-cnt">0 checks selected</span>
+            <span class="spacer"></span>
+            <button class="btn success sm" onclick="bulkChecks('resolve')">&#10003; Mark all reviewed</button>
+            <button class="btn ghost sm" onclick="bulkChecks('compliant')">Mark compliant</button>
+            <button class="btn ghost sm" onclick="clearChecks()">Clear</button>
+          </div>
+          <div id="checks-body"><!-- cards injected --></div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 3: ANALYST REVIEW CHECKS ===== -->
+      <div class="section analyst" id="sec-analyst">
+        <div class="sec-head" onclick="toggleSection('sec-analyst', event)">
+          <div class="sec-ico">&#128100;</div>
+          <div>
+            <div class="sec-title">Analyst Review Checks</div>
+            <div class="sec-sub">Manual checks with no AI verdict — these need a human. Kept separate so they don't inflate the violation count.</div>
+          </div>
+          <div class="sec-right">
+            <span class="pill warn">3 pending review</span>
+            <span class="chev">&#9660;</span>
+          </div>
+        </div>
+        <div class="sec-body">
+          <div class="bulkbar checks hidden" id="analyst-bulk">
+            <span class="cnt" id="analyst-cnt">0 selected</span>
+            <span class="spacer"></span>
+            <button class="btn success sm" onclick="bulkAnalyst()">&#10003; Mark reviewed</button>
+            <button class="btn ghost sm" onclick="clearAnalyst()">Clear</button>
+          </div>
+          <div id="analyst-body"><!-- items injected --></div>
+        </div>
+      </div>
+
+    </div><!-- /qs-scroll -->
+  </div><!-- /modal -->
+
+  <div class="callout amber" style="margin-top:18px">
+    <b>Why this matters:</b> On a rough site, today's flat list can run 30–50 cards where ~half are the same handful of terms repeated per page. The analyst scrolls a wall of near-duplicate rows and marks each individually. Grouping turns that into ~10 rows + 3 bulk buttons, and lifts manual-review items out of the red count so the severity strip reflects real AI-detected risk.
+  </div>
+
+  <!-- ============ OPTIMIZATION PATH ============ -->
+  <h2 class="block">Optimization path — scanner enhancements</h2>
+  <p class="block-sub">What's realistically shippable in the real findings tab tonight vs. what's a larger lift. File pointers are to <code>RTQ-Admin-UI</code>.</p>
+  <div class="path">
+    <div class="pcard">
+      <h5>&#9201; <span class="phase tonight">Tonight</span></h5>
+      <ul>
+        <li><b>Group VIOLATIVE_TERM by keyword</b> in <code>findingComponentHelper.tsx</code> — collapse same <code>metadata.keywords[0]</code> into one row with a page count.</li>
+        <li><b>Split analyst-review checks</b> into their own section in <code>QScanFindingTab.tsx</code> using the existing <code>isAnalystReviewCheck</code> flag — pure render change.</li>
+        <li><b>Collapsible section wrappers</b> around each group (CSS/state only).</li>
+        <li><b>Show all keywords</b>, not just <code>keywords[0]</code> (<code>QScanAIFindingResultItemNew.tsx:1219</code>).</li>
+      </ul>
+    </div>
+    <div class="pcard">
+      <h5>&#128640; <span class="phase next">Next sprint</span></h5>
+      <ul>
+        <li><b>Per-group bulk actions</b> reusing <code>bulkUpdateComplianceVerificationReview()</code> — pass every finding id in the group.</li>
+        <li><b>Per-page occurrence sub-table</b> on term expand (needs the occurrence list grouped client-side).</li>
+        <li><b>Stale-review state</b> (re-flag reviewed findings when content changes).</li>
+      </ul>
+    </div>
+    <div class="pcard">
+      <h5>&#127959; <span class="phase later">Larger lift</span></h5>
+      <ul>
+        <li><b>Threaded "across scans" history</b> per term — requires backend to expose first/last-seen + per-scan presence.</li>
+        <li><b>Aggregate / Latest / What's new</b> view modes (cross-scan diffing).</li>
+        <li><b>Screenshot peek lightbox</b> with prev/next navigation.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout green" style="margin-top:18px">
+    <b>Tonight's quick wins, summarized:</b> (1) group violative terms by keyword → one row per term; (2) move analyst-review checks to their own collapsible section; (3) wrap each group in a collapsible section. All three are render/grouping changes on data already in the finding payload — no backend or API change required.
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ic">&#10003;</span><span id="toast-msg"></span></div>
+
+<script>
+// ---------- sample data (anonymized) ----------
+var TERMS = [
+  { term:"clinically tested", cat:"Clinical", sev:"HIGH", status:"ongoing", pages:4, active:3, resolved:1,
+    first:"Mar 18", last:"Jun 2", scans:"napaapn".split(""), top:"/product/recovery-gummies",
+    occ:[
+      {page:"/product/recovery-gummies", present:true,  first:"Mar 18", last:"Jun 2",  ctx:'"Our clinically tested gummies deliver consistent results."'},
+      {page:"/shop",                      present:true,  first:"Apr 02", last:"Jun 2",  ctx:'"All formulations are clinically tested for therapeutic strength."'},
+      {page:"/blog/wellness-guide",       present:true,  first:"Apr 30", last:"Jun 2",  ctx:'"Education, safety, purity and potency from a clinical perspective."'},
+      {page:"/faq",                       present:false, first:"Mar 18", last:"May 14", ctx:'"Clinically tested for purity in every batch."'}
+    ]},
+  { term:"FDA approved", cat:"Clinical", sev:"HIGH", status:"ongoing", pages:2, active:2, resolved:0,
+    first:"Apr 02", last:"Jun 2", scans:"nnapap".split(""), top:"/about-us",
+    occ:[
+      {page:"/about-us",               present:true, first:"Apr 02", last:"Jun 2", ctx:'"Our formulas are FDA approved and ready for therapeutic use."'},
+      {page:"/product/cbd-oil-1500mg", present:true, first:"May 14", last:"Jun 2", ctx:'"FDA approved ingredients in every bottle."'}
+    ]},
+  { term:"pregnant", cat:"Health", sev:"HIGH", status:"ongoing", pages:3, active:2, resolved:1,
+    first:"Mar 18", last:"Jun 2", scans:"papapp".split(""), top:"/faq",
+    occ:[
+      {page:"/faq",                  present:true,  first:"Mar 18", last:"Jun 2",  ctx:'"Always consult your provider, especially if you are PREGNANT or nursing."'},
+      {page:"/product/wellness-bundle", present:true, first:"Apr 30", last:"Jun 2", ctx:'"Safe for pregnant women looking for relief."'},
+      {page:"/blog/wellness-guide",  present:false, first:"Mar 18", last:"Apr 30", ctx:'"Pregnant or nursing? Our formula is gentle."'}
+    ]},
+  { term:"marijuana", cat:"Cannabis", sev:"MEDIUM", status:"ongoing", pages:2, active:2, resolved:0,
+    first:"Apr 30", last:"Jun 2", scans:"nnnpap".split(""), top:"/shop",
+    occ:[
+      {page:"/shop", present:true, first:"Apr 30", last:"Jun 2", ctx:'"All the benefits of marijuana, hemp-derived."'},
+      {page:"/blog/the-truth-about-marijuana", present:true, first:"May 14", last:"Jun 2", ctx:'"Marijuana extract for non-medical, recreational use."'}
+    ]},
+  { term:"high", cat:"Psychoactive", sev:"MEDIUM", status:"ongoing", pages:2, active:1, resolved:1,
+    first:"Mar 18", last:"Jun 2", scans:"papapp".split(""), top:"/product/recovery-gummies",
+    occ:[
+      {page:"/product/recovery-gummies", present:true,  first:"Mar 18", last:"Jun 2",  ctx:'"Get the full plant high without any guesswork."'},
+      {page:"/",                         present:false, first:"Mar 18", last:"May 14", ctx:'"A legal high you can feel."'}
+    ]},
+  { term:"medical grade", cat:"Clinical", sev:"MEDIUM", status:"ongoing", pages:1, active:1, resolved:0,
+    first:"May 14", last:"Jun 2", scans:"nnnnpp".split(""), top:"/product/cbd-oil-1500mg",
+    occ:[
+      {page:"/product/cbd-oil-1500mg", present:true, first:"May 14", last:"Jun 2", ctx:'"Medical grade CBD oil, lab-tested for therapeutic strength."'}
+    ]},
+  { term:"cures", cat:"Clinical", sev:"HIGH", status:"resolved", pages:1, active:0, resolved:1,
+    first:"Mar 18", last:"Apr 30", scans:"ppaann".split(""), top:"/blog/wellness-guide",
+    occ:[
+      {page:"/blog/wellness-guide", present:false, first:"Mar 18", last:"Apr 30", ctx:'"Customers report it cures chronic insomnia within two weeks."'}
+    ]}
+];
+
+var CHECKS = [
+  { id:"fda", name:"FDA Disclaimer", cat:"Disclosure", sev:"HIGH", status:"violative", tags:["ongoing"],
+    desc:"Page must include the FDA disclaimer for hemp/CBD claims.",
+    excerpt:'No "These statements have not been evaluated by the FDA" disclaimer found on product pages.',
+    page:"/product/recovery-gummies", reviewed:null,
+    hist:[["#6","Jun 2","violative"],["#5","May 14","violative"],["#4","Apr 30","violative"],["#3","Apr 02","compliant"]]},
+  { id:"thc", name:"THC Disclaimer", cat:"Disclosure", sev:"MEDIUM", status:"violative", tags:["new"],
+    desc:"Site must disclose THC content and legal status.",
+    excerpt:'Product label "Delta-9 THC" not paired with required disclaimer.',
+    page:"/product/cbd-oil-1500mg", reviewed:null,
+    hist:[["#6","Jun 2","violative"],["#5","May 14","compliant"]]},
+  { id:"sub", name:"Product Subscription Model", cat:"Commerce", sev:"MEDIUM", status:"violative", tags:["ongoing","flip"],
+    desc:"Subscription disclosure and cancellation terms must be explicit.",
+    excerpt:"Auto-renewing subscription default-selected without explicit consent.",
+    page:"/checkout", reviewed:{by:"Maya Patel", at:"May 9", stale:true},
+    hist:[["#6","Jun 2","violative"],["#5","May 14","violative"],["#4","Apr 30","compliant"]]},
+  { id:"age", name:"Age Verification", cat:"Gating", sev:"MEDIUM", status:"compliant", tags:[],
+    desc:"Site must gate access via age confirmation.",
+    excerpt:"Age gate detected on landing page.", page:"/", reviewed:{by:"Andre Lopez", at:"May 30", stale:false},
+    hist:[["#6","Jun 2","compliant"],["#5","May 14","compliant"]]},
+  { id:"ssl", name:"SSL/TLS Security", cat:"Security", sev:"MEDIUM", status:"compliant", tags:[],
+    desc:"Valid SSL/TLS certificate served on all pages.", excerpt:"Valid SSL/TLS certificate found.", page:"/", reviewed:{by:"Lin Chen", at:"May 30", stale:false},
+    hist:[["#6","Jun 2","compliant"],["#5","May 14","compliant"]]},
+  { id:"ret", name:"Return Policy", cat:"Operations", sev:"LOW", status:"compliant", tags:[],
+    desc:"Return policy disclosed in checkout flow.", excerpt:"Return policy linked from checkout footer.", page:"/checkout", reviewed:null,
+    hist:[["#6","Jun 2","compliant"],["#5","May 14","compliant"]]}
+];
+
+var ANALYST = [
+  { id:"watch", name:"Tri-State Watchlist Review", desc:"Cross-reference the business against the tri-state regulatory watchlist. No automated verdict — requires an analyst to confirm match status." },
+  { id:"behav", name:"Behavioral Pattern Review", desc:"Manual review of marketing/behavioral signals that fall outside automated keyword detection (claim framing, imagery, bundling)." },
+  { id:"lic", name:"License Display Presence", desc:"Confirm the operating license is displayed and matches the registered entity. Flagged for manual confirmation." }
+];
+
+var sevPill = {HIGH:"bad", MEDIUM:"warn", LOW:"info"};
+
+// ---------- render terms ----------
+function renderTerms(filter){
+  filter = (filter||"").toLowerCase();
+  var body = document.getElementById('terms-body'); body.innerHTML="";
+  TERMS.forEach(function(t,i){
+    if(filter && t.term.toLowerCase().indexOf(filter)<0 && t.cat.toLowerCase().indexOf(filter)<0) return;
+    var tr = document.createElement('tr');
+    tr.className="agg-row"; tr.dataset.idx=i;
+    var pstrip = t.scans.map(function(c){var cl=c==='p'?'p':c==='a'?'a':'n';return '<i class="'+cl+'"></i>';}).join('');
+    var statusPill = t.status==='resolved' ? '<span class="pill ok">Resolved</span>' : '<span class="pill bad">Ongoing</span>';
+    var pagesExtra = (t.active>0 && t.resolved>0) ? ' <span class="muted" style="font-size:10px">· '+t.active+' active, '+t.resolved+' resolved</span>' : '';
+    tr.innerHTML =
+      '<td onclick="event.stopPropagation()"><input type="checkbox" class="cb term-cb" data-idx="'+i+'" data-pages="'+t.pages+'" onclick="updateTermsBulk()"></td>'+
+      '<td><span class="rowchev">&#9656;</span></td>'+
+      '<td><span class="term-txt">"'+t.term+'"</span></td>'+
+      '<td class="muted">'+t.cat+'</td>'+
+      '<td><span class="pill '+sevPill[t.sev]+'">'+t.sev+'</span></td>'+
+      '<td>'+statusPill+'</td>'+
+      '<td class="cell-pages"><b>'+t.pages+'</b> page'+(t.pages>1?'s':'')+pagesExtra+'</td>'+
+      '<td class="muted">'+t.first+'</td>'+
+      '<td class="muted">'+t.last+'</td>'+
+      '<td><span class="pstrip">'+pstrip+'</span></td>'+
+      '<td><a class="lnk" href="#" onclick="return false">'+t.top+'</a></td>'+
+      '<td onclick="event.stopPropagation()"><button class="btn ghost xs" onclick="bulkOneTerm('+i+')">Resolve all</button></td>';
+    tr.onclick = function(){ toggleTermRow(i, tr); };
+    body.appendChild(tr);
+
+    var dr = document.createElement('tr');
+    dr.className="detail-row"; dr.style.display="none"; dr.dataset.detail=i;
+    var occRows = t.occ.map(function(o){
+      return '<tr>'+
+        '<td><a class="lnk" href="#" onclick="return false">'+o.page+'</a></td>'+
+        '<td>'+(o.present?'<span class="pill bad">Present</span>':'<span class="pill ok">Resolved</span>')+'</td>'+
+        '<td class="muted">'+o.first+'</td>'+
+        '<td class="muted">'+o.last+'</td>'+
+        '<td class="ctx">'+o.ctx+'</td>'+
+        '<td><button class="btn ghost xs" onclick="toast(\'Opened page in new tab\')">View</button></td>'+
+      '</tr>';
+    }).join('');
+    dr.innerHTML = '<td colspan="12"><div class="detail-inner">'+
+      '<div class="detail-note">&#9432; <div><b>"'+t.term+'"</b> appears on <b>'+t.pages+'</b> page'+(t.pages>1?'s':'')+' of this site'+
+        (t.active>0?' · <b style="color:var(--red)">'+t.active+'</b> still present':'')+
+        (t.resolved>0?' · <b style="color:var(--green)">'+t.resolved+'</b> resolved':'')+'.</div></div>'+
+      '<div class="occ-table"><table><thead><tr><th>Page</th><th>Status</th><th>First seen</th><th>Last seen</th><th>Context</th><th></th></tr></thead><tbody>'+occRows+'</tbody></table></div>'+
+      '</div></td>';
+    body.appendChild(dr);
+  });
+}
+function toggleTermRow(i, tr){
+  var dr = document.querySelector('[data-detail="'+i+'"]');
+  var open = dr.style.display==="none";
+  dr.style.display = open ? "table-row" : "none";
+  tr.classList.toggle('expanded', open);
+}
+function filterTerms(v){ renderTerms(v); }
+
+// ---------- terms bulk selection ----------
+function updateTermsBulk(){
+  var checked = document.querySelectorAll('.term-cb:checked');
+  var bar = document.getElementById('terms-bulk');
+  if(checked.length===0){ bar.classList.add('hidden'); return; }
+  bar.classList.remove('hidden');
+  var pages=0; checked.forEach(function(c){pages+=parseInt(c.dataset.pages,10);});
+  document.getElementById('terms-cnt').textContent = checked.length+' term group'+(checked.length>1?'s':'')+' selected';
+  document.getElementById('terms-pages').textContent = 'covering '+pages+' page occurrence'+(pages>1?'s':'');
+}
+function toggleAllTerms(box){
+  document.querySelectorAll('.term-cb').forEach(function(c){c.checked=box.checked;});
+  updateTermsBulk();
+}
+function clearTerms(){
+  document.querySelectorAll('.term-cb').forEach(function(c){c.checked=false;});
+  document.getElementById('terms-all').checked=false;
+  updateTermsBulk();
+}
+function bulkTerms(action){
+  var checked = document.querySelectorAll('.term-cb:checked');
+  var pages=0; checked.forEach(function(c){pages+=parseInt(c.dataset.pages,10);});
+  var verb = action==='resolve'?'marked reviewed':action==='compliant'?'marked compliant':'dismissed';
+  toast(checked.length+' term group'+(checked.length>1?'s':'')+' '+verb+' ('+pages+' page occurrences)');
+  clearTerms();
+}
+function bulkOneTerm(i){
+  toast('"'+TERMS[i].term+'" — all '+TERMS[i].pages+' occurrence'+(TERMS[i].pages>1?'s':'')+' marked reviewed');
+}
+
+// ---------- render compliance checks ----------
+function renderChecks(){
+  var body = document.getElementById('checks-body'); body.innerHTML="";
+  CHECKS.forEach(function(f,i){
+    var viol = f.status==='violative';
+    var card = document.createElement('div');
+    card.className = "fcard "+(viol?"violative":"compliant");
+    var tagHtml = "";
+    if(f.tags.indexOf('new')>=0) tagHtml += '<span class="tag new">new finding</span>';
+    if(f.tags.indexOf('flip')>=0) tagHtml += '<span class="tag fbad">flipped &rarr; violative</span>';
+    if(f.tags.indexOf('ongoing')>=0) tagHtml += '<span class="tag ongoing">ongoing</span>';
+    var sevHtml = viol ? '<span class="pill '+sevPill[f.sev]+'">'+f.sev+'</span>' : '';
+    var stamp;
+    if(f.reviewed){
+      stamp = f.reviewed.stale
+        ? '<span class="stale-stamp">&#9888; Stale review</span>'
+        : '<span class="reviewed-stamp">&#10003; Reviewed</span>';
+    } else {
+      stamp = '<button class="btn xs" onclick="event.stopPropagation();toast(\''+f.name+' marked reviewed\')">&#10003; Mark reviewed</button>';
+    }
+    var hist = f.hist.map(function(h){
+      var p = h[2]==='violative'?'<span class="pill bad">Violative</span>':'<span class="pill ok">Compliant</span>';
+      return '<tr><td class="muted">'+h[0]+'</td><td class="muted">'+h[1]+'</td><td>'+p+'</td><td class="muted">'+(h[2]==='violative'?f.sev:'—')+'</td></tr>';
+    }).join('');
+    var shot = viol
+      ? '<div class="shot"><div class="bar"><i style="background:#ff5f57"></i><i style="background:#ffbd2e"></i><i style="background:#28ca41"></i></div><div class="body"><div class="line" style="width:60%"></div><div class="line" style="width:90%"></div><div class="flag">'+f.excerpt+'</div><div class="line" style="width:70%"></div></div></div>'
+      : '<div class="shot ok">&#10003;<div>Page passes check</div></div>';
+    card.innerHTML =
+      '<div class="frow" onclick="toggleCard(this)">'+
+        '<input type="checkbox" class="cb check-cb" onclick="event.stopPropagation();updateChecksBulk()">'+
+        '<span class="rowchev">&#9656;</span>'+
+        '<div style="min-width:0;flex:1">'+
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+            (viol?'<span style="color:var(--red)">&#10007;</span>':'<span style="color:var(--green)">&#10003;</span>')+
+            '<span class="fc-title">'+f.name+'</span>'+
+            '<span class="pill '+(viol?'bad':'ok')+'">'+(viol?'Violative':'Compliant')+'</span>'+
+            sevHtml+'<span class="tag ai">Q-AI Scan</span>'+tagHtml+
+          '</div>'+
+          '<div class="fc-meta">'+
+            '<span>'+f.cat+'</span>'+
+            (viol?'<span class="muted" style="font-style:italic;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+f.excerpt+'</span>':'')+
+            '<span>&#127760; '+f.page+'</span>'+
+          '</div>'+
+        '</div>'+
+        '<div class="fc-actions" onclick="event.stopPropagation()">'+stamp+'</div>'+
+      '</div>'+
+      '<div class="fc-exp" style="display:none">'+
+        '<div><div class="fc-desc">'+f.desc+'</div>'+
+          '<div class="histlabel">SCAN HISTORY</div>'+
+          '<div class="occ-table"><table><thead><tr><th>Scan</th><th>Date</th><th>Status</th><th>Severity</th></tr></thead><tbody>'+hist+'</tbody></table></div>'+
+          '<div style="display:flex;gap:8px;margin-top:10px">'+
+            '<button class="btn sm">&#8599; View page</button>'+
+            '<button class="btn ghost sm">Change risk level</button>'+
+            '<button class="btn ghost sm">Mark '+(viol?'compliant':'violative')+'</button>'+
+          '</div>'+
+        '</div>'+
+        '<div><div class="histlabel">LATEST SCREENSHOT</div>'+shot+'</div>'+
+      '</div>';
+    body.appendChild(card);
+  });
+}
+function toggleCard(row){
+  var card = row.parentElement;
+  var exp = card.querySelector('.fc-exp');
+  var open = exp.style.display==="none";
+  exp.style.display = open ? "grid":"none";
+  card.classList.toggle('expanded', open);
+}
+function updateChecksBulk(){
+  var checked = document.querySelectorAll('.check-cb:checked');
+  var bar = document.getElementById('checks-bulk');
+  if(checked.length===0){ bar.classList.add('hidden'); return; }
+  bar.classList.remove('hidden');
+  document.getElementById('checks-cnt').textContent = checked.length+' check'+(checked.length>1?'s':'')+' selected';
+}
+function clearChecks(){ document.querySelectorAll('.check-cb').forEach(function(c){c.checked=false;}); updateChecksBulk(); }
+function bulkChecks(action){
+  var n = document.querySelectorAll('.check-cb:checked').length;
+  toast(n+' check'+(n>1?'s':'')+' '+(action==='resolve'?'marked reviewed':'marked compliant'));
+  clearChecks();
+}
+
+// ---------- render analyst review ----------
+function renderAnalyst(){
+  var body = document.getElementById('analyst-body'); body.innerHTML="";
+  ANALYST.forEach(function(a){
+    var el = document.createElement('div');
+    el.className="areview";
+    el.innerHTML =
+      '<input type="checkbox" class="cb analyst-cb" style="margin-top:3px" onclick="updateAnalystBulk()">'+
+      '<div style="flex:1">'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+          '<span class="ai-title">'+a.name+'</span>'+
+          '<span class="pill info">INFORMATION</span>'+
+          '<span class="tag manual">Needs analyst</span>'+
+        '</div>'+
+        '<div class="ai-desc">'+a.desc+'</div>'+
+      '</div>'+
+      '<div class="ai-act">'+
+        '<select class="selshell" style="height:28px"><option>Pending</option><option>High</option><option>Medium</option><option>Low</option><option>Compliant</option></select>'+
+        '<button class="btn xs" onclick="toast(\''+a.name+' marked reviewed\')">&#10003; Mark reviewed</button>'+
+      '</div>';
+    body.appendChild(el);
+  });
+}
+function updateAnalystBulk(){
+  var checked = document.querySelectorAll('.analyst-cb:checked');
+  var bar = document.getElementById('analyst-bulk');
+  if(checked.length===0){ bar.classList.add('hidden'); return; }
+  bar.classList.remove('hidden');
+  document.getElementById('analyst-cnt').textContent = checked.length+' selected';
+}
+function clearAnalyst(){ document.querySelectorAll('.analyst-cb').forEach(function(c){c.checked=false;}); updateAnalystBulk(); }
+function bulkAnalyst(){
+  var n = document.querySelectorAll('.analyst-cb:checked').length;
+  toast(n+' analyst check'+(n>1?'s':'')+' marked reviewed');
+  clearAnalyst();
+}
+
+// ---------- chrome ----------
+function toggleSection(id, e){
+  if(e && e.target.closest('input,button,a,select')) return;
+  document.getElementById(id).classList.toggle('collapsed');
+}
+function toggleSummary(btn){
+  var es = document.getElementById('esum');
+  var open = es.style.display==="none";
+  es.style.display = open ? "block":"none";
+  btn.innerHTML = open ? "&#9650; Hide summary" : "&#9662; Compliance scan summary";
+}
+function setView(v){
+  document.querySelectorAll('.seg button').forEach(function(b){b.classList.toggle('active', b.dataset.v===v);});
+  if(v==='new'){ toast("Showing 1 new + 1 flipped finding since last scan"); }
+}
+var toastTimer;
+function toast(msg){
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){t.classList.remove('show');}, 2600);
+}
+
+renderTerms(); renderChecks(); renderAnalyst();
+</script>
+</body>
+</html>
