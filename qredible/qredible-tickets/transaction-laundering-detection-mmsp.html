@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transaction Laundering Detection (MMSP) — Today, Roadmap &amp; End State</title>
+<!--
+  Public concept mockup. Qredible design-system tokens (DEFAULT variant).
+  Conceptual / product-level only — illustrative merchant data, no live metrics.
+  Three-stage arc: Where we are today → Where we're going + what's needed → The final state.
+-->
+<style>
+  :root{
+    --ink:#1A202E; --muted:#657496; --link:#376fd0; --action:#2563eb;
+    --navy:#233044; --navy-foot:#1E2A38; --wash:#F7F5FF;
+    --page:#F4F6FA; --card:#FFFFFF; --field:#F8FBFD; --subtle:#F1F5F9;
+    --divider:#EBEDF2; --inputborder:#C5C5C5;
+    --green:#00d581; --green-hub:#48D188; --yellow:#FFDD50; --yellow-hub:#E4AE3C;
+    --red:#ff404a; --red-soft:#F05252; --info:#50A8FF; --info-bg:#DCEEFF;
+    --shadow-card:rgba(50,50,93,0.04) 0px 2px 6px -1px, rgba(0,0,0,0.05) 0px 1px 3px -1px;
+    --r-card:8px; --r-btn:5px; --r-chip:6px;
+    --font:"Uber Move",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:var(--font);font-size:13px;line-height:1.5;color:var(--ink);background:var(--page);-webkit-font-smoothing:antialiased;padding-bottom:70px;}
+  a{color:var(--link);text-decoration:none;} a:hover{text-decoration:underline;}
+  h1,h2,h3,h4,h5{margin:0;line-height:1.25;font-weight:600;}
+  .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:12px;}
+
+  /* proto-nav (site convention) */
+  .proto-nav{background:var(--navy);padding:11px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+  .proto-nav a{color:#aeb9cd;font-size:12px;font-weight:600;}
+  .proto-nav a:hover{color:#fff;text-decoration:none;}
+  .proto-nav .sep{color:#3a4861;}
+  .proto-nav .current{color:#fff;font-size:12px;font-weight:600;}
+  .proto-nav .badge{margin-left:auto;background:rgba(37,99,235,.22);color:#9ec5ff;font-size:11px;font-weight:700;padding:3px 11px;border-radius:5px;letter-spacing:.03em;}
+
+  .page{max-width:1140px;margin:0 auto;padding:34px 22px;}
+
+  /* hero */
+  .hero{text-align:center;margin-bottom:30px;}
+  .hero .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#50A8FF);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:20px;margin-bottom:14px;}
+  .hero h1{font-size:30px;font-weight:700;letter-spacing:-.01em;}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:720px;margin:12px auto 0;line-height:1.65;}
+  .hero .meta{margin-top:18px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+  .hero .meta .pill{background:#fff;border:1px solid var(--divider);color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 12px;border-radius:999px;}
+  .hero .meta .pill.accent{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.25);color:var(--action);}
+
+  /* stepper arc */
+  .arc{display:flex;align-items:stretch;gap:0;margin:28px 0 26px;}
+  @media(max-width:820px){.arc{flex-direction:column;gap:8px;}.arc .arc-join{display:none;}}
+  .arc-step{flex:1;background:#fff;border:1px solid var(--divider);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:.15s;}
+  .arc-step:hover{border-color:#b9c6e6;}
+  .arc-step.active{border-color:var(--action);box-shadow:0 0 0 2px rgba(37,99,235,.12);background:rgba(37,99,235,.03);}
+  .arc-step .n{width:28px;height:28px;border-radius:50%;background:var(--subtle);color:var(--muted);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 28px;}
+  .arc-step.active .n{background:var(--action);color:#fff;}
+  .arc-step .lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;}
+  .arc-step .ti{font-size:14px;font-weight:600;margin-top:3px;}
+  .arc-step .de{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.45;}
+  .arc-join{display:flex;align-items:center;color:#c2cbdb;font-size:20px;padding:0 6px;}
+
+  .view{display:none;} .view.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  /* cards / layout */
+  .card{background:var(--card);border-radius:var(--r-card);box-shadow:var(--shadow-card);padding:22px 24px;}
+  .card + .card{margin-top:16px;}
+  .card h3{font-size:16px;font-weight:600;}
+  .card .ch-sub{color:var(--muted);font-size:12.5px;margin-top:3px;}
+  .grid{display:grid;gap:15px;}
+  .g2{grid-template-columns:1fr 1fr;} .g3{grid-template-columns:repeat(3,1fr);} .g4{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:980px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+  .sectlabel{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted);font-weight:700;margin:0 0 10px;}
+  .lead{font-size:14px;color:#2a3142;line-height:1.65;} .lead b{color:var(--ink);}
+  .stagehd{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+  .stagehd .tag{font-size:10px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;padding:4px 10px;border-radius:999px;}
+  .stagehd h2{font-size:22px;font-weight:700;}
+  .stagehd.s1 .tag{background:rgba(72,209,136,.16);color:#1c7d4d;}
+  .stagehd.s2 .tag{background:#FEF3C7;color:#92400E;}
+  .stagehd.s3 .tag{background:rgba(37,99,235,.12);color:var(--action);}
+  .stagesub{color:var(--muted);font-size:13.5px;max-width:780px;margin:0 0 18px;line-height:1.6;}
+
+  /* badges */
+  .badge{display:inline-flex;align-items:center;gap:5px;height:22px;padding:2px 9px;border-radius:var(--r-chip);font-size:11.5px;font-weight:600;line-height:1;}
+  .b-s1{background:#FEE2E2;color:#991B1B;} .b-s2{background:#FEF3C7;color:#92400E;} .b-s3{background:#DBEAFE;color:#1E40AF;}
+  .b-have{background:rgba(72,209,136,.16);color:#1c7d4d;} .b-partial{background:#FEF3C7;color:#92400E;}
+  .b-gap{background:#FEE2E2;color:#991B1B;} .b-road{background:#E5E7EB;color:#1F2937;} .b-mc{background:#1A202E;color:#fff;}
+
+  /* capability cards (stage 1) */
+  .cap{background:var(--field);border:1px solid var(--divider);border-radius:9px;padding:16px;}
+  .cap .ci{width:30px;height:30px;border-radius:8px;background:rgba(37,99,235,.1);color:var(--action);display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+  .cap h4{font-size:13.5px;font-weight:600;}
+  .cap p{color:var(--muted);font-size:12px;margin:6px 0 0;line-height:1.55;}
+  .cap .live{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#1c7d4d;margin-top:10px;text-transform:uppercase;letter-spacing:.06em;}
+  .cap .live .d{width:7px;height:7px;border-radius:50%;background:var(--green-hub);}
+
+  /* gap cards (stage 2) */
+  .gap{background:#fff;border:1px solid var(--divider);border-radius:9px;padding:16px 18px;display:flex;gap:14px;}
+  .gap .gi{width:34px;height:34px;border-radius:8px;background:var(--wash);color:#5b4bbd;display:flex;align-items:center;justify-content:center;flex:0 0 34px;}
+  .gap h4{font-size:14px;font-weight:600;}
+  .gap .unlock{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.55;}
+  .gap .unlock b{color:var(--ink);}
+  .gap .meta{margin-top:9px;display:flex;gap:8px;flex-wrap:wrap;}
+
+  /* scope two-column */
+  .scopecol{border-radius:10px;padding:18px 20px;}
+  .scopecol.own{background:rgba(72,209,136,.06);border:1px solid rgba(72,209,136,.3);}
+  .scopecol.road{background:var(--subtle);border:1px solid var(--divider);}
+  .scopecol h4{font-size:14px;display:flex;align-items:center;gap:8px;}
+  .scopecol .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;}
+  .scopecol.own .tag{background:var(--green-hub);color:#063e23;} .scopecol.road .tag{background:#cfd6e2;color:#374151;}
+  .scopecol ul{margin:12px 0 0;padding-left:0;list-style:none;}
+  .scopecol li{padding:9px 0;border-top:1px dashed var(--divider);font-size:12.5px;display:flex;gap:9px;align-items:flex-start;}
+  .scopecol li:first-child{border-top:none;}
+  .scopecol li .mk{flex:0 0 16px;font-weight:700;}
+  .scopecol.own li .mk{color:#1c7d4d;} .scopecol.road li .mk{color:#92400E;}
+  .scopecol li .lt b{display:block;font-weight:600;color:var(--ink);} .scopecol li .lt span{color:var(--muted);font-size:11.5px;}
+
+  /* three-party */
+  .partywrap{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;}
+  @media(max-width:900px){.partywrap{grid-template-columns:1fr;gap:12px;}.partywrap .arrowcol{display:none;}}
+  .party{background:var(--field);border:1px solid var(--divider);border-radius:10px;padding:15px;text-align:center;}
+  .party .role{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;}
+  .party .who{font-size:14.5px;font-weight:600;margin-top:6px;} .party .desc{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5;}
+  .party.mc{background:#11161f;color:#fff;border-color:#11161f;} .party.mc .role{color:#9aa6bd;} .party.mc .desc{color:#b6c0d4;}
+  .party.us{border:1.5px solid var(--action);background:rgba(37,99,235,.04);}
+  .arrowcol{padding:0 12px;text-align:center;color:var(--muted);font-size:11px;} .arrowcol .ar{font-size:18px;color:var(--action);}
+
+  .nest{display:flex;gap:10px;flex-wrap:wrap;}
+  .nest .ring{flex:1;min-width:200px;border-radius:10px;padding:14px 16px;border:1px solid var(--divider);}
+  .nest .ring.mmp{background:var(--field);} .nest .ring.mmsp{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.35);}
+  .nest .ring .k{font-size:12px;font-weight:700;} .nest .ring .v{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5;}
+
+  /* pipeline (stage 3) */
+  .pipe{display:grid;grid-template-columns:1.15fr auto .9fr auto .9fr auto 1fr;align-items:stretch;}
+  @media(max-width:1100px){.pipe{grid-template-columns:1fr;}.pipe .pipe-ar{display:none;}}
+  .stage{background:var(--field);border:1px solid var(--divider);border-radius:10px;padding:14px;}
+  .stage h4{font-size:13px;font-weight:600;margin-bottom:4px;} .stage .stg-sub{font-size:11.5px;color:var(--muted);margin-bottom:10px;}
+  .stage.ai{background:#11161f;color:#fff;border-color:#11161f;} .stage.ai h4{color:#fff;} .stage.ai .stg-sub{color:#aab4c9;}
+  .stage.out{border:1.5px solid var(--action);background:rgba(37,99,235,.04);}
+  .pipe-ar{display:flex;align-items:center;justify-content:center;color:var(--action);font-size:22px;padding:0 8px;}
+  .sig{background:#fff;border:1px solid var(--divider);border-radius:7px;padding:8px 10px;margin-bottom:7px;font-size:12px;display:flex;gap:8px;}
+  .sig:last-child{margin-bottom:0;} .sig .si{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 8px;}
+  .sig .si.g{background:var(--green-hub);} .sig .si.p{background:var(--yellow-hub);} .sig .si.x{background:var(--red-soft);}
+  .sig .st{font-weight:600;} .sig .sd{color:var(--muted);font-size:11px;}
+  .scorebar{height:8px;border-radius:999px;background:var(--divider);overflow:hidden;margin:8px 0 4px;}
+  .scorebar>span{display:block;height:100%;background:linear-gradient(90deg,#E4AE3C,#F05252);}
+
+  .frame{display:flex;gap:12px;align-items:flex-start;background:var(--wash);border:1px solid #e3ddf6;border-radius:8px;padding:14px 16px;margin-top:16px;}
+  .frame .fi{width:22px;height:22px;flex:0 0 22px;color:#5b4bbd;margin-top:1px;}
+  .frame .ft{font-weight:600;color:#3f3580;} .frame .fb{color:#4a4570;font-size:12.5px;margin-top:3px;line-height:1.55;}
+
+  /* report viewer */
+  .subtabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .subtab{padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;border:1px solid var(--divider);color:var(--muted);}
+  .subtab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .report{background:#fff;border-radius:var(--r-card);box-shadow:var(--shadow-card);overflow:hidden;border:1px solid var(--divider);}
+  .rep-head{background:var(--wash);padding:20px 26px;border-bottom:1px solid var(--divider);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;}
+  .rep-head .rl{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#5b4bbd;font-weight:700;}
+  .rep-head h2{font-size:19px;margin-top:6px;} .rep-head .meta{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.6;}
+  .rep-head .rbrand{text-align:right;font-size:11px;color:var(--muted);} .rep-head .rbrand .qb{font-weight:700;color:var(--ink);font-size:14px;}
+  .rep-body{padding:22px 26px;}
+  .rep-section{padding:18px 0;border-top:1px solid var(--divider);} .rep-section:first-child{border-top:none;padding-top:6px;}
+  .rep-section h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:12px;}
+  .kv{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px;}
+  @media(max-width:780px){.kv{grid-template-columns:1fr;}}
+  .kv .row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--divider);padding-bottom:7px;}
+  .kv .row .k{color:var(--muted);} .kv .row .v{font-weight:600;text-align:right;}
+  .scorebox{display:flex;align-items:center;gap:18px;background:var(--field);border:1px solid var(--divider);border-radius:10px;padding:16px 18px;}
+  .gauge{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 72px;font-weight:700;font-size:19px;}
+  .gauge.high{background:conic-gradient(#F05252 0 72%,#f1d4d4 72% 100%);} .gauge.med{background:conic-gradient(#E4AE3C 0 54%,#efe4c9 54% 100%);} .gauge.low{background:conic-gradient(#48D188 0 22%,#d6efe0 22% 100%);}
+  .gauge span{width:52px;height:52px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;}
+  .gauge.high span{color:#991B1B;} .gauge.med span{color:#92400E;} .gauge.low span{color:#1c7d4d;}
+  .narr{background:#fbfcfe;border:1px solid var(--divider);border-left:3px solid var(--action);border-radius:6px;padding:14px 16px;font-size:13px;line-height:1.65;color:#2a3142;}
+  .narr .ai-tag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--action);font-weight:700;margin-bottom:8px;}
+  .evid{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+  .evid .e{flex:1;min-width:150px;background:var(--field);border:1px solid var(--divider);border-radius:7px;padding:10px 12px;font-size:11.5px;}
+  .evid .e .et{font-weight:600;margin-bottom:3px;} .evid .e .ev{color:var(--muted);}
+  .findrow{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--divider);} .findrow:first-of-type{border-top:none;}
+  .findrow .ft2{flex:1;} .findrow .ft2 b{display:block;} .findrow .ft2 span{color:var(--muted);font-size:12px;}
+  .rec{background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.25);border-radius:8px;padding:14px 16px;}
+  .rec .rt{font-weight:600;color:var(--action);margin-bottom:5px;}
+  .clock{display:inline-flex;gap:6px;align-items:center;font-size:11.5px;color:#92400E;background:#FEF3C7;border-radius:999px;padding:3px 10px;font-weight:600;}
+
+  table.tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.tbl th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;padding:9px 12px;border-bottom:1px solid var(--divider);background:var(--subtle);}
+  table.tbl td{padding:10px 12px;border-bottom:1px solid var(--divider);vertical-align:top;} table.tbl tr:last-child td{border-bottom:none;}
+  .yes{color:#1c7d4d;font-weight:600;} .no{color:#991B1B;font-weight:600;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:12px;}
+  .legend .li{display:flex;align-items:center;gap:6px;} .legend .li .d{width:9px;height:9px;border-radius:50%;}
+  .footnote{color:var(--muted);font-size:11.5px;margin-top:14px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span class="sep">/</span>
+  <span class="current">Transaction Laundering Detection (MMSP)</span>
+  <span class="badge">CONCEPT · PRODUCT ROADMAP</span>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="logo">Q</div>
+    <h1>Transaction Laundering Detection</h1>
+    <p>A merchant-monitoring service for Mastercard <b>MMSP</b> accreditation. It turns the website, domain, and content signals Qredible already captures into evidenced <b>“potential transaction-laundering risk signals,”</b> synthesizes them into acquirer-facing reports with AI, and elevates them to a case for human review. We name the signals. We never render the verdict.</p>
+    <div class="meta">
+      <span class="pill accent">Q-Scan AI · new surface</span>
+      <span class="pill">BRAM content monitoring</span>
+      <span class="pill">Transaction laundering detection</span>
+      <span class="pill">Signals → AI narrative → case</span>
+    </div>
+  </div>
+
+  <!-- OVERVIEW BAND -->
+  <div class="card">
+    <p class="lead" style="margin-top:0">
+      Mastercard delegates merchant policing to <b>acquirers</b> under <b>BRAM</b> (Business Risk Assessment &amp; Mitigation). The <b>Merchant Monitoring Program (MMP)</b> defines how: scan a merchant before its first transaction, then monitor it continuously. An <b>MMSP</b> (Merchant Monitoring Service Provider) is the approved third party that performs this on the acquirer’s behalf. Qredible’s direction is to operate as an MMSP, with transaction-laundering detection at the center.
+    </p>
+    <div class="grid g2" style="margin-top:18px;">
+      <div>
+        <div class="sectlabel">The three-party model</div>
+        <div class="partywrap">
+          <div class="party mc"><div class="role">Card network</div><div class="who">Mastercard</div><div class="desc">Sets BRAM / MMP rules · receives the monitoring report · governs accreditation</div></div>
+          <div class="arrowcol"><div class="ar">⇄</div><div>registers</div></div>
+          <div class="party"><div class="role">Acquirer</div><div class="who">Acquiring bank</div><div class="desc">Holds accountability · registers the MMSP · investigates &amp; resolves</div></div>
+          <div class="arrowcol"><div class="ar">⇄</div><div>alerts</div></div>
+          <div class="party us"><div class="role">MMSP</div><div class="who">Qredible</div><div class="desc">Performs the scans &amp; TLD · reports potential violations with evidence</div></div>
+        </div>
+        <div class="footnote">The MMSP is engaged by the acquirer, not by the card network. Accreditation is the credential; the acquirer does the registration.</div>
+      </div>
+      <div>
+        <div class="sectlabel">BRAM → MMP → MMSP</div>
+        <div class="nest"><div class="ring"><div class="k">BRAM</div><div class="v">Keeps illegal / brand-damaging merchant activity off the network — including transaction laundering.</div></div></div>
+        <div class="nest" style="margin-top:9px;"><div class="ring mmp"><div class="k">MMP</div><div class="v">The operational layer: an initial scan before first transaction, then persistent monitoring of every merchant URL.</div></div></div>
+        <div class="nest" style="margin-top:9px;"><div class="ring mmsp"><div class="k">MMSP</div><div class="v">The approved monitoring-provider category Qredible is building toward.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARC STEPPER -->
+  <div class="arc">
+    <div class="arc-step active" data-view="today">
+      <div class="n">1</div>
+      <div><div class="lab">Where we are today</div><div class="ti">Live capabilities</div><div class="de">The signals the platform already captures</div></div>
+    </div>
+    <div class="arc-join">→</div>
+    <div class="arc-step" data-view="going">
+      <div class="n">2</div>
+      <div><div class="lab">Where we’re going</div><div class="ti">Gaps &amp; what they unlock</div><div class="de">The build that completes the service</div></div>
+    </div>
+    <div class="arc-join">→</div>
+    <div class="arc-step" data-view="final">
+      <div class="n">3</div>
+      <div><div class="lab">The final state</div><div class="ti">Full TLD service</div><div class="de">Signals → AI narrative → reports</div></div>
+    </div>
+  </div>
+
+  <!-- ============================ STAGE 1 — TODAY ============================ -->
+  <section class="view active" id="today">
+    <div class="card">
+      <div class="stagehd s1"><span class="tag">Stage 1 · Today</span><h2>Where we are today</h2></div>
+      <p class="stagesub">The platform already captures real, transaction-laundering-relevant signals — all from the website and domain layer, none requiring payment data. These are the building blocks the service stands on.</p>
+
+      <div class="grid g4">
+        <div class="cap">
+          <div class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></div>
+          <h4>DNS / RDAP diligence</h4>
+          <p>Domain age, DNSSEC status, and privacy-shielded or unverifiable registrant — surfaced as human-readable findings.</p>
+          <div class="live"><span class="d"></span> Live</div>
+        </div>
+        <div class="cap">
+          <div class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h12M12 6l6 6-6 6"/><path d="M20 5v14"/></svg></div>
+          <h4>Redirect detection</h4>
+          <p>Detects when a checkout or page redirects the user to a different destination during the flow.</p>
+          <div class="live"><span class="d"></span> Live</div>
+        </div>
+        <div class="cap">
+          <div class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="M4 9h16M8 13h8M8 16h5"/></svg></div>
+          <h4>Content &amp; product signals</h4>
+          <p>Website scanner + violative-terms engine: prohibited goods, misrepresentation, and missing disclosures across crawled URLs.</p>
+          <div class="live"><span class="d"></span> Live</div>
+        </div>
+        <div class="cap">
+          <div class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h6M9 16h6"/></svg></div>
+          <h4>Report engine (early)</h4>
+          <p>An AI-assisted report that gathers scanner output, product data, and domain findings into a single narrative — the proof-of-concept for the service.</p>
+          <div class="live"><span class="d"></span> Prototype</div>
+        </div>
+      </div>
+
+      <div class="frame">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <div>
+          <div class="ft">These are genuine transaction-laundering signals — not a stretch.</div>
+          <div class="fb">A redirecting checkout on a recently-registered, privacy-shielded domain whose products don’t match the stated business is a textbook laundering profile. Each of these signals is something the platform produces today; the service’s job is to aggregate and interpret them.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What’s captured vs. what it would indicate</h3>
+      <table class="tbl" style="margin-top:10px;">
+        <thead><tr><th>Signal</th><th>Source layer</th><th>Needs payment data?</th><th>Today</th></tr></thead>
+        <tbody>
+          <tr><td>Prohibited goods / misrepresentation</td><td>Website crawl</td><td class="yes">No</td><td><span class="badge b-have">Live</span></td></tr>
+          <tr><td>Domain / DNS / RDAP intelligence</td><td>RDAP / DNS</td><td class="yes">No</td><td><span class="badge b-have">Live</span></td></tr>
+          <tr><td>Checkout / payment redirect</td><td>Checkout inspection</td><td class="yes">No</td><td><span class="badge b-partial">Partial</span></td></tr>
+          <tr><td>Product catalog vs declared business</td><td>Product extract</td><td class="yes">No</td><td><span class="badge b-partial">Partial</span></td></tr>
+          <tr><td>Shared-infrastructure linkage</td><td>IP / DNS correlation</td><td class="yes">No</td><td><span class="badge b-partial">Partial</span></td></tr>
+          <tr><td>Narrative report from signals</td><td>AI synthesis</td><td class="yes">No</td><td><span class="badge b-partial">Prototype</span></td></tr>
+        </tbody>
+      </table>
+      <div class="legend">
+        <div class="li"><span class="d" style="background:var(--green-hub)"></span> Live in platform</div>
+        <div class="li"><span class="d" style="background:var(--yellow-hub)"></span> Partial / prototype</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ STAGE 2 — GOING ============================ -->
+  <section class="view" id="going">
+    <div class="card">
+      <div class="stagehd s2"><span class="tag">Stage 2 · Roadmap</span><h2>Where we’re going + what’s needed</h2></div>
+      <p class="stagesub">A handful of gaps stand between today’s signals and a complete MMSP service. Each one unlocks a specific capability — and several unlock more than transaction-laundering detection alone.</p>
+
+      <div class="grid g2">
+        <div class="gap">
+          <div class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h4"/></svg></div>
+          <div><h4>MCC validation</h4>
+            <div class="unlock">Compare products actually sold against the merchant’s assigned category code. <b>Unlocks the marquee laundering signal</b> (category mismatch) and a field required in the monitoring report.</div>
+            <div class="meta"><span class="badge b-gap">Needed</span><span class="badge b-mc">High priority</span></div>
+          </div>
+        </div>
+        <div class="gap">
+          <div class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></div>
+          <div><h4>Product-family mapping</h4>
+            <div class="unlock">A taxonomy that maps catalog products into families and onward to category codes. <b>Unlocks</b> MCC validation and product-level compliance checks.</div>
+            <div class="meta"><span class="badge b-gap">Needed</span></div>
+          </div>
+        </div>
+        <div class="gap">
+          <div class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 7 4-14 3 7h4"/></svg></div>
+          <div><h4>Acquirer transaction-data feed</h4>
+            <div class="unlock">A data partnership for settlement-level signals. <b>Unlocks the second half of TLD</b>: velocity, refund patterns, and cross-border settlement — things a website can’t reveal.</div>
+            <div class="meta"><span class="badge b-road">Roadmap</span></div>
+          </div>
+        </div>
+        <div class="gap">
+          <div class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6"/><circle cx="11" cy="14" r="2.5"/></svg></div>
+          <div><h4>Productized AI narrative report</h4>
+            <div class="unlock">Turn the report prototype into a one-action, branded output. <b>Unlocks</b> consistent, interpreted reports at scale instead of a manual exercise.</div>
+            <div class="meta"><span class="badge b-gap">Needed</span></div>
+          </div>
+        </div>
+        <div class="gap">
+          <div class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="M4 9h16M9 13h7M9 16h4"/></svg></div>
+          <div><h4>Enterprise reporting</h4>
+            <div class="unlock">A reporting surface fit for acquirers, replacing ad-hoc output. <b>Unlocks</b> the three Mastercard report types delivered on a defined cadence.</div>
+            <div class="meta"><span class="badge b-gap">Needed</span></div>
+          </div>
+        </div>
+        <div class="gap">
+          <div class="gi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></div>
+          <div><h4>Infra linkage &amp; test transactions</h4>
+            <div class="unlock">Cross-domain infrastructure correlation plus optional test purchases. <b>Unlocks</b> network-level laundering detection beyond a single site.</div>
+            <div class="meta"><span class="badge b-road">Roadmap</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>The honest scope boundary</h3>
+      <div class="ch-sub">Transaction laundering splits in two. We own one half from the website layer; the other needs an acquirer data feed. Being clear about the line is what makes the service credible.</div>
+      <div class="grid g2" style="margin-top:16px;">
+        <div class="scopecol own">
+          <h4><span class="tag">OWN TODAY</span> Website / domain / content signals</h4>
+          <ul>
+            <li><span class="mk">✓</span><div class="lt"><b>Domain &amp; RDAP intelligence</b><span>age, DNSSEC, shielded registrant</span></div></li>
+            <li><span class="mk">✓</span><div class="lt"><b>Prohibited content &amp; misrepresentation</b><span>scanner + violative terms</span></div></li>
+            <li><span class="mk">✓</span><div class="lt"><b>Checkout redirect detection</b><span>payment routed elsewhere</span></div></li>
+            <li><span class="mk">~</span><div class="lt"><b>Category (MCC) mismatch</b><span>once MCC validation lands</span></div></li>
+            <li><span class="mk">~</span><div class="lt"><b>Shared-infrastructure linkage</b><span>cross-domain correlation</span></div></li>
+          </ul>
+        </div>
+        <div class="scopecol road">
+          <h4><span class="tag">NEEDS DATA FEED</span> Transaction / settlement signals</h4>
+          <ul>
+            <li><span class="mk">○</span><div class="lt"><b>Descriptor masking</b><span>statement shows the front, not the seller</span></div></li>
+            <li><span class="mk">○</span><div class="lt"><b>Velocity / volume spikes</b><span>needs settlement data</span></div></li>
+            <li><span class="mk">○</span><div class="lt"><b>Refund / chargeback patterns</b><span>needs the acquirer feed</span></div></li>
+            <li><span class="mk">○</span><div class="lt"><b>Cross-border settlement geography</b><span>needs the acquirer feed</span></div></li>
+            <li><span class="mk">○</span><div class="lt"><b>Case-scoring across financial events</b><span>the layer a data partnership unlocks</span></div></li>
+          </ul>
+        </div>
+      </div>
+      <div class="frame">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <div>
+          <div class="ft">Why the split is defensible</div>
+          <div class="fb">Conventional fraud tooling works on payment data and therefore misses transaction laundering, which lives in the merchant’s digital presence — the half the platform already sees. The roadmap documents the content/domain service honestly and names the transaction-data half as a data-partnership phase.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ STAGE 3 — FINAL ============================ -->
+  <section class="view" id="final">
+    <div class="card">
+      <div class="stagehd s3"><span class="tag">Stage 3 · End state</span><h2>The final state</h2></div>
+      <p class="stagesub">The full service: every signal flows into an aggregation and scoring step, an AI engine synthesizes a neutral narrative, the result appears as a “Potential TL Risk Signals” section, and it is elevated to a case for a human analyst — with evidence attached.</p>
+
+      <div class="pipe">
+        <div class="stage">
+          <h4>1 · Signal collectors</h4><div class="stg-sub">From the scanner + domain stack</div>
+          <div class="sig"><span class="si g"></span><div><span class="st">DNS / RDAP diligence</span><div class="sd">age · DNSSEC · shielded registrant</div></div></div>
+          <div class="sig"><span class="si g"></span><div><span class="st">Checkout redirect</span><div class="sd">payment routed to another domain</div></div></div>
+          <div class="sig"><span class="si p"></span><div><span class="st">Product / category mismatch</span><div class="sd">products vs assigned MCC</div></div></div>
+          <div class="sig"><span class="si p"></span><div><span class="st">Infrastructure linkage</span><div class="sd">shared host/IP across domains</div></div></div>
+          <div class="sig"><span class="si g"></span><div><span class="st">Prohibited content</span><div class="sd">scanner + violative terms</div></div></div>
+        </div>
+        <div class="pipe-ar">→</div>
+        <div class="stage">
+          <h4>2 · Aggregate &amp; score</h4><div class="stg-sub">Cluster signals per merchant</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">No single signal escalates. The <b>case</b> is the unit.</div>
+          <div style="font-size:12px;font-weight:600;">Composite risk</div>
+          <div class="scorebar"><span style="width:74%"></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);"><span>multi-signal</span><span>confidence band</span></div>
+          <div style="margin-top:10px;font-size:11.5px;color:var(--muted);">Each signal carries an evidence pointer + a confidence contribution.</div>
+        </div>
+        <div class="pipe-ar">→</div>
+        <div class="stage ai">
+          <h4>3 · AI synthesis</h4><div class="stg-sub">Policy as the system prompt</div>
+          <div style="font-size:12px;color:#cdd6e4;line-height:1.55;">Aggregated signals + evidence → AI narrative engine → a neutral, evidenced account.</div>
+          <div style="margin-top:10px;font-size:11px;color:#8b96ad;">Async · audit-logged · live web lookups for license / regulatory checks.</div>
+        </div>
+        <div class="pipe-ar">→</div>
+        <div class="stage out">
+          <h4>4 · Report &amp; case</h4><div class="stg-sub">Acquirer-facing output</div>
+          <div style="font-size:12px;color:#2a3142;line-height:1.55;">A <b>“Potential TL Risk Signals”</b> section → elevated to a <b>case for human review</b>, evidence attached.</div>
+          <div style="margin-top:10px;"><span class="badge b-mc">Verdict: human analyst</span></div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="li"><span class="d" style="background:var(--green-hub)"></span> Capturing today</div>
+        <div class="li"><span class="d" style="background:var(--yellow-hub)"></span> Roadmap signal</div>
+      </div>
+      <div class="frame">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <div>
+          <div class="ft">We name the signals. We never render the verdict.</div>
+          <div class="fb">This is the industry posture: findings are indicators warranting human review, backed by evidence — not determinations. The <b>service</b> is named “Transaction Laundering Detection,” the <b>report section</b> is named “Potential TL Risk Signals,” and each <b>finding</b> is a neutral, evidenced observation the acquirer’s analyst adjudicates.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The three report types -->
+    <div class="card">
+      <h3>The three Mastercard report types</h3>
+      <div class="ch-sub">One report engine, three templates. Illustrative data only.</div>
+      <div class="subtabs" style="margin-top:14px;">
+        <div class="subtab active" data-rep="onboard">① Onboarding-risk report</div>
+        <div class="subtab" data-rep="persist">② Persistent-monitoring report</div>
+        <div class="subtab" data-rep="incident">③ Incident report</div>
+      </div>
+
+      <!-- Onboarding -->
+      <div class="report rep-block" id="rep-onboard">
+        <div class="rep-head">
+          <div>
+            <div class="rl">MMSP · Onboarding Risk Report</div>
+            <h2>Northgate Lending Co. <span style="font-weight:400;color:var(--muted);font-size:13px;">(illustrative)</span></h2>
+            <div class="meta">Online lender · category code 6012 (declared) · pre-transaction review</div>
+          </div>
+          <div class="rbrand"><div class="qb">Qredible</div>MMSP · Q-Scan AI<br/>AI-generated narrative</div>
+        </div>
+        <div class="rep-body">
+          <div class="rep-section"><h4>Overall risk rating</h4>
+            <div class="scorebox"><div class="gauge med"><span>Med</span></div>
+              <div><div style="font-weight:600;font-size:14px;">Medium risk — board with conditions</div>
+                <div style="color:var(--muted);font-size:12.5px;margin-top:4px;">Top factors: one product page missing a required disclosure · recently-registered domain. No transaction-laundering signals at onboarding.</div></div></div>
+          </div>
+          <div class="rep-section"><h4>Merchant identity &amp; declared business</h4>
+            <div class="kv">
+              <div class="row"><span class="k">Business model</span><span class="v">Online lender</span></div>
+              <div class="row"><span class="k">Declared category</span><span class="v">6012</span></div>
+              <div class="row"><span class="k">Detected primary category</span><span class="v">6012 ✓ match</span></div>
+              <div class="row"><span class="k">Domain age</span><span class="v">recent — watch</span></div>
+            </div>
+          </div>
+          <div class="rep-section"><h4>Content &amp; category findings</h4>
+            <div class="findrow"><span class="badge b-s2">S2</span><div class="ft2"><b>Missing required disclosure on a product page</b><span>present in Terms; absent on the product page</span></div></div>
+            <div class="findrow"><span class="badge b-s3">S3</span><div class="ft2"><b>Category match confirmed</b><span>products consistent with the declared code — no mismatch signal</span></div></div>
+            <div class="findrow"><span class="badge b-have">Pass</span><div class="ft2"><b>Privacy policy, Terms, contact present</b><span>found across crawled corpus</span></div></div>
+          </div>
+          <div class="rep-section"><h4>Recommendation</h4>
+            <div class="rec"><div class="rt">Board with conditions</div>Add the missing disclosure before first transaction. Standard monitoring cadence. Re-evaluate the domain-age watch later. Evidence appendix: screenshots + domain record.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Persistent -->
+      <div class="report rep-block" id="rep-persist" style="display:none;">
+        <div class="rep-head">
+          <div><div class="rl">MMSP · Persistent Monitoring Report</div>
+            <h2>Acquirer portfolio — monitoring period <span style="font-weight:400;color:var(--muted);font-size:13px;">(illustrative)</span></h2>
+            <div class="meta">Continuous monitoring across the acquirer’s merchant portfolio · summary of new &amp; changed risk</div></div>
+          <div class="rbrand"><div class="qb">Qredible</div>MMSP · Q-Scan AI</div>
+        </div>
+        <div class="rep-body">
+          <div class="rep-section"><h4>Portfolio summary</h4>
+            <div class="grid g4">
+              <div class="stage"><h4 style="font-size:20px;">●●●</h4><div class="stg-sub">Merchants monitored</div></div>
+              <div class="stage"><h4 style="font-size:20px;color:#991B1B;">few</h4><div class="stg-sub">S1 — new this period</div></div>
+              <div class="stage"><h4 style="font-size:20px;color:#92400E;">several</h4><div class="stg-sub">S2 — new this period</div></div>
+              <div class="stage"><h4 style="font-size:20px;color:var(--action);">2</h4><div class="stg-sub">Potential TL cases</div></div>
+            </div>
+          </div>
+          <div class="rep-section"><h4>New &amp; changed findings since last period</h4>
+            <table class="tbl">
+              <thead><tr><th>Merchant</th><th>Change</th><th>Signal</th><th>Severity</th></tr></thead>
+              <tbody>
+                <tr><td>Vireo Labs</td><td>New product line added</td><td>Products now exceed declared category scope</td><td><span class="badge b-s2">S2</span></td></tr>
+                <tr><td>Harbor Botanicals</td><td>Checkout flow changed</td><td><b>Redirect to a new domain at the pay step</b></td><td><span class="badge b-s1">S1</span></td></tr>
+                <tr><td>Northgate Lending</td><td>Domain re-registered</td><td>Registrant now privacy-shielded</td><td><span class="badge b-s2">S2</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="rep-section"><h4>Potential transaction-laundering risk signals</h4>
+            <div class="narr"><div class="ai-tag">◈ AI-synthesized · elevated to case</div>
+              <b>Harbor Botanicals.</b> The checkout began redirecting the payment step to a domain registered only days earlier, with privacy-shielded ownership and no DNSSEC, while listed products remain inconsistent with the destination’s apparent setup. These signals combine into a profile consistent with potential transaction laundering and have been <b>elevated to a case for the acquirer’s analyst to review</b>. This is a risk signal, not a determination.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Incident -->
+      <div class="report rep-block" id="rep-incident" style="display:none;">
+        <div class="rep-head">
+          <div><div class="rl">MMSP · Incident Report</div>
+            <h2>Potential transaction laundering — Harbor Botanicals <span style="font-weight:400;color:var(--muted);font-size:13px;">(illustrative)</span></h2>
+            <div class="meta">Raised during persistent monitoring · type: potential transaction laundering</div></div>
+          <div class="rbrand"><div class="qb">Qredible</div>MMSP · Q-Scan AI</div>
+        </div>
+        <div class="rep-body">
+          <div class="rep-section"><h4>Incident header</h4>
+            <div class="scorebox"><div class="gauge high"><span>S1</span></div>
+              <div><div style="font-weight:600;font-size:14px;">High severity · multiple corroborating signals</div>
+                <div style="color:var(--muted);font-size:12.5px;margin-top:4px;">Raised automatically when the aggregated signal cluster crossed the escalation threshold.</div></div></div>
+          </div>
+          <div class="rep-section"><h4>What we observed</h4>
+            <div class="narr"><div class="ai-tag">◈ AI-synthesized · neutral &amp; evidenced</div>
+              The checkout redirects the payment step to <span class="mono">checkout-pay-x9.example</span>, a domain registered days before detection with privacy-shielded registrant details and DNSSEC disabled. The destination shares hosting infrastructure with unrelated storefronts. Products advertised on the front are inconsistent with the assigned category code, and the descriptor presented at checkout names the front merchant rather than the redirect destination.</div>
+          </div>
+          <div class="rep-section"><h4>Why it is elevated</h4>
+            <div class="findrow"><span class="badge b-s1">S1</span><div class="ft2"><b>Payment redirect to a different, undisclosed domain</b><span>core transaction-laundering indicator</span></div></div>
+            <div class="findrow"><span class="badge b-s2">S2</span><div class="ft2"><b>Recently-registered, privacy-shielded destination</b><span>ownership cannot be validated</span></div></div>
+            <div class="findrow"><span class="badge b-s2">S2</span><div class="ft2"><b>Shared infrastructure with unrelated storefronts</b><span>possible network linkage</span></div></div>
+            <div class="findrow"><span class="badge b-s3">S3</span><div class="ft2"><b>Product / category tension</b><span>advertised products vs assigned code</span></div></div>
+          </div>
+          <div class="rep-section"><h4>Evidence package (audit-ready)</h4>
+            <div class="evid">
+              <div class="e"><div class="et">Screenshots</div><div class="ev">checkout pre/post-redirect</div></div>
+              <div class="e"><div class="et">Domain record</div><div class="ev">full RDAP payload</div></div>
+              <div class="e"><div class="et">Redirect chain</div><div class="ev">captured hops</div></div>
+              <div class="e"><div class="et">Scan reference</div><div class="ev">linked scan</div></div>
+            </div>
+          </div>
+          <div class="rep-section"><h4>Recommended action</h4>
+            <div class="rec"><div class="rt">Refer for human investigation — do not auto-terminate</div>Recommend the acquirer investigate the redirect destination and request a merchant explanation of the checkout routing. Delivered to the acquirer with the standard alert and resolution cadence.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TL case -->
+    <div class="card">
+      <h3>How a cluster of signals becomes a reviewable case</h3>
+      <div class="ch-sub">The case is the unit of review — signals + evidence + an AI narrative + a recommended action. Never an automated verdict.</div>
+      <div class="grid g2" style="margin-top:16px;">
+        <div>
+          <div class="sectlabel">Aggregated signals</div>
+          <div class="sig"><span class="si x"></span><div><span class="st">Payment redirect</span> <span class="badge b-s1" style="margin-left:6px;">S1</span><div class="sd">checkout → another domain · evidence: redirect chain + screenshots</div></div></div>
+          <div class="sig"><span class="si p"></span><div><span class="st">Shielded recent domain</span> <span class="badge b-s2" style="margin-left:6px;">S2</span><div class="sd">registered days ago · privacy-shielded · no DNSSEC · evidence: domain record</div></div></div>
+          <div class="sig"><span class="si p"></span><div><span class="st">Shared infrastructure</span> <span class="badge b-s2" style="margin-left:6px;">S2</span><div class="sd">host shared with unrelated storefronts · evidence: linkage</div></div></div>
+          <div class="sig"><span class="si p"></span><div><span class="st">Product / category tension</span> <span class="badge b-s3" style="margin-left:6px;">S3</span><div class="sd">products vs assigned code · evidence: catalog + scan</div></div></div>
+          <div class="sectlabel" style="margin-top:18px;">Composite confidence</div>
+          <div class="scorebar"><span style="width:78%"></span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);"><span>multiple corroborating signals</span><span>high</span></div>
+        </div>
+        <div>
+          <div class="sectlabel">AI narrative + adjudication</div>
+          <div class="narr" style="border-left-color:#11161f;"><div class="ai-tag" style="color:var(--ink)">◈ Synthesized for human review</div>
+            The signal cluster is consistent with potential transaction laundering: a card payment on a legitimate-appearing front is redirected to a recently-registered, ownership-obscured destination sharing infrastructure with unrelated storefronts, while advertised products do not match the assigned category. <b>Presented as a risk case, not a determination.</b></div>
+          <div class="rec" style="margin-top:14px;"><div class="rt">Status: awaiting acquirer analyst</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <span class="badge b-mc">Refer for investigation</span><span class="badge b-road">Request explanation</span><span class="badge b-road">Dismiss with note</span></div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:10px;">Human-in-the-loop is the product, not a limitation — it’s what the interpreted-report model is built on. The decision + rationale are recorded to the audit log.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footnote" style="text-align:center;margin-top:24px;">Concept / product-level mockup · Qredible design system · illustrative data only.</div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.arc-step').forEach(function(s){
+    s.addEventListener('click',function(){
+      document.querySelectorAll('.arc-step').forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+      s.classList.add('active');
+      document.getElementById(s.dataset.view).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+  var repMap={onboard:'rep-onboard',persist:'rep-persist',incident:'rep-incident'};
+  document.querySelectorAll('.subtab').forEach(function(s){
+    s.addEventListener('click',function(){
+      document.querySelectorAll('.subtab').forEach(function(x){x.classList.remove('active');});
+      s.classList.add('active');
+      Object.values(repMap).forEach(function(id){document.getElementById(id).style.display='none';});
+      document.getElementById(repMap[s.dataset.rep]).style.display='block';
+    });
+  });
+</script>
+</body>
+</html>
