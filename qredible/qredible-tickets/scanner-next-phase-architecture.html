@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Scan AI — Next-Phase Scanner Architecture</title>
+<!--
+  Conceptual product / roadmap mockup. Illustrative example values only.
+  Three-stage arc: where we are today → where we're going + what's needed → the final-state vision.
+  Qredible design system (Uber Move, 13px base).
+-->
+<style>
+  :root{
+    --navy:#292E6F; --navy-hover:#1F2357; --black:#1A202E;
+    --action:#2563eb; --link:#376fd0; --blue-light:#50A8FF; --blue-bg:#DCEEFF;
+    --sage:#95BC64; --green:#00D581; --green-hub:#48D188;
+    --yellow:#FFDD50; --yellow-hub:#E4AE3C; --red:#FF404A; --red-soft:#F57C7C;
+    --violet:#7C3AED;
+    --subtitle:#657496; --placeholder:#9BA09C;
+    --divider:#EBEDF2; --field:#F8FBFD; --subtle:#F1F5F9; --modal-wash:#F7F5FF;
+    --shadow-card:10px 10px 30px rgba(0,0,0,0.10);
+    --shadow-soft:0px 1px 2px 0px rgba(0,0,0,0.05);
+    --font:"Uber Move","Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#EEF1F6;color:var(--navy);font-family:var(--font);font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{margin:0;line-height:1.25;color:var(--navy);}
+  p{margin:0 0 10px;}
+  code,.mono{font-family:var(--mono);font-size:12px;}
+  a{color:var(--link);text-decoration:none;}
+
+  .topbar{position:sticky;top:0;z-index:50;height:64px;background:#fff;border-bottom:1px solid var(--divider);
+    display:flex;align-items:center;padding:0 28px;gap:14px;box-shadow:var(--shadow-soft);}
+  .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--action));
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;}
+  .topbar .t{font-size:15px;font-weight:600;}
+  .topbar .sub{font-size:12px;color:var(--subtitle);font-weight:500;}
+  .topbar .spacer{flex:1;}
+  .pill-ver{font-size:11px;font-weight:600;color:var(--subtitle);background:var(--subtle);border-radius:999px;padding:4px 11px;}
+  .pill-concept{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1d4ed8;background:#E7F0FF;border-radius:999px;padding:4px 11px;}
+
+  .nav{position:sticky;top:64px;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--divider);display:flex;gap:4px;padding:8px 28px;overflow-x:auto;}
+  .nav a{font-size:12px;font-weight:600;color:var(--subtitle);padding:6px 12px;border-radius:999px;white-space:nowrap;}
+  .nav a:hover{background:var(--subtle);color:var(--navy);}
+  .nav a.active{background:var(--navy);color:#fff;}
+  .nav .stagepin{font-size:10px;font-weight:700;color:var(--action);}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 28px 80px;}
+  section{margin-top:30px;scroll-margin-top:128px;}
+  .eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--action);}
+  .sec-title{font-size:22px;font-weight:600;margin:6px 0 4px;}
+  .sec-lede{font-size:14px;color:var(--subtitle);max-width:840px;margin-bottom:18px;}
+
+  .card{background:#fff;border-radius:15px;box-shadow:var(--shadow-card);padding:24px;}
+  .grid{display:grid;gap:16px;}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g2{grid-template-columns:repeat(2,1fr);}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:900px){.g3,.g2,.g4{grid-template-columns:1fr;}}
+
+  /* hero */
+  .hero{background:linear-gradient(135deg,#23285f 0%,#2b3382 55%,#2563eb 130%);border-radius:18px;color:#fff;
+    padding:34px 36px;box-shadow:var(--shadow-card);}
+  .hero h1{color:#fff;font-size:29px;font-weight:600;letter-spacing:-.01em;max-width:780px;}
+  .hero p{color:#cdd6f7;font-size:15px;max-width:760px;margin-top:12px;}
+  .arc{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;}
+  .arc .a{flex:1;min-width:200px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);
+    border-radius:13px;padding:14px 16px;}
+  .arc .a .n{font-size:11px;font-weight:700;letter-spacing:.14em;color:#9fb4f5;text-transform:uppercase;}
+  .arc .a .h{font-size:15px;font-weight:600;color:#fff;margin:4px 0 2px;}
+  .arc .a .d{font-size:11.5px;color:#c2cdf3;}
+  .arc .sep{align-self:center;color:#7f93d8;font-size:18px;font-weight:700;}
+
+  /* stage banner */
+  .stage{display:flex;align-items:center;gap:18px;border-radius:16px;padding:20px 24px;color:#fff;
+    box-shadow:var(--shadow-card);margin-top:38px;scroll-margin-top:128px;}
+  .stage .big{font-size:40px;font-weight:700;opacity:.55;line-height:1;}
+  .stage .lbl{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.85;}
+  .stage .ti{font-size:22px;font-weight:700;margin-top:2px;}
+  .stage .de{font-size:12.5px;opacity:.9;margin-top:4px;max-width:720px;}
+  .s1{background:linear-gradient(120deg,#475569,#334155);}
+  .s2{background:linear-gradient(120deg,#2563eb,#1d4ed8);}
+  .s3{background:linear-gradient(120deg,#16855c,#0f7a52);}
+
+  /* chips / modes */
+  .mode{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;}
+  .mode .dot{width:7px;height:7px;border-radius:50%;}
+  .m-key{background:#EEF1F6;color:#475569;} .m-key .dot{background:#64748b;}
+  .m-ai{background:#E7F0FF;color:#1d4ed8;} .m-ai .dot{background:var(--action);}
+  .m-dom{background:#F1EAFE;color:#6d28d9;} .m-dom .dot{background:var(--violet);}
+  .m-beh{background:#FCF2DC;color:#92400e;} .m-beh .dot{background:var(--yellow-hub);}
+  .chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:600;}
+  .c-green{color:#166534;background:#DCFCE7;} .c-red{color:#991B1B;background:#FEE2E2;}
+  .c-amber{color:#92400e;background:#FEF3C7;} .c-blue{color:#1E40AF;background:#DBEAFE;}
+  .c-grey{color:#1F2937;background:#E5E7EB;} .c-violet{color:#6d28d9;background:#F1EAFE;}
+  .kicker{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--subtitle);}
+  .note{font-size:11.5px;color:var(--subtitle);}
+  .divider-lite{height:1px;background:var(--divider);margin:16px 0;}
+  .hl{background:linear-gradient(transparent 62%,rgba(255,221,80,.55) 0);font-weight:600;color:var(--navy);}
+
+  /* two-tier today */
+  .tier{border-radius:14px;border:1px solid var(--divider);padding:16px;background:#fff;}
+  .tier .tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--subtitle);}
+  .tier h4{font-size:14px;margin:6px 0 6px;}
+  .tier .flow{font-family:var(--mono);font-size:11.5px;background:var(--field);border:1px solid var(--divider);
+    border-radius:9px;padding:8px 10px;color:var(--navy);}
+  .tier ul{margin:10px 0 0;padding-left:16px;}
+  .tier li{font-size:12px;margin-bottom:3px;}
+
+  /* blind cards */
+  .blind h4{font-size:14px;margin-bottom:6px;}
+  .blind .has{font-size:12px;color:var(--green-hub);font-weight:600;}
+  .blind .lacks{font-size:12px;color:var(--red);font-weight:600;}
+  .blind .conseq{font-size:12.5px;color:var(--subtitle);margin-top:8px;border-top:1px dashed var(--divider);padding-top:8px;}
+
+  /* engine lanes */
+  .seam{font-family:var(--mono);font-size:12.5px;background:#0f1535;color:#cfe0ff;border-radius:12px;padding:14px 16px;text-align:center;}
+  .seam b{color:#fff;} .seam .new{color:#7fffc4;}
+  .arrows{display:flex;justify-content:center;color:var(--placeholder);font-size:20px;margin:10px 0;}
+  .lanes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  @media(max-width:900px){.lanes{grid-template-columns:1fr 1fr;}}
+  .lane{border-radius:14px;padding:14px;border:1px solid var(--divider);background:#fff;}
+  .lane.key{border-top:3px solid #64748b;} .lane.ai{border-top:3px solid var(--action);}
+  .lane.dom{border-top:3px solid var(--violet);} .lane.beh{border-top:3px solid var(--yellow-hub);}
+  .lane h4{font-size:13px;margin:8px 0 4px;}
+  .lane .desc{font-size:12px;color:var(--subtitle);}
+  .lane ul{margin:8px 0 0;padding-left:16px;}
+  .lane li{font-size:11.5px;margin-bottom:3px;}
+  .lane .cost{margin-top:10px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+
+  /* context diff */
+  .ctx{display:grid;grid-template-columns:1fr 1fr;border-radius:14px;overflow:hidden;border:1px solid var(--divider);}
+  @media(max-width:900px){.ctx{grid-template-columns:1fr;}}
+  .ctx .col-old{background:var(--subtle);padding:18px;}
+  .ctx .col-new{background:#F4F8FF;padding:18px;}
+  .ctx .lbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;}
+  .ctx .col-old .lbl{color:var(--subtitle);} .ctx .col-new .lbl{color:var(--action);}
+  .field-row{display:flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:11.5px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,.06);}
+  .field-row .k{color:var(--navy);font-weight:600;min-width:120px;}
+  .field-row .v{color:var(--subtitle);}
+  .field-row.add{background:rgba(37,99,235,.05);margin:0 -8px;padding:5px 8px;border-radius:6px;}
+  .tag-new{font-size:9px;font-weight:700;color:#fff;background:var(--action);border-radius:4px;padding:1px 5px;letter-spacing:.05em;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--subtitle);text-align:left;padding:8px 10px;border-bottom:1px solid var(--divider);}
+  td{padding:9px 10px;border-bottom:1px solid var(--divider);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td .tok{font-family:var(--mono);font-size:11.5px;color:var(--action);font-weight:600;}
+
+  /* axis + classes */
+  .axis .bar{height:8px;border-radius:999px;background:linear-gradient(90deg,#22c55e,#84cc16,#eab308,#f97316,#ef4444);}
+  .axis .ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;font-weight:700;color:var(--subtitle);letter-spacing:.04em;text-transform:uppercase;}
+  .classcard{border-radius:13px;border:1px solid var(--divider);padding:14px;background:#fff;position:relative;overflow:hidden;}
+  .classcard:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+  .classcard.cheap:before{background:var(--green-hub);} .classcard.mid:before{background:var(--yellow-hub);} .classcard.exp:before{background:var(--red);}
+  .classcard h4{font-size:13.5px;margin:3px 0 5px;}
+  .classcard .eg{font-size:11.5px;color:var(--subtitle);min-height:30px;}
+  .classcard .infra{font-size:11.5px;font-weight:600;margin-top:8px;border-top:1px dashed var(--divider);padding-top:8px;}
+  .ph-tag{font-size:9.5px;font-weight:700;border-radius:5px;padding:2px 7px;letter-spacing:.04em;}
+  .ph0{background:#E7F0FF;color:#1d4ed8;} .ph1{background:#F1EAFE;color:#6d28d9;}
+  .ph2{background:#FEF3C7;color:#92400e;} .ph3{background:#FEE2E2;color:#991B1B;} .ph-x{background:#E5E7EB;color:#374151;}
+
+  /* pipeline */
+  .pipe{display:flex;flex-direction:column;}
+  .step{display:grid;grid-template-columns:46px 1fr;gap:16px;}
+  .step .rail{display:flex;flex-direction:column;align-items:center;}
+  .step .num{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:var(--shadow-soft);}
+  .step .line{width:2px;flex:1;background:var(--divider);margin:4px 0;}
+  .step:last-child .line{display:none;}
+  .step .body{padding-bottom:18px;}
+  .step .body h4{font-size:14px;margin-bottom:3px;}
+  .step .body .meta{font-size:11px;color:var(--subtitle);font-weight:600;margin-bottom:8px;}
+  .panel{background:var(--field);border:1px solid var(--divider);border-radius:12px;padding:13px 15px;}
+  .panel.dark{background:#0f1535;border:none;color:#dbe6ff;}
+  .panel.warn{background:#FFF6F6;border:1px solid #ffd5d7;}
+  .panel.ok{background:#F1FCF6;border:1px solid #c3f0d8;}
+  .mono-block{font-family:var(--mono);font-size:12px;white-space:pre-wrap;line-height:1.6;}
+  .tok-h{background:rgba(37,99,235,.18);color:#1d4ed8;border-radius:3px;padding:0 3px;font-weight:700;}
+  .tok-r{background:rgba(0,213,129,.20);color:#067a4b;border-radius:3px;padding:0 3px;font-weight:700;}
+  .gate{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .gate .branch{font-size:11.5px;font-weight:600;border-radius:8px;padding:6px 10px;}
+  .gate .miss{background:#EEF1F6;color:#475569;} .gate .hit{background:#E7F0FF;color:#1d4ed8;}
+  .verdict{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;}
+  @media(max-width:760px){.verdict{grid-template-columns:1fr;}}
+  .meter{height:9px;border-radius:999px;background:var(--subtle);overflow:hidden;margin:6px 0 4px;}
+  .meter>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));}
+  .route{display:flex;flex-direction:column;gap:8px;}
+  .route .r{display:flex;gap:10px;align-items:flex-start;font-size:12px;padding:9px 11px;border-radius:10px;border:1px solid var(--divider);}
+  .route .r.win{border-color:#bfe6cf;background:#F1FCF6;}
+
+  /* scale */
+  .lever{display:flex;gap:12px;}
+  .lever .ic{width:36px;height:36px;border-radius:11px;background:var(--blue-bg);color:var(--action);display:flex;align-items:center;justify-content:center;flex:none;font-weight:700;}
+  .lever h4{font-size:13px;margin-bottom:2px;}
+  .lever p{font-size:12px;color:var(--subtitle);margin:0;}
+  .fallback{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;}
+  .fb{font-size:11.5px;font-weight:600;border-radius:9px;padding:7px 11px;border:1px solid var(--divider);background:#fff;}
+  .fb.b{border-color:#f4d58b;background:#FEF8E7;color:#92400e;} .fb.d{border-color:#d9c4f7;background:#F6F0FE;color:#6d28d9;}
+  .fb.t{border-color:#bcd3f7;background:#EEF4FE;color:#1d4ed8;} .fb.a{border-color:#cfd6e2;background:#F1F5F9;color:#334155;}
+  .fb-arrow{color:var(--placeholder);font-weight:700;}
+
+  /* roadmap */
+  .roadmap{display:flex;flex-direction:column;gap:14px;}
+  .phase{display:grid;grid-template-columns:140px 1fr;gap:18px;border-radius:15px;border:1px solid var(--divider);overflow:hidden;background:#fff;}
+  @media(max-width:760px){.phase{grid-template-columns:1fr;}}
+  .phase .side{padding:18px;color:#fff;display:flex;flex-direction:column;justify-content:center;}
+  .phase .side .pn{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.85;}
+  .phase .side .pt{font-size:17px;font-weight:700;margin-top:4px;line-height:1.2;}
+  .phase .side .when{font-size:11px;margin-top:8px;opacity:.85;font-weight:500;}
+  .p0 .side{background:linear-gradient(160deg,#2563eb,#1d4ed8);}
+  .p1 .side{background:linear-gradient(160deg,#7C3AED,#6d28d9);}
+  .p2 .side{background:linear-gradient(160deg,#E4AE3C,#b9821f);}
+  .p3 .side{background:linear-gradient(160deg,#ef4444,#b91c1c);}
+  .phase .main{padding:16px 18px;}
+  .phase .main .build{font-size:12.5px;}
+  .unblocks{margin-top:10px;background:var(--subtle);border-radius:11px;padding:11px 13px;}
+  .unblocks .ul{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--subtitle);margin-bottom:6px;}
+  .lenrow{display:flex;flex-wrap:wrap;gap:6px;}
+  .len{font-size:11px;font-weight:600;border-radius:7px;padding:3px 8px;background:#fff;border:1px solid var(--divider);}
+
+  /* manual-checks walls */
+  .walls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  @media(max-width:900px){.walls{grid-template-columns:1fr 1fr;}}
+  @media(max-width:560px){.walls{grid-template-columns:1fr;}}
+  .wallcard{border-radius:13px;border:1px solid var(--divider);padding:14px;background:#fff;border-top:3px solid var(--divider);}
+  .wallcard.w0{border-top-color:var(--action);} .wallcard.w1{border-top-color:var(--violet);}
+  .wallcard.w3{border-top-color:var(--red);} .wallcard.wx{border-top-color:#94a3b8;}
+  .wallcard h4{font-size:13px;margin:4px 0 6px;}
+  .wallcard ul{margin:0;padding-left:15px;} .wallcard li{font-size:11.5px;margin-bottom:3px;color:var(--navy);}
+  .wallcard .h{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+
+  .callout{border-left:4px solid var(--action);background:var(--modal-wash);border-radius:0 12px 12px 0;padding:14px 18px;}
+  .callout.green{border-color:var(--green-hub);background:#F1FCF6;}
+  .callout h4{font-size:13px;margin-bottom:4px;}
+  .callout p{font-size:12.5px;margin:0;}
+  .foot{margin-top:46px;border-top:1px solid var(--divider);padding-top:18px;font-size:11.5px;color:var(--subtitle);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Q</div>
+  <div>
+    <div class="t">Q-Scan AI · Next-Phase Scanner Architecture</div>
+    <div class="sub">From keyword matching to context-aware AI, product reasoning &amp; behavioral checks</div>
+  </div>
+  <div class="spacer"></div>
+  <span class="pill-ver">Concept v1</span>
+  <span class="pill-concept">Product / Roadmap</span>
+</div>
+
+<div class="nav" id="nav">
+  <a href="#hero" class="active">Overview</a>
+  <a href="#stage1"><span class="stagepin">01</span>&nbsp;Today</a>
+  <a href="#today-tiers">What it supports</a>
+  <a href="#today-breaks">Where it breaks</a>
+  <a href="#stage2"><span class="stagepin">02</span>&nbsp;The plan</a>
+  <a href="#engine">Extended engine</a>
+  <a href="#context">Context &amp; tokens</a>
+  <a href="#classes">What's needed</a>
+  <a href="#stage3"><span class="stagepin">03</span>&nbsp;The vision</a>
+  <a href="#example">End to end</a>
+  <a href="#scale">Scale</a>
+  <a href="#roadmap">Roadmap</a>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <section id="hero" style="margin-top:24px;">
+    <div class="hero">
+      <h1>Don't build a new engine. Give the existing one more context — and more ways to act on it.</h1>
+      <p>Today's scanner is excellent at one question: <i>"is this required disclosure present on the page?"</i>
+         The next phase teaches it to reason about <b>who the merchant is</b>, <b>what it sells</b>, and
+         <b>what happens when a customer acts</b> — without throwing away the fast, reliable engine we already run.</p>
+      <div class="arc">
+        <div class="a"><div class="n">Stage 01</div><div class="h">Where we are today</div><div class="d">A two-tier keyword engine. Great for simple disclosures; blind to context.</div></div>
+        <div class="sep">→</div>
+        <div class="a"><div class="n">Stage 02</div><div class="h">Where we're going + what's needed</div><div class="d">An extended engine with four execution modes and the infrastructure each needs.</div></div>
+        <div class="sep">→</div>
+        <div class="a"><div class="n">Stage 03</div><div class="h">The final state</div><div class="d">A flexible, scalable, context-aware scanner — new verticals are published, not coded.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== STAGE 1 ====================================================== -->
+  <div class="stage s1" id="stage1">
+    <div class="big">01</div>
+    <div>
+      <div class="lbl">Stage one</div>
+      <div class="ti">Where we are today</div>
+      <div class="de">What the scanner supports now, and exactly where it hits a wall.</div>
+    </div>
+  </div>
+
+  <!-- what it supports -->
+  <section id="today-tiers">
+    <div class="eyebrow">What the scanner supports now</div>
+    <h2 class="sec-title">A two-tier keyword engine — fast, reliable, deterministic</h2>
+    <p class="sec-lede">Every check today asks a presence/absence question over the text of a page:
+       <i>is this on or off? present or missing?</i> That is the right tool for statutory disclosures, and it runs
+       quickly and cheaply across many merchants. Which checks run is <b>configuration per merchant profile</b>, not
+       code — the policy-first foundation the next phase builds on.</p>
+    <div class="grid g2">
+      <div class="tier">
+        <span class="mode m-key"><span class="dot"></span>Tier 1</span>
+        <h4>Compliance checks — pure keyword / pattern</h4>
+        <div class="flow">match( page text ) → present / absent → compliant or deficiency</div>
+        <ul>
+          <li>Required-disclosure presence (e.g. license footer, FDA disclaimer, privacy policy)</li>
+          <li>Prohibited-language detection (e.g. guaranteed-approval claims)</li>
+          <li>No AI. Deterministic, auditable, effectively free to run.</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <span class="mode m-ai"><span class="dot"></span>Tier 2</span>
+        <h4>Violative terms — keyword, then optional AI</h4>
+        <div class="flow">keyword hit → optional AI instructions → violative / not</div>
+        <ul>
+          <li>A configurable watchlist of terms and phrases</li>
+          <li>AI is already used here to judge borderline matches</li>
+          <li>Still <b>keyword-triggered</b> — it only looks where a term fires</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout green" style="margin-top:16px;">
+      <h4>The important takeaway</h4>
+      <p>The AI execution path <b>already exists</b> for violative terms, and check selection is <b>already
+         config-driven</b>. The next phase is an extension of proven foundations, not a rebuild.</p>
+    </div>
+  </section>
+
+  <!-- where it breaks -->
+  <section id="today-breaks">
+    <div class="eyebrow">Where it breaks</div>
+    <h2 class="sec-title">Three things the engine cannot see</h2>
+    <p class="sec-lede">Newer checks are more complex than presence/absence. They fail for one of three reasons —
+       and naming them precisely is the whole design.</p>
+    <div class="grid g3">
+      <div class="card blind">
+        <span class="chip c-grey">Context blindness</span>
+        <h4 style="margin-top:10px;">Who the merchant is</h4>
+        <div class="has">HAS · the text of the page</div>
+        <div class="lacks">LACKS · the merchant's locations, licenses, declared category</div>
+        <div class="conseq">A single-state lender gets flagged for a missing <i>multi-state</i> disclosure it never needed.</div>
+      </div>
+      <div class="card blind">
+        <span class="chip c-grey">Single-signal</span>
+        <h4 style="margin-top:10px;">Several facts, reasoned together</h4>
+        <div class="has">HAS · one string match per check</div>
+        <div class="lacks">LACKS · "required only if A and B and not C"</div>
+        <div class="conseq">Multi-condition logic can't be a single keyword. It needs a reasoner.</div>
+      </div>
+      <div class="card blind">
+        <span class="chip c-grey">Surface blindness</span>
+        <h4 style="margin-top:10px;">What it sells &amp; what happens when you act</h4>
+        <div class="has">HAS · one page of text</div>
+        <div class="lacks">LACKS · product structure, page interaction, on-page controls</div>
+        <div class="conseq">"Is a consent step actually required at checkout?" is unanswerable from text alone.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;background:#FFFBF6;">
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="flex:1;min-width:280px;">
+          <span class="chip c-red">The emblem case</span>
+          <h3 style="font-size:16px;margin:8px 0 6px;">The single-state lender false positive</h3>
+          <p style="font-size:13px;">A lender operating in <b>one state only</b> was flagged <b>violative</b> for not
+            publishing a multi-state served-states list. It correctly named its single state and was fully compliant —
+            the keyword matcher simply had <b>no idea which state(s) the merchant serves</b>, so it expected a list
+            that didn't apply. Pure keyword logic can't fix this; the check needs the merchant's own facts.</p>
+        </div>
+        <div style="flex:1;min-width:280px;">
+          <span class="chip c-amber">The backlog it creates</span>
+          <h3 style="font-size:16px;margin:8px 0 6px;">The complex checks stuck in manual review</h3>
+          <p style="font-size:13px;">Because the engine can't run them reliably, the most complex checks ship as
+            <b>Analyst Review</b> — a human examines each merchant by hand. That is accurate but slow and doesn't
+            scale. The next phase is about moving these from manual to automated, safely.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== STAGE 2 ====================================================== -->
+  <div class="stage s2" id="stage2">
+    <div class="big">02</div>
+    <div>
+      <div class="lbl">Stage two</div>
+      <div class="ti">Where we're going + what's needed</div>
+      <div class="de">The extended check engine, the context it reasons over, and the infrastructure each class of check requires.</div>
+    </div>
+  </div>
+
+  <section id="engine">
+    <div class="eyebrow">The proposal · part 1</div>
+    <h2 class="sec-title">The extended check engine — a <span class="mono" style="font-size:18px;color:var(--action)">detection_mode</span> dispatch</h2>
+    <p class="sec-lede">One engine, one config model, one results view — unchanged. We make each check's
+       <b>execution mode explicit</b>, and the engine dispatches to the right executor. Existing checks stay in
+       <span class="mode m-key"><span class="dot"></span>KEYWORD</span> mode and behave exactly as today. Complexity is opt-in, per check.</p>
+    <div class="card">
+      <div class="seam">
+        evaluate( <b>page</b>, <span class="new">context</span> )&nbsp; ·&nbsp; today <span class="new">context = the page</span> →
+        enriched with merchant facts, product catalog, per-page content &amp; on-page controls
+      </div>
+      <div class="arrows">▼</div>
+      <div class="lanes">
+        <div class="lane key">
+          <span class="mode m-key"><span class="dot"></span>KEYWORD</span>
+          <h4>Pattern over text</h4>
+          <div class="desc">Today's strategies. Deterministic.</div>
+          <ul><li>Disclosure presence</li><li>Prohibited language</li></ul>
+          <div class="cost" style="color:var(--green-hub)">● Free · already shipped</div>
+        </div>
+        <div class="lane ai">
+          <span class="mode m-ai"><span class="dot"></span>AI</span>
+          <h4>Keyword gate → AI verdict</h4>
+          <div class="desc">Trigger fires → instructions + merchant-context tokens → verdict.</div>
+          <ul><li>Served-states (context)</li><li>Product / service match</li></ul>
+          <div class="cost" style="color:var(--action)">◐ Gated cost · near-term</div>
+        </div>
+        <div class="lane dom">
+          <span class="mode m-dom"><span class="dot"></span>ON-PAGE</span>
+          <h4>Read rendered controls</h4>
+          <div class="desc">Inspect on-page elements already rendered for screenshots.</div>
+          <ul><li>Pre-checked consent box</li><li>Terms checkbox present</li></ul>
+          <div class="cost" style="color:var(--violet)">◔ Cheap · soon</div>
+        </div>
+        <div class="lane beh">
+          <span class="mode m-beh"><span class="dot"></span>BEHAVIORAL</span>
+          <h4>Drive the live site</h4>
+          <div class="desc">A headless browser runs a flow; verdict over what it observes.</div>
+          <ul><li>Consent as a checkout step</li><li>Restricted-state block</li></ul>
+          <div class="cost" style="color:var(--red)">● Expensive · R&amp;D</div>
+        </div>
+      </div>
+      <div class="divider-lite"></div>
+      <p class="note"><b>Why this is the unifying move:</b> a "complex check" is no longer special code. It becomes a
+        definition with a mode, an instruction template, a trigger, and a list of context tokens. Authoring a
+        contextual check becomes a <b>content task for the compliance team</b>; engineering builds each executor
+        <b>once</b>. That is policy-first, realized for complex checks.</p>
+    </div>
+  </section>
+
+  <section id="context">
+    <div class="eyebrow">The proposal · part 2</div>
+    <h2 class="sec-title">Enriched check context + a merchant-context resolver</h2>
+    <p class="sec-lede">Everything flows from enriching <b>what a check is allowed to see</b>. A resolver gathers a
+       merchant's facts once per scan and the AI executor renders them into the instruction template as
+       <span class="mono">{{tokens}}</span>.</p>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="ctx">
+        <div class="col-old">
+          <div class="lbl">Today · context = the page</div>
+          <div class="field-row"><span class="k">page</span><span class="v">the crawled page text</span></div>
+          <p class="note" style="margin-top:12px;">A check sees the page and nothing about the business behind it.</p>
+        </div>
+        <div class="col-new">
+          <div class="lbl">Next phase · enriched context</div>
+          <div class="field-row"><span class="k">page(s)</span><span class="v">per-page content</span></div>
+          <div class="field-row add"><span class="k">merchant</span><span class="v">locations · licenses · category</span> <span class="tag-new">near-term</span></div>
+          <div class="field-row add"><span class="k">products</span><span class="v">catalog + bundle structure</span> <span class="tag-new">mid</span></div>
+          <div class="field-row add"><span class="k">on-page</span><span class="v">rendered controls / elements</span> <span class="tag-new">soon</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <div class="kicker">Merchant-context resolver</div>
+        <h4 style="margin:8px 0 10px;font-size:15px;">The dynamic-token source</h4>
+        <div class="panel dark"><div class="mono-block">MerchantContext {
+  servedStates:        [ ... ]
+  licenses:            [ ... ]
+  track / sub-type:    A | B
+  declaredCategory:    ...
+  declaredMcc:         ...        <span style="color:#8aa0d6">// merchant category code</span>
+  conditionalFlags:    { ... }    <span style="color:#8aa0d6">// e.g. servesState, isSubType</span>
+}</div></div>
+        <p class="note" style="margin-top:10px;">Resolved once per merchant per scan and cached, so many AI checks
+          on one merchant share the same context — fast and inexpensive.</p>
+      </div>
+      <div class="card">
+        <div class="kicker">Token catalog</div>
+        <h4 style="margin:8px 0 10px;font-size:15px;">What an instruction template can reference</h4>
+        <table>
+          <thead><tr><th>Token</th><th>Source</th><th>Solves</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tok">{{served_states}}</span></td><td>Merchant locations</td><td>The single-state false positive</td></tr>
+            <tr><td><span class="tok">{{licenses}}</span></td><td>License verification</td><td>"Is this license required here?"</td></tr>
+            <tr><td><span class="tok">{{track}}</span></td><td>Profile / sub-type</td><td>Vertical-specific check selection</td></tr>
+            <tr><td><span class="tok">{{declared_mcc}}</span></td><td>Onboarding</td><td>Category-code validation</td></tr>
+            <tr><td><span class="tok">{{product_catalog}}</span></td><td>Product scan</td><td>Bundling &amp; prohibited-item reasoning</td></tr>
+            <tr><td><span class="tok">{{conditional_flags}}</span></td><td>Per-merchant flags</td><td>Conditional check gating</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="classes">
+    <div class="eyebrow">What's needed · the capability map</div>
+    <h2 class="sec-title">Eight classes of complex check → the infrastructure each requires</h2>
+    <p class="sec-lede">The single most useful distinction in the whole plan: <b>reading an on-page control is cheap;
+       driving a full checkout is expensive.</b> They get conflated constantly. A pre-checked box is an element on
+       an already-rendered page. Advancing through checkout is a different universe of effort.</p>
+    <div class="card">
+      <div class="axis">
+        <div class="bar"></div>
+        <div class="ticks"><span>Free · text</span><span>Cheap · on-page</span><span>Gated · AI</span><span>Data · product/category</span><span>Expensive · interaction</span></div>
+      </div>
+      <div class="grid g4" style="margin-top:14px;">
+        <div class="classcard cheap"><div style="display:flex;justify-content:space-between;"><span class="kicker">Context-aware</span><span class="ph-tag ph0">Near-term</span></div>
+          <h4>Multi-condition logic</h4><div class="eg">Disclosure required only if more than one state is served</div>
+          <div class="infra" style="color:var(--action)">AI mode + merchant-context injection</div></div>
+        <div class="classcard cheap"><div style="display:flex;justify-content:space-between;"><span class="kicker">Location-aware</span><span class="ph-tag ph0">Near-term</span></div>
+          <h4>License / footprint aware</h4><div class="eg">A license only required for certain footprints or sub-types</div>
+          <div class="infra" style="color:var(--action)">Conditional flags + dynamic tokens</div></div>
+        <div class="classcard mid"><div style="display:flex;justify-content:space-between;"><span class="kicker">Multi-page</span><span class="ph-tag ph1">Soon</span></div>
+          <h4>Across the whole site</h4><div class="eg">A disclosure that lives on a terms or subpage; cross-page consistency</div>
+          <div class="infra" style="color:var(--violet)">Per-page content model</div></div>
+        <div class="classcard cheap"><div style="display:flex;justify-content:space-between;"><span class="kicker">On-page</span><span class="ph-tag ph1">Soon</span></div>
+          <h4>Rendered controls <span class="chip c-green" style="margin-left:4px;">cheap win</span></h4><div class="eg">A pre-checked consent box; a terms checkbox present at checkout</div>
+          <div class="infra" style="color:var(--violet)">Rendered elements in context</div></div>
+        <div class="classcard mid"><div style="display:flex;justify-content:space-between;"><span class="kicker">Product</span><span class="ph-tag ph2">Mid</span></div>
+          <h4>Bundling / co-occurrence</h4><div class="eg">Consumables bundled with a product in a way that implies misuse</div>
+          <div class="infra" style="color:var(--yellow-hub)">Product catalog + bundle structure</div></div>
+        <div class="classcard mid"><div style="display:flex;justify-content:space-between;"><span class="kicker">Category</span><span class="ph-tag ph2">Mid</span></div>
+          <h4>Category-code validation</h4><div class="eg">Products actually sold vs the declared merchant category code</div>
+          <div class="infra" style="color:var(--yellow-hub)">Category dictionary + product mapping</div></div>
+        <div class="classcard exp"><div style="display:flex;justify-content:space-between;"><span class="kicker">Behavioral</span><span class="ph-tag ph3">R&amp;D</span></div>
+          <h4>Checkout-flow checks</h4><div class="eg">Consent as a real step; nothing auto-added to the cart</div>
+          <div class="infra" style="color:var(--red)">Headless-browser automation</div></div>
+        <div class="classcard exp"><div style="display:flex;justify-content:space-between;"><span class="kicker">External</span><span class="ph-tag ph-x">Adjacent</span></div>
+          <h4>External lookups</h4><div class="eg">Verifying a license against a public registry; outbound-link checks</div>
+          <div class="infra" style="color:#475569">Link extraction + verification services</div></div>
+      </div>
+      <div class="divider-lite"></div>
+      <p class="note">The two context-aware classes are the <b>same engine work</b> (AI + context), and the cheapest
+        to ship. The external-lookup class is partly the scanner's job (links) and partly the work of the adjacent
+        merchant-verification system, which the scanner simply <i>calls</i> rather than rebuilds.</p>
+    </div>
+  </section>
+
+  <!-- ====================================================== STAGE 3 ====================================================== -->
+  <div class="stage s3" id="stage3">
+    <div class="big">03</div>
+    <div>
+      <div class="lbl">Stage three</div>
+      <div class="ti">The final state</div>
+      <div class="de">A flexible, scalable, context-aware scanner — shown end to end, with the roadmap to get there.</div>
+    </div>
+  </div>
+
+  <section id="example">
+    <div class="eyebrow">The vision, made concrete · end to end</div>
+    <h2 class="sec-title">A context-aware AI check, running start to finish</h2>
+    <p class="sec-lede">The same single-state-lender case that produces a false positive today, running cleanly in
+       <span class="mode m-ai"><span class="dot"></span>AI</span> mode in the final-state engine. Example values are illustrative.</p>
+    <div class="card">
+      <div class="pipe">
+        <div class="step">
+          <div class="rail"><div class="num">1</div><div class="line"></div></div>
+          <div class="body">
+            <h4>Trigger gate <span class="chip c-blue" style="margin-left:6px;">cost &amp; accuracy control</span></h4>
+            <div class="meta">A cheap keyword pre-filter decides whether to invoke the model at all.</div>
+            <div class="gate"><code class="mono">trigger: ["available in", "residents of", "we serve", "not available in"]</code></div>
+            <div class="gate" style="margin-top:10px;">
+              <span class="branch miss">no match → skip · <b>no model call</b></span>
+              <span class="fb-arrow">·</span>
+              <span class="branch hit">match on the terms page → proceed ✓</span>
+            </div>
+            <p class="note" style="margin-top:8px;">This is what makes "AI across many sites" affordable: the model runs only where the topic plausibly appears.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="num">2</div><div class="line"></div></div>
+          <div class="body">
+            <h4>Resolve merchant context</h4>
+            <div class="meta">The resolver pulls the facts (cached) — the thing the old engine never had.</div>
+            <div class="panel">
+              <span class="chip c-blue">servedStates: one state</span>
+              <span class="chip c-grey" style="margin-left:6px;">license: state-level</span>
+              <span class="chip c-amber" style="margin-left:6px;">flag: single-state footprint</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="num">3</div><div class="line"></div></div>
+          <div class="body">
+            <h4>Render tokens into the instruction</h4>
+            <div class="meta">The authored template (left) becomes the resolved prompt (right): <span class="tok-h">tokens</span> → <span class="tok-r">values</span>.</div>
+            <div class="grid g2" style="gap:12px;">
+              <div class="panel"><div class="kicker" style="margin-bottom:6px;">Authored instruction (content)</div>
+                <div class="mono-block">This merchant operates in: <span class="tok-h">{{served_states}}</span>.
+A multi-state service-area disclosure is
+required ONLY when more than one state is
+served. If exactly one state is served, the
+requirement does not apply → compliant.
+Otherwise, check for an explicit served /
+excluded-states list. Return a verdict and
+a one-sentence rationale.</div></div>
+              <div class="panel dark"><div class="kicker" style="margin-bottom:6px;color:#8aa0d6;">Resolved prompt (sent to model)</div>
+                <div class="mono-block">This merchant operates in: <span class="tok-r">[one state]</span>.
+A multi-state service-area disclosure is
+required ONLY when more than one state is
+served. If exactly one state is served, the
+requirement does not apply → compliant.
+Otherwise, check for an explicit served /
+excluded-states list. Return a verdict and
+a one-sentence rationale.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="num">4</div><div class="line"></div></div>
+          <div class="body">
+            <h4>AI verdict (structured)</h4>
+            <div class="meta">Forced structured output; the verdict carries its reasoning. Confidence value is illustrative.</div>
+            <div class="verdict">
+              <div class="panel ok"><div class="mono-block">{
+  "isCompliant": <span class="tok-r">true</span>,
+  "confidence": <span class="tok-r">high</span>,
+  "rationale": "Merchant serves a single
+     state; the multi-state disclosure
+     requirement does not apply.",
+  "evidence": "Footer names the single
+     state of operation."
+}</div></div>
+              <div>
+                <div class="kicker">Confidence</div>
+                <div class="meter"><i style="width:92%"></i></div>
+                <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--subtitle);font-weight:600;"><span>low</span><span style="color:var(--green-hub)">high ✓</span><span></span></div>
+                <p class="note" style="margin-top:10px;">The rationale is saved with the finding, so a reviewer reads <i>why</i>, not just <i>what</i> — the same interpret-it-for-the-customer quality leading risk reports are known for.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="rail"><div class="num">5</div></div>
+          <div class="body">
+            <h4>Confidence routing — how manual checks migrate without an accuracy cliff</h4>
+            <div class="meta">No hard cutover. A check can be AI-assisted with an analyst fallback during a transition window.</div>
+            <div class="route">
+              <div class="r win"><span class="chip c-green">high</span>
+                <div><b>High confidence → automated finding.</b> Our case resolves <b>compliant</b> automatically. The old false positive is gone.</div></div>
+              <div class="r"><span class="chip c-amber">low</span>
+                <div><b>Low confidence → Analyst Review</b>, pre-filled with the AI rationale and evidence. The analyst starts from a draft, not a blank page.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="scale">
+    <div class="eyebrow">The vision · flexible AND scalable</div>
+    <h2 class="sec-title">Built to run across many merchants</h2>
+    <p class="sec-lede">The architecture is only worth it if the economics work. Each capability has a distinct
+       scaling profile; the levers below are in priority order of impact.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h4 style="font-size:15px;margin-bottom:14px;">AI cost controls</h4>
+        <div class="grid" style="gap:14px;">
+          <div class="lever"><div class="ic">1</div><div><h4>Trigger-gating</h4><p>No model call unless a cheap keyword pre-filter fires. Most checks on most pages cost nothing.</p></div></div>
+          <div class="lever"><div class="ic">2</div><div><h4>Page-scoping</h4><p>Send the relevant page(s), not the whole site. Smaller, cheaper, and more accurate at once.</p></div></div>
+          <div class="lever"><div class="ic">3</div><div><h4>Context caching</h4><p>One merchant's many AI checks share the same resolved context — gathered once, reused for the rest.</p></div></div>
+          <div class="lever"><div class="ic">4</div><div><h4>Tiered models</h4><p>A fast model for routine classification; escalate to a stronger model only when a verdict is uncertain.</p></div></div>
+          <div class="lever"><div class="ic">5</div><div><h4>Result caching</h4><p>Unchanged pages on re-scan reuse their prior verdict instead of paying again.</p></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="font-size:15px;margin-bottom:14px;">Behavioral throughput &amp; resilience</h4>
+        <div class="grid" style="gap:14px;">
+          <div class="lever"><div class="ic">⧉</div><div><h4>Isolated worker pool</h4><p>Browser-driven checks are slow and heavy, so they run in a separate, independently-scaled pool that never starves the fast text scans.</p></div></div>
+          <div class="lever"><div class="ic">⟳</div><div><h4>Cadence, not every scan</h4><p>Run interactive checks on onboarding, on detected site change, and on a schedule — the biggest throughput lever.</p></div></div>
+        </div>
+        <div class="divider-lite"></div>
+        <div class="kicker">Graceful degradation — the key to running everywhere</div>
+        <div class="fallback">
+          <span class="fb b">Behavioral check</span><span class="fb-arrow">→ fail →</span>
+          <span class="fb d">On-page read</span><span class="fb-arrow">→ fail →</span>
+          <span class="fb t">Text proxy</span><span class="fb-arrow">→ fail →</span>
+          <span class="fb a">Analyst Review</span>
+        </div>
+        <p class="note" style="margin-top:10px;">A site that blocks an interactive check falls back to reading its
+          page, then to a text proxy, then to a human. No check ever crashes a scan; reviewers only see what truly
+          could not be automated.</p>
+      </div>
+    </div>
+    <div class="callout green" style="margin-top:16px;">
+      <h4>Why it stays flexible</h4>
+      <p>Every knob — mode, instructions, trigger, page-scope, tokens — lives on the check definition, not in code.
+         Adding a new vertical means <b>publishing a profile</b> that enables a set of checks and supplies their
+         instructions. Engineering builds each executor once; the compliance team grows coverage as content.</p>
+    </div>
+  </section>
+
+  <section id="roadmap">
+    <div class="eyebrow">Ordered by leverage-per-effort</div>
+    <h2 class="sec-title">The phased roadmap</h2>
+    <p class="sec-lede">Each phase is tagged with the kinds of currently-manual checks it moves to automated.</p>
+    <div class="roadmap">
+      <div class="phase p0">
+        <div class="side"><div class="pn">Phase 0</div><div class="pt">AI-mode wiring</div><div class="when">Near-term · the UI groundwork exists</div></div>
+        <div class="main">
+          <div class="build"><b>Build:</b> mode dispatch · the merchant-context resolver + token rendering · the AI
+            pipeline (gate → context → structured verdict → confidence routing) · an AI-assisted &harr; analyst-confirm
+            hybrid state · cost controls from day one. Extends the AI path already used for violative terms.</div>
+          <div class="unblocks"><div class="ul">Moves to automated (AI-assisted)</div>
+            <div class="lenrow"><span class="len">Served-states / context checks</span><span class="len">Product-service match</span><span class="len">Hidden-fees judgment</span><span class="len">Threshold reasoning</span></div></div>
+        </div>
+      </div>
+      <div class="phase p1">
+        <div class="side"><div class="pn">Phase 1</div><div class="pt">Per-page + on-page</div><div class="when">Small lift on Phase 0</div></div>
+        <div class="main">
+          <div class="build"><b>Build:</b> a per-page content model with page-type classification · expose rendered
+            on-page controls (already rendered for screenshots) as an <span class="mode m-dom"><span class="dot"></span>ON-PAGE</span>
+            mode. Also fixes whole-site disclosure detection, not just the homepage.</div>
+          <div class="unblocks"><div class="ul">Moves to automated</div>
+            <div class="lenrow"><span class="len">Pre-checked consent box · <b>soonest win</b></span><span class="len">Terms-checkbox presence</span><span class="len">Outbound-link checks</span><span class="len">Disclosure-on-a-subpage · cross-page consistency</span></div></div>
+        </div>
+      </div>
+      <div class="phase p2">
+        <div class="side"><div class="pn">Phase 2</div><div class="pt">Product &amp; category</div><div class="when">Data + mapping</div></div>
+        <div class="main">
+          <div class="build"><b>Build:</b> a structured product catalog with bundle structure from the product scan ·
+            a product-family taxonomy · a category-code dictionary and product-to-category mapping · the
+            declared-vs-actual category check.</div>
+          <div class="unblocks"><div class="ul">Moves to automated</div>
+            <div class="lenrow"><span class="len">Product bundling (accurate)</span><span class="len">Full product-service match</span><span class="len">Structured prohibited-item detection</span><span class="len">Category-code validation</span></div></div>
+        </div>
+      </div>
+      <div class="phase p3">
+        <div class="side"><div class="pn">Phase 3</div><div class="pt">Behavioral checks</div><div class="when">Funded R&amp;D</div></div>
+        <div class="main">
+          <div class="build"><b>Build:</b> an isolated, autoscaled browser-automation pool · a small library of reusable
+            checkout flows · the graceful-degradation fallback chain · per-site safeguards · a probe cadence.</div>
+          <div class="unblocks"><div class="ul">Moves to automated (the hardest)</div>
+            <div class="lenrow"><span class="len">Restricted-state checkout enforcement</span><span class="len">Nothing auto-added to cart</span><span class="len">Shipping vs billing handling</span><span class="len">True consent-as-a-step</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="eyebrow">The honest framing</div>
+      <h3 style="font-size:17px;margin:6px 0 4px;">The backlog of manual checks isn't one wall — it's four walls of different heights</h3>
+      <p class="sec-lede" style="margin-bottom:14px;">Sequencing each currently-manual check by <i>which wall</i> it
+        hits is how we ship steadily instead of stalling on the hardest one.</p>
+      <div class="walls">
+        <div class="wallcard w1"><span class="h" style="color:var(--violet)">Next-sprint</span><h4>Cheap on-page reads</h4>
+          <ul><li>Pre-checked consent box</li><li>Terms checkbox present</li></ul></div>
+        <div class="wallcard w0"><span class="h" style="color:var(--action)">Phase 0 · AI + confirm</span><h4>Context reasoning</h4>
+          <ul><li>Served-states logic</li><li>Threshold comparisons</li><li>Product-service match</li></ul></div>
+        <div class="wallcard w3"><span class="h" style="color:var(--red)">Phase 3 · R&amp;D</span><h4>True interaction</h4>
+          <ul><li>Checkout enforcement</li><li>Cart-integrity checks</li><li>Geo-restriction testing</li></ul></div>
+        <div class="wallcard wx"><span class="h" style="color:#475569">Adjacent / other</span><h4>Not scanner work</h4>
+          <ul><li>Registry / sanctions verification</li><li>Onboarding documents</li><li>Document-buried disclosures</li></ul></div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:18px;">
+      <h4>Everything here is additive</h4>
+      <p>Nothing in the engine running today changes behavior. Today's keyword checks keep running exactly as they
+         do. The new capability is opt-in, per check, through configuration — which is precisely what keeps the
+         scanner flexible and scalable as new verticals are published rather than coded.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    Conceptual product / roadmap mockup for internal review. Illustrative example values only — not a specification.
+    Qredible design system · Uber Move · 13px base.
+  </div>
+
+</div>
+
+<script>
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+    var map = {};
+    links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var ids = links.map(function(a){ return a.getAttribute('href').slice(1); });
+    var targets = ids.map(function(id){ return document.getElementById(id); });
+    function onScroll(){
+      var y = window.scrollY + 150, cur = ids[0];
+      targets.forEach(function(t,i){ if(t && t.offsetTop <= y) cur = ids[i]; });
+      links.forEach(function(a){ a.classList.remove('active'); });
+      if(map[cur]) map[cur].classList.add('active');
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+  })();
+</script>
+</body>
+</html>
