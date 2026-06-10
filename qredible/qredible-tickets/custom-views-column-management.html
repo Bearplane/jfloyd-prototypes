@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Custom Views &amp; Column Management — QP-3322</title>
+<!--
+  Public concept mockup. Qredible design-system tokens (DEFAULT variant).
+  Conceptual / product-level only — illustrative, fictional data. No live metrics.
+  Shared column-management + saved-named-views across all four product/COA tables.
+-->
+<style>
+  :root{
+    --ink:#1A202E; --muted:#657496; --link:#376fd0; --action:#2563eb;
+    --navy:#233044; --navy-foot:#1E2A38; --wash:#F7F5FF;
+    --page:#F4F6FA; --card:#FFFFFF; --field:#F8FBFD; --subtle:#F1F5F9;
+    --divider:#EBEDF2; --inputborder:#C5C5C5;
+    --green:#00d581; --green-hub:#48D188; --yellow:#FFDD50; --yellow-hub:#E4AE3C;
+    --red:#ff404a; --red-soft:#F05252; --info:#50A8FF; --info-bg:#DCEEFF;
+    --shadow-card:rgba(50,50,93,0.04) 0px 2px 6px -1px, rgba(0,0,0,0.05) 0px 1px 3px -1px;
+    --r-card:8px; --r-btn:5px; --r-chip:6px;
+    --font:"Uber Move",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:var(--font);font-size:13px;line-height:1.5;color:var(--ink);background:var(--page);-webkit-font-smoothing:antialiased;padding-bottom:70px;}
+  a{color:var(--link);text-decoration:none;} a:hover{text-decoration:underline;}
+  h1,h2,h3,h4,h5{margin:0;line-height:1.25;font-weight:600;}
+  .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:12px;}
+
+  .proto-nav{background:var(--navy);padding:11px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+  .proto-nav a{color:#aeb9cd;font-size:12px;font-weight:600;}
+  .proto-nav a:hover{color:#fff;text-decoration:none;}
+  .proto-nav .sep{color:#3a4861;}
+  .proto-nav .current{color:#fff;font-size:12px;font-weight:600;}
+  .proto-nav .badge{margin-left:auto;background:rgba(37,99,235,.22);color:#9ec5ff;font-size:11px;font-weight:700;padding:3px 11px;border-radius:5px;letter-spacing:.03em;}
+
+  .page{max-width:1180px;margin:0 auto;padding:34px 22px;}
+
+  /* hero */
+  .hero{text-align:center;margin-bottom:26px;}
+  .hero .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#1A202E,#3a4861);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:20px;margin-bottom:14px;}
+  .hero h1{font-size:29px;font-weight:700;letter-spacing:-.01em;}
+  .hero p{color:var(--muted);font-size:14px;max-width:760px;margin:12px auto 0;line-height:1.65;}
+  .hero .meta{margin-top:16px;display:flex;justify-content:center;gap:9px;flex-wrap:wrap;}
+  .hero .meta .pill{background:#fff;border:1px solid var(--divider);color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 12px;border-radius:999px;}
+  .hero .meta .pill.accent{background:rgba(240,82,82,.08);border-color:rgba(240,82,82,.28);color:var(--red-soft);}
+
+  /* explainer band */
+  .card{background:var(--card);border-radius:var(--r-card);box-shadow:var(--shadow-card);padding:22px 24px;}
+  .card + .card{margin-top:16px;}
+  .sectlabel{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted);font-weight:700;margin:0 0 12px;}
+  .grid{display:grid;gap:14px;}
+  .g4{grid-template-columns:repeat(4,1fr);} .g2{grid-template-columns:1fr 1fr;}
+  @media(max-width:980px){.g4{grid-template-columns:1fr 1fr;}.g2{grid-template-columns:1fr;}}
+  @media(max-width:620px){.g4{grid-template-columns:1fr;}}
+  .tcard{background:var(--field);border:1px solid var(--divider);border-radius:9px;padding:14px 15px;}
+  .tcard .src{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--muted);}
+  .tcard h4{font-size:13.5px;margin-top:5px;}
+  .tcard p{font-size:11.5px;color:var(--muted);margin:6px 0 0;line-height:1.5;}
+  .tcard .tag{display:inline-block;margin-top:9px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;}
+  .tag.new{background:rgba(37,99,235,.1);color:var(--action);} .tag.legacy{background:#FEF3C7;color:#92400E;} .tag.shared{background:rgba(72,209,136,.16);color:#1c7d4d;}
+  .lead{font-size:13.5px;color:#2a3142;line-height:1.65;} .lead b{color:var(--ink);}
+
+  /* ===== Workspace (the live demo) ===== */
+  .ws{background:#fff;border:1px solid var(--divider);border-radius:var(--r-card);box-shadow:var(--shadow-card);overflow:hidden;position:relative;}
+  .ws-head{background:var(--wash);border-bottom:1px solid var(--divider);padding:14px 18px;}
+  .ws-head .rl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#5b4bbd;font-weight:700;}
+  .ws-head h3{font-size:16px;margin-top:5px;}
+  .ws-head .sub{font-size:12px;color:var(--muted);margin-top:4px;}
+
+  /* table picker tabs */
+  .tabs{display:flex;gap:2px;padding:0 14px;border-bottom:1px solid var(--divider);background:#fff;flex-wrap:wrap;}
+  .tab{padding:12px 14px;font-size:12.5px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:var(--ink);border-bottom-color:var(--red-soft);}
+  .tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+  .dot.qm{background:var(--action);} .dot.mc{background:#5b4bbd;}
+
+  /* toolbar */
+  .toolbar{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--divider);flex-wrap:wrap;}
+  .toolbar .ctx{font-size:11.5px;color:var(--muted);flex:1;min-width:200px;line-height:1.4;}
+  .toolbar .ctx b{color:var(--ink);}
+  .vsel{display:flex;align-items:center;gap:7px;}
+  .vsel label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;}
+  select.view{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--inputborder);border-radius:var(--r-btn);padding:7px 9px;cursor:pointer;}
+  .vchip{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:#FEF3C7;color:#92400E;}
+  .vchip.company{background:rgba(37,99,235,.1);color:var(--action);}
+
+  .btn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:12.5px;font-weight:600;border-radius:var(--r-btn);padding:9px 14px;cursor:pointer;border:1px solid transparent;background:none;}
+  .btn.dark{background:var(--ink);color:#fff;} .btn.dark:hover{background:#000;}
+  .btn.ghost{background:#fff;border-color:var(--inputborder);color:var(--ink);} .btn.ghost:hover{border-color:#9aa3b2;}
+  .btn.accent{background:var(--red-soft);color:#fff;} .btn.accent:hover{background:#d83f45;}
+  .btn.sm{padding:7px 11px;font-size:12px;}
+  .btn .cog{font-size:13px;}
+
+  /* data table */
+  .tbl-wrap{overflow-x:auto;}
+  table.dt{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap;}
+  table.dt th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--divider);background:var(--subtle);position:relative;}
+  table.dt td{padding:11px 14px;border-bottom:1px solid var(--divider);vertical-align:middle;color:#2a3142;}
+  table.dt tr:last-child td{border-bottom:none;}
+  table.dt tr:hover td{background:#fcfdff;}
+  table.dt th.sys,table.dt td.sys{background:#fbfcfe;color:var(--muted);}
+  table.dt td.sys{text-align:center;}
+  .dim{color:#aab2c2;}
+  .chk{width:13px;height:13px;accent-color:var(--action);}
+  .act{cursor:pointer;color:var(--muted);font-weight:700;letter-spacing:1px;}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+  .c-red{background:#FEE2E2;color:#991B1B;} .c-amber{background:#FEF3C7;color:#92400E;}
+  .c-green{background:rgba(72,209,136,.16);color:#1c7d4d;} .c-gray{background:#F1F5F9;color:#475569;} .c-blue{background:#DBEAFE;color:#1E40AF;}
+  .lnk{color:var(--link);font-weight:600;} .acts-mini{color:var(--muted);}
+  .acts-mini i{font-style:normal;margin:0 2px;cursor:pointer;}
+  .colcount{padding:9px 18px;font-size:11px;color:var(--muted);border-top:1px solid var(--divider);background:#fbfcfe;}
+  .colcount b{color:var(--ink);}
+
+  /* ===== slide-over panel ===== */
+  .scrim{position:fixed;inset:0;background:rgba(26,32,46,.32);opacity:0;pointer-events:none;transition:opacity .2s;z-index:200;}
+  .scrim.open{opacity:1;pointer-events:auto;}
+  .panel{position:fixed;top:0;right:0;height:100vh;width:380px;max-width:92vw;background:#fff;box-shadow:-8px 0 30px rgba(26,32,46,.18);transform:translateX(102%);transition:transform .24s cubic-bezier(.4,0,.2,1);z-index:201;display:flex;flex-direction:column;}
+  .panel.open{transform:none;}
+  .panel .ph{padding:18px 20px 14px;border-bottom:1px solid var(--divider);}
+  .panel .ph .row1{display:flex;align-items:center;justify-content:space-between;}
+  .panel .ph h3{font-size:15px;}
+  .panel .ph .x{cursor:pointer;color:var(--muted);font-size:18px;line-height:1;border:none;background:none;}
+  .panel .ph .ps{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5;}
+  .panel .pview{display:flex;align-items:center;gap:8px;margin-top:13px;}
+  .panel .pview select.view{flex:1;}
+
+  .panel .pbody{flex:1;overflow-y:auto;padding:6px 14px 14px;}
+  .grouphd{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;padding:14px 6px 7px;display:flex;align-items:center;gap:8px;}
+  .grouphd .ln{flex:1;height:1px;background:var(--divider);}
+
+  .sysnote{background:var(--field);border:1px dashed var(--divider);border-radius:8px;padding:9px 11px;margin:8px 6px 2px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .sysnote b{color:var(--ink);}
+
+  .colrow{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid transparent;border-radius:8px;background:#fff;margin:3px 2px;cursor:default;}
+  .colrow:hover{background:#fbfcfe;border-color:var(--divider);}
+  .colrow.dragging{opacity:.5;border:1px dashed var(--action);background:rgba(37,99,235,.04);}
+  .colrow.over{border-top:2px solid var(--action);}
+  .grip{cursor:grab;color:#c2cbdb;font-size:14px;line-height:1;flex:0 0 14px;user-select:none;}
+  .grip:active{cursor:grabbing;}
+  .colrow.locked .grip{visibility:hidden;}
+  .colname{flex:1;font-size:12.5px;font-weight:500;color:var(--ink);}
+  .colname .fld{font-size:10.5px;color:var(--muted);font-weight:400;margin-left:0;display:block;margin-top:1px;}
+  .minitag{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase;}
+  .minitag.newc{background:rgba(37,99,235,.12);color:var(--action);}
+  .minitag.pro{background:#1A202E;color:#fff;}
+  .minitag.lock{background:#FEF3C7;color:#92400E;}
+
+  /* switch */
+  .sw{position:relative;display:inline-block;width:34px;height:20px;flex:0 0 34px;}
+  .sw input{opacity:0;width:0;height:0;}
+  .sw .sl{position:absolute;inset:0;background:#cfd6e2;border-radius:999px;transition:.18s;cursor:pointer;}
+  .sw .sl:before{content:"";position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 2px rgba(0,0,0,.25);}
+  .sw input:checked + .sl{background:var(--green-hub);}
+  .sw input:checked + .sl:before{transform:translateX(14px);}
+  .sw input:disabled + .sl{background:#e6e9ef;cursor:not-allowed;}
+  .upg{font-size:10.5px;font-weight:700;color:var(--red-soft);cursor:pointer;flex:0 0 auto;}
+
+  /* save bar */
+  .savebar{border-top:1px solid var(--divider);padding:13px 16px;background:#fff;display:flex;flex-direction:column;gap:9px;}
+  .savebar .st{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:7px;}
+  .savebar .st .pdot{width:7px;height:7px;border-radius:50%;background:#cfd6e2;}
+  .savebar.dirty .st .pdot{background:var(--yellow-hub);}
+  .savebar .row{display:flex;gap:8px;}
+  .savebar .btn{flex:1;justify-content:center;}
+  .saveas{display:none;flex-direction:column;gap:8px;border-top:1px dashed var(--divider);padding-top:10px;}
+  .saveas.show{display:flex;}
+  .saveas input.nm{font-family:inherit;font-size:12.5px;padding:8px 10px;border:1px solid var(--inputborder);border-radius:var(--r-btn);}
+  .saveas .scope{display:flex;gap:6px;}
+  .scopebtn{flex:1;text-align:center;font-size:11px;font-weight:700;padding:7px;border:1px solid var(--inputborder);border-radius:var(--r-btn);cursor:pointer;color:var(--muted);background:#fff;}
+  .scopebtn.on{border-color:var(--action);color:var(--action);background:rgba(37,99,235,.05);}
+
+  .footnote{color:var(--muted);font-size:11.5px;margin-top:18px;line-height:1.6;text-align:center;}
+  .callout{display:flex;gap:11px;align-items:flex-start;background:var(--wash);border:1px solid #e3ddf6;border-radius:8px;padding:13px 15px;margin-top:14px;}
+  .callout .ci{flex:0 0 20px;color:#5b4bbd;font-size:16px;}
+  .callout .ct b{color:#3f3580;} .callout .cb{color:#4a4570;font-size:12px;margin-top:2px;line-height:1.55;}
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <a href="../">← All Mockups</a>
+  <span class="sep">/</span>
+  <span class="current">Custom Views &amp; Column Management</span>
+  <span class="badge">QP-3322 · CONCEPT</span>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="logo">Q</div>
+    <h1>Custom Views &amp; Column Management</h1>
+    <p>One shared mechanism for the four product &amp; COA tables: expose more columns, toggle them <b>on/off</b>, <b>drag to reorder</b>, and <b>save named views</b> — all governed by Q-Config plan-gating. It normalizes the tables that drifted apart, and it does it <b>without deleting a single legacy column</b>. The COAs tab already ships a feature-gated <span class="mono">faCog</span> &ldquo;Table Settings&rdquo; placeholder — this is what fills it in.</p>
+    <div class="meta">
+      <span class="pill accent">QP-3322</span>
+      <span class="pill">Registry-driven · all 4 tables</span>
+      <span class="pill">Toggle · reorder · saved views</span>
+      <span class="pill">Q-Config plan-gated</span>
+    </div>
+  </div>
+
+  <!-- THE FOUR TABLES + DISCONNECT -->
+  <div class="card">
+    <div class="sectlabel">The four tables this normalizes</div>
+    <div class="grid g4">
+      <div class="tcard">
+        <div class="src">Q-Monitor</div><h4>Products tab</h4>
+        <p>Newer styling — <span class="mono">ProductListCompliance</span>, PaginationTable, styled-components. 11 managed columns.</p>
+        <span class="tag new">Modern baseline</span>
+      </div>
+      <div class="tcard">
+        <div class="src">Q-Monitor</div><h4>COAs tab</h4>
+        <p><span class="mono">ProductListComplianceCOA</span>. 9 managed columns; Disposition &amp; Activity already plan-gated.</p>
+        <span class="tag new">Modern baseline</span>
+      </div>
+      <div class="tcard">
+        <div class="src">MyCOA</div><h4>Products tab</h4>
+        <p>Derived from Q-Monitor — reuses the same component behind a wrapper. Company column hidden by config today.</p>
+        <span class="tag shared">Shared component</span>
+      </div>
+      <div class="tcard">
+        <div class="src">MyCOA</div><h4>COAs tab</h4>
+        <p>The legacy outlier — hand-rolled <span class="mono">mycoa-table</span> on raw MUI, 14 managed cols, several noisy-but-needed.</p>
+        <span class="tag legacy">Legacy · untouched</span>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="ci">◈</div>
+      <div class="ct"><b>The disconnect, in one line.</b>
+        <div class="cb">The MyCOA <b>Products</b> tab inherited Q-Monitor's modern table; the MyCOA <b>COAs</b> tab never did and carries columns (Metrc Source ID, Sample ID, Lot…) that are dead weight for most users but load-bearing for some. A shared column registry + saved views lets the default view <b>hide</b> them while the registry <b>keeps</b> them — one click to bring them back. Try it below: switch tables, open the cog, toggle, drag, and save a view.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE WORKSPACE -->
+  <div class="ws" style="margin-top:16px;">
+    <div class="ws-head">
+      <div class="rl">Interactive · click the cog</div>
+      <h3>Table workspace</h3>
+      <div class="sub">The same column-management engine drives every tab below. Selection &amp; row-action columns are fixed; everything else is yours to arrange.</div>
+    </div>
+
+    <!-- table picker -->
+    <div class="tabs" id="tabs"></div>
+
+    <!-- toolbar -->
+    <div class="toolbar">
+      <div class="ctx" id="ctx"></div>
+      <div class="vsel">
+        <label>View</label>
+        <select class="view" id="viewSel"></select>
+        <span id="viewChip"></span>
+      </div>
+      <button class="btn ghost sm" id="cogBtn"><span class="cog">⚙</span> Table Settings</button>
+    </div>
+
+    <!-- table -->
+    <div class="tbl-wrap">
+      <table class="dt" id="dt"></table>
+    </div>
+    <div class="colcount" id="colcount"></div>
+  </div>
+
+  <div class="footnote">Concept / product-level mockup · Qredible design system · fictional illustrative data only · ties to QP-3322 (shared column-management + saved views).</div>
+
+</div>
+
+<!-- ===== slide-over panel ===== -->
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel" aria-label="Column management">
+  <div class="ph">
+    <div class="row1"><h3>Manage columns</h3><button class="x" id="closeBtn">×</button></div>
+    <div class="ps" id="panelSub"></div>
+    <div class="pview">
+      <select class="view" id="panelViewSel"></select>
+      <button class="btn ghost sm" id="resetBtn" title="Reset this view to its default">Reset</button>
+    </div>
+  </div>
+  <div class="pbody" id="pbody"></div>
+  <div class="savebar" id="savebar">
+    <div class="st"><span class="pdot"></span><span id="saveState">All changes saved to this view</span></div>
+    <div class="row">
+      <button class="btn dark sm" id="saveBtn">Save view</button>
+      <button class="btn ghost sm" id="saveAsBtn">Save as new…</button>
+    </div>
+    <div class="saveas" id="saveAs">
+      <input class="nm" id="newName" placeholder="New view name (e.g. Lab QA)" />
+      <div class="scope">
+        <div class="scopebtn on" data-scope="user" id="scUser">My view</div>
+        <div class="scopebtn" data-scope="company" id="scCompany">Company-wide</div>
+      </div>
+      <button class="btn accent sm" id="createBtn">Create view</button>
+    </div>
+  </div>
+</aside>
+
+<script>
+/* ============ Registries (one per table) ============ */
+/* g=group, gate: 'pro' (premium, toggleable) | 'lock' (NON_INTERACTABLE, plan-locked) | undefined.
+   def=default-visible in the seed. add=net-new column (shows "New" badge). */
+function C(key,label,field,g,o){o=o||{};return{key:key,label:label,field:field,group:g,def:o.def!==false,gate:o.gate,add:o.add};}
+
+var REG = {
+  'qmonitor.products':[
+    C('sku','SKU','attribute.skus','Identity'),
+    C('title','Product Definition','attribute.title','Identity'),
+    C('price','Price','attribute.retailPrice','Commercial'),
+    C('classification','Classification','categories[0].name','Identity'),
+    C('company','Company','company.name','Identity'),
+    C('scanChange','Scan Change','computed','Compliance',{gate:'pro'}),
+    C('listingStatus','Listing Status','computed','Compliance',{gate:'pro'}),
+    C('coaStatus','COA Status','plProductVaultCoas','Compliance'),
+    C('disposition','Disposition','disposition','Compliance',{gate:'pro'}),
+    C('dateAdded','Date Added','createdAt','Meta'),
+    C('activity','Activity','—','Activity',{gate:'pro'}),
+    C('riskScore','Risk Score','computed','Compliance',{def:false,gate:'lock',add:true}),
+    C('vendor','Vendor','supplier.name','Identity',{def:false,add:true}),
+    C('tags','Tags','labels','Meta',{def:false,add:true}),
+  ],
+  'qmonitor.coas':[
+    C('company','Company','plCompany.name','Identity'),
+    C('product','Product Assignment','productCoaName','Identity'),
+    C('fileName','File Name','uploadedFileName','COA Data'),
+    C('batchDate','Batch Date','batchDate','COA Data'),
+    C('batchNumber','Batch Number','batchNumber','COA Data'),
+    C('dateAdded','Date Added','dateAdded','Meta'),
+    C('status','Status','status','Compliance'),
+    C('disposition','Disposition','disposition','Compliance',{gate:'pro'}),
+    C('activity','Activity','—','Activity',{gate:'pro'}),
+    C('d9thc','Δ9-THC %','coa.delta9','COA Data',{def:false,gate:'pro',add:true}),
+    C('totalThc','Total THC %','coa.totalThc','COA Data',{def:false,gate:'pro',add:true}),
+    C('result','Pass / Fail','coa.result','Compliance',{def:false,gate:'lock',add:true}),
+    C('lab','Lab','labCompanyName','Lab',{def:false,add:true}),
+  ],
+  'mycoa.products':[
+    C('sku','SKU','attribute.skus','Identity'),
+    C('title','Product Definition','attribute.title','Identity'),
+    C('price','Price','attribute.retailPrice','Commercial'),
+    C('classification','Classification','categories[0].name','Identity'),
+    C('company','Company','company.name','Identity',{def:false}),
+    C('scanChange','Scan Change','computed','Compliance',{gate:'pro'}),
+    C('listingStatus','Listing Status','computed','Compliance',{gate:'pro'}),
+    C('coaStatus','COA Status','plProductVaultCoas','Compliance'),
+    C('disposition','Disposition','disposition','Compliance',{gate:'pro'}),
+    C('dateAdded','Date Added','createdAt','Meta'),
+    C('activity','Activity','—','Activity',{gate:'pro'}),
+    C('vendor','Vendor','supplier.name','Identity',{def:false,add:true}),
+    C('tags','Tags','labels','Meta',{def:false,add:true}),
+  ],
+  'mycoa.coas':[
+    C('severity','Severity','severity','Compliance'),
+    C('sku','SKU','sku','Identity'),
+    C('batch','Batch','batchNumber','COA Data'),
+    C('product','Product Assignment','productName','Identity'),
+    C('coaUrl','COA URL','coaUrl','COA Data'),
+    C('dateReceived','Date Received','receivedProductAt','Meta'),
+    C('expiration','Expiration','expireDate','Compliance'),
+    C('dateModified','Date Modified','updatedAt','Meta'),
+    C('metrcSourceId','Metrc Source ID','metrcSourceId','Lab',{def:false}),
+    C('sampleId','Sample ID','sampleNumber','Lab',{def:false}),
+    C('lot','Lot','lotNumber','Lab',{def:false}),
+    C('lab','Lab','labCompanyName','Lab'),
+    C('status','Status','uploadStatus','Compliance'),
+    C('qrCode','QR Code','—','Meta',{gate:'pro'}),
+    C('d9thc','Δ9-THC %','coa.delta9','COA Data',{def:false,gate:'pro',add:true}),
+    C('totalThc','Total THC %','coa.totalThc','COA Data',{def:false,gate:'pro',add:true}),
+    C('result','Pass / Fail','coa.result','Compliance',{def:false,gate:'lock',add:true}),
+  ],
+};
+
+var TABLES = [
+  {id:'qmonitor.products',dot:'qm',label:'Q-Monitor · Products',
+   ctx:'<b>Q-Monitor · Products</b> — the modern baseline (<span class="mono">ProductListCompliance</span>). 11 managed columns.'},
+  {id:'qmonitor.coas',dot:'qm',label:'Q-Monitor · COAs',
+   ctx:'<b>Q-Monitor · COAs</b> — Disposition &amp; Activity already plan-gated. 9 managed columns + new cannabinoid fields available.'},
+  {id:'mycoa.products',dot:'mc',label:'MyCOA · Products',
+   ctx:'<b>MyCOA · Products</b> — reuses the Q-Monitor component. The default view hides <b>Company</b> (was a hardcoded flag; now just a saved-view default).'},
+  {id:'mycoa.coas',dot:'mc',label:'MyCOA · COAs',
+   ctx:'<b>MyCOA · COAs</b> — legacy table. <b>Metrc Source ID, Sample ID, Lot</b> are hidden by the default view but kept in the registry — toggle them back anytime.'},
+];
+
+/* ============ chips ============ */
+function chip(cls,txt){return '<span class="chip '+cls+'">'+txt+'</span>';}
+var SEV={High:chip('c-red','● High'),Med:chip('c-amber','● Med'),Low:chip('c-green','● Low')};
+var STA={Published:chip('c-green','Published'),Pending:chip('c-amber','Pending'),Draft:chip('c-gray','Draft'),Failed:chip('c-red','Failed'),Active:chip('c-green','Active'),Flagged:chip('c-red','Flagged'),Watch:chip('c-amber','Watch')};
+var DIS={Approved:chip('c-green','Approved'),Review:chip('c-amber','Under Review'),Rejected:chip('c-red','Rejected')};
+var RES={Pass:chip('c-green','Pass'),Fail:chip('c-red','Fail')};
+function actMini(){return '<span class="acts-mini"><i title="Reminder">⏰</i><i title="Message">✉</i><i title="Conversation">💬</i></span>';}
+
+/* ============ sample rows (fictional) ============ */
+var ROWS = {
+  'qmonitor.products':[
+    {sku:'GD-0420-A',title:'Calm Gummies · 25mg',price:'$28.00',classification:'Edible · Gummy',company:'Northwind Botanicals',scanChange:STA.Watch,listingStatus:STA.Active,coaStatus:chip('c-green','Matched'),disposition:DIS.Approved,dateAdded:'May 02, 2026',activity:actMini(),riskScore:'',vendor:'Northwind',tags:'<span class="chip c-blue">retail</span>'},
+    {sku:'TN-1180-B',title:'Relief Tincture · 1000mg',price:'$54.00',classification:'Tincture',company:'Cedar & Sage Co.',scanChange:STA.Flagged,listingStatus:STA.Active,coaStatus:chip('c-amber','Pending'),disposition:DIS.Review,dateAdded:'May 06, 2026',activity:actMini(),riskScore:'',vendor:'Cedar & Sage',tags:'<span class="chip c-blue">wholesale</span>'},
+    {sku:'VP-7720-C',title:'Daily Vape · Mint',price:'$39.50',classification:'Inhalable',company:'Harbor Leaf Labs',scanChange:STA.Watch,listingStatus:STA.Active,coaStatus:chip('c-green','Matched'),disposition:DIS.Approved,dateAdded:'May 09, 2026',activity:actMini(),riskScore:'',vendor:'Harbor Leaf',tags:''},
+    {sku:'CP-3310-D',title:'Sleep Capsules · 10ct',price:'$22.00',classification:'Capsule',company:'Northwind Botanicals',scanChange:STA.Flagged,listingStatus:STA.Watch,coaStatus:chip('c-red','Expired'),disposition:DIS.Rejected,dateAdded:'May 12, 2026',activity:actMini(),riskScore:'',vendor:'Northwind',tags:'<span class="chip c-blue">retail</span>'},
+    {sku:'TP-5590-E',title:'Topical Balm · 500mg',price:'$31.00',classification:'Topical',company:'Cedar & Sage Co.',scanChange:STA.Active,listingStatus:STA.Active,coaStatus:chip('c-green','Matched'),disposition:DIS.Approved,dateAdded:'May 15, 2026',activity:actMini(),riskScore:'',vendor:'Cedar & Sage',tags:''},
+  ],
+  'qmonitor.coas':[
+    {company:'Northwind Botanicals',product:'Calm Gummies · 25mg',fileName:'coa_gd0420_b14.pdf',batchDate:'Apr 18, 2026',batchNumber:'B-2026-0418',dateAdded:'May 02, 2026',status:STA.Published,disposition:DIS.Approved,activity:actMini(),d9thc:'0.28%',totalThc:'0.41%',result:RES.Pass,lab:'Greenleaf Analytics'},
+    {company:'Cedar & Sage Co.',product:'Relief Tincture · 1000mg',fileName:'coa_tn1180_b07.pdf',batchDate:'Apr 22, 2026',batchNumber:'B-2026-0422',dateAdded:'May 06, 2026',status:STA.Pending,disposition:DIS.Review,activity:actMini(),d9thc:'0.31%',totalThc:'0.55%',result:RES.Pass,lab:'PureScience Labs'},
+    {company:'Harbor Leaf Labs',product:'Daily Vape · Mint',fileName:'coa_vp7720_b22.pdf',batchDate:'Apr 25, 2026',batchNumber:'B-2026-0425',dateAdded:'May 09, 2026',status:STA.Published,disposition:DIS.Approved,activity:actMini(),d9thc:'0.19%',totalThc:'0.34%',result:RES.Pass,lab:'Greenleaf Analytics'},
+    {company:'Northwind Botanicals',product:'Sleep Capsules · 10ct',fileName:'coa_cp3310_b09.pdf',batchDate:'Mar 30, 2026',batchNumber:'B-2026-0330',dateAdded:'May 12, 2026',status:STA.Failed,disposition:DIS.Rejected,activity:actMini(),d9thc:'0.92%',totalThc:'1.12%',result:RES.Fail,lab:'PureScience Labs'},
+    {company:'Cedar & Sage Co.',product:'Topical Balm · 500mg',fileName:'coa_tp5590_b03.pdf',batchDate:'Apr 28, 2026',batchNumber:'B-2026-0428',dateAdded:'May 15, 2026',status:STA.Published,disposition:DIS.Approved,activity:actMini(),d9thc:'0.22%',totalThc:'0.38%',result:RES.Pass,lab:'Greenleaf Analytics'},
+  ],
+  'mycoa.coas':[
+    {severity:SEV.Low,sku:'GD-0420-A',batch:'B-2026-0418',product:'Calm Gummies · 25mg',coaUrl:'<a class="lnk" href="#">View PDF ↗</a>',dateReceived:'Apr 18, 2026',expiration:'Apr 18, 2027',dateModified:'May 02, 2026',metrcSourceId:'1A40D0300012',sampleId:'S-88421',lot:'LOT-4471',lab:'Greenleaf Analytics',status:STA.Published,qrCode:'<a class="lnk" href="#">QR ↓</a>',d9thc:'0.28%',totalThc:'0.41%',result:RES.Pass},
+    {severity:SEV.Med,sku:'TN-1180-B',batch:'B-2026-0422',product:'Relief Tincture · 1000mg',coaUrl:'<a class="lnk" href="#">View PDF ↗</a>',dateReceived:'Apr 22, 2026',expiration:'Apr 22, 2027',dateModified:'May 06, 2026',metrcSourceId:'1A40D0300188',sampleId:'S-88507',lot:'LOT-4490',lab:'PureScience Labs',status:STA.Pending,qrCode:'<a class="lnk" href="#">QR ↓</a>',d9thc:'0.31%',totalThc:'0.55%',result:RES.Pass},
+    {severity:SEV.Low,sku:'VP-7720-C',batch:'B-2026-0425',product:'Daily Vape · Mint',coaUrl:'<a class="lnk" href="#">View PDF ↗</a>',dateReceived:'Apr 25, 2026',expiration:'Apr 25, 2027',dateModified:'May 09, 2026',metrcSourceId:'1A40D0300251',sampleId:'S-88560',lot:'LOT-4503',lab:'Greenleaf Analytics',status:STA.Published,qrCode:'<a class="lnk" href="#">QR ↓</a>',d9thc:'0.19%',totalThc:'0.34%',result:RES.Pass},
+    {severity:SEV.High,sku:'CP-3310-D',batch:'B-2026-0330',product:'Sleep Capsules · 10ct',coaUrl:'<a class="lnk" href="#">View PDF ↗</a>',dateReceived:'Mar 30, 2026',expiration:'Mar 30, 2027',dateModified:'May 12, 2026',metrcSourceId:'1A40D0300094',sampleId:'S-88193',lot:'LOT-4402',lab:'PureScience Labs',status:STA.Failed,qrCode:'<a class="lnk" href="#">QR ↓</a>',d9thc:'0.92%',totalThc:'1.12%',result:RES.Fail},
+    {severity:SEV.Low,sku:'TP-5590-E',batch:'B-2026-0428',product:'Topical Balm · 500mg',coaUrl:'<a class="lnk" href="#">View PDF ↗</a>',dateReceived:'Apr 28, 2026',expiration:'Apr 28, 2027',dateModified:'May 15, 2026',metrcSourceId:'1A40D0300312',sampleId:'S-88611',lot:'LOT-4519',lab:'Greenleaf Analytics',status:STA.Published,qrCode:'<a class="lnk" href="#">QR ↓</a>',d9thc:'0.22%',totalThc:'0.38%',result:RES.Pass},
+  ],
+};
+ROWS['mycoa.products']=ROWS['qmonitor.products']; // same shape
+
+/* ============ seeded views ============ */
+function seedCols(t){return REG[t].map(function(c){return{key:c.key,visible:!!c.def};});}
+function cloneCols(cols){return cols.map(function(c){return{key:c.key,visible:c.visible};});}
+function withVis(t,onKeys,order){ // build a view: order keys first (visible), rest from registry off
+  var reg=REG[t].map(function(c){return c.key;});
+  var ord=order?order.slice():[];
+  reg.forEach(function(k){if(ord.indexOf(k)<0)ord.push(k);});
+  return ord.map(function(k){return{key:k,visible:onKeys.indexOf(k)>=0};});
+}
+
+var VIEWS = {
+  'qmonitor.products':[
+    {id:'default',name:'Default',seed:true,scope:'system',cols:seedCols('qmonitor.products')},
+    {id:'qmp-comp',name:'Compliance focus',scope:'user',
+     cols:withVis('qmonitor.products',['sku','title','classification','scanChange','listingStatus','coaStatus','disposition','riskScore','dateAdded'],
+       ['sku','title','classification','scanChange','listingStatus','coaStatus','disposition','riskScore','dateAdded'])},
+  ],
+  'qmonitor.coas':[
+    {id:'default',name:'Default',seed:true,scope:'system',cols:seedCols('qmonitor.coas')},
+    {id:'qmc-lab',name:'Lab QA',scope:'company',
+     cols:withVis('qmonitor.coas',['product','batchNumber','d9thc','totalThc','result','lab','status'],
+       ['product','batchNumber','d9thc','totalThc','result','lab','status'])},
+  ],
+  'mycoa.products':[
+    {id:'default',name:'Default (Company hidden)',seed:true,scope:'system',cols:seedCols('mycoa.products')},
+    {id:'mcp-triage',name:'Quick triage',scope:'user',
+     cols:withVis('mycoa.products',['sku','title','coaStatus','disposition','dateAdded'],
+       ['sku','title','coaStatus','disposition','dateAdded'])},
+  ],
+  'mycoa.coas':[
+    {id:'default',name:'Default (normalized)',seed:true,scope:'system',cols:seedCols('mycoa.coas')},
+    {id:'mcc-metrc',name:'Metrc reconciliation',scope:'company',
+     cols:withVis('mycoa.coas',['sku','product','batch','metrcSourceId','sampleId','lot','lab','status'],
+       ['sku','product','batch','metrcSourceId','sampleId','lot','lab','status'])},
+  ],
+};
+
+var GROUPS=['Identity','Commercial','COA Data','Compliance','Lab','Activity','Meta'];
+
+/* ============ state ============ */
+var ST={table:'mycoa.coas',work:{},scope:'user'};
+TABLES.forEach(function(tb){
+  var v=VIEWS[tb.id][0];
+  ST.work[tb.id]={viewId:v.id,cols:cloneCols(v.cols),dirty:false};
+});
+
+function reg(t){return REG[t];}
+function defOf(t,key){return REG[t].filter(function(c){return c.key===key;})[0];}
+function curView(){return VIEWS[ST.table].filter(function(v){return v.id===ST.work[ST.table].viewId;})[0];}
+function work(){return ST.work[ST.table];}
+
+/* reconcile working cols with registry (append new, drop retired) */
+function reconcile(t,cols){
+  var keys=REG[t].map(function(c){return c.key;});
+  var out=cols.filter(function(c){return keys.indexOf(c.key)>=0;});
+  var have=out.map(function(c){return c.key;});
+  REG[t].forEach(function(c){if(have.indexOf(c.key)<0)out.push({key:c.key,visible:!!c.def});});
+  return out;
+}
+
+/* ============ render: table ============ */
+function renderTable(){
+  var t=ST.table,w=work(),rows=ROWS[t];
+  var cols=reconcile(t,w.cols).filter(function(c){
+    var d=defOf(t,c.key); if(d.gate==='lock')return false; return c.visible;
+  });
+  var html='<thead><tr>';
+  html+='<th class="sys">☑</th>';
+  cols.forEach(function(c){html+='<th>'+defOf(t,c.key).label+'</th>';});
+  html+='<th class="sys">Actions</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    html+='<tr><td class="sys"><input class="chk" type="checkbox"></td>';
+    cols.forEach(function(c){
+      var v=r[c.key]; html+='<td>'+((v===undefined||v===null||v==='')?'<span class="dim">—</span>':v)+'</td>';
+    });
+    html+='<td class="sys"><span class="act">⋯</span></td></tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('dt').innerHTML=html;
+  document.getElementById('colcount').innerHTML='Showing <b>'+cols.length+'</b> of '+
+    reg(t).filter(function(c){return c.gate!=='lock';}).length+' available columns · 2 fixed (selection, actions)';
+}
+
+/* ============ render: view selectors ============ */
+function viewOptions(){
+  return VIEWS[ST.table].map(function(v){
+    return '<option value="'+v.id+'"'+(v.id===work().viewId?' selected':'')+'>'+v.name+'</option>';
+  }).join('');
+}
+function renderSelectors(){
+  document.getElementById('viewSel').innerHTML=viewOptions();
+  document.getElementById('panelViewSel').innerHTML=viewOptions();
+  var v=curView(),chip='';
+  if(v.scope==='company')chip='<span class="vchip company">Company</span>';
+  else if(v.seed)chip='';
+  if(work().dirty)chip='<span class="vchip">Modified</span>';
+  document.getElementById('viewChip').innerHTML=chip;
+}
+
+/* ============ render: tabs + ctx ============ */
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=TABLES.map(function(tb){
+    return '<div class="tab'+(tb.id===ST.table?' active':'')+'" data-t="'+tb.id+'"><span class="dot '+tb.dot+'"></span>'+tb.label+'</div>';
+  }).join('');
+  document.getElementById('ctx').innerHTML=TABLES.filter(function(x){return x.id===ST.table;})[0].ctx;
+}
+
+/* ============ render: panel ============ */
+function renderPanel(){
+  var t=ST.table,w=work();
+  document.getElementById('panelSub').innerHTML='Editing <b>'+curView().name+'</b> on <b>'+
+    TABLES.filter(function(x){return x.id===t;})[0].label+'</b>. Drag to reorder, toggle to show/hide.';
+  // system note
+  var body='<div class="sysnote">☑ <b>Selection</b> &amp; ⋯ <b>Row actions</b> are fixed columns — always shown.</div>';
+  // group by registry group, preserving working order within
+  var ordered=reconcile(t,w.cols);
+  GROUPS.forEach(function(g){
+    var inG=ordered.filter(function(c){return defOf(t,c.key).group===g;});
+    if(!inG.length)return;
+    body+='<div class="grouphd">'+g+'<span class="ln"></span></div>';
+    inG.forEach(function(c){
+      var d=defOf(t,c.key),locked=(d.gate==='lock');
+      var tags='';
+      if(d.add)tags+='<span class="minitag newc">New</span>';
+      if(d.gate==='pro')tags+='<span class="minitag pro">Pro</span>';
+      if(locked)tags+='<span class="minitag lock">Locked</span>';
+      body+='<div class="colrow'+(locked?' locked':'')+'" draggable="'+(locked?'false':'true')+'" data-key="'+c.key+'">'+
+        '<span class="grip">⋮⋮</span>'+
+        '<span class="colname">'+d.label+tags+'<span class="fld mono">'+d.field+'</span></span>'+
+        (locked
+          ? '<span class="upg" title="Upgrade plan">Upgrade →</span>'
+          : '<label class="sw"><input type="checkbox" data-key="'+c.key+'"'+(c.visible?' checked':'')+'><span class="sl"></span></label>')+
+        '</div>';
+    });
+  });
+  document.getElementById('pbody').innerHTML=body;
+  wirePanelRows();
+  // save bar state
+  var sb=document.getElementById('savebar');
+  sb.classList.toggle('dirty',w.dirty);
+  document.getElementById('saveState').textContent=w.dirty?'Unsaved changes in this view':'All changes saved to this view';
+  document.getElementById('saveBtn').disabled=!w.dirty;
+}
+
+/* toggle + drag wiring */
+function wirePanelRows(){
+  document.querySelectorAll('#pbody .sw input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      var w=work(),c=w.cols.filter(function(x){return x.key===inp.dataset.key;})[0];
+      if(c){c.visible=inp.checked;markDirty();renderTable();renderSelectors();
+        document.getElementById('savebar').classList.toggle('dirty',true);
+        document.getElementById('saveState').textContent='Unsaved changes in this view';
+        document.getElementById('saveBtn').disabled=false;}
+    });
+  });
+  var body=document.getElementById('pbody');
+  document.querySelectorAll('#pbody .colrow[draggable="true"]').forEach(function(row){
+    row.addEventListener('dragstart',function(){row.classList.add('dragging');});
+    row.addEventListener('dragend',function(){
+      row.classList.remove('dragging');
+      // rebuild order from DOM
+      var domKeys=[].map.call(document.querySelectorAll('#pbody .colrow'),function(r){return r.dataset.key;});
+      var w=work(),map={};w.cols.forEach(function(c){map[c.key]=c;});
+      w.cols=domKeys.map(function(k){return map[k];});
+      markDirty();renderTable();renderSelectors();renderPanel();
+    });
+  });
+  body.addEventListener('dragover',function(e){
+    e.preventDefault();
+    var dragging=document.querySelector('#pbody .colrow.dragging');if(!dragging)return;
+    var after=getAfter(body,e.clientY);
+    if(after==null)body.appendChild(dragging);
+    else body.insertBefore(dragging,after);
+  });
+}
+function getAfter(container,y){
+  var els=[].slice.call(container.querySelectorAll('.colrow:not(.dragging)'));
+  var closest={offset:-Infinity,el:null};
+  els.forEach(function(el){
+    var box=el.getBoundingClientRect();var off=y-box.top-box.height/2;
+    if(off<0&&off>closest.offset)closest={offset:off,el:el};
+  });
+  return closest.el;
+}
+
+function markDirty(){work().dirty=true;}
+
+/* ============ actions ============ */
+function loadView(viewId){
+  var v=VIEWS[ST.table].filter(function(x){return x.id===viewId;})[0];
+  ST.work[ST.table]={viewId:viewId,cols:reconcile(ST.table,cloneCols(v.cols)),dirty:false};
+  document.getElementById('saveAs').classList.remove('show');
+  renderSelectors();renderTable();renderPanel();
+}
+function switchTable(t){
+  ST.table=t;renderTabs();renderSelectors();renderTable();renderPanel();
+  document.getElementById('saveAs').classList.remove('show');
+}
+function openPanel(){document.getElementById('panel').classList.add('open');document.getElementById('scrim').classList.add('open');renderPanel();}
+function closePanel(){document.getElementById('panel').classList.remove('open');document.getElementById('scrim').classList.remove('open');}
+
+function saveView(){
+  var v=curView();v.cols=cloneCols(work().cols);work().dirty=false;
+  renderSelectors();renderPanel();
+}
+function resetView(){
+  var v=curView();
+  if(v.seed){v.cols=seedCols(ST.table);} // re-seed
+  loadView(v.id);
+}
+function createView(){
+  var nm=document.getElementById('newName').value.trim()||'My view';
+  var id='v'+Date.now();
+  VIEWS[ST.table].push({id:id,name:nm,scope:ST.scope,cols:cloneCols(work().cols)});
+  document.getElementById('newName').value='';
+  document.getElementById('saveAs').classList.remove('show');
+  ST.work[ST.table]={viewId:id,cols:cloneCols(work().cols),dirty:false};
+  renderSelectors();renderPanel();
+}
+
+/* ============ wire up ============ */
+document.getElementById('tabs').addEventListener('click',function(e){
+  var t=e.target.closest('.tab');if(t)switchTable(t.dataset.t);
+});
+document.getElementById('viewSel').addEventListener('change',function(e){loadView(e.target.value);});
+document.getElementById('panelViewSel').addEventListener('change',function(e){loadView(e.target.value);});
+document.getElementById('cogBtn').addEventListener('click',openPanel);
+document.getElementById('closeBtn').addEventListener('click',closePanel);
+document.getElementById('scrim').addEventListener('click',closePanel);
+document.getElementById('resetBtn').addEventListener('click',resetView);
+document.getElementById('saveBtn').addEventListener('click',saveView);
+document.getElementById('saveAsBtn').addEventListener('click',function(){
+  document.getElementById('saveAs').classList.toggle('show');
+});
+document.getElementById('createBtn').addEventListener('click',createView);
+document.getElementById('scUser').addEventListener('click',function(){ST.scope='user';this.classList.add('on');document.getElementById('scCompany').classList.remove('on');});
+document.getElementById('scCompany').addEventListener('click',function(){ST.scope='company';this.classList.add('on');document.getElementById('scUser').classList.remove('on');});
+
+/* init */
+renderTabs();renderSelectors();renderTable();renderPanel();
+</script>
+</body>
+</html>
