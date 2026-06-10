@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyCOA June 25 — Disposition + Approved + Policy View</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  Sanitized PUBLIC mockup for jfloyd-prototypes. Build-ready spec:
+  qredible-brain/mycoa/mycoa-june25-disposition-proposal.md (commit 0c9e119).
+  Mirrors the REAL MyCOA Products tab layout; applies ONLY the June-25 delta:
+  + Disposition and + Approved columns (after COA Status), the Approved
+  breakdown modal (EntityListModal), and a read-only global Settings
+  Product Compliance Policy view. All merchant/processor data is fictional.
+
+  Qredible design-system tokens:
+    Uber Move (Plus Jakarta Sans web fallback), 13px base
+    text #1A202E · bg #F7F5FF · nav #1A202E · active tab underline #F05252
+    link blue #376fd0 · action #2563eb · modal header wash #F7F5FF
+-->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Uber Move','Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F5FF;color:#1A202E;font-size:13px;line-height:1.5}
+a{color:#376fd0;text-decoration:none}a:hover{text-decoration:underline}
+code,.mono{font-family:'IBM Plex Mono',monospace}
+
+/* TOP NAV */
+.topnav{background:#1A202E;padding:12px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8;position:sticky;top:0;z-index:100}
+.topnav a{color:#E2E8F0}.topnav .sep{color:#475569}
+.topnav .ticket-badge{background:#F05252;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.topnav .title{color:#fff;font-weight:600}
+
+/* PAGE */
+.page{max-width:1320px;margin:0 auto;padding:28px 24px 72px}
+.page-header{margin-bottom:18px}
+.page-header .ticket-badge-lg{display:inline-flex;align-items:center;gap:6px;background:#F05252;color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;margin-bottom:10px}
+.page-header h1{font-size:20px;font-weight:700;color:#1A202E;margin-bottom:6px}
+.page-header p{color:#4A5568;font-size:13px;line-height:1.6;max-width:880px}
+
+/* INFO BLOCK */
+.info-block{background:#FFFBEB;border:2px dashed #FCD34D;border-radius:8px;padding:14px 18px;margin-bottom:28px}
+.info-block .info-pill{display:inline-flex;align-items:center;gap:5px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.info-block p,.info-block li{font-size:12px;color:#78350F;line-height:1.65}
+.info-block ul{padding-left:18px;margin-top:6px}
+.info-block strong{color:#92400E}
+.info-block code{background:#FEF3C7;padding:1px 5px;border-radius:3px;font-size:11px}
+
+/* SECTION */
+.section-block{margin-bottom:34px}
+.section-label{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:3px;margin-bottom:12px;background:#EDE9FE;color:#4C1D95}
+.section-title{font-size:14px;font-weight:700;color:#1A202E;margin-bottom:14px}
+.section-divider{height:1px;background:#E9D8FD;margin:32px 0}
+
+/* APP SHELL */
+.app-shell{background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.app-topbar{background:#fff;border-bottom:1px solid #E2E8F0;padding:14px 20px;display:flex;align-items:center;gap:12px}
+.app-topbar h3{font-size:15px;font-weight:700;color:#1A202E}
+.app-topbar .merchant-name{font-size:12px;font-weight:700;color:#4C1D95;background:#EDE9FE;padding:2px 8px;border-radius:4px}
+.app-topbar .settings-link{margin-left:auto;font-size:12px;font-weight:600;color:#4A5568;display:inline-flex;align-items:center;gap:5px}
+
+/* UNDERLINE TABS */
+.tabs{display:flex;gap:2px;padding:0 20px;border-bottom:1px solid #E2E8F0;background:#fff}
+.tab{padding:14px 16px;font-size:13px;font-weight:600;color:#718096;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:#1A202E;border-bottom-color:#F05252}
+.tab-count{font-size:11px;background:#EDF2F7;color:#4A5568;padding:1px 7px;border-radius:10px;margin-left:5px;font-weight:700}
+.tab.active .tab-count{background:#FED7D7;color:#C53030}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid #F1F5F9;background:#fff;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;max-width:320px;padding:7px 12px 7px 32px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-family:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;color:#1A202E}
+.search-input::placeholder{color:#A0AEC0}
+.toolbar .spacer{flex:1}
+
+/* BUTTONS */
+.btn{padding:7px 13px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:inherit;line-height:1;white-space:nowrap}
+.btn-primary{background:#1A202E;color:#fff;border-color:#1A202E}
+.btn-primary:hover{background:#000}
+.btn-secondary{background:#fff;border-color:#CBD5E1;color:#1A202E}
+.btn-secondary:hover{background:#F7FAFC}
+.btn-filter{background:#fff;border-color:#CBD5E1;color:#4A5568;font-weight:600}
+.btn-filter.active{background:#EDE9FE;border-color:#C4B5FD;color:#4C1D95}
+
+/* TABLE */
+.table-wrap{padding:0;overflow-x:auto}
+table.products{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1180px}
+table.products thead th{background:#F7FAFC;text-align:left;font-size:10.5px;font-weight:700;color:#4A5568;text-transform:uppercase;letter-spacing:.04em;padding:10px 12px;border-bottom:1px solid #E2E8F0;white-space:nowrap}
+table.products tbody td{padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:middle;white-space:nowrap}
+table.products tbody tr:hover{background:#FAFAFA}
+/* NEW column emphasis (delta) */
+table.products th.col-new{color:#4C1D95;background:#F5F3FF;border-bottom-color:#DDD6FE}
+table.products td.col-new{background:#FBFAFF}
+table.products tbody tr:hover td.col-new{background:#F5F3FF}
+.col-new-pill{display:inline-block;background:#7C3AED;color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;margin-left:5px;vertical-align:middle}
+.cb{accent-color:#1A202E;width:15px;height:15px;cursor:pointer}
+.thumb{width:34px;height:34px;border-radius:6px;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid #E2E8F0}
+.sku{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#718096}
+.pname{font-weight:700;color:#1A202E;font-size:12.5px;white-space:normal;max-width:230px;line-height:1.35}
+.price{font-weight:600}
+.activity-icons{display:flex;align-items:center;gap:7px;color:#94A3B8;font-size:14px}
+.activity-icons span{cursor:pointer}
+
+/* BADGES (status pills, real-app fidelity) */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.b-validated{background:#fff;color:#16A34A;border:1.5px solid #16A34A}
+.b-missing{background:#FEE2E2;color:#B01E1E;border:1.5px solid #FECACA}
+.b-expired{background:#FEE2E2;color:#B01E1E;border:1.5px solid #FECACA}
+.b-pendingscan{background:#EDF2F7;color:#4A5568;border:1px solid #CBD5E1}
+.b-listed{background:#DCFCE7;color:#166534;border:1px solid #BBF7D0}
+.b-unlisted{background:#EDF2F7;color:#4A5568;border:1px solid #CBD5E1}
+.b-scan-none{background:#F1F5F9;color:#64748B;border:1px solid #E2E8F0}
+.b-scan-changed{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.b-na-t{color:#64748B;font-weight:700}
+
+/* DISPOSITION CHIP (reuse Q-Monitor chip styling) */
+.disp{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:10px;font-size:10.5px;font-weight:700;white-space:nowrap;position:relative;cursor:default}
+.disp-compliant{background:#C6F6D5;color:#22643F}
+.disp-violative{background:#FED7D7;color:#9B2C2C}
+.disp-pending{background:#FEEBC8;color:#975A16}
+.disp-na{background:transparent;color:#A0AEC0;font-weight:700}
+/* custom tooltip on disposition */
+.disp .tip{visibility:hidden;opacity:0;transition:opacity .12s;position:absolute;left:0;top:calc(100% + 7px);z-index:60;width:268px;background:#1A202E;color:#fff;border-radius:8px;padding:11px 13px;font-size:11.5px;font-weight:500;line-height:1.55;box-shadow:0 10px 30px rgba(15,23,42,.35);white-space:normal;text-transform:none;letter-spacing:0}
+.disp .tip::before{content:'';position:absolute;left:18px;top:-5px;width:10px;height:10px;background:#1A202E;transform:rotate(45deg)}
+.disp:hover .tip,.disp .tip:hover{visibility:visible;opacity:1}
+.disp .tip .tip-reason{color:#E2E8F0}
+.disp .tip .tip-src{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.16);font-size:11px;color:#CBD5E1}
+.disp .tip .tip-src a{color:#9EC5FF;font-weight:700}
+
+/* APPROVED cell */
+.appr-yes{color:#16A34A;font-weight:700}
+.appr-no{color:#B01E1E;font-weight:700}
+.appr-pending{color:#376fd0;font-weight:700;text-decoration:underline;cursor:pointer}
+.appr-na{color:#94A3B8;font-weight:700}
+.appr-badges{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+.count-badge{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:30px;height:20px;padding:0 7px;border-radius:11px;font-size:11px;font-weight:700}
+.count-approved{background:#16A34A;color:#fff}
+.count-violative{background:#DC2626;color:#fff}
+
+/* TABLE FOOTER */
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#fff;border-top:1px solid #F1F5F9;font-size:12px;color:#718096}
+.pager{display:flex;gap:4px}
+.page-btn{min-width:28px;height:28px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:#4A5568;font-size:12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit}
+.page-btn.active{background:#1A202E;border-color:#1A202E;color:#fff}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:14px 18px;font-size:12px;line-height:1.65;margin-top:14px;background:#F7F5FF;border:1px solid #E9D8FD;border-left:3px solid #805AD5;color:#44337A}
+.callout strong{font-weight:700;color:#322659}
+.callout code{background:#EDE9FE;padding:1px 5px;border-radius:3px;font-size:11px}
+
+/* MODAL (EntityListModal) */
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:60px 20px}
+.modal-backdrop.open{display:flex}
+.modal{background:#fff;border-radius:10px;width:560px;max-width:100%;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.modal-head{background:#F7F5FF;border-bottom:1px solid #E9D8FD;padding:16px 20px;display:flex;align-items:flex-start;gap:12px}
+.modal-head h4{font-size:15px;font-weight:700;color:#1A202E}
+.modal-head .m-sub{font-size:12px;color:#718096;margin-top:3px}
+.modal-head .m-close{margin-left:auto;font-size:18px;color:#718096;cursor:pointer;line-height:1;background:none;border:none}
+.modal-body{padding:6px 20px 20px}
+table.entity{width:100%;border-collapse:collapse;font-size:12.5px}
+table.entity thead th{text-align:left;font-size:10.5px;font-weight:700;color:#4A5568;text-transform:uppercase;letter-spacing:.04em;padding:10px 8px;border-bottom:1px solid #E2E8F0}
+table.entity tbody td{padding:11px 8px;border-bottom:1px solid #F1F5F9}
+table.entity tbody tr:last-child td{border-bottom:none}
+.ent-name{font-weight:700;color:#1A202E}
+.ent-type{color:#4A5568}
+.st-approved{color:#16A34A;font-weight:700}
+.st-pending{color:#975A16;font-weight:700}
+.st-violative{color:#B01E1E;font-weight:700}
+.modal-foot{padding:12px 20px;border-top:1px solid #F1F5F9;font-size:11.5px;color:#718096;background:#FCFCFE}
+
+/* "shown inline" copy of the modal for documentation */
+.inline-modal{width:560px;max-width:100%;border:1px solid #E9D8FD;border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+
+/* POLICY VIEW */
+.policy-shell{background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.policy-crumb{background:#fff;border-bottom:1px solid #E2E8F0;padding:14px 20px;font-size:13px;color:#718096;display:flex;align-items:center;gap:8px}
+.policy-crumb .here{color:#1A202E;font-weight:700}
+.policy-crumb .ro-badge{margin-left:auto;background:#EDF2F7;color:#4A5568;font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em}
+.applied{display:flex;gap:14px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid #F1F5F9}
+.applied .ap-box{flex:1;min-width:240px;background:#F7F5FF;border:1px solid #E9D8FD;border-radius:7px;padding:12px 14px}
+.applied .ap-label{font-size:10px;font-weight:700;color:#6B46C1;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.applied .ap-value{font-size:13px;font-weight:700;color:#1A202E}
+.applied .inherit-chip{display:inline-block;background:#EDE9FE;color:#553C9A;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:6px;text-transform:uppercase;letter-spacing:.04em}
+.policy-body{padding:18px 20px}
+table.policy{width:100%;border-collapse:collapse;font-size:12.5px}
+table.policy thead th{text-align:left;font-size:10.5px;font-weight:700;color:#4A5568;text-transform:uppercase;letter-spacing:.04em;padding:9px 10px;border-bottom:1px solid #E2E8F0}
+table.policy tbody td{padding:11px 10px;border-bottom:1px solid #F1F5F9;vertical-align:top}
+table.policy .f-name{font-weight:700;color:#1A202E}
+table.policy .f-value{font-weight:600}
+.chk{font-family:'IBM Plex Mono',monospace;font-size:11px;background:#EDE9FE;color:#4C1D95;padding:1px 6px;border-radius:3px}
+.src{font-size:11.5px;color:#4A5568}
+.src a{color:#376fd0;font-weight:600}
+.subhead td{background:#FAFAFB;font-weight:700;color:#4A5568;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.sub-row .f-name{padding-left:22px;font-weight:600}
+.unsourced{color:#9B2C2C;font-weight:700}
+tr.policy-highlight td{background:#FFF7ED!important;box-shadow:inset 3px 0 0 #F05252}
+.policy-foot{padding:12px 20px;border-top:1px solid #F1F5F9;font-size:11.5px;color:#94A3B8;background:#FCFCFE;font-style:italic}
+
+/* QCONFIG GATE */
+.gate-card{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px}
+.gate-card .gate-title{font-size:12px;font-weight:700;color:#1A202E;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gate-card .gate-badge{background:#DCFCE7;color:#166534;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.gate-card p{font-size:12px;color:#4A5568;line-height:1.6;margin-bottom:8px}
+.gate-card p:last-child{margin-bottom:0}
+.gate-card code{background:#EDE9FE;padding:1px 5px;border-radius:3px;font-size:11px;color:#4C1D95;font-family:'IBM Plex Mono',monospace}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="../index.html">&#8592; All Mockups</a>
+  <span class="sep">/</span>
+  <span class="title">MyCOA &middot; June 25 — Disposition + Approved + Policy</span>
+  <span class="sep">/</span>
+  <span class="ticket-badge">MyCOA · JUN 25</span>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="ticket-badge-lg">MyCOA · JUNE 25 RELEASE</div>
+    <h1>Disposition + Approved columns &amp; the read-only Product Compliance Policy view</h1>
+    <p>Mirrors the real MyCOA Products tab exactly and applies <strong>only the June-25 delta</strong>: two new columns (<b>Disposition</b> + <b>Approved</b>) inserted after COA Status, the Approved breakdown modal (<code>EntityListModal</code>), and a read-only Product Compliance Policy view under global Settings. Sanitized fictional data — merchant <b>Willow Creek Extracts</b>; fictional monitoring entities.</p>
+  </div>
+
+  <!-- WHAT CHANGED -->
+  <div class="info-block">
+    <div class="info-pill">&#8505; What changed (the only delta)</div>
+    <ul>
+      <li><strong>Two new columns after COA Status:</strong> <strong>Disposition</strong> (merchant&rsquo;s effective-policy verdict chip + tooltip with a &ldquo;Source:&rdquo; deep-link) and <strong>Approved</strong> (single label when monitors agree; green/red <strong>count badges</strong> on divergence, click opens the breakdown). Everything else in the table chrome is unchanged.</li>
+      <li><strong>Both columns are Q-Config plan-gated</strong> (<code>mycoa_products_dispositionColumn</code>, <code>mycoa_products_approvedColumn</code>), <strong>default ON for MyCOA</strong>. Approved does <strong>not</strong> apply to the Q-Monitor product-compliance products tab.</li>
+      <li><strong>Policy view lives under global Settings</strong> (not under MyCOA/Q-Monitor), read-only for step 1. No authoring controls.</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════ SECTION 1: Products tab ═══════════ -->
+  <div class="section-block">
+    <div class="section-label">Section 1 &middot; MyCOA Products tab (merchant view)</div>
+    <div class="section-title">Products tab with the two new compliance columns</div>
+
+    <div class="app-shell">
+
+      <div class="app-topbar">
+        <h3>MyCOA</h3>
+        <span class="merchant-name">Willow Creek Extracts</span>
+        <a class="settings-link" href="#policy">&#9881; Settings</a>
+      </div>
+
+      <!-- Tabs: COAs | Products | Display | Labs -->
+      <div class="tabs">
+        <div class="tab">COAs <span class="tab-count">38</span></div>
+        <div class="tab active">Products <span class="tab-count">12</span></div>
+        <div class="tab">Display</div>
+        <div class="tab">Labs</div>
+      </div>
+
+      <!-- Header actions (unchanged): Filters | Add Product | Import | Scan | Report | Export -->
+      <div class="toolbar">
+        <input class="search-input" type="text" placeholder="Search products by SKU, definition&hellip;" readonly>
+        <div class="spacer"></div>
+        <button class="btn btn-filter active">&#9776; Filters</button>
+        <button class="btn btn-secondary">&#43; Add Product</button>
+        <button class="btn btn-secondary">&#8679; Import Products</button>
+        <button class="btn btn-secondary">&#8635; Scan the Products</button>
+        <button class="btn btn-secondary">&#9872; Report an Issue</button>
+        <button class="btn btn-primary">&#8595; Export</button>
+      </div>
+
+      <!-- Products table: REAL columns + the two new ones -->
+      <div class="table-wrap">
+        <table class="products">
+          <thead>
+            <tr>
+              <th style="width:30px"><input type="checkbox" class="cb"></th>
+              <th style="width:46px"></th>
+              <th>SKU</th>
+              <th>Product Definition</th>
+              <th>Price</th>
+              <th>Classification</th>
+              <th>Scan Change</th>
+              <th>Listing Status</th>
+              <th>COA Status</th>
+              <th class="col-new">Disposition <span class="col-new-pill">New</span></th>
+              <th class="col-new">Approved <span class="col-new-pill">New</span></th>
+              <th>Date Added</th>
+              <th style="text-align:right">Activity</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- Row 1: Compliant · Approved Yes -->
+            <tr>
+              <td><input type="checkbox" class="cb"></td>
+              <td><div class="thumb">&#129380;</div></td>
+              <td class="sku">WCE-1000-FS</td>
+              <td class="pname">Full-Spectrum CBD Tincture — 1000mg</td>
+              <td class="price">$54.00</td>
+              <td>Tincture</td>
+              <td><span class="badge b-scan-none">No change</span></td>
+              <td><span class="badge b-listed">Listed</span></td>
+              <td><span class="badge b-validated">COA Validated</span></td>
+              <td class="col-new"><span class="disp disp-compliant">Compliant
+                <span class="tip"><span class="tip-reason">Passes all checks under your effective policy. Delta-9 THC 0.21% (&le; 0.3%), THC-O 0%, COA within expiration interval.</span><span class="tip-src">Source: Product Compliance Policy &rarr; <a href="#policy">Delta-9 THC limit 0.3%</a></span></span>
+              </span></td>
+              <td class="col-new"><span class="appr-yes">Yes</span></td>
+              <td>03/14/26</td>
+              <td><div class="activity-icons" style="justify-content:flex-end">&#8599; &#8635; &#8595; <span>&#8942;</span></div></td>
+            </tr>
+
+            <!-- Row 2: Violative Delta-9 · Approved Pending -->
+            <tr>
+              <td><input type="checkbox" class="cb"></td>
+              <td><div class="thumb">&#127811;</div></td>
+              <td class="sku">WCE-FLW-22</td>
+              <td class="pname">Hemp Flower — Sunset Runtz 3.5g</td>
+              <td class="price">$28.00</td>
+              <td>Smokable Flower</td>
+              <td><span class="badge b-scan-changed">Changed</span></td>
+              <td><span class="badge b-listed">Listed</span></td>
+              <td><span class="badge b-validated">COA Validated</span></td>
+              <td class="col-new"><span class="disp disp-violative">Delta-9 THC &gt; 0.3%
+                <span class="tip"><span class="tip-reason">COA reports Delta-9 THC of 0.42%, above the 0.3% limit in your effective policy. Flagged as violative.</span><span class="tip-src">Source: Product Compliance Policy &rarr; <a href="#policy" class="src-link" data-target="row-d9">Delta-9 THC limit 0.3%</a></span></span>
+              </span></td>
+              <td class="col-new"><span class="appr-pending" onclick="return false;">Pending</span></td>
+              <td>04/02/26</td>
+              <td><div class="activity-icons" style="justify-content:flex-end">&#8599; &#8635; &#8595; <span>&#8942;</span></div></td>
+            </tr>
+
+            <!-- Row 3: Missing COA · disposition "-" · Approved NA -->
+            <tr>
+              <td><input type="checkbox" class="cb"></td>
+              <td><div class="thumb">&#129516;</div></td>
+              <td class="sku">WCE-500-TOP</td>
+              <td class="pname">Topical Relief Salve — 500mg</td>
+              <td class="price">$32.00</td>
+              <td>Topical</td>
+              <td><span class="badge b-scan-none">No change</span></td>
+              <td><span class="badge b-unlisted">Unlisted</span></td>
+              <td><span class="badge b-missing">Missing COA</span></td>
+              <td class="col-new"><span class="disp disp-na">&mdash;
+                <span class="tip"><span class="tip-reason">No COA present yet. Disposition activates once a COA is present.</span></span>
+              </span></td>
+              <td class="col-new"><span class="appr-na">NA</span></td>
+              <td>04/19/26</td>
+              <td><div class="activity-icons" style="justify-content:flex-end">&#8599; &#8635; &#8595; <span>&#8942;</span></div></td>
+            </tr>
+
+            <!-- Row 4: DIVERGENCE · count badges · click opens modal -->
+            <tr>
+              <td><input type="checkbox" class="cb"></td>
+              <td><div class="thumb">&#129704;</div></td>
+              <td class="sku">WCE-1000-FSO</td>
+              <td class="pname">1000mg Full Spectrum CBD Oil</td>
+              <td class="price">$59.00</td>
+              <td>Tincture</td>
+              <td><span class="badge b-scan-none">No change</span></td>
+              <td><span class="badge b-listed">Listed</span></td>
+              <td><span class="badge b-validated">COA Validated</span></td>
+              <td class="col-new"><span class="disp disp-compliant">Compliant
+                <span class="tip"><span class="tip-reason">Passes your effective policy. Monitoring entities disagree on approval — see the Approved column.</span><span class="tip-src">Source: Product Compliance Policy &rarr; <a href="#policy">Delta-9 THC limit 0.3%</a></span></span>
+              </span></td>
+              <td class="col-new">
+                <span class="appr-badges" onclick="openApprovedModal()" title="Monitors disagree — click for breakdown">
+                  <span class="count-badge count-approved">&#10003; 2</span>
+                  <span class="count-badge count-violative">&#10007; 1</span>
+                </span>
+              </td>
+              <td>02/27/26</td>
+              <td><div class="activity-icons" style="justify-content:flex-end">&#8599; &#8635; &#8595; <span>&#8942;</span></div></td>
+            </tr>
+
+            <!-- Row 5: Expired COA violative · Approved No -->
+            <tr>
+              <td><input type="checkbox" class="cb"></td>
+              <td><div class="thumb">&#128138;</div></td>
+              <td class="sku">WCE-PEP-09</td>
+              <td class="pname">Peptide Recovery Blend — BPC-157</td>
+              <td class="price">$89.00</td>
+              <td>Peptide</td>
+              <td><span class="badge b-scan-none">No change</span></td>
+              <td><span class="badge b-unlisted">Unlisted</span></td>
+              <td><span class="badge b-expired">Expired</span></td>
+              <td class="col-new"><span class="disp disp-violative">Expired COA
+                <span class="tip"><span class="tip-reason">COA passed its expiration interval for this classification (Peptide). Re-test required to clear.</span><span class="tip-src">Source: Product Compliance Policy &rarr; <a href="#policy" class="src-link" data-target="row-exp">COA expiration by classification</a></span></span>
+              </span></td>
+              <td class="col-new"><span class="appr-no">No</span></td>
+              <td>01/30/26</td>
+              <td><div class="activity-icons" style="justify-content:flex-end">&#8599; &#8635; &#8595; <span>&#8942;</span></div></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span>Showing 5 of 12 products</span>
+        <div class="pager">
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">&rsaquo;</button>
+        </div>
+      </div>
+
+    </div><!-- /app-shell -->
+
+    <div class="callout">
+      <strong>Reading the two new cells.</strong> <b>Disposition</b> = the verdict under the <em>one</em> policy that applies to this merchant (baseline + inherited overrides) — hover any chip for the reason and a <b>&ldquo;Source:&rdquo;</b> line that deep-links to the policy field. <b>Approved</b> = the aggregate across <em>all active</em> monitoring entities: a single label when they agree (<span class="appr-yes">Yes</span> / <span class="appr-pending">Pending</span> / <span class="appr-no">No</span> / <span class="appr-na">NA</span>), or two count badges <span class="count-badge count-approved" style="font-size:9px">&#10003; 2</span> <span class="count-badge count-violative" style="font-size:9px">&#10007; 1</span> when they disagree — click to open the breakdown.
+    </div>
+  </div><!-- /section-block -->
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════ SECTION 2: Approved breakdown modal ═══════════ -->
+  <div class="section-block">
+    <div class="section-label">Section 2 &middot; Approved breakdown (EntityListModal)</div>
+    <div class="section-title">Per-monitoring-entity breakdown — opened from the divergence row</div>
+
+    <div class="inline-modal">
+      <div class="modal-head">
+        <div>
+          <h4>Approval by monitoring entity</h4>
+          <div class="m-sub">Product: &ldquo;1000mg Full Spectrum CBD Oil&rdquo; &middot; active monitors only</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <table class="entity">
+          <thead>
+            <tr><th>Monitoring Entity</th><th>Type</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="ent-name">Northbridge Processing</td><td class="ent-type">Processor</td><td><span class="st-approved">&#10003; Approved</span></td></tr>
+            <tr><td class="ent-name">Harbor Acquiring</td><td class="ent-type">Processor</td><td><span class="st-pending">&#9679; Pending</span></td></tr>
+            <tr><td class="ent-name">Coastal Bank</td><td class="ent-type">Bank</td><td><span class="st-violative">&#10007; Violative</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-foot">2 approved &middot; 1 violative &middot; archived / inactive monitors are filtered out. The count badges in the Approved column summarize this list.</div>
+    </div>
+
+    <div class="callout">
+      <strong>Re-exposed, not new.</strong> This is the existing <code>EntityListModal</code>, scoped to <code>status = ACTIVE</code> monitors. The Approved column and this modal were removed in QP-3501 and are brought back for June 25, now Q-Config plan-gated. Click the count badges in Section 1 to open it as a live overlay.
+    </div>
+  </div><!-- /section-block -->
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════ SECTION 3: Policy view ═══════════ -->
+  <div class="section-block" id="policy">
+    <div class="section-label">Section 3 &middot; Global Settings — Product Compliance Policy</div>
+    <div class="section-title">Read-only Policy view (step 1) — baseline + inherited/overridden values</div>
+
+    <div class="policy-shell">
+      <div class="policy-crumb">
+        <span>Settings</span><span class="sep">&rsaquo;</span><span class="here">Product Compliance Policy</span>
+        <span class="ro-badge">Read-only · step 1</span>
+      </div>
+
+      <div class="applied">
+        <div class="ap-box">
+          <div class="ap-label">Applied policy</div>
+          <div class="ap-value">Product Compliance Policy <span style="font-weight:500;color:#718096">(baseline)</span></div>
+        </div>
+        <div class="ap-box">
+          <div class="ap-label">Effective for you</div>
+          <div class="ap-value">Baseline + Northbridge overrides <span class="inherit-chip">Inherited</span></div>
+        </div>
+      </div>
+
+      <div class="policy-body">
+        <table class="policy">
+          <thead>
+            <tr><th style="width:34%">Field</th><th style="width:20%">Value</th><th>Source (check code + document)</th></tr>
+          </thead>
+          <tbody>
+            <tr id="row-d9">
+              <td class="f-name">Delta-9 THC limit</td>
+              <td class="f-value">&le; 0.3%</td>
+              <td class="src"><span class="chk">CHK-D9</span> &middot; <a href="#">2018 Farm Bill threshold (as a value)</a></td>
+            </tr>
+            <tr>
+              <td class="f-name">THC-O</td>
+              <td class="f-value">0% (always)</td>
+              <td class="src"><span class="chk">CHK-THCO</span> &middot; <a href="#">Controlled-substance source doc</a></td>
+            </tr>
+            <tr>
+              <td class="f-name">Peptide purity</td>
+              <td class="f-value">&ge; 98%</td>
+              <td class="src"><span class="chk">CHK-PUR</span> &middot; <a href="#">V3 peptide document</a></td>
+            </tr>
+            <tr class="subhead"><td colspan="3" id="row-exp">COA expiration by classification <span style="text-transform:none;letter-spacing:0;font-weight:500;color:#94A3B8">— intervals vary by classification &amp; by processor</span></td></tr>
+            <tr class="sub-row">
+              <td class="f-name">Smokable Flower</td>
+              <td class="f-value">1 year</td>
+              <td class="src"><span class="chk">CHK-EXP</span> &middot; <span class="unsourced">Northbridge override — no source document (enforced)*</span></td>
+            </tr>
+            <tr class="sub-row">
+              <td class="f-name">Other classifications</td>
+              <td class="f-value">2 years</td>
+              <td class="src"><span class="chk">CHK-EXP</span> &middot; <a href="#">Baseline expiration source doc</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size:11.5px;color:#9B2C2C;margin-top:12px;font-weight:600">* Processor override with no backing source document. Still <u>visible to the processor/merchant</u> and <u>enforced</u> (enforced directly in the DB today).</p>
+      </div>
+
+      <div class="policy-foot">No authoring controls in step 1 (read-only). &ldquo;Edit policy&rdquo; &rarr; the Policy Editor (QP-3647) is the step-2 affordance and is intentionally not shown for June 25.</div>
+    </div>
+
+    <div class="callout">
+      <strong>Source-of-violation round-trip.</strong> The <b>&ldquo;Source:&rdquo;</b> line in a violative disposition tooltip (Section 1) deep-links here and highlights the exact field that produced the verdict. Try the <a href="#policy" class="src-link" data-target="row-d9" onclick="highlightPolicy('row-d9')">Delta-9 THC &gt; 0.3%</a> link — it lands on the Delta-9 row. Un-sourced processor overrides are never invisible: they show their check code and a clear &ldquo;no source document (enforced)&rdquo; marker.
+    </div>
+  </div><!-- /section-block -->
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════ SECTION 4: Q-Config gate ═══════════ -->
+  <div class="section-block">
+    <div class="section-label">Section 4 &middot; Q-Config Gate</div>
+    <div class="section-title">Both columns are plan-gated (not hardcoded)</div>
+    <div class="gate-card">
+      <div class="gate-title">
+        Q-Config Sources: <code>mycoa_products_dispositionColumn</code> &middot; <code>mycoa_products_approvedColumn</code>
+        <span class="gate-badge">Default: ON for MyCOA</span>
+      </div>
+      <p>Both columns render via <code>SubscriptionFeatureProxy</code> against new MyCOA Sources, <strong>default ON for MyCOA plans</strong>, and remain toggleable via the existing Table Settings column-visibility pattern. The <strong>Approved</strong> column is the main gating requirement and does <strong>not</strong> apply to the Q-Monitor product-compliance products tab.</p>
+      <p>The disposition resolver uses the merchant&rsquo;s <strong>effective policy</strong> when the merchant is the viewer (a standalone merchant is populated by the baseline — no longer blank); the existing processor path is untouched.</p>
+    </div>
+  </div><!-- /section-block -->
+
+</div><!-- /page -->
+
+<!-- LIVE OVERLAY MODAL (EntityListModal) -->
+<div class="modal-backdrop" id="approvedModal" onclick="if(event.target===this)closeApprovedModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h4>Approval by monitoring entity</h4>
+        <div class="m-sub">Product: &ldquo;1000mg Full Spectrum CBD Oil&rdquo; &middot; active monitors only</div>
+      </div>
+      <button class="m-close" onclick="closeApprovedModal()" title="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <table class="entity">
+        <thead><tr><th>Monitoring Entity</th><th>Type</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="ent-name">Northbridge Processing</td><td class="ent-type">Processor</td><td><span class="st-approved">&#10003; Approved</span></td></tr>
+          <tr><td class="ent-name">Harbor Acquiring</td><td class="ent-type">Processor</td><td><span class="st-pending">&#9679; Pending</span></td></tr>
+          <tr><td class="ent-name">Coastal Bank</td><td class="ent-type">Bank</td><td><span class="st-violative">&#10007; Violative</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-foot">2 approved &middot; 1 violative &middot; archived / inactive monitors filtered out.</div>
+  </div>
+</div>
+
+<script>
+  function openApprovedModal(){document.getElementById('approvedModal').classList.add('open');}
+  function closeApprovedModal(){document.getElementById('approvedModal').classList.remove('open');}
+  function highlightPolicy(id){
+    document.querySelectorAll('tr.policy-highlight,td.policy-highlight').forEach(function(e){e.classList.remove('policy-highlight');});
+    var el=document.getElementById(id);
+    if(!el)return;
+    var row=el.closest('tr')||el;
+    row.classList.add('policy-highlight');
+    document.getElementById('policy').scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(function(){row.classList.remove('policy-highlight');},2600);
+  }
+  // wire all "Source:" deep-links (tooltip + callout)
+  document.querySelectorAll('a.src-link').forEach(function(a){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      highlightPolicy(a.dataset.target||'row-d9');
+    });
+  });
+  // plain "Source:" links (no explicit target) land on the Delta-9 row
+  document.querySelectorAll('.tip-src a:not(.src-link)').forEach(function(a){
+    a.addEventListener('click',function(e){e.preventDefault();highlightPolicy('row-d9');});
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeApprovedModal();});
+</script>
+</body>
+</html>
