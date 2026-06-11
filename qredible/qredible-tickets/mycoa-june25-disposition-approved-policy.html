@@ -201,6 +201,62 @@ tr.policy-highlight td{background:#FFF7ED!important;box-shadow:inset 3px 0 0 #F0
 .gate-card p{font-size:12px;color:#4A5568;line-height:1.6;margin-bottom:8px}
 .gate-card p:last-child{margin-bottom:0}
 .gate-card code{background:#EDE9FE;padding:1px 5px;border-radius:3px;font-size:11px;color:#4C1D95;font-family:'IBM Plex Mono',monospace}
+
+/* ITERATION-2 / FUTURE wrapper */
+.iter2-wrap{border:2px dashed #C4B5FD;border-radius:12px;padding:6px 18px 22px;background:linear-gradient(180deg,#FBFAFF, #FFFFFF 120px);position:relative;margin-top:8px}
+.iter2-flag{display:inline-flex;align-items:center;gap:8px;background:#4C1D95;color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:0 0 8px 8px;letter-spacing:.04em;text-transform:uppercase;transform:translateY(-2px)}
+.iter2-flag .dot{width:7px;height:7px;border-radius:50%;background:#C4B5FD}
+.iter2-sub{font-size:12.5px;color:#6B46C1;margin:12px 0 4px;line-height:1.6}
+.iter2-sub strong{color:#4C1D95}
+.scope-pill{display:inline-block;background:#EDE9FE;color:#4C1D95;font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em;margin-left:6px}
+.scope-pill.v1{background:#DCFCE7;color:#166534}
+.scope-pill.iter2{background:#EDE9FE;color:#5B21B6}
+
+/* Q-Audit admin shell (distinct from the user app shell) */
+.qaudit-shell{background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04);margin-top:14px}
+.qaudit-bar{background:#1A202E;color:#fff;padding:12px 18px;display:flex;align-items:center;gap:10px}
+.qaudit-bar .qa-logo{font-size:13px;font-weight:700;letter-spacing:.02em}
+.qaudit-bar .qa-crumb{font-size:12px;color:#94A3B8}
+.qaudit-bar .qa-crumb b{color:#E2E8F0}
+.qaudit-bar .qa-admin{margin-left:auto;font-size:10px;font-weight:700;background:#F05252;color:#fff;padding:2px 9px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em}
+.reg-head{padding:14px 18px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.reg-head h4{font-size:13px;font-weight:700;color:#1A202E}
+.reg-head .reg-note{font-size:11.5px;color:#718096}
+.reg-head .reg-actions{margin-left:auto;display:flex;gap:6px}
+.btn-xs{padding:5px 11px;border-radius:6px;font-size:11.5px;font-weight:700;border:1px solid #CBD5E1;background:#fff;color:#1A202E;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.btn-xs.primary{background:#1A202E;color:#fff;border-color:#1A202E}
+.btn-xs.ghost{border-color:transparent;color:#4A5568}
+
+table.registry{width:100%;border-collapse:collapse;font-size:12.5px;min-width:920px}
+table.registry thead th{background:#F7FAFC;text-align:left;font-size:10.5px;font-weight:700;color:#4A5568;text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-bottom:1px solid #E2E8F0;white-space:nowrap}
+table.registry tbody td{padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:middle;white-space:nowrap}
+table.registry tbody tr:hover{background:#FAFAFA}
+.reg-scroll{overflow-x:auto}
+.scope-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}
+.scope-global{background:#DBEAFE;color:#1E40AF}
+.scope-perclass{background:#FEF3C7;color:#92400E}
+.st-active{display:inline-flex;align-items:center;gap:5px;color:#166534;font-weight:700;font-size:11.5px}
+.st-active::before{content:'';width:7px;height:7px;border-radius:50%;background:#16A34A}
+.st-superseded{display:inline-flex;align-items:center;gap:5px;color:#92400E;font-weight:700;font-size:11.5px}
+.st-superseded::before{content:'';width:7px;height:7px;border-radius:50%;background:#D97706}
+.row-acts{display:flex;gap:8px;color:#4A5568;font-size:11.5px}
+.row-acts a{color:#376fd0;font-weight:600;cursor:pointer}
+.row-acts a.danger{color:#B01E1E}
+.no-src{color:#9B2C2C;font-weight:700;font-size:11.5px}
+.doc-name{font-weight:700;color:#1A202E}
+.cite{font-size:11px;color:#718096}
+
+/* relationship diagram */
+.rel-flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:6px}
+.rel-node{flex:1;min-width:160px;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px;background:#fff}
+.rel-node .rl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#718096;margin-bottom:5px}
+.rel-node .rv{font-size:12.5px;font-weight:700;color:#1A202E}
+.rel-node .rx{font-size:11px;color:#718096;margin-top:3px;line-height:1.45}
+.rel-node.policy{background:#F7F5FF;border-color:#E9D8FD}
+.rel-node.chk{background:#EFF6FF;border-color:#BFDBFE}
+.rel-node.doc{background:#F0FFF4;border-color:#C6F6D5}
+.rel-arrow{display:flex;align-items:center;justify-content:center;color:#805AD5;font-size:20px;font-weight:700;padding:0 10px;flex:0 0 auto}
+@media(max-width:820px){.rel-flow{flex-direction:column}.rel-arrow{transform:rotate(90deg);padding:6px 0}}
 </style>
 </head>
 <body>
@@ -526,6 +582,196 @@ tr.policy-highlight td{background:#FFF7ED!important;box-shadow:inset 3px 0 0 #F0
       <p>Both columns render via <code>SubscriptionFeatureProxy</code> against new MyCOA Sources, <strong>default ON for MyCOA plans</strong>, and remain toggleable via the existing Table Settings column-visibility pattern. The <strong>Approved</strong> column is the main gating requirement and does <strong>not</strong> apply to the Q-Monitor product-compliance products tab.</p>
       <p>The disposition resolver uses the merchant&rsquo;s <strong>effective policy</strong> when the merchant is the viewer (a standalone merchant is populated by the baseline — no longer blank); the existing processor path is untouched.</p>
     </div>
+  </div><!-- /section-block -->
+
+  <div class="section-divider"></div>
+
+  <!-- ═══════════ ITERATION 2 / FUTURE — Q-Audit registry (NOT June-25 V1) ═══════════ -->
+  <div class="section-block">
+    <div class="section-label" style="background:#4C1D95;color:#fff">Iteration 2 &middot; Future &mdash; NOT in June-25 V1 scope</div>
+    <div class="section-title">Backend / admin side &mdash; the Q-Audit check-code + source-document registry</div>
+
+    <div class="iter2-wrap">
+      <span class="iter2-flag"><span class="dot"></span> Iteration 2 / Future &mdash; management surface, ships after V1</span>
+
+      <p class="iter2-sub">
+        <strong>Two distinct surfaces, do not conflate them.</strong> The user-facing <strong>policy showcase</strong> (Section 3, under <em>global Settings</em>, read-only) is a <em>consumer</em> that only displays each rule&rsquo;s check code + source. This panel is the <strong>admin registry</strong> &mdash; where those check codes and source documents are actually catalogued and managed &mdash; and it lives under <strong>Q-Audit global settings</strong> (the backend admin home where compliance elements already live), <strong>not</strong> under global Settings.
+      </p>
+      <p class="iter2-sub" style="margin-top:4px">
+        <strong>V1 only seeds this data</strong> <span class="scope-pill v1">V1: seed only</span> &mdash; the check codes + source-doc references must exist (migration / fixture) so policy fields can reference them and the showcase can display them. <strong>No management UI ships in V1.</strong> The full create / edit / retire surface below is <span class="scope-pill iter2">Iteration 2</span>, paralleling how Q-Audit already manages compliance elements.
+      </p>
+
+      <!-- Relationship: policy field -> check code -> source doc -->
+      <div style="margin-top:16px">
+        <div class="section-title" style="font-size:12px;margin-bottom:8px">How they compose (same pattern as Q-Audit compliance elements)</div>
+        <div class="rel-flow">
+          <div class="rel-node policy">
+            <div class="rl">Policy field</div>
+            <div class="rv">Delta-9 THC limit = &le; 0.3%</div>
+            <div class="rx">Composed in the policy (global Settings showcase / Policy Editor). <em>References</em> a check code.</div>
+          </div>
+          <div class="rel-arrow">&rarr;</div>
+          <div class="rel-node chk">
+            <div class="rl">Check code <span class="scope-pill iter2" style="margin:0">registry</span></div>
+            <div class="rv mono">CHK-D9</div>
+            <div class="rx">Reusable building block in Q-Audit. <em>References</em> a source document (or none, for enforced overrides).</div>
+          </div>
+          <div class="rel-arrow">&rarr;</div>
+          <div class="rel-node doc">
+            <div class="rl">Source document</div>
+            <div class="rv">2018 Farm Bill reference</div>
+            <div class="rx">The authority a check code cites. Managed in the source-doc registry.</div>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:12px">
+          <strong>Building-block catalog, composed by the policy.</strong> The registry holds reusable blocks; the policy references them &mdash; exactly the relationship Q-Audit already models with compliance elements. <strong>Un-sourced overrides</strong> (e.g. the Smokable Flower 1-year override) have a check code (<code>CHK-EXP</code>) but <strong>no source document here</strong> &mdash; they remain visible and enforced, shown as &ldquo;no source document&rdquo; rather than hidden.
+        </div>
+      </div>
+
+      <!-- ── CHECK-CODE REGISTRY ── -->
+      <div class="qaudit-shell">
+        <div class="qaudit-bar">
+          <span class="qa-logo">Q-Audit</span>
+          <span class="qa-crumb">Global Settings &rsaquo; Compliance Elements &rsaquo; <b>Check-Code Registry</b></span>
+          <span class="qa-admin">Admin only</span>
+        </div>
+        <div class="reg-head">
+          <h4>Check-Code Registry</h4>
+          <span class="reg-note">The catalog of check codes the Product Compliance Policy references.</span>
+          <div class="reg-actions">
+            <button class="btn-xs primary">&#43; Add Check Code</button>
+          </div>
+        </div>
+        <div class="reg-scroll">
+          <table class="registry">
+            <thead>
+              <tr>
+                <th>Check Code</th><th>Name</th><th>Value / Type</th><th>Scope</th><th>Linked Source Doc</th><th>Status</th><th style="text-align:right">Manage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="chk">CHK-D9</span></td>
+                <td>Delta-9 THC limit</td>
+                <td>&le; 0.3% &middot; <span class="cite">threshold</span></td>
+                <td><span class="scope-tag scope-global">Global</span></td>
+                <td><a>2018 Farm Bill reference</a></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a class="danger">Deactivate</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="chk">CHK-THCO</span></td>
+                <td>THC-O presence</td>
+                <td>= 0% &middot; <span class="cite">prohibited</span></td>
+                <td><span class="scope-tag scope-global">Global</span></td>
+                <td><a>Controlled-substance source doc</a></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a class="danger">Deactivate</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="chk">CHK-PUR</span></td>
+                <td>Peptide purity</td>
+                <td>&ge; 98% &middot; <span class="cite">threshold</span></td>
+                <td><span class="scope-tag scope-global">Global</span></td>
+                <td><a>V3 peptide document</a></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a class="danger">Deactivate</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="chk">CHK-EXP</span></td>
+                <td>COA expiration interval</td>
+                <td>varies &middot; <span class="cite">duration</span></td>
+                <td><span class="scope-tag scope-perclass">Per-classification</span></td>
+                <td><a>Baseline expiration source doc</a> <span class="cite">+ per-processor overrides</span></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a class="danger">Deactivate</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="chk">CHK-EXP</span> <span class="cite">/ Smokable Flower</span></td>
+                <td>Expiration override &mdash; Smokable Flower</td>
+                <td>1 year &middot; <span class="cite">override</span></td>
+                <td><span class="scope-tag scope-perclass">Per-classification</span></td>
+                <td><span class="no-src">&mdash; no source document (enforced)</span></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a class="danger">Deactivate</a></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── SOURCE-DOCUMENT REGISTRY ── -->
+      <div class="qaudit-shell">
+        <div class="qaudit-bar">
+          <span class="qa-logo">Q-Audit</span>
+          <span class="qa-crumb">Global Settings &rsaquo; Compliance Elements &rsaquo; <b>Source-Document Registry</b></span>
+          <span class="qa-admin">Admin only</span>
+        </div>
+        <div class="reg-head">
+          <h4>Source-Document Registry</h4>
+          <span class="reg-note">The authorities that check codes cite.</span>
+          <div class="reg-actions">
+            <button class="btn-xs primary">&#43; Add Document</button>
+          </div>
+        </div>
+        <div class="reg-scroll">
+          <table class="registry">
+            <thead>
+              <tr>
+                <th>Document</th><th>Citation</th><th>Type</th><th>Linked Check Codes</th><th>Status</th><th style="text-align:right">Manage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="doc-name">2018 Farm Bill reference</span></td>
+                <td class="cite">Agriculture Improvement Act &sect;297A (illustrative)</td>
+                <td>Statute</td>
+                <td><span class="chk">CHK-D9</span></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a>Supersede</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="doc-name">Controlled-substance source doc</span></td>
+                <td class="cite">Synthetic-cannabinoid guidance (illustrative)</td>
+                <td>Guidance</td>
+                <td><span class="chk">CHK-THCO</span></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a>Supersede</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="doc-name">V3 peptide document</span></td>
+                <td class="cite">Internal peptide standard, rev. 3 (illustrative)</td>
+                <td>Internal standard</td>
+                <td><span class="chk">CHK-PUR</span></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a>Supersede</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="doc-name">Baseline expiration source doc</span></td>
+                <td class="cite">COA shelf-life baseline, rev. 2 (illustrative)</td>
+                <td>Internal standard</td>
+                <td><span class="chk">CHK-EXP</span></td>
+                <td><span class="st-active">Active</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>Edit</a><a>Supersede</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="doc-name">COA shelf-life baseline, rev. 1</span></td>
+                <td class="cite">Superseded by rev. 2 (illustrative)</td>
+                <td>Internal standard</td>
+                <td><span class="cite">&mdash;</span></td>
+                <td><span class="st-superseded">Superseded</span></td>
+                <td><div class="row-acts" style="justify-content:flex-end"><a>View</a></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:14px">
+        <strong>Net.</strong> V1 = the read-only policy showcase under global Settings (Section 3) + <em>seeded</em> registry data (no UI). <strong>Iteration 2</strong> = this Q-Audit registry CRUD (Add / Edit / Deactivate check codes; Add / Edit / Supersede source docs) <em>plus</em> the Policy Editor (QP-3647) &mdash; both additive on the same data the V1 resolver and showcase already read. Same check codes (<code>CHK-D9</code> / <code>CHK-THCO</code> / <code>CHK-PUR</code> / <code>CHK-EXP</code>) and sources as the V1 sections above &mdash; one coherent front-to-back story.
+      </div>
+
+    </div><!-- /iter2-wrap -->
   </div><!-- /section-block -->
 
 </div><!-- /page -->
