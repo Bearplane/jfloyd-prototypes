@@ -763,7 +763,7 @@
 
   <div class="proto-bar">
     <strong>Prototype · QP-3714 MyCOA Setup Wizard v1</strong>
-    <span>Gated first-run modal for <strong>JC Green</strong>. Built on Qredible Design System (qredible-brain @ 89d342b). Two slides, then post-completion preview of the Default Template (QP-3713).</span>
+    <span>Gated first-run modal for <strong>Natribis</strong>. Built on Qredible Design System (qredible-brain @ 89d342b). Two slides, then post-completion preview of the Default Template (QP-3713).</span>
     <span class="spacer"></span>
     <a class="nav" href="mycoa-default-template.html">View template standalone →</a>
     <a class="back" href="../index.html">← All mockups</a>
@@ -780,7 +780,7 @@
     <div class="faux-portal" aria-hidden="true">
       <div class="fp-top">
         <div class="fp-logo">Q</div>
-        <span>Qredible Merchant Portal · JC Green</span>
+        <span>Qredible Merchant Portal · Natribis</span>
       </div>
       <div class="fp-body"></div>
     </div>
@@ -818,7 +818,7 @@
                   Read-only
                 </span>
               </div>
-              <input class="input" type="text" value="JC Green" readonly />
+              <input class="input" type="text" value="Natribis" readonly />
               <div class="field-help">Pulled from your Qredible account. Contact support to change it.</div>
             </div>
 
@@ -830,7 +830,7 @@
                 class="input"
                 id="shoppingUrl"
                 type="url"
-                placeholder="https://shop.jcgreen.com"
+                placeholder="https://shop.natribis.com"
                 oninput="validateShoppingUrl()"
                 required
               />
@@ -848,7 +848,7 @@
               </div>
               <div class="input-prefix">
                 <span class="prefix">https://</span>
-                <input class="input" type="text" value="jcgreen.mycoa.com" readonly />
+                <input class="input" type="text" value="natribis.mycoa.com" readonly />
               </div>
               <div class="field-help">Your published MyCOA site. Custom CNAME mapping is available later from the Display tab.</div>
             </div>
@@ -920,7 +920,7 @@
       <span class="check">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </span>
-      <div><strong>Setup complete.</strong> Your MyCOA site is live at <code>https://<span id="pbHost">jcgreen.mycoa.com</span></code>. Preview reflects the captured logo and shopping URL.</div>
+      <div><strong>Setup complete.</strong> Your MyCOA site is live at <code>https://<span id="pbHost">natribis.mycoa.com</span></code>. Preview reflects the captured logo and shopping URL.</div>
       <span class="spacer"></span>
       <button class="reopen" onclick="goTo(1)">Re-open wizard</button>
     </div>
@@ -929,7 +929,7 @@
       <span class="dot"></span>
       <div>
         <strong>Captured from wizard:</strong>
-        Logo wired into the hero · "Resume Shopping" CTA links to <code id="pbShoppingUrl">https://shop.jcgreen.com</code> ·
+        Logo wired into the hero · "Resume Shopping" CTA links to <code id="pbShoppingUrl">https://shop.natribis.com</code> ·
         Everything else follows the Qredible default template — customizable later via the Display tab (<a href="../mycoa-display-tab-mockup.html">QP-3626</a>).
       </div>
     </div>
@@ -937,7 +937,7 @@
     <div class="preview-frame-wrap">
       <div class="browser-bar">
         <div class="browser-dots"><span></span><span></span><span></span></div>
-        <div class="browser-url">https://jcgreen.mycoa.com/</div>
+        <div class="browser-url">https://natribis.mycoa.com/</div>
       </div>
 
       <div class="mycoa-template">
@@ -945,7 +945,7 @@
           <div class="mycoa-hero-top">
             <div class="mycoa-merchant">
               <div class="mycoa-merchant-logo" id="previewMerchantLogo">JC</div>
-              <div class="mycoa-merchant-name">JC Green</div>
+              <div class="mycoa-merchant-name">Natribis</div>
             </div>
             <div class="mycoa-wordmark">
               <div class="mycoa-wordmark-logo">MyCOA<sup>®</sup></div>
@@ -954,7 +954,7 @@
           </div>
           <h1 class="mycoa-hero-title">Certificate of Analysis</h1>
           <p class="mycoa-hero-lead">
-            At JC Green, we believe in full transparency and rigorous quality control. Every batch of our
+            At Natribis, we believe in full transparency and rigorous quality control. Every batch of our
             products is tested by accredited laboratories and the results are made readily available for your review.
           </p>
           <div class="mycoa-hero-ctas">
@@ -1011,7 +1011,7 @@
         </section>
 
         <footer class="mycoa-footer" data-component="mycoa-footer">
-          <div class="mycoa-footer-left">© 2026 JC Green. All rights reserved.</div>
+          <div class="mycoa-footer-left">© 2026 Natribis. All rights reserved.</div>
           <div class="mycoa-footer-right">Powered by <strong>MyCOA<sup>®</sup></strong></div>
         </footer>
       </div>
@@ -1154,11 +1154,11 @@
     function applyToPreview() {
       const logoEl = document.getElementById('previewMerchantLogo');
       if (state.logoDataUrl) {
-        logoEl.innerHTML = '<img src="' + state.logoDataUrl + '" alt="JC Green logo">';
+        logoEl.innerHTML = '<img src="' + state.logoDataUrl + '" alt="Natribis logo">';
       } else {
         logoEl.innerHTML = 'JC';
       }
-      const shop = state.shoppingUrl || 'https://shop.jcgreen.com';
+      const shop = state.shoppingUrl || 'https://shop.natribis.com';
       const resume = document.getElementById('previewResumeShopping');
       resume.href = shop;
       document.getElementById('pbShoppingUrl').textContent = shop;
