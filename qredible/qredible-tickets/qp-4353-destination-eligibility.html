@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Trust — Destination Eligibility (State) — QP-4353</title>
+<style>
+  :root {
+    --primary: #1677ff; --primary-soft: #e6f4ff;
+    --text: #1f2329; --text-2: #5c6570; --border: #e3e6ea;
+    --bg: #f5f6f8; --card: #ffffff;
+    --green: #389e0d;  --green-bg: #f6ffed;  --green-bd: #b7eb8f;
+    --red: #cf1322;    --red-bg: #fff1f0;    --red-bd: #ffa39e;
+    --amber: #d46b08;  --amber-bg: #fff7e6;  --amber-bd: #ffd591;
+    --grey: #595959;   --grey-bg: #fafafa;   --grey-bd: #d9d9d9;
+    --purple: #531dab; --purple-bg: #f9f0ff; --purple-bd: #d3adf7;
+    --blue: #0958d9;   --blue-bg: #e6f4ff;   --blue-bd: #91caff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.55; }
+  .topbar { background: #0b1e39; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 16px; }
+  .topbar .logo { font-weight: 700; font-size: 15px; } .topbar .logo span { color: #69b1ff; }
+  .topbar .crumb { color: #b6c2d4; font-size: 12px; }
+  .mock-banner { background: #fffbe6; border-bottom: 1px solid #ffe58f; color: #874d00; padding: 6px 24px; font-size: 12px; }
+  .screen-nav { display: flex; gap: 4px; padding: 12px 24px 0; background: var(--card); border-bottom: 1px solid var(--border); }
+  .screen-nav button { border: 1px solid var(--border); border-bottom: none; background: var(--bg); padding: 8px 18px;
+    border-radius: 6px 6px 0 0; cursor: pointer; font-size: 13px; color: var(--text-2); font-family: inherit; }
+  .screen-nav button.active { background: var(--card); color: var(--primary); font-weight: 600; position: relative; top: 1px; }
+  .screen { display: none; padding: 20px 24px 48px; max-width: 1150px; margin: 0 auto; }
+  .screen.active { display: block; }
+  h2.pagetitle { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+  .pagesub { color: var(--text-2); margin-bottom: 16px; font-size: 12.5px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; margin-bottom: 16px; }
+  .card h3 { font-size: 14px; margin-bottom: 8px; }
+  .card p + p { margin-top: 8px; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); margin-top: 8px; }
+  th { text-align: left; font-weight: 600; font-size: 12px; color: var(--text-2); background: #fafbfc; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600; border: 1px solid; white-space: nowrap; }
+  .tag.built   { color: var(--green); background: var(--green-bg); border-color: var(--green-bd); }
+  .tag.later   { color: var(--grey); background: var(--grey-bg); border-color: var(--grey-bd); }
+  .tag.modeled { color: var(--purple); background: var(--purple-bg); border-color: var(--purple-bd); }
+  .chip { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 600; border: 1px solid; }
+  .chip.ok   { color: var(--green); background: var(--green-bg); border-color: var(--green-bd); }
+  .chip.fail { color: var(--red); background: var(--red-bg); border-color: var(--red-bd); }
+  .chip.cond { color: var(--blue); background: var(--blue-bg); border-color: var(--blue-bd); }
+  .chip.rev  { color: var(--purple); background: var(--purple-bg); border-color: var(--purple-bd); }
+  .chip.ins  { color: var(--amber); background: var(--amber-bg); border-color: var(--amber-bd); }
+  .note { background: #f0f7ff; border: 1px dashed #91caff; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #0958d9; margin: 10px 0; }
+  .note b { color: #003eb3; }
+  ol, ul { margin: 8px 0 0 18px; display: flex; flex-direction: column; gap: 6px; }
+  .arith { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--text-2); }
+  .qualifier { font-size: 11px; color: var(--purple); font-style: italic; }
+  .disclaimer { font-size: 11px; color: var(--text-2); font-style: italic; margin-top: 18px; }
+  /* mini destination matrix */
+  .matrix { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; margin-top: 10px; }
+  .state { border-radius: 4px; text-align: center; font-size: 10.5px; font-weight: 700; padding: 7px 0; border: 1px solid; cursor: default; }
+  .state.e { color: var(--green); background: var(--green-bg); border-color: var(--green-bd); }
+  .state.r { color: var(--blue); background: var(--blue-bg); border-color: var(--blue-bd); }
+  .state.p { color: var(--red); background: var(--red-bg); border-color: var(--red-bd); }
+  .state.v { color: var(--purple); background: var(--purple-bg); border-color: var(--purple-bd); }
+  .state.i { color: var(--amber); background: var(--amber-bg); border-color: var(--amber-bd); }
+  .state.sel { outline: 2px solid #0b1e39; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; font-size: 11.5px; color: var(--text-2); }
+  .popbox { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 12px 14px; margin-top: 12px; max-width: 640px; }
+  .popbox h4 { font-size: 12.5px; margin-bottom: 6px; }
+  code { background: #f1f3f5; border-radius: 3px; padding: 0 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Qredible <span>Q-Trust</span></div>
+  <div class="crumb">QP-4353 · Destination Eligibility — state-level shipping</div>
+</div>
+<div class="mock-banner">DESIGN ADDENDUM — QP-4353 (drafted under placeholder "QP-4360"), extends QP-4352. Sequencing per product direction: <b>federal overlay rolls first; state content is a subsequent version.</b> The readiness seams below are already built into the federal engine.</div>
+
+<div class="screen-nav">
+  <button class="active" onclick="showScreen(0,this)">1 · The proposal — where state fits &amp; what merchants see</button>
+  <button onclick="showScreen(1,this)">2 · Engineering status — answers &amp; what's already built</button>
+</div>
+
+<!-- ═══════════ TAB 1: THE PROPOSAL ═══════════ -->
+<div class="screen active" id="s0">
+  <h2 class="pagetitle">State-level shipping restrictions — the model and the merchant surface</h2>
+  <div class="pagesub">Adds no new engine concepts: one new <b>axis</b> (jurisdiction) on the policy model from QP-4352, and one new <b>surface</b> (the destination matrix) built from the popover pattern already signed off there.</div>
+
+  <div class="card">
+    <h3>Q3 — Where does state authority fit in the policy model?</h3>
+    <p><b>The same three-layer pattern, applied on a second axis.</b> A state policy is a policy row like any other (QP-4352 already names "a state regime" as valid). The one difference: <b>applicability resolves by jurisdiction, not by processor selection</b> — a state's policy applies whenever that state is the evaluated destination (or, for a handful of regimes, the origin), regardless of processor preference. <b>A processor cannot opt out of a state policy</b>, mirroring the federal asymmetry rule. Overlays on state policies are <b>restriction-only</b>: narrow yes, widen never — and a widening attempt is refused at write time, when the person configuring can still see the error.</p>
+    <p><b>Origin matters, not just destination.</b> Eligibility is a function of (product, origin, destination). A merchant with multiple fulfillment sites gets a verdict per site. This is carried in the evaluation signature from day one because destination-only is very hard to retrofit.</p>
+  </div>
+
+  <div class="card">
+    <h3>Q4 — What does a merchant see? The Destination Matrix</h3>
+    <p>One cell per jurisdiction on the product's Shipping tab, showing the effective destination verdict. <b>The map is the summary; the popover is the truth</b> — clicking a cell opens the same authority-breakdown popover from QP-4352, arithmetic included. No verdict may appear on the map that cannot be expanded into its arithmetic.</p>
+
+    <div class="matrix">
+      <div class="state e">AL</div><div class="state e">AZ</div><div class="state p">AR</div><div class="state e">CA</div><div class="state r">CO</div><div class="state p">CT</div><div class="state e">DE</div><div class="state e">FL</div><div class="state sel p">GA</div><div class="state v">HI</div><div class="state r">ID</div><div class="state e">IL</div><div class="state e">IN</div>
+      <div class="state i">IA</div><div class="state e">KS</div><div class="state e">KY</div><div class="state r">LA</div><div class="state e">ME</div><div class="state e">MD</div><div class="state e">MA</div><div class="state e">MI</div><div class="state r">MN</div><div class="state e">MS</div><div class="state e">MO</div><div class="state p">MT</div><div class="state e">NE</div>
+      <div class="state e">NV</div><div class="state e">NH</div><div class="state e">NJ</div><div class="state e">NM</div><div class="state r">NY</div><div class="state e">NC</div><div class="state i">ND</div><div class="state e">OH</div><div class="state e">OK</div><div class="state r">OR</div><div class="state e">PA</div><div class="state p">RI</div><div class="state e">SC</div>
+      <div class="state e">SD</div><div class="state e">TN</div><div class="state e">TX</div><div class="state p">UT</div><div class="state e">VT</div><div class="state e">VA</div><div class="state r">WA</div><div class="state e">WV</div><div class="state e">WI</div><div class="state e">WY</div><div class="state e">DC</div><div class="state i">PR</div><div class="state e">VI</div>
+    </div>
+    <div class="legend">
+      <span><span class="chip ok">ELIGIBLE</span> ship</span>
+      <span><span class="chip cond">RESTRICTED</span> shippable if a condition is met — shows the condition</span>
+      <span><span class="chip fail">PROHIBITED</span> blocked; remediation delta shown where closable</span>
+      <span><span class="chip rev">REVIEW</span> rules conflict / analyte unmapped</span>
+      <span><span class="chip ins">INSUFFICIENT_DATA</span> never renders as eligible; names the missing datum</span>
+    </div>
+
+    <div class="popbox">
+      <h4>GA — Relax Gummies 30ct <span style="float:right;color:var(--text-2);font-weight:400">illustrative</span></h4>
+      <table>
+        <thead><tr><th>Policy</th><th>Verdict</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Federal — Farm Bill</td><td><span class="chip ok">COMPLIANT</span></td><td class="arith">Δ9 0.12% vs 0.3% · COA-88121</td></tr>
+          <tr><td>Georgia (destination)</td><td><span class="chip fail">PROHIBITED</span></td><td class="arith">Δ8 8.0 mg/serving vs 5.0 cap · COA-88121<br><span style="color:var(--text-2)">Remediation: a 5 mg/serving presentation is eligible</span></td></tr>
+          <tr><td>Carrier (ground)</td><td><span class="chip cond">RESTRICTED</span></td><td class="arith">signature-on-delivery required<br><span class="qualifier">carrier acceptance policy — not a determination of law</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note"><b>Also in the proposal:</b> a catalog-level <b>Shipping Profile</b> (per state: N eligible / restricted / prohibited / undetermined — the screen a merchant lives in), an <b>effective-date selector</b> ("where can I ship the day §781 lands" — free because every verdict is precomputed and date-scoped), batch-level truth with per-batch history, and citation links on every rule row. <code>INSUFFICIENT_DATA</code> is surfaced prominently, not buried — it converts directly into MyCOA adoption and scan coverage.</div>
+  </div>
+
+  <div class="card">
+    <h3>What state policies must be able to express</h3>
+    <p>Fourteen predicate shapes; the regulatory team owns the values. Concentration, mg/serving, mg/container, compound prohibition (with de minimis floors), synthetic/derivation, ratios, product form, servings caps — plus the ones that break a COA-only model: <b>registration requirements, testing provenance, labeling/packaging, age gates, channel prohibitions</b>, and <b>carriers modeled as policies</b> (UPS/FedEx/USPS conditions as a CARRIER-tier policy with the mandatory "not a determination of law" qualifier). A product can pass every analyte rule and still be non-shippable because it is unregistered — which is why non-COA predicates are a sibling family beside the analyte evaluator, not a bolt-on.</p>
+    <div class="note"><b>The one genuine data gap: Product Presentation.</b> Per-serving and per-container predicates need net weight, serving size, servings per container, product form and packaging attributes per SKU/batch — with provenance and confidence per field. A low-confidence presentation field yields INSUFFICIENT_DATA for anything that depends on it, never a computed verdict. Ships as its own ticket ahead of the matrix; extraction sits with the scan pipeline.</div>
+  </div>
+  <div class="disclaimer">Determinations produced by this system are compliance tooling based on published rules and merchant-supplied data. They are not legal advice, are not a determination that a shipment is lawful, and do not substitute for the merchant's own legal review or its carrier's acceptance policies.</div>
+</div>
+
+<!-- ═══════════ TAB 2: ENGINEERING STATUS ═══════════ -->
+<div class="screen" id="s1">
+  <h2 class="pagetitle">Engineering status — what the engine already satisfies, and the seams just built</h2>
+  <div class="pagesub">Everything verified against the shipped engine, not assumed. Zero behavior change for existing regimes; zero state rule content authored.</div>
+
+  <div class="card">
+    <h3>Already satisfied before this addendum arrived</h3>
+    <table>
+      <thead><tr><th>Addendum requirement</th><th>Engine reality</th></tr></thead>
+      <tbody>
+        <tr><td>State as a policy tier</td><td>Already first-class — the STATE authority tier shipped with the authority stack; only the <i>content</i> of state rule sets was deferred</td></tr>
+        <tr><td>mg/serving and mg/container predicates</td><td>Both unit bases exist; per-serving converts via declared servings count and <b>refuses</b> (INDETERMINATE) when presentation data is missing — "never derive from a guessed serving size" is already the implemented behavior</td></tr>
+        <tr><td>"INSUFFICIENT_DATA never renders eligible"</td><td>Invariant 3 — structural, test-asserted</td></tr>
+        <tr><td>Arithmetic always shown; qualifier travels on the verdict</td><td>Structural — observed/threshold/exceedance on every rule result; the qualifier sentence rides the verdict object</td></tr>
+        <tr><td>Compound prohibition with de minimis floors</td><td>The validator refuses literal zero and requires an explicit numeric floor — the exact shape the addendum asks for</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>State-readiness seams — built now, in the federal engine <span class="tag built">SHIPPED IN PR #2401</span></h3>
+    <table>
+      <thead><tr><th></th><th>Constraint</th><th>What was built</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag built">C1</span></td><td>Jurisdiction axis on the policy shape</td><td>Optional <code>jurisdiction</code> (ISO 3166-2) + <code>appliesTo</code> (DESTINATION / ORIGIN / BOTH) on every regime. Federal/acquirer regimes leave it null and are untouched.</td></tr>
+        <tr><td><span class="tag built">C2</span></td><td>Origin + destination in the evaluation context</td><td>Optional <code>jurisdictionContext</code> on the evaluator with a <b>fail-closed gate</b>: matching context evaluates; non-matching is OUT_OF_SCOPE; a jurisdiction-scoped policy with <i>no</i> context returns INDETERMINATE_DATA — "we don't know where this ships" can never silently mean "the state doesn't apply".</td></tr>
+        <tr><td><span class="tag built">C3</span></td><td>Carrier is a policy, not a special case</td><td>CARRIER authority tier; never a legal determination; every carrier verdict carries "a carrier acceptance policy, not a determination of law" — the sentence cannot be dropped by any screen or export.</td></tr>
+        <tr><td><span class="tag built">C4</span></td><td>Every verdict names its evidence</td><td><code>sourceCoaId</code> stamped from the evaluation input onto every rule result — statute + number + the certificate it came from.</td></tr>
+        <tr><td><span class="tag built">C5</span></td><td>Rules keyed to a corpus</td><td><code>corpusId</code> on threshold rules — a second vertical (kratom, peptides) becomes content authoring, not a schema migration.</td></tr>
+        <tr><td><span class="tag built">C6</span></td><td>RESTRICTED reserved</td><td>The conditional verdict exists in the enum, ranked above COMPLIANT and below every INDETERMINATE, with <b>no producer</b> (test-asserted) — nothing can overload an INDETERMINATE to mean "shippable if" in the meantime.</td></tr>
+        <tr><td><span class="tag built">Q3</span></td><td>Statutory overlays are restriction-only</td><td>Write-time validator: an OK override on a federal/state regime is refused as an ERROR (a customer cannot widen a statute); THRESHOLD warns for analyst review; acquirer/carrier regimes keep their full overlay freedom.</td></tr>
+        <tr><td><span class="tag later">C7</span></td><td>Non-COA predicates as a sibling family</td><td>Architecture note for the future predicate-library build — registration/labeling/age/channel checks merge at the regime-verdict level, never inside the analyte evaluator.</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><b>Verification:</b> 126/126 engine unit tests green (12 new state-readiness tests), acceptance fixture harness shows no regressions, corpus invariant gate clean. All dark behind the same fail-closed kill switch as the rest of the engine.</div>
+  </div>
+
+  <div class="card">
+    <h3>Answers to the addendum's open questions (condensed)</h3>
+    <ul>
+      <li><b>Evaluation cost at 50+ jurisdictions:</b> fine — the expensive work (corpus resolution, normalization, reconciliation) is jurisdiction-invariant and computed once; per-state fan-out is arithmetic. Snapshots go lazy/incremental, keyed to policy version + input hash + jurisdiction, so storage tracks policy and COA churn, not the state count.</li>
+      <li><b>Where Product Presentation lives:</b> a separate versioned object tied to batch (batch-level truth + per-field provenance/confidence demand it); the evaluator already consumes its fields as parameters, so only a resolver is needed.</li>
+      <li><b>Overlay directionality:</b> did not exist — now built (Q3 row above).</li>
+      <li><b>Ship-from:</b> was not modeled as evaluation input — the seam now exists (C2); company-profile addresses give the data a home when the feature builds.</li>
+      <li><b>Storage at 50×:</b> viable with the incremental keying above; most states agree on most products and can share canonical rows.</li>
+    </ul>
+  </div>
+  <div class="disclaimer">Determinations produced by this system are compliance tooling based on published rules and merchant-supplied data. They are not legal advice and do not substitute for the merchant's own legal review.</div>
+</div>
+
+<script>
+  function showScreen(i, btn) {
+    document.querySelectorAll('.screen').forEach((s, j) => s.classList.toggle('active', i === j));
+    document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
