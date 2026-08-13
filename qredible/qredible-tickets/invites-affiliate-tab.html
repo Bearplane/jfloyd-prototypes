@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invites Tab + Affiliates Financial View — Mockup &amp; Spec</title>
+<style>
+  :root {
+    --bg: #f4f6f8; --surface: #ffffff; --ink: #1e293b; --ink2: #64748b; --ink3: #94a3b8;
+    --line: #e2e8f0; --brand: #1d7a6e; --brand-wash: #e7f2f0; --brand-ink: #135e55;
+    --blue: #1d4ed8; --blue-wash: #eff6ff;
+    --amber: #92610e; --amber-wash: #fdf3df;
+    --red: #b3392c; --red-wash: #fbeae7;
+    --green: #15803d; --green-wash: #e9f7ee;
+    --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--line); padding: 14px 26px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .topbar h1 { font-size: 17px; margin: 0; font-weight: 650; }
+  .topbar .sub { color: var(--ink2); font-size: 12.5px; }
+  .viewtabs { display: flex; gap: 4px; padding: 12px 26px 0; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .viewtab { border: 1px solid var(--line); border-bottom: none; background: #f8fafc; color: var(--ink2); padding: 8px 16px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .viewtab.active { background: var(--surface); color: var(--brand-ink); border-color: var(--brand); border-bottom: 2px solid var(--surface); margin-bottom: -1px; }
+  .screen { display: none; padding: 20px 26px 60px; max-width: 1280px; margin: 0 auto; }
+  .screen.active { display: block; }
+  .note { background: var(--amber-wash); border-left: 3px solid var(--amber); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 12.5px; color: #6b4a10; margin: 0 0 16px; }
+  /* app chrome mock */
+  .appnav { display: flex; gap: 2px; background: #0f2f2a; border-radius: 10px 10px 0 0; padding: 8px 12px 0; }
+  .appnav span { color: #9fc4be; padding: 8px 16px 10px; font-size: 13px; font-weight: 600; border-radius: 8px 8px 0 0; }
+  .appnav span.on { background: var(--surface); color: var(--brand-ink); }
+  .appnav .newchip { background: #ffd76e; color: #6b4a10; font-size: 9.5px; font-weight: 800; border-radius: 8px; padding: 1px 6px; margin-left: 6px; vertical-align: 2px; }
+  .appbody { background: var(--surface); border: 1px solid var(--line); border-top: none; border-radius: 0 0 10px 10px; padding: 18px 20px 22px; }
+  .subtabs { display: flex; gap: 18px; border-bottom: 2px solid var(--line); margin-bottom: 16px; }
+  .subtab { padding: 6px 2px 8px; font-weight: 600; color: var(--ink2); cursor: default; font-size: 13.5px; }
+  .subtab.on { color: var(--brand-ink); border-bottom: 2px solid var(--brand); margin-bottom: -2px; }
+  .statrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .stat { background: #f8fafc; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .stat b { display: block; font-size: 19px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 11px; color: var(--ink2); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+  .toolrow { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .search { border: 1px solid var(--line); border-radius: 7px; padding: 6px 12px; color: var(--ink3); font-size: 13px; flex: 1; min-width: 180px; background: #fff; }
+  .btn { border-radius: 7px; padding: 6px 14px; font-size: 12.5px; font-weight: 650; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .btn.ghost { color: var(--ink2); }
+  select.btn { padding: 6px 8px; }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink2); padding: 8px 10px; border-bottom: 1px solid var(--line); background: #f8fafc; white-space: nowrap; }
+  td { padding: 8px 10px; border-bottom: 1px solid #eef2f6; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.total td { background: #f8fafc; font-weight: 700; border-top: 2px solid var(--line); }
+  .chip { display: inline-block; border-radius: 12px; padding: 1px 9px; font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+  .c-green { background: var(--green-wash); color: var(--green); }
+  .c-blue { background: var(--blue-wash); color: var(--blue); }
+  .c-grey { background: #f1f5f9; color: var(--ink2); }
+  .c-amber { background: var(--amber-wash); color: var(--amber); }
+  .c-red { background: var(--red-wash); color: var(--red); }
+  .c-brand { background: var(--brand-wash); color: var(--brand-ink); }
+  .mini { font-size: 11px; color: var(--ink2); }
+  .mono { font-family: var(--mono); font-size: 11.5px; }
+  a.rowlink { color: var(--blue); text-decoration: none; font-weight: 600; }
+  /* docs */
+  .docs { max-width: 860px; }
+  .docs h2 { font-size: 19px; margin: 34px 0 8px; border-top: 1px solid var(--line); padding-top: 20px; }
+  .docs h2:first-of-type { border-top: none; padding-top: 0; margin-top: 8px; }
+  .docs h3 { font-size: 15px; margin: 20px 0 6px; }
+  .docs p, .docs li { max-width: 72ch; }
+  .docs code { font-family: var(--mono); font-size: .87em; background: #f1f5f9; border-radius: 4px; padding: 1px 5px; }
+  .docs .rule { background: var(--brand-wash); border-left: 3px solid var(--brand); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 14px 0; }
+  .docs table { font-size: 13px; }
+  .qcard { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: 0 8px 8px 0; padding: 10px 14px; margin: 10px 0; }
+  .qcard b { display: block; }
+  .footer-cta { margin-top: 40px; padding: 16px 20px; background: var(--brand-wash); border-radius: 10px; font-size: 13.5px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Invites Tab + Affiliates Financial View</h1>
+  <span class="sub">Proposal mockup for sign-off &middot; Aug 13, 2026 &middot; Spec: qredible-engineering PR #64</span>
+</div>
+
+<div class="viewtabs">
+  <div class="viewtab active" onclick="show(0,this)">1 &middot; Invites &rsaquo; Funnel</div>
+  <div class="viewtab" onclick="show(1,this)">2 &middot; Invites &rsaquo; Affiliates</div>
+  <div class="viewtab" onclick="show(2,this)">3 &middot; Partner drill-down</div>
+  <div class="viewtab" onclick="show(3,this)">Full design explanation</div>
+</div>
+
+<!-- ============ SCREEN 1: FUNNEL ============ -->
+<div class="screen active">
+  <p class="note"><b>What changed:</b> Invites moves OUT of We Monitor into its own top-level tab. We Monitor keeps monitoring (scans / compliance / cases); this tab owns the campaign funnel and the money attribution. All companies and figures below are illustrative.</p>
+
+  <div class="appnav">
+    <span>Dashboard</span><span>We Monitor</span><span class="on">Invites<span class="newchip">NEW</span></span><span>Cases</span><span>Settings</span>
+  </div>
+  <div class="appbody">
+    <div class="subtabs">
+      <div class="subtab on">Funnel</div>
+      <div class="subtab">Affiliates</div>
+      <div class="subtab">Templates</div>
+    </div>
+
+    <div class="statrow">
+      <div class="stat"><b>1,018</b><span>Companies</span></div>
+      <div class="stat"><b>43</b><span>Invited</span></div>
+      <div class="stat"><b>21</b><span>Opened</span></div>
+      <div class="stat"><b>17</b><span>Joined</span></div>
+      <div class="stat"><b>322</b><span>Unreachable</span></div>
+      <div class="stat"><b>975</b><span>Not yet invited</span></div>
+    </div>
+
+    <div class="toolrow">
+      <div class="search">Search company, contact, email&hellip;</div>
+      <select class="btn"><option>Status: All</option></select>
+      <select class="btn"><option>Template: All scenarios</option></select>
+      <select class="btn"><option>Partner: All</option></select>
+      <button class="btn ghost">Validate selection</button>
+      <button class="btn primary">Send invites</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <tr><th></th><th>Company</th><th>Recipient (send target)</th><th>Template</th><th>Partner</th><th>Invite status</th><th>Sent</th><th>Opened</th><th>Joined</th><th></th></tr>
+        <tr><td>&#9744;</td><td><a class="rowlink">Green Valley Botanicals</a><div class="mini">FL &middot; Active</div></td><td>owner@greenvalleybotanicals.com<div class="mini">Operational contact</div></td><td>New merchant</td><td class="mono">APEX15</td><td><span class="chip c-green">JOINED</span></td><td class="mini">Jul 28</td><td class="mini">Jul 28</td><td class="mini">Jul 30</td><td><button class="btn ghost">&#8942;</button></td></tr>
+        <tr><td>&#9744;</td><td><a class="rowlink">Coastal Wellness Co.</a><div class="mini">CA &middot; Active</div></td><td>ops@coastalwellness.co<div class="mini">Operational contact</div></td><td>Existing account</td><td class="mono">APEX15</td><td><span class="chip c-blue">OPENED</span></td><td class="mini">Aug 4</td><td class="mini">Aug 5</td><td class="mini">&mdash;</td><td><button class="btn ghost">&#8942;</button></td></tr>
+        <tr><td>&#9744;</td><td><a class="rowlink">Blue Ridge Naturals</a><div class="mini">NC &middot; Pre-underwriting</div></td><td>founder@blueridgenaturals.com<div class="mini">Owner</div></td><td><span class="chip c-brand">Pre-underwriting</span></td><td class="mono">SUMMIT10</td><td><span class="chip c-amber">UNOPENED</span></td><td class="mini">Aug 11</td><td class="mini">&mdash;</td><td class="mini">&mdash;</td><td><button class="btn ghost">&#8942;</button></td></tr>
+        <tr><td>&#9744;</td><td><a class="rowlink">Prairie Peak Supply</a><div class="mini">CO &middot; Active</div></td><td><span class="chip c-red">PLACEHOLDER</span><div class="mini">No real contact on file</div></td><td>New merchant</td><td class="mini">&mdash;</td><td><span class="chip c-grey">NOT INVITED</span></td><td class="mini">&mdash;</td><td class="mini">&mdash;</td><td class="mini">&mdash;</td><td><button class="btn ghost">&#8942;</button></td></tr>
+        <tr><td>&#9744;</td><td><a class="rowlink">Lakeshore Organics</a><div class="mini">MI &middot; Active</div></td><td>admin@lakeshoreorganics.com<div class="mini">Member &middot; Admin</div></td><td>Existing account</td><td class="mono">HARBOR12</td><td><span class="chip c-blue">CLICKED</span></td><td class="mini">Aug 8</td><td class="mini">Aug 9</td><td class="mini">&mdash;</td><td><button class="btn ghost">&#8942;</button></td></tr>
+      </table>
+    </div>
+    <p class="mini" style="margin-top:8px">The funnel listing is the existing invites dashboard moved here unchanged — contact resolution, unreachable detection, the three template scenarios, validate/send/resend/revoke. One addition: the <b>Partner</b> column and filter.</p>
+  </div>
+</div>
+
+<!-- ============ SCREEN 2: AFFILIATES ============ -->
+<div class="screen">
+  <p class="note"><b>The new view.</b> One row per partner code; period-scoped; every dollar traces to settled transactions on subscriptions carrying the code. The (unattributed) row makes totals reconcile to gross platform revenue. Share is computed on net collected revenue only — never on MRR or unpaid invoices.</p>
+
+  <div class="appnav">
+    <span>Dashboard</span><span>We Monitor</span><span class="on">Invites</span><span>Cases</span><span>Settings</span>
+  </div>
+  <div class="appbody">
+    <div class="subtabs">
+      <div class="subtab">Funnel</div>
+      <div class="subtab on">Affiliates</div>
+      <div class="subtab">Templates</div>
+    </div>
+
+    <div class="toolrow">
+      <select class="btn"><option>Period: August 2026 (MTD)</option><option>July 2026</option><option>Q3 2026</option><option>Custom&hellip;</option></select>
+      <select class="btn"><option>Partner: All active</option></select>
+      <span style="flex:1"></span>
+      <button class="btn ghost">Export XLSX</button>
+      <button class="btn">Manage partners</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <tr><th>Partner</th><th class="num">Sent</th><th class="num">Opened</th><th class="num">Joined</th><th class="num">Subscribed</th><th class="num">Active subs</th><th class="num">MRR attrib.</th><th class="num">Collected</th><th class="num">Refunds</th><th class="num">Net</th><th class="num">Rate</th><th class="num">Share owed</th><th>Payout</th></tr>
+        <tr>
+          <td><a class="rowlink" onclick="show(2,document.querySelectorAll('.viewtab')[2]);return false" href="#">Apex Payment Group</a><div class="mono">APEX15</div></td>
+          <td class="num">120</td><td class="num">74</td><td class="num">41</td><td class="num">18</td><td class="num">17</td>
+          <td class="num">$1,439.82</td><td class="num">$2,879.64</td><td class="num" style="color:var(--red)">&minus;$99.99</td><td class="num"><b>$2,779.65</b></td>
+          <td class="num">15%</td><td class="num"><b>$416.95</b></td><td><span class="chip c-amber">ACCRUED</span></td>
+        </tr>
+        <tr>
+          <td>Summit ISO Services<div class="mono">SUMMIT10</div></td>
+          <td class="num">64</td><td class="num">39</td><td class="num">22</td><td class="num">9</td><td class="num">9</td>
+          <td class="num">$629.91</td><td class="num">$1,259.82</td><td class="num">$0.00</td><td class="num"><b>$1,259.82</b></td>
+          <td class="num">10%</td><td class="num"><b>$125.98</b></td><td><span class="chip c-green">PAID &middot; Jul</span></td>
+        </tr>
+        <tr>
+          <td>Harbor Merchant Partners<div class="mono">HARBOR12</div></td>
+          <td class="num">31</td><td class="num">12</td><td class="num">5</td><td class="num">2</td><td class="num">2</td>
+          <td class="num">$149.98</td><td class="num">$149.98</td><td class="num">$0.00</td><td class="num"><b>$149.98</b></td>
+          <td class="num">12%</td><td class="num"><b>$18.00</b></td><td><span class="chip c-grey">&mdash;</span></td>
+        </tr>
+        <tr>
+          <td class="mini">(unattributed)<div class="mini">no partner code</div></td>
+          <td class="num">28</td><td class="num">11</td><td class="num">6</td><td class="num">3</td><td class="num">3</td>
+          <td class="num">$249.97</td><td class="num">$499.94</td><td class="num">$0.00</td><td class="num">$499.94</td>
+          <td class="num mini">&mdash;</td><td class="num mini">&mdash;</td><td class="mini">&mdash;</td>
+        </tr>
+        <tr class="total">
+          <td>Total</td>
+          <td class="num">243</td><td class="num">136</td><td class="num">74</td><td class="num">32</td><td class="num">31</td>
+          <td class="num">$2,469.68</td><td class="num">$4,789.38</td><td class="num" style="color:var(--red)">&minus;$99.99</td><td class="num">$4,689.39</td>
+          <td class="num"></td><td class="num">$560.93</td><td></td>
+        </tr>
+      </table>
+    </div>
+    <p class="mini" style="margin-top:8px">Rates come from the partner registry (basis points, snapshotted at period close). Payout states: &mdash; (nothing owed) &rarr; ACCRUED &rarr; EXPORTED &rarr; PAID. No money moves in-platform — the ledger records what accounting pays externally, with a reference.</p>
+  </div>
+</div>
+
+<!-- ============ SCREEN 3: DRILL-DOWN ============ -->
+<div class="screen">
+  <p class="note"><b>Every number decomposes to named merchants.</b> The drill-down answers a partner dispute in one click: which companies, what funnel state, what was collected, what refunded.</p>
+
+  <div class="appnav">
+    <span>Dashboard</span><span>We Monitor</span><span class="on">Invites</span><span>Cases</span><span>Settings</span>
+  </div>
+  <div class="appbody">
+    <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:4px">
+      <h2 style="font-size:17px; margin:0">Apex Payment Group <span class="mono" style="font-weight:400">APEX15</span></h2>
+      <span class="chip c-green">ACTIVE</span>
+      <span class="mini">Share rate 15% (1500 bps) &middot; August 2026 MTD</span>
+      <span style="flex:1"></span>
+      <button class="btn ghost">Export detail XLSX</button>
+      <button class="btn primary">Close period&hellip;</button>
+    </div>
+
+    <div class="statrow" style="margin-top:12px">
+      <div class="stat"><b>18</b><span>Subscribed</span></div>
+      <div class="stat"><b>$2,879.64</b><span>Collected</span></div>
+      <div class="stat"><b>&minus;$99.99</b><span>Refunds</span></div>
+      <div class="stat"><b>$2,779.65</b><span>Net revenue</span></div>
+      <div class="stat"><b>$416.95</b><span>Share owed</span></div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <tr><th>Company</th><th>Funnel state</th><th>Plan</th><th>Subscribed</th><th class="num">Collected (period)</th><th class="num">Refunded</th><th class="num">Net</th></tr>
+        <tr><td><a class="rowlink">Green Valley Botanicals</a></td><td><span class="chip c-green">ACTIVE SUB</span></td><td>MyCOA Pro 250 &middot; monthly</td><td class="mini">Jul 30</td><td class="num">$99.98</td><td class="num">$0.00</td><td class="num">$99.98</td></tr>
+        <tr><td><a class="rowlink">Sierra Leaf Trading</a></td><td><span class="chip c-green">ACTIVE SUB</span></td><td>MyCOA Pro 500 &middot; monthly</td><td class="mini">Jul 22</td><td class="num">$199.98</td><td class="num">$0.00</td><td class="num">$199.98</td></tr>
+        <tr><td><a class="rowlink">Meadowbrook Farms</a></td><td><span class="chip c-amber">30-DAY TRIAL</span><div class="mini">converts Aug 29</div></td><td>MyCOA Pro 250 &middot; monthly</td><td class="mini">Jul 30</td><td class="num">$0.00</td><td class="num">$0.00</td><td class="num">$0.00</td></tr>
+        <tr><td><a class="rowlink">Cedar Hollow Wellness</a></td><td><span class="chip c-red">REFUNDED</span></td><td>MyCOA Pro 250 &middot; monthly</td><td class="mini">Jul 12</td><td class="num">$99.99</td><td class="num" style="color:var(--red)">&minus;$99.99</td><td class="num">$0.00</td></tr>
+        <tr><td colspan="4" class="mini">+ 14 more&hellip;</td><td class="num mini">$2,479.69</td><td class="num mini">$0.00</td><td class="num mini">$2,479.69</td></tr>
+      </table>
+    </div>
+
+    <h3 style="font-size:14px; margin:18px 0 8px">Payout ledger</h3>
+    <div class="tablewrap">
+      <table>
+        <tr><th>Period</th><th class="num">Net revenue</th><th class="num">Rate (snapshot)</th><th class="num">Share</th><th>Status</th><th>Reference</th></tr>
+        <tr><td>Jul 1 &ndash; Jul 31, 2026</td><td class="num">$2,133.20</td><td class="num">15%</td><td class="num">$319.98</td><td><span class="chip c-green">PAID</span></td><td class="mono">ACH-20260805-114</td></tr>
+        <tr><td>Aug 1 &ndash; Aug 31, 2026</td><td class="num mini">accruing&hellip;</td><td class="num">15%</td><td class="num mini">$416.95 to date</td><td><span class="chip c-amber">ACCRUED</span></td><td class="mini">&mdash;</td></tr>
+      </table>
+    </div>
+    <p class="mini" style="margin-top:8px">&ldquo;Close period&rdquo; snapshots the rate and net into a ledger row — later rate changes never rewrite history. Marking PAID is a bookkeeping stamp with a reference; the actual payment happens in accounting's own rails.</p>
+  </div>
+</div>
+
+<!-- ============ DOCS ============ -->
+<div class="screen">
+  <div class="docs">
+    <h2>Why this exists</h2>
+    <p>Two forces meet on one surface. First, the invite workflow — the funnel dashboard, contact resolution, three template scenarios including pre-underwriting, resend/revoke, the activation ledger — is campaign ops, squeezed into We Monitor, which was built for compliance ops. The moment the large invite campaign fires, it becomes the most-used surface in the processor app. Second, the partner program needs books: partners carry a code, income attributed to their invites owes them a share, and today that arithmetic exists nowhere — the data is fully recorded but never aggregated.</p>
+
+    <h2>What already exists (verified against the schema)</h2>
+    <p>The attribution chain is complete end-to-end today. The partner code lives on the processor-client relation, is stamped by the invite send, carries onto the subscription at signup, and every settled transaction and invoice (including refunds) hangs off that subscription. <b>This is a reporting feature, not a data-model feature.</b> What does not exist: a partner registry (who owns a code, their rate, payout contact), the aggregation layer, and a payout ledger. That is the whole build.</p>
+
+    <h2>Information architecture</h2>
+    <p>A new top-level <b>Invites</b> tab in the processor app. We Monitor keeps monitoring; Invites owns the funnel and the money. Three sub-tabs:</p>
+    <ul>
+      <li><b>Funnel</b> — the existing invites dashboard moved wholesale (no API rewrite), plus a Partner column and filter.</li>
+      <li><b>Affiliates</b> — the financial view: one row per partner code, period-scoped (screen 2).</li>
+      <li><b>Templates</b> — proposed: the invite-template management moves here so scenario templates live beside the sends that use them (open decision).</li>
+    </ul>
+
+    <h2>Attribution rules — written down before money moves</h2>
+    <div class="rule">
+      <ol style="margin:4px 0; padding-left: 20px">
+        <li><b>The subscription's code is the source of truth for money.</b> Funnel counts attribute via the invite; revenue attributes via the subscription. If they diverge, the money follows the subscription.</li>
+        <li><b>First-touch, sticky.</b> The code stamped at subscription creation persists for that subscription's life. Re-invites with a different code never re-attribute existing revenue.</li>
+        <li><b>Refunds reduce the period they land in</b>, not the period of the original charge. Closed periods stay closed.</li>
+        <li><b>No code, no attribution</b> — but unattributed revenue rolls up in an explicit row so the totals always reconcile to gross platform revenue.</li>
+        <li><b>Share = net collected revenue &times; rate.</b> Never MRR, never invoiced-but-unpaid.</li>
+      </ol>
+    </div>
+
+    <h2>Data model (additive, two tables)</h2>
+    <h3>Partner registry</h3>
+    <p><code>pl_partner</code>: code (unique), name, contact, share rate in basis points, status, owning processor, notes. Codes already in the wild get seeded rows at 0 bps so history is visible immediately; operators set real rates. CRUD is a super-admin surface in Q-Config.</p>
+    <h3>Payout ledger</h3>
+    <p><code>pl_partner_payout</code>: period, net revenue, rate <i>snapshot</i>, share amount, status (ACCRUED &rarr; EXPORTED &rarr; PAID / VOID), external reference, operator, notes. Generated by the "Close period" action. <b>No money movement in-platform</b> — the ledger records what accounting pays outside, which keeps this entirely out of regulated-payments territory.</p>
+
+    <h2>Kill switches</h2>
+    <p><code>invites_tab_enabled</code> — the tab split itself; off means invites stay inside We Monitor, revertible within a minute. <code>affiliate_financials_enabled</code> — the Affiliates view and partner endpoints. Both follow the platform's config-param pattern (fail closed, 60-second cache).</p>
+
+    <h2>Phasing</h2>
+    <table class="tablewrap" style="border:1px solid var(--line); border-radius:8px">
+      <tr><th style="width:56px">Phase</th><th>Content</th><th>Depends on</th></tr>
+      <tr><td><b>F-1</b></td><td>Tab split: move the funnel surfaces, deep links both ways</td><td>nothing (UI move)</td></tr>
+      <tr><td><b>F-2</b></td><td>Partner registry: DDL, Q-Config CRUD, seed from wild codes</td><td>release slot</td></tr>
+      <tr><td><b>F-3</b></td><td>Affiliates view: rollups, drill-down, XLSX export</td><td>F-2</td></tr>
+      <tr><td><b>F-4</b></td><td>Payout ledger, "Close period", payout status</td><td>F-3 + decisions below</td></tr>
+    </table>
+    <p class="mini">Proof per phase: self-seeding e2e — a seeded partner code with a seeded subscription and settled transaction must produce the expected share to the cent.</p>
+
+    <h2>Open decisions (sign-off needed)</h2>
+    <div class="qcard"><b>1 &middot; Share-rate shape</b>Flat basis points per partner (spec'd), or tiered/per-plan? Flat ships in F-2; tiered is a later registry column, not a blocker.</div>
+    <div class="qcard"><b>2 &middot; Who closes periods and marks PAID</b>And does accounting want the XLSX export, or an emailed statement?</div>
+    <div class="qcard"><b>3 &middot; Retroactive attribution</b>Do historic settled transactions on already-coded subscriptions count toward share, or does the program start at a cut date? (Spec assumes a cut date at flag-on; the data supports either.)</div>
+    <div class="qcard"><b>4 &middot; Population</b>Launch scoped to the one processor running the program, or platform-generic from day one? Schema supports both.</div>
+    <div class="qcard"><b>5 &middot; Templates location</b>Move invite-template management into the Invites tab (recommended), or leave it where it is?</div>
+    <div class="qcard"><b>6 &middot; Naming</b>&ldquo;Affiliates&rdquo; vs &ldquo;Partners&rdquo; in the UI. The data model says <code>partner_code</code>.</div>
+
+    <h2>Explicitly out of scope</h2>
+    <ul>
+      <li>Any in-platform money movement to partners (ledger is bookkeeping only).</li>
+      <li>Multi-touch attribution — first-touch sticky only.</li>
+      <li>A partner self-service portal (worth a future phase, not this spec).</li>
+      <li>Any change to invite-sending mechanics or contact resolution.</li>
+    </ul>
+
+    <div class="footer-cta">
+      <b>Sign-off requested:</b> the tab split direction (screen 1), the Affiliates view columns and attribution rules (screen 2 + rules above), and answers to the six open decisions. Full engineering spec: <span class="mono">qredible-engineering PR #64 &middot; subscription-monetization/invites-affiliate-financial-spec.md</span>.
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i, el) {
+  document.querySelectorAll('.screen').forEach((s, j) => s.classList.toggle('active', i === j));
+  document.querySelectorAll('.viewtab').forEach((t) => t.classList.remove('active'));
+  el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
