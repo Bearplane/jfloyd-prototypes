@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MyCOA Automatic Tier-Up — Commercial Decision Pack</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#111318; --surface:#1a1d24; --surface2:#21252e; --border:#2a2f3a;
+    --text:#f1f5f9; --text2:#8892a4; --muted:#4a5568;
+    --s1:#3987e5; --good:#199e70; --warn:#c98500; --crit:#e66767;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 96px}
+  a{color:var(--s1);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .crumb{font-size:13px;color:var(--text2);margin-bottom:24px}
+  h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.02em;line-height:1.2}
+  .sub{color:var(--text2);font-size:1.02rem;margin-top:10px;max-width:840px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(57,135,229,.15);color:var(--s1);margin-bottom:14px}
+  h2{font-size:1.35rem;font-weight:700;margin:64px 0 6px;letter-spacing:-.01em}
+  h3{font-size:1.02rem;font-weight:700;margin:26px 0 8px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--s1)}
+  p{color:var(--text2);max-width:860px;margin:10px 0}
+  p strong,li strong{color:var(--text)}
+  ul,ol{color:var(--text2);margin:10px 0 10px 22px;max-width:840px}
+  li{margin:6px 0}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:26px 0 6px}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .tile .v{font-size:1.25rem;font-weight:800;letter-spacing:-.01em}
+  .tile .l{font-size:12.5px;color:var(--text2);margin-top:6px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin:18px 0;overflow-x:auto}
+  .panel h3:first-child{margin-top:0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+  th{color:var(--text2);font-weight:600;text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)}
+  td{padding:9px 12px;border-bottom:1px solid rgba(42,47,58,.5);color:var(--text2);vertical-align:top}
+  td:first-child{color:var(--text)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  .pill.rec{background:rgba(25,158,112,.16);color:#34d19a}
+  .pill.later{background:rgba(201,133,0,.16);color:#e5a72e}
+  .pill.avoid{background:rgba(230,103,103,.16);color:#ef8f8f}
+  .pill.open{background:rgba(57,135,229,.15);color:#6aa9ee}
+  .caption{font-size:12px;color:var(--muted);margin-top:8px;max-width:840px}
+  .decision{border-left:3px solid var(--s1);padding-left:18px;margin:44px 0}
+  .decision .dnum{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--s1);text-transform:uppercase}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:860px){.cols2{grid-template-columns:1fr}}
+
+  /* ── light product mockups, framed inside the dark page ─────────────── */
+  .mockframe{background:#e9edf4;border:1px solid var(--border);border-radius:14px;padding:26px;margin:18px 0}
+  .mockframe .mftitle{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5b6575;margin:-6px 0 14px}
+  .mock{font-family:system-ui,'Segoe UI',Arial,sans-serif;color:#1a202e;line-height:1.45}
+  .qcard{background:#fff;border-radius:16px;box-shadow:0 4px 18px rgba(26,32,46,.10);padding:22px;max-width:560px}
+  .qcard.plan{max-width:300px;padding:0;overflow:hidden;text-align:center}
+  .qcard.plan .planhead{background:#5aa2f0;color:#fff;font-size:12px;font-weight:700;padding:6px 0;border-radius:16px 16px 0 0}
+  .qcard.plan .planname{font-size:19px;font-weight:800;margin:16px 0 4px}
+  .qcard.plan .planprice{color:#48d188;font-weight:700;margin-bottom:14px}
+  .chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:0 12px 16px}
+  .chip{display:inline-block;padding:3px 12px;border-radius:10px;font-size:11.5px;font-weight:600}
+  .chip.trial{background:#fdf6b2;color:#8e4b10}
+  .chip.addon{background:#def7ec;color:#03543f}
+  .qpanel{background:#eff4fa;border-radius:14px;padding:14px 16px;margin:12px 0;max-width:560px;text-align:left}
+  .qpanel .pt{font-weight:700;font-size:13.5px;color:#2a3950}
+  .qpanel .pb{font-size:13px;color:#2a3950;margin-top:4px}
+  .qpanel.amber{background:#fdf6e3;border:1px solid #f2dfae}
+  .qpanel.amber .pt{color:#8e6a10}
+  .qpanel.amber .pb{color:#7a6224}
+  .qbtn{display:inline-block;background:#1a202e;color:#fff;font-size:12px;font-weight:700;padding:8px 18px;border-radius:6px;margin-right:10px}
+  .qbtn.ghost{background:#fff;color:#1a202e;border:1.5px solid #1a202e}
+  .qlink{color:#1e429f;text-decoration:underline;font-size:12.5px;font-weight:600}
+  .qswitch{display:inline-block;width:34px;height:18px;border-radius:10px;background:#48d188;position:relative;vertical-align:middle}
+  .qswitch::after{content:'';position:absolute;right:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff}
+  .qswitch.off{background:#cbd5e1}
+  .qswitch.off::after{right:auto;left:2px}
+  .mailcard{background:#fff;border-radius:10px;box-shadow:0 4px 18px rgba(26,32,46,.10);padding:26px;max-width:560px;font-size:13.5px;color:#1a202e}
+  .mailcard .mfrom{font-size:12px;color:#6b7280;border-bottom:1px solid #e5e7eb;padding-bottom:10px;margin-bottom:14px}
+  .mailcard .msub{font-weight:700;font-size:14.5px;margin-bottom:12px}
+  .mailcard p{color:#374151;font-size:13.5px;max-width:none;margin:8px 0}
+  .mailcard .cta{display:inline-block;background:#1e429f;color:#fff;font-weight:700;font-size:13px;padding:9px 20px;border-radius:6px;margin:10px 0}
+  .tok{background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:10px;padding:0 6px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .trow{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;max-width:560px;margin:8px 0}
+  .trow .tt{font-weight:700;font-size:13.5px}
+  .trow .td2{font-size:12.5px;color:#4b5563;margin:4px 0 8px}
+  .tbadge{display:inline-block;background:#eef2f7;border:1px solid #d7dee8;color:#3b4657;font-size:11px;font-weight:700;padding:2px 10px;border-radius:8px}
+  .tbadge.custom{background:#def7ec;border-color:#b7ecd6;color:#03543f}
+  .barwrap{max-width:560px}
+  .barlabel{font-size:12px;color:#4b5563;margin:10px 0 4px;font-weight:600}
+  .bar{display:flex;height:26px;border-radius:6px;overflow:hidden;background:#e2e8f0}
+  .bar .seg{height:100%}
+  .capline{position:relative;max-width:560px;height:0}
+  .capmark{position:absolute;top:-34px;bottom:auto;width:2px;height:34px;background:#e02424}
+  .caplabel{font-size:11px;color:#e02424;font-weight:700;position:absolute;top:-50px;transform:translateX(-50%)}
+  .checklist td:last-child{font-size:16px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html">Prototypes</a> / Qredible / MyCOA Tier-Up Decision Pack</div>
+  <span class="badge">Needs commercial decisions · no build started</span>
+  <h1>MyCOA Automatic Tier-Up</h1>
+  <p class="sub">MyCOA plans are tiered by product count, but a merchant is slotted into a tier <strong>once, at purchase</strong> — nothing moves them afterward. This pack lays out the eight decisions the commercial side needs to make before engineering builds automatic tier movement, with mockups of every surface each decision touches. Answer (or edit) the eight calls at the bottom and engineering starts the same day.</p>
+
+  <h2>Two features hiding in “auto tier-up”</h2>
+  <div class="tiles">
+    <div class="tile"><div class="v">A · Tier-at-conversion</div><div class="l"><strong>Small, ready to build.</strong> When a trial converts to paid, charge the tier matching the count on conversion day — the first real charge is simply honest. No mid-cycle change ever happens. A platform kill switch (<code>trial_auto_tier_enabled</code>) is already reserved and ships dark.</div></div>
+    <div class="tile"><div class="v">B · Mid-subscription tier-up</div><div class="l"><strong>The one needing these decisions.</strong> An active, paying subscription moves up because the merchant grew. This changes what an existing customer is billed on a stored card — every question below is about doing that without surprising anyone.</div></div>
+  </div>
+
+  <!-- ───────────────────────── DECISION 1 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 1</div>
+    <h3>Which product count triggers it?</h3>
+    <p>Tiers are defined by product caps, but “product count” has more than one honest answer — and the choice moves real money. On measured Westtown data, tiering on <em>all</em> parent products overstates the billable count by roughly <strong>79%</strong> versus cannabis-only parents (only cannabis products require a COA).</p>
+    <div class="mockframe"><div class="mftitle">What the engine would actually measure — one real merchant</div>
+      <div class="mock barwrap">
+        <div class="barlabel">All parent products — 34 <span style="font-weight:400">(would trigger Tier 2)</span></div>
+        <div class="bar"><div class="seg" style="width:62%;background:#199e70"></div><div class="seg" style="width:38%;background:#94a3b8"></div></div>
+        <div class="capline"><div class="capmark" style="left:73.5%"></div><div class="caplabel" style="left:73.5%">Tier 1 cap · 25</div></div>
+        <div class="barlabel" style="margin-top:22px">Cannabis parents only — 21 <span style="font-weight:400">(stays Tier 1)</span></div>
+        <div class="bar" style="width:62%"><div class="seg" style="width:100%;background:#199e70"></div></div>
+        <div class="barlabel" style="margin-top:14px;font-weight:400;color:#6b7280">■ cannabis parents&nbsp;&nbsp;■ non-cannabis parents — same merchant, opposite outcome. Also decide: do <strong>archived</strong> products count?</div>
+      </div>
+    </div>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Cannabis parent products only</td><td>Matches what MyCOA actually does for the merchant (COAs). Fewer, more defensible tier-ups.</td><td><span class="pill rec">Recommended</span></td></tr>
+      <tr><td>All parent products</td><td>Bigger counts, more tier-ups — and merchants can fairly argue they’re paying for products MyCOA doesn’t serve.</td><td><span class="pill open">Your call</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── DECISION 2 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 2</div>
+    <h3>When is the threshold “crossed”?</h3>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Sustained above the cap for N days (e.g. 14)</td><td>A bulk upload that gets trimmed the next day never triggers anything. Protects trust; slightly delays revenue.</td><td><span class="pill rec">Recommended</span></td></tr>
+      <tr><td>The instant the count exceeds the cap</td><td>Maximum revenue capture; punishes normal catalog housekeeping and invites support tickets.</td><td><span class="pill open">Your call</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── DECISION 3 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 3</div>
+    <h3>Up only — or down too?</h3>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Up only; downgrades via support</td><td>No gaming incentive (archive products before renewal, restore after). Revenue never silently gives itself back.</td><td><span class="pill rec">Recommended</span></td></tr>
+      <tr><td>Automatic both directions</td><td>“Fairest” on paper; creates an archive-before-billing-date exploit and noisy tier churn.</td><td><span class="pill avoid">Not advised</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── DECISION 4 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 4</div>
+    <h3>Notify-first, or change the bill immediately?</h3>
+    <p>The customer-experience call, and the biggest engineering fork. <strong>Notify + apply at next renewal</strong> reuses billing machinery that already exists (the renewal simply charges the new tier; the notice rides the existing pre-billing notice system). <strong>Immediate mid-cycle proration</strong> is a brand-new payment path — partial charges, failed-charge handling, credit notes.</p>
+    <div class="cols2">
+      <div class="mockframe"><div class="mftitle">Mockup — merchant’s Settings → Subscription during the notice window</div>
+        <div class="mock">
+          <div class="qcard plan">
+            <div class="planhead">Current Plan</div>
+            <div class="planname">MyCOA Tier 1</div>
+            <div class="planprice">$49.00 / mo</div>
+            <div class="chips"><span class="chip addon">MyCOA Management — Included</span></div>
+          </div>
+          <div class="qpanel amber">
+            <div class="pt">Tier change scheduled — MyCOA Tier 2 from March 1</div>
+            <div class="pb">You now have <strong>34 products</strong>, above Tier 1’s 25-product cap. From your next billing date you’ll be on Tier 2 at <strong>$89.00 / mo</strong>. Nothing changes before then.</div>
+            <div class="pb" style="margin-top:8px"><span class="qlink">Review products</span> &nbsp;·&nbsp; <span class="qlink">Contact support</span></div>
+          </div>
+          <div class="qpanel">
+            <div class="pt">Next Billing Date</div>
+            <div class="pb">$49.00 / mo · February 28 — <strong>then $89.00 / mo (Tier 2)</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="mockframe"><div class="mftitle">Mockup — the notice email (see Decision 8 for who writes it)</div>
+        <div class="mock mailcard">
+          <div class="mfrom">From: Qredible &lt;no-reply@qredible.com&gt; · To: owner@merchant.com</div>
+          <div class="msub">Your MyCOA plan is changing on <span class="tok">{{effectiveDate}}</span></div>
+          <p>Hi <span class="tok">{{companyName}}</span>,</p>
+          <p>Your catalog has grown to <span class="tok">{{productCount}}</span> products — above the <span class="tok">{{currentTier}}</span> limit of <span class="tok">{{tierCap}}</span>. From your next billing date you’ll move to <span class="tok">{{newTier}}</span> at <span class="tok">{{newPrice}}</span>/mo.</p>
+          <p>No action is needed. If this doesn’t look right, review your products or reach out before <span class="tok">{{effectiveDate}}</span>.</p>
+          <span class="cta">Review my products</span>
+          <p style="font-size:12px;color:#6b7280">You’re receiving this because your MyCOA plan is tiered by product count.</p>
+        </div>
+      </div>
+    </div>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Notify → apply at next renewal</td><td>Zero mid-cycle card activity. Fastest, lowest-risk build (v1). Revenue lags by at most one cycle.</td><td><span class="pill rec">Recommended v1</span></td></tr>
+      <tr><td>Immediate change with proration</td><td>Fastest revenue; new payment plumbing, more surprise-charge risk, needs Decision 6 answered.</td><td><span class="pill later">Later phase</span></td></tr>
+      <tr><td>Silent change, no notice</td><td>A price increase on a stored card with no warning. Reputational and card-network risk.</td><td><span class="pill avoid">Not advised</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── DECISION 5 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 5</div>
+    <h3>What about annual plans?</h3>
+    <p>The biggest revenue-timing question. A merchant who up-tiers in month 2 of an annual plan either waits ~10 months at the old price, gets a mid-year prorated charge, or gets switched to monthly at the new tier.</p>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Wait for the annual renewal (notice at renewal time)</td><td>Simplest and matches the v1 mechanism; revenue lag can be most of a year.</td><td><span class="pill rec">Recommended v1</span></td></tr>
+      <tr><td>Prorate mid-year</td><td>Needs the full proration path from Decision 4’s later phase — plus credit-note handling.</td><td><span class="pill later">Later phase</span></td></tr>
+      <tr><td>Switch to monthly at the new tier</td><td>Punishes annual commitment; effectively a plan change the merchant didn’t ask for.</td><td><span class="pill avoid">Not advised</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── DECISION 6 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 6</div>
+    <h3>If the higher charge fails?</h3>
+    <p>Only bites if you pick an immediate/prorated path — under notify-at-renewal, a failed charge is just the normal renewal-failure flow at the new price.</p>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Normal payment-failed flow at the new tier</td><td>One consistent dunning story; the tier change stands.</td><td><span class="pill rec">Recommended</span></td></tr>
+      <tr><td>Revert to the old tier and retry later</td><td>Two sources of truth for what the merchant owes; messy support conversations.</td><td><span class="pill avoid">Not advised</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── DECISION 7 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 7</div>
+    <h3>Exceptions — can staff pin a company’s tier?</h3>
+    <p>Enterprise and negotiated deals shouldn’t be touched by an algorithm. We’d default this to yes: a per-company override in Q-Config that auto-tier-up never crosses.</p>
+    <div class="mockframe"><div class="mftitle">Mockup — Q-Config, per-company subscription panel</div>
+      <div class="mock qcard" style="max-width:520px">
+        <div style="font-weight:800;font-size:15px;margin-bottom:2px">ZZ-TEST Acme — Subscription</div>
+        <div style="font-size:12.5px;color:#6b7280;margin-bottom:14px">MyCOA Tier 1 · $49.00/mo · renews Mar 1</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #eef1f6">
+          <div><div style="font-weight:700;font-size:13.5px">Pin tier (exempt from auto tier-up)</div>
+          <div style="font-size:12px;color:#6b7280">Negotiated pricing — automatic tier movement will never touch this company.</div></div>
+          <span class="qswitch"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #eef1f6">
+          <div><div style="font-weight:700;font-size:13.5px">Tier-up notices</div>
+          <div style="font-size:12px;color:#6b7280">Send the advance notice email when a change is scheduled.</div></div>
+          <span class="qswitch"></span>
+        </div>
+      </div>
+    </div>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Yes — Q-Config per-company pin</td><td>Sales keeps its promises; the algorithm skips pinned companies entirely.</td><td><span class="pill rec">Recommended</span></td></tr>
+      <tr><td>No exceptions</td><td>Every negotiated deal becomes a future support escalation.</td><td><span class="pill avoid">Not advised</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── DECISION 8 ───────────────────────── -->
+  <div class="decision">
+    <div class="dnum">Decision 8</div>
+    <h3>Who writes the notice email?</h3>
+    <p>The notice can be fixed Qredible copy, or a customer-editable card on the existing <strong>My Templates</strong> page — the same machinery the MyCOA activation invitation just joined (QP-4415), with tokens and fallbacks.</p>
+    <div class="mockframe"><div class="mftitle">Mockup — My Templates, new card</div>
+      <div class="mock">
+        <div class="trow"><div class="tt">Tier change notice</div>
+          <div class="td2">Sent when a company you bill outgrows its MyCOA tier and a change is scheduled for its next billing date. It carries the new tier, price, and effective date.</div>
+          <span class="tbadge">Using the Qredible default</span></div>
+        <div class="trow" style="opacity:.55"><div class="tt">MyCOA activation invitation</div>
+          <div class="td2">Sent when you invite a company you monitor to activate MyCOA on the account they already have.</div>
+          <span class="tbadge custom">Customised by you</span></div>
+      </div>
+    </div>
+    <table>
+      <tr><th>Option</th><th>Implication</th><th></th></tr>
+      <tr><td>Editable My Templates card with a Qredible default</td><td>Consistent with every other merchant-facing email; processors can speak in their own voice. Marginal extra cost — the machinery exists.</td><td><span class="pill rec">Recommended</span></td></tr>
+      <tr><td>Fixed Qredible copy</td><td>Simplest; billing-adjacent wording stays fully controlled.</td><td><span class="pill open">Your call</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ───────────────────────── SUMMARY ───────────────────────── -->
+  <h2>The eight calls, on one card</h2>
+  <div class="panel">
+    <table class="checklist">
+      <tr><th>#</th><th>Decision</th><th>Our recommendation</th><th>Your call</th></tr>
+      <tr><td>1</td><td>Count basis</td><td>Cannabis parent products only; archived excluded</td><td>⬜</td></tr>
+      <tr><td>2</td><td>Threshold</td><td>Sustained above cap for N days (propose 14)</td><td>⬜</td></tr>
+      <tr><td>3</td><td>Direction</td><td>Up only; downgrades via support</td><td>⬜</td></tr>
+      <tr><td>4</td><td>Mechanism</td><td>Notify → apply at next renewal (v1); proration later</td><td>⬜</td></tr>
+      <tr><td>5</td><td>Annual plans</td><td>Apply at annual renewal with notice</td><td>⬜</td></tr>
+      <tr><td>6</td><td>Failed charge</td><td>Normal payment-failed flow at the new tier</td><td>⬜</td></tr>
+      <tr><td>7</td><td>Exceptions</td><td>Q-Config per-company tier pin</td><td>⬜</td></tr>
+      <tr><td>8</td><td>Notice authorship</td><td>Editable My Templates card with Qredible default</td><td>⬜</td></tr>
+    </table>
+    <p class="caption">Feature A (tier-at-conversion) needs only a yes — it’s small, behind its reserved kill switch, and makes the first charge honest. Feature B starts the day rows 1–8 come back.</p>
+  </div>
+
+  <p class="caption">Prepared 2026-08-19 · Engineering: Joseph Floyd · Companion one-pager: <em>tier-up-commercial-decisions.md</em> in qredible-engineering. Mockups are illustrative — copy, prices, and N-day values are placeholders for the commercial side to set.</p>
+</div>
+</body>
+</html>
