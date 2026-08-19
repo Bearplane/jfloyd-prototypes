@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Classification 2.0 — Confidence-Scored, Description-Gated, AI-Tailed</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#111318; --surface:#1a1d24; --surface2:#21252e; --border:#2a2f3a; --border-hover:#3a4050;
+    --text:#f1f5f9; --text2:#8892a4; --muted:#4a5568;
+    /* validated dark-mode categorical palette (dataviz reference instance) */
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s8:#e66767;
+    --good:#199e70; --warn:#c98500; --crit:#e66767;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 96px}
+  a{color:var(--s1);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .crumb{font-size:13px;color:var(--text2);margin-bottom:24px}
+  h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.02em;line-height:1.2}
+  .sub{color:var(--text2);font-size:1.02rem;margin-top:10px;max-width:820px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(57,135,229,.15);color:var(--s1);margin-bottom:14px}
+  h2{font-size:1.35rem;font-weight:700;margin:64px 0 6px;letter-spacing:-.01em}
+  h3{font-size:1.02rem;font-weight:700;margin:26px 0 8px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--s1)}
+  p{color:var(--text2);max-width:860px;margin:10px 0}
+  p strong,li strong{color:var(--text)}
+  ul,ol{color:var(--text2);margin:10px 0 10px 22px;max-width:840px}
+  li{margin:6px 0}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:30px 0 6px}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 18px 14px}
+  .tile .v{font-size:1.9rem;font-weight:800;letter-spacing:-.02em}
+  .tile .l{font-size:12.5px;color:var(--text2);margin-top:4px}
+  .tile .n{font-size:11px;color:var(--muted);margin-top:6px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin:18px 0;overflow-x:auto}
+  .panel h3:first-child{margin-top:0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+  th{color:var(--text2);font-weight:600;text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)}
+  td{padding:8px 12px;border-bottom:1px solid rgba(42,47,58,.5);color:var(--text2)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  td:first-child{color:var(--text)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:700}
+  .pill.hi{background:rgba(25,158,112,.16);color:#34d19a}
+  .pill.md{background:rgba(201,133,0,.16);color:#e5a72e}
+  .pill.lo{background:rgba(230,103,103,.16);color:#ef8f8f}
+  .caption{font-size:12px;color:var(--muted);margin-top:8px;max-width:840px}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:820px){.cols2{grid-template-columns:1fr}}
+  .example{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;font-size:13.5px}
+  .example .t{font-weight:700;color:var(--text);font-size:14px}
+  .example .path{color:var(--text2);margin-top:8px}
+  .example .path b{color:var(--text)}
+  svg text{font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px;font-size:12.5px;color:var(--text2)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .flow{display:flex;flex-direction:column;gap:0}
+  .tier{display:flex;gap:16px;align-items:stretch}
+  .tierbox{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:6px 0}
+  .tierbox .tt{font-weight:700;color:var(--text);font-size:14.5px}
+  .tierbox .td2{font-size:13px;color:var(--text2);margin-top:4px}
+  .tierbox .tn{font-size:12px;margin-top:8px;font-weight:700}
+  .arrow{display:flex;justify-content:center;color:var(--muted);font-size:18px;line-height:1;margin:-2px 0}
+  .note{border-left:3px solid var(--s4);background:rgba(201,133,0,.07);border-radius:0 10px 10px 0;padding:12px 16px;margin:16px 0;font-size:13.5px;color:var(--text2);max-width:860px}
+  .note b{color:var(--text)}
+  .ok{border-left-color:var(--s3);background:rgba(25,158,112,.07)}
+  .bad{border-left-color:var(--s8);background:rgba(230,103,103,.07)}
+  code{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-size:12.5px;color:#c9d4e5}
+  .tooltip{position:fixed;pointer-events:none;background:#0b0d11;border:1px solid var(--border-hover);border-radius:8px;padding:7px 11px;font-size:12.5px;color:var(--text);z-index:50;display:none;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+  .phase{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid rgba(42,47,58,.5)}
+  .phase:last-child{border-bottom:none}
+  .phase .pn{font-weight:800;color:var(--s1);font-size:14px}
+  .phase .pt{color:var(--text);font-weight:600;font-size:14px}
+  .phase .pd{color:var(--text2);font-size:13px;margin-top:3px}
+  footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../index.html">← All prototypes</a></div>
+  <span class="badge">Design proposal · calibrated on real data</span>
+  <h1>Product Classification 2.0</h1>
+  <p class="sub">Confidence-scored keyword rules, description pulled in only when the title can't decide, and AI reserved for the small tail that's left — calibrated against <strong>5,682 real Westtown products</strong> with <strong>500 blind-labeled ground-truth samples</strong>. Industry-agnostic by design: the same machinery covers cannabis, mushroom, kava, nicotine, kratom, and whatever comes next.</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="v">79.5%</div><div class="l">auto-classified by deterministic rules</div><div class="n">at the recommended threshold — no AI involved</div></div>
+    <div class="tile"><div class="v" style="color:#34d19a">97.8%</div><div class="l">COA-decision precision on auto-accepted products</div><div class="n">measured against blind labels</div></div>
+    <div class="tile"><div class="v">20.5%</div><div class="l">of products fall to the AI tail</div><div class="n">1,165 of 5,682 Westtown products</div></div>
+    <div class="tile"><div class="v">~$6</div><div class="l">AI cost to re-classify the entire platform</div><div class="n">62k products, batched Haiku 4.5</div></div>
+  </div>
+
+  <!-- ============================ PROBLEM ============================ -->
+  <h2><span class="kicker">01</span><br/>Why the current system needs this</h2>
+  <p>Classification drives COA requirements today and will drive legalization &amp; regulation requirements next. The keyword engine was the best possible pre-AI answer, and merchants name products however they like — we can't control that. Four structural problems showed up when we replayed the engine over Westtown's real book:</p>
+
+  <div class="panel">
+    <h3>Nearly half of Westtown's products aren't really classified at all</h3>
+    <div class="legend"><span><span class="sw" style="background:var(--s8)"></span>"Not Specified" fallback</span><span><span class="sw" style="background:var(--s1)"></span>Carrying a real classification</span><span><span class="sw" style="background:var(--s3)"></span>Rules replay finds a category for these today</span></div>
+    <svg viewBox="0 0 900 118" width="100%" height="118" role="img" aria-label="46 percent of Westtown products sit in Not Specified; the rules replay resolves 95 percent of them">
+      <text x="0" y="16" fill="#8892a4" font-size="12.5">Current stored state (5,682 products)</text>
+      <rect x="0" y="24" width="411" height="26" rx="4" fill="#e66767"><title>Not Specified: 2,604 products (46%)</title></rect>
+      <rect x="413" y="24" width="477" height="26" rx="4" fill="#3987e5"><title>Real classification stored: 3,022 products (53%)</title></rect>
+      <text x="10" y="42" fill="#0b0d11" font-size="12.5" font-weight="700">Not Specified — 2,604 (46%)</text>
+      <text x="423" y="42" fill="#0b0d11" font-size="12.5" font-weight="700">Classified — 3,022 (53%)</text>
+      <text x="0" y="80" fill="#8892a4" font-size="12.5">Same products, after replaying today's keyword rules</text>
+      <rect x="0" y="88" width="390" height="26" rx="4" fill="#199e70"><title>Replay finds a category for 2,473 of the 2,604 Not-Specified products (95%)</title></rect>
+      <rect x="392" y="88" width="21" height="26" rx="4" fill="#4a5568"><title>Still unmatched: 131</title></rect>
+      <rect x="415" y="88" width="475" height="26" rx="4" fill="#3987e5" opacity=".45"><title>Already classified</title></rect>
+      <text x="10" y="106" fill="#0b0d11" font-size="12.5" font-weight="700">Rules already resolve 2,473 of them (95%)</text>
+    </svg>
+    <p class="caption">Stored classifications are stale, not wrong: products were classified once at scan time and never re-run as the keyword rules matured. The engine already knows the answer for 95% of the "Not Specified" pile — nothing has asked it since.</p>
+  </div>
+
+  <div class="cols2">
+    <div class="panel"><h3>The confidence paradox</h3>
+      <p style="margin-top:2px">A product titled just <strong>"Lemonade"</strong> exactly matches a beverage keyword. The match is perfect — the <em>information</em> isn't. The title alone cannot say whether this is a hemp-infused drink that needs a COA or a plain drink that doesn't. Today the system treats that match with the same certainty as "Delta-8 Pre-Roll 1g." There is no notion of confidence anywhere.</p></div>
+    <div class="panel"><h3>Generic buckets punt the real question</h3>
+      <p style="margin-top:2px">Conditional categories (Beverages-style) defer the COA decision to a global keyword pool with no product context. In the calibrated sample, products landing in a conditional bucket <em>without</em> substance evidence got the COA call right only <strong>~50%</strong> of the time — a coin flip. That's the exact population confidence scoring routes to deeper checks.</p></div>
+    <div class="panel"><h3>First-win shadowing</h3>
+      <p style="margin-top:2px">Priority order is first-match-wins: a broad bucket high in the list silently swallows more specific ones below it. Measured: the single keyword <code>thca</code> inside Flower's list steals THCA <em>vapes, pre-rolls, diamonds and seeds</em> — about <strong>⅓ of all high-confidence category errors</strong> trace to this one cluster.</p></div>
+    <div class="panel"><h3>Two engines, two answers</h3>
+      <p style="margin-top:2px">The classifier is forked: the Admin API matches <strong>title only</strong>; the scanner matches <strong>name + breadcrumbs/meta</strong>, with different defaults. The same product can classify differently depending on which code path touched it last. Unifying this is step zero — no scoring work is trustworthy on a forked engine.</p></div>
+  </div>
+
+  <!-- ============================ ARCHITECTURE ============================ -->
+  <h2><span class="kicker">02</span><br/>The design — four tiers, one engine</h2>
+  <p>Deterministic rules stay in charge. Every product gets a <strong>confidence score</strong> computed from the match itself. High-confidence products are done — title only, no description risk, no AI cost. Everything else escalates one tier at a time. Manual overrides sit above all of it, untouched.</p>
+
+  <div class="panel">
+    <div class="flow">
+      <div class="tierbox"><div class="tt">Tier 1 — Deterministic rules + confidence score <span class="pill hi">title + scraped meta</span></div>
+        <div class="td2">Today's keyword engine, unified across both repos, evaluating <em>all</em> categories instead of stopping at the first hit. Confidence computed from keyword specificity, bucket generality, competing matches, exclusion proximity, substance evidence, and override history.</div>
+        <div class="tn" style="color:#34d19a">▸ 4,112 of 5,682 auto-accepted here (72.4%)</div></div>
+      <div class="arrow">▼ low confidence only</div>
+      <div class="tierbox"><div class="tt">Tier 2 — Description, gated <span class="pill md">only when Tier 1 can't decide</span></div>
+        <div class="td2">Same rules re-run over title + description. Because it only runs on products the title already failed, it can rescue a "Lemonade" but can never corrupt a confident title match — which is exactly the always-on misclassification risk that kept description out of the engine until now.</div>
+        <div class="tn" style="color:#e5a72e">▸ +405 more resolved (79.5% cumulative)</div></div>
+      <div class="arrow">▼ still unresolved</div>
+      <div class="tierbox"><div class="tt">Tier 3 — AI adjudication <span class="pill lo">the tail only</span></div>
+        <div class="td2">Batched LLM call against a <em>closed</em> taxonomy (our categories + product families — it cannot invent buckets), with title + description + page metadata, required to quote its evidence. Results stamped as AI-sourced, still AUTO — never touches a manual override.</div>
+        <div class="tn" style="color:#ef8f8f">▸ 1,165 products (20.5%) — ≈ $0.58 for all of Westtown</div></div>
+      <div class="arrow">▼ AI uncertain or contradictory</div>
+      <div class="tierbox"><div class="tt">Tier 4 — Human review queue</div>
+        <div class="td2">The existing review modal + weekly export loop, now fed by a "needs review" confidence filter instead of gut feel. Human decisions become MANUAL locks and future training signal.</div></div>
+    </div>
+  </div>
+
+  <!-- ============================ CONFIDENCE MODEL ============================ -->
+  <h2><span class="kicker">03</span><br/>What actually goes into the confidence score</h2>
+  <p>Every factor is computable from data the platform already has. Nothing here is a vibe — each one moved measured precision during calibration.</p>
+
+  <div class="panel">
+    <table>
+      <thead><tr><th style="width:210px">Factor</th><th>Signal</th><th>How "Lemonade" fails it</th></tr></thead>
+      <tbody>
+        <tr><td>Keyword specificity</td><td>How reliably this keyword's matches belong to its category — "pre roll" ≈ always right; "lemonade", "oil", "chocolate" split across regulated and plain products. Seeded from priors, then learned from labeled data.</td><td>"lemonade" is a low-discrimination keyword</td></tr>
+        <tr><td>Bucket generality</td><td>Landing in a conditional/generic category is the bucket itself admitting it can't decide → confidence capped unless substance evidence rescues it.</td><td>Beverages is a conditional bucket → capped</td></tr>
+        <tr><td>Competing matches</td><td>Two or more categories matched on different keywords → the rules disagree with themselves → penalty scaled by how close the runner-up is.</td><td>—</td></tr>
+        <tr><td>Exclusion proximity</td><td>An exclusion keyword fired somewhere nearby (another category, or a field Tier 1 doesn't consult) → the rule set is signalling ambiguity.</td><td>—</td></tr>
+        <tr><td>Substance evidence</td><td>Δ8/Δ9/THCA/CBD/mg-dosing/mushroom/kratom/nicotine tokens in the matched text corroborate → boost; lifts the conditional cap.</td><td>No substance token anywhere in "Lemonade"</td></tr>
+        <tr><td>Override history</td><td>How often humans manually overrode this keyword→category pairing in the past — free labels from the existing manual-adjustment trail.</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="caption">Two scores come out, deliberately separate: <strong>classification confidence</strong> (is the category right?) and <strong>COA-requirement confidence</strong> (is required/not-required right?). "Delta-9 Lemonade" can be fuzzy on category and near-certain on requirement — and the requirement is what compliance runs on.</p>
+  </div>
+
+  <div class="cols2">
+    <div class="example"><div class="t">"Delta-8 Pre-Roll 1g"</div>
+      <div class="path">Prerolls via <b>"pre roll"</b> (high-discrimination) · REQUIRED bucket · no competitors · substance token explained → <b style="color:#34d19a">HIGH — accepted at Tier 1.</b> Title only, description never read, zero AI cost.</div></div>
+    <div class="example"><div class="t">"Lemonade"</div>
+      <div class="path">Beverages via <b>"lemonade"</b> — an exact match, scored honestly: low-discrimination keyword + conditional bucket + no substance evidence → <b style="color:#ef8f8f">LOW.</b> Description pulled → "100mg Delta-9 per bottle" resolves it deterministically at Tier 2; a plain description sends it to AI. <b>The paradox is the point: exactness of match ≠ information in the title.</b></div></div>
+    <div class="example"><div class="t">"Delta-9 THC Lemonade 12-pack"</div>
+      <div class="path">Same keyword — but substance evidence fires → conditional cap lifted → <b style="color:#34d19a">HIGH, COA required.</b> Never needs the description at all.</div></div>
+    <div class="example"><div class="t">"Mushroom Gummies 500mg"</div>
+      <div class="path">Two categories match on different keywords (substance axis vs form axis colliding on one list) → competing-match penalty → <b style="color:#e5a72e">MEDIUM</b> → resolved by description or AI today, and by the <b>product-family axis</b> permanently (section 06).</div></div>
+  </div>
+
+  <!-- ============================ CALIBRATION ============================ -->
+  <h2><span class="kicker">04</span><br/>Calibration — measured, not assumed</h2>
+  <p>Method: the full production matcher was re-implemented faithfully and replayed over Westtown's book (5,682 active products, 54 merchants, 91% with descriptions). A stratified sample of <strong>500 products was blind-labeled</strong> — labelers saw only title + description, never the engine's answer — and every claim below is the engine measured against those labels.</p>
+
+  <div class="panel">
+    <h3>Precision by confidence decile</h3>
+    <div class="legend"><span><span class="sw" style="background:var(--s1)"></span>Category correct</span><span><span class="sw" style="background:var(--s3)"></span>COA decision correct</span></div>
+    <svg viewBox="0 0 900 260" width="100%" height="260" role="img" aria-label="Precision rises with confidence score; COA precision reaches 96 to 100 percent in upper deciles">
+      <!-- gridlines -->
+      <g stroke="#2a2f3a" stroke-width="1">
+        <line x1="60" y1="30" x2="880" y2="30"/><line x1="60" y1="80" x2="880" y2="80"/>
+        <line x1="60" y1="130" x2="880" y2="130"/><line x1="60" y1="180" x2="880" y2="180"/><line x1="60" y1="230" x2="880" y2="230"/>
+      </g>
+      <g fill="#8892a4" font-size="11">
+        <text x="52" y="34" text-anchor="end">100%</text><text x="52" y="84" text-anchor="end">75%</text>
+        <text x="52" y="134" text-anchor="end">50%</text><text x="52" y="184" text-anchor="end">25%</text><text x="52" y="234" text-anchor="end">0%</text>
+      </g>
+      <!-- deciles: [.2-.3) .. [.9-1.0) with n>=15; bar pairs; y = 230 - 200*p -->
+      <!-- 0.2-0.3: cat .106 coa .717 | 0.3-0.4: .741/.944 | 0.5-0.6: .519/.500 | 0.6-0.7: .786/.990 | 0.7-0.8: .833/1.0 | 0.8-0.9: .837/1.0 | 0.9-1.0: .866/.962 -->
+      <g>
+        <rect class="hv" x="80"  y="208.8" width="40" height="21.2" rx="4" fill="#3987e5" data-tip="0.2–0.3 · category 10.6% · n=47"/>
+        <rect class="hv" x="122" y="86.6"  width="40" height="143.4" rx="4" fill="#199e70" data-tip="0.2–0.3 · COA 71.7%"/>
+        <rect class="hv" x="196" y="81.8"  width="40" height="148.2" rx="4" fill="#3987e5" data-tip="0.3–0.4 · category 74.1% · n=58"/>
+        <rect class="hv" x="238" y="41.2"  width="40" height="188.8" rx="4" fill="#199e70" data-tip="0.3–0.4 · COA 94.4%"/>
+        <rect class="hv" x="312" y="126.2" width="40" height="103.8" rx="4" fill="#3987e5" data-tip="0.5–0.6 · category 51.9% · n=27 — the Lemonade zone"/>
+        <rect class="hv" x="354" y="130"   width="40" height="100" rx="4" fill="#199e70" data-tip="0.5–0.6 · COA 50% — coin-flip zone, routed to Tier 2/3"/>
+        <rect class="hv" x="428" y="72.8"  width="40" height="157.2" rx="4" fill="#3987e5" data-tip="0.6–0.7 · category 78.6% · n=98"/>
+        <rect class="hv" x="470" y="32"    width="40" height="198" rx="4" fill="#199e70" data-tip="0.6–0.7 · COA 99.0%"/>
+        <rect class="hv" x="544" y="63.4"  width="40" height="166.6" rx="4" fill="#3987e5" data-tip="0.7–0.8 · category 83.3% · n=24"/>
+        <rect class="hv" x="586" y="30"    width="40" height="200" rx="4" fill="#199e70" data-tip="0.7–0.8 · COA 100%"/>
+        <rect class="hv" x="660" y="62.6"  width="40" height="167.4" rx="4" fill="#3987e5" data-tip="0.8–0.9 · category 83.7% · n=43"/>
+        <rect class="hv" x="702" y="30"    width="40" height="200" rx="4" fill="#199e70" data-tip="0.8–0.9 · COA 100%"/>
+        <rect class="hv" x="776" y="56.8"  width="40" height="173.2" rx="4" fill="#3987e5" data-tip="0.9–1.0 · category 86.6% · n=157"/>
+        <rect class="hv" x="818" y="37.6"  width="40" height="192.4" rx="4" fill="#199e70" data-tip="0.9–1.0 · COA 96.2%"/>
+      </g>
+      <g fill="#8892a4" font-size="11" text-anchor="middle">
+        <text x="121" y="250">0.2–0.3</text><text x="237" y="250">0.3–0.4</text><text x="353" y="250">0.5–0.6</text>
+        <text x="469" y="250">0.6–0.7</text><text x="585" y="250">0.7–0.8</text><text x="701" y="250">0.8–0.9</text><text x="817" y="250">0.9–1.0</text>
+      </g>
+    </svg>
+    <p class="caption">The score is honest: precision climbs with confidence, and the 0.5–0.6 band — conditional buckets without substance evidence, the "Lemonade zone" — shows the coin-flip COA behavior the gating exists to catch. Deciles with n&lt;15 omitted.</p>
+  </div>
+
+  <div class="panel">
+    <h3>Choosing the operating point</h3>
+    <div class="legend"><span><span class="sw" style="background:var(--s3)"></span>COA precision above threshold</span><span><span class="sw" style="background:var(--s1)"></span>Category precision above threshold</span><span><span class="sw" style="background:var(--s2)"></span>Share of corpus escalated (tail)</span></div>
+    <svg viewBox="0 0 900 250" width="100%" height="250" role="img" aria-label="Threshold sweep: COA precision is flat near 97 percent from 0.6 upward while the tail grows; 0.6 is the recommended operating point">
+      <g stroke="#2a2f3a" stroke-width="1">
+        <line x1="60" y1="20" x2="880" y2="20"/><line x1="60" y1="70" x2="880" y2="70"/>
+        <line x1="60" y1="120" x2="880" y2="120"/><line x1="60" y1="170" x2="880" y2="170"/><line x1="60" y1="220" x2="880" y2="220"/>
+      </g>
+      <g fill="#8892a4" font-size="11">
+        <text x="52" y="24" text-anchor="end">100%</text><text x="52" y="74" text-anchor="end">75%</text>
+        <text x="52" y="124" text-anchor="end">50%</text><text x="52" y="174" text-anchor="end">25%</text><text x="52" y="224" text-anchor="end">0%</text>
+      </g>
+      <!-- x positions: T=.5(100) .55(190) .6(280) .65(370) .7(460) .75(550) .8(640) .85(730) .9(820); y=220-2*pct -->
+      <polyline fill="none" stroke="#199e70" stroke-width="2.5" points="100,31.4 190,30.2 280,24.4 370,25.2 460,25.4 550,26 640,26 730,26 820,27.6"/>
+      <polyline fill="none" stroke="#3987e5" stroke-width="2.5" points="100,57.8 190,53.8 280,53 370,52.4 460,48.6 550,48.8 640,48 730,48.4 820,46.8"/>
+      <polyline fill="none" stroke="#d95926" stroke-width="2.5" points="100,185.2 190,182 280,179 370,150.8 460,145.2 550,138 640,137.2 730,136.8 820,113.2"/>
+      <g>
+        <circle class="hv" cx="280" cy="24.4" r="7" fill="#199e70" stroke="#111318" stroke-width="2" data-tip="T=0.60 · COA precision 97.8%"/>
+        <circle class="hv" cx="280" cy="53"   r="7" fill="#3987e5" stroke="#111318" stroke-width="2" data-tip="T=0.60 · category precision 83.5%"/>
+        <circle class="hv" cx="280" cy="179"  r="7" fill="#d95926" stroke="#111318" stroke-width="2" data-tip="T=0.60 · tail 20.5% of corpus"/>
+        <circle class="hv" cx="640" cy="26"  r="5.5" fill="#199e70" stroke="#111318" stroke-width="2" data-tip="T=0.80 · COA 97.0%"/>
+        <circle class="hv" cx="640" cy="137.2" r="5.5" fill="#d95926" stroke="#111318" stroke-width="2" data-tip="T=0.80 · tail 41.4%"/>
+        <circle class="hv" cx="820" cy="113.2" r="5.5" fill="#d95926" stroke="#111318" stroke-width="2" data-tip="T=0.90 · tail 53.4%"/>
+      </g>
+      <line x1="280" y1="20" x2="280" y2="220" stroke="#3a4050" stroke-dasharray="4 4"/>
+      <text x="288" y="208" fill="#f1f5f9" font-size="12" font-weight="700">recommended T = 0.60</text>
+      <g fill="#8892a4" font-size="11" text-anchor="middle">
+        <text x="100" y="240">0.50</text><text x="190" y="240">0.55</text><text x="280" y="240">0.60</text><text x="370" y="240">0.65</text>
+        <text x="460" y="240">0.70</text><text x="550" y="240">0.75</text><text x="640" y="240">0.80</text><text x="730" y="240">0.85</text><text x="820" y="240">0.90</text>
+      </g>
+    </svg>
+    <p class="caption">The decisive finding: <strong>COA-decision precision is flat at ~97–98% from T=0.60 upward</strong> — raising the bar past 0.60 doubles the AI tail (20.5% → 41%+) while buying nothing on the compliance decision. T=0.60 auto-accepts 79.5% of the corpus at 97.8% COA precision.</p>
+  </div>
+
+  <div class="panel">
+    <h3>Where the remaining category errors live — and why they're the soft kind</h3>
+    <table>
+      <thead><tr><th>Error cluster (high-confidence band)</th><th class="num">Share</th><th>Compliance impact</th></tr></thead>
+      <tbody>
+        <tr><td><code>thca</code> in Flower's keywords steals THCA vapes / pre-rolls / diamonds / seeds</td><td class="num">~⅓ of errors</td><td><span class="pill hi">None — COA required either way</span></td></tr>
+        <tr><td>Adjacent-form disputes (Flower↔Prerolls, Concentrates↔Vaporizers)</td><td class="num">~⅓</td><td><span class="pill hi">None — same requirement</span></td></tr>
+        <tr><td>Marketing bleed ("tincture" on a pet product page, "balm" on a beverage)</td><td class="num">~⅕</td><td><span class="pill md">Low — caught by Tier 2/3</span></td></tr>
+        <tr><td>Genuinely wrong bucket</td><td class="num">rest</td><td><span class="pill lo">Real — the review queue's job</span></td></tr>
+      </tbody>
+    </table>
+    <p class="caption">Category precision at the operating point is 83.5% — but most misses are <em>adjacent-form</em> disagreements between two COA-required buckets, which is why the COA decision still lands at 97.8%. The <code>thca</code> cluster is one keyword edit away from fixed; this is exactly the weekly keyword-surgery loop, now fed by measured error clusters instead of complaints. We also tested auto-ranking the winner by keyword specificity instead of priority: it moved <em>more</em> products to high confidence but <em>diluted</em> precision (86% → 84%) — so it's rejected, and the honest fix stays keyword surgery. Negative results published on purpose.</p>
+  </div>
+
+  <!-- ============================ COST ============================ -->
+  <h2><span class="kicker">05</span><br/>Cost — the gate is the cost control, not the model</h2>
+  <p>Because ~80% of products never reach AI, the tail is small enough that model choice barely matters. Prices are current Claude API list prices with the 50% batch discount; a Tier-3 call is ~500 input + ~100 output tokens with the taxonomy prompt cached.</p>
+  <div class="panel">
+    <svg viewBox="0 0 900 210" width="100%" height="210" role="img" aria-label="Cost bars: Westtown tail 58 cents, platform tail about 6 dollars, premium-model options under 31 dollars">
+      <g fill="#8892a4" font-size="12.5">
+        <text x="0" y="30">Westtown tail (1,165 products, Haiku 4.5)</text>
+        <text x="0" y="80">Platform tail (~12,800 products, Haiku 4.5)</text>
+        <text x="0" y="130">Same platform tail on Sonnet-class</text>
+        <text x="0" y="180">One-time full-corpus ground-truth labeling (62k, Sonnet)</text>
+      </g>
+      <rect class="hv" x="330" y="16"  width="11"  height="20" rx="4" fill="#199e70" data-tip="≈ $0.58 — all of Westtown's AI tail"/>
+      <rect class="hv" x="330" y="66"  width="118" height="20" rx="4" fill="#3987e5" data-tip="≈ $6.40 — entire platform's AI tail, batched Haiku 4.5"/>
+      <rect class="hv" x="330" y="116" width="350" height="20" rx="4" fill="#c98500" data-tip="≈ $19 — if Haiku accuracy proves insufficient"/>
+      <rect class="hv" x="330" y="166" width="570" height="20" rx="4" fill="#d95926" data-tip="≈ $31 one-time — reference labels for calibration, not a recurring cost"/>
+      <g fill="#f1f5f9" font-size="12.5" font-weight="700">
+        <text x="349" y="31">$0.58</text><text x="456" y="81">$6.40</text><text x="688" y="131">~$19</text><text x="770" y="181" fill="#0b0d11" text-anchor="end">~$31 (one-time)</text>
+      </g>
+    </svg>
+    <p class="caption">Ongoing cost after backfill: only new and renamed products flow through the tiers — cents per day. Even a worst-case "run 100% of the platform through AI" scenario is ≈ $31 on Haiku. The design's real cost control is the confidence gate keeping 4 of 5 products deterministic.</p>
+  </div>
+
+  <!-- ============================ FAMILY ============================ -->
+  <h2><span class="kicker">06</span><br/>The product-family dependency — how "beverages + conditional" dies</h2>
+  <p>The endgame isn't "MCPD Beverages" as one more keyword bucket next to "Mushroom Beverages" and thirty others. It's <strong>two axes</strong>: <em>form</em> (what today's classifications already are — beverage, gummy, vape, pre-roll) stays generic on purpose, and <em>family</em> (the substance/regulatory regime — hemp-THC, CBD, mushroom, kava, nicotine, kratom, peptide) becomes its own dimension. "Cannabis beverage" is then a <em>derived display value</em>, not a maintained keyword list.</p>
+
+  <div class="cols2">
+    <div class="panel">
+      <h3>What family unlocks</h3>
+      <ul style="margin-left:18px">
+        <li><strong>Conditional COA disappears.</strong> Requirement resolves from a small family × form matrix (hemp-THC × any ingestible → required; none × beverage → not required) instead of a global keyword pool.</li>
+        <li><strong>Industry-agnostic for real.</strong> Onboarding kava or nicotine = adding a family row + lexicon + matrix rows. No category redesign, ever.</li>
+        <li><strong>Regulation layer.</strong> Legalization/regulation requirements key off family × jurisdiction — the second thing classifications must drive.</li>
+        <li><strong>Self-healing.</strong> COA-driven promotion: when a lab report later shows Δ9 &gt; 0.3%, the product's family upgrades automatically. The "Lemonade" whose COA arrives corrects itself.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Family signal is already in the data</h3>
+      <div class="legend"><span>Blind-label family distribution, Westtown sample (n=500)</span></div>
+      <svg viewBox="0 0 420 190" width="100%" height="190" role="img" aria-label="Family distribution: hemp THC 34 percent, none 36 percent, CBD 22 percent, mushroom 3 percent">
+        <g fill="#8892a4" font-size="12">
+          <text x="0" y="26">Hemp-THC (intoxicating)</text><text x="0" y="61">No active substance</text>
+          <text x="0" y="96">CBD (non-intoxicating)</text><text x="0" y="131">Mushroom</text><text x="0" y="166">Other / unknown</text>
+        </g>
+        <rect class="hv" x="170" y="12" width="171" height="18" rx="4" fill="#3987e5" data-tip="hemp_thc: 171 of 500 (34%)"/>
+        <rect class="hv" x="170" y="47" width="181" height="18" rx="4" fill="#4a5568" data-tip="none: 181 (36%) — apparel, hardware, plain goods"/>
+        <rect class="hv" x="170" y="82" width="112" height="18" rx="4" fill="#199e70" data-tip="cbd_non_intox: 112 (22%)"/>
+        <rect class="hv" x="170" y="117" width="14" height="18" rx="4" fill="#c98500" data-tip="mushroom (functional + psychoactive): 14 (3%)"/>
+        <rect class="hv" x="170" y="152" width="22" height="18" rx="4" fill="#d95926" data-tip="other_active + peptide + unknown: 22 (4%)"/>
+        <g fill="#f1f5f9" font-size="12" font-weight="700">
+          <text x="348" y="26">34%</text><text x="358" y="61">36%</text><text x="289" y="96">22%</text><text x="191" y="131">3%</text><text x="199" y="166">4%</text>
+        </g>
+      </svg>
+      <p class="caption">Labelers assigned a family confidently for 96% of products — the axis is recoverable from existing text. Tier-3 AI emits a family from day one, so family data accumulates before the axis formally ships.</p>
+    </div>
+  </div>
+  <div class="note"><b>Stated dependency:</b> Tiers 1–3 (confidence, gated description, AI tail) do <b>not</b> wait for product family — they ship against today's single axis and deliver the precision win now. What <b>does</b> wait for family is retiring generic-conditional buckets and the regulation layer. Family tables are already specified in the MCC/family engineering spec; this proposal consumes them, it doesn't redefine them.</div>
+
+  <!-- ============================ ROLLOUT ============================ -->
+  <h2><span class="kicker">07</span><br/>Rollout</h2>
+  <div class="panel">
+    <div class="phase"><div><div class="pn">P0</div></div><div><div class="pt">Shadow scoring — zero behavior change</div><div class="pd">Unify the forked matcher (with a golden parity test suite), compute + persist confidence on every classify/preview, surface it in the review modal and the weekly export. Assigned values stay bit-for-bit identical to today. Also fixes the stale-classification problem: re-running the engine re-classifies the "Not Specified" 46%.</div></div></div>
+    <div class="phase"><div><div class="pn">P1</div></div><div><div class="pt">Gated description + AI tail — flagged, per-company</div><div class="pd">Tier 2/3 behind a flag, Westtown first. New and renamed products flow through the tiers; backfill runs as an operator job. Thresholds sealed by the calibration loop below.</div></div></div>
+    <div class="phase"><div><div class="pn">P2</div></div><div><div class="pt">Product-family axis</div><div class="pd">Family tables + family × form requirement matrix + per-family lexicons; retire conditional COA; derived family × form display names ("Hemp Beverage", "Mushroom Gummies").</div></div></div>
+    <div class="phase"><div><div class="pn">P3</div></div><div><div class="pt">Regulation layer</div><div class="pd">Family × jurisdiction requirement rules — classification now drives legalization/regulation requirements with the same machinery.</div></div></div>
+  </div>
+
+  <!-- ============================ METHOD ============================ -->
+  <h2><span class="kicker">08</span><br/>Methodology &amp; honest caveats</h2>
+  <div class="panel">
+    <ul style="margin-left:18px">
+      <li><strong>Corpus:</strong> 5,682 active Westtown products (54 merchants) from the local platform snapshot; 91% carry descriptions (platform-wide: 96% of 62,479 products).</li>
+      <li><strong>Engine:</strong> faithful re-implementation of the production matcher — priority-ascending first-win, word-boundary keyword regex, exclusion veto, conditional keyword pool — extended with all-match tracing and the confidence score.</li>
+      <li><strong>Ground truth:</strong> 500-product stratified sample, blind-labeled (title + description only, never the engine's answer) by ten independent labeling passes; average labeler self-confidence 0.90. Category boundaries are genuinely fuzzy in places (a "THCA Diamond Infused Pre-Roll" is legitimately two things), which puts a ceiling on measurable category precision — but not on COA precision.</li>
+      <li><strong>Cleaned before measuring:</strong> the snapshot's rule set contained dev/test categories and duplicate buckets, which were removed/merged; the snapshot's manual-override rows turned out to be QA noise and were excluded — the override-history factor therefore runs neutral here and gets its real signal from production's clean audit trail.</li>
+      <li><strong>What production adds (deliberately still wanted):</strong> current keyword rules (they're refined weekly; the snapshot's are ~6 weeks stale), merchants onboarded since, and real manual-override history. The description-inclusive production SQL is written and ready — re-running this same harness on that extract is the final seal on the thresholds before anything flips on. If they hold across both datasets, that's stronger evidence than either alone.</li>
+      <li><strong>Precision target is a dial, not a law:</strong> T=0.60 is recommended (97.8% COA precision, 20.5% tail). If we want ≥99%, the sweep says the tail grows to ~40% and roughly doubles the (still tiny) AI cost — a product decision, made visible.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Prepared 2026-08-18 · Calibration: 5,682-product replay + 500 blind labels, local platform snapshot · Companion docs: description-inclusive production SQL + full engineering design (internal) · Prices: Claude API list, batch tier.
+  </footer>
+</div>
+<div class="tooltip" id="tt"></div>
+<script>
+  const tt=document.getElementById('tt');
+  document.querySelectorAll('.hv').forEach(el=>{
+    el.addEventListener('mousemove',e=>{tt.style.display='block';tt.textContent=el.dataset.tip;
+      const pad=14;let x=e.clientX+pad,y=e.clientY+pad;
+      const r=tt.getBoundingClientRect();
+      if(x+r.width>innerWidth-8)x=e.clientX-r.width-pad;
+      if(y+r.height>innerHeight-8)y=e.clientY-r.height-pad;
+      tt.style.left=x+'px';tt.style.top=y+'px';});
+    el.addEventListener('mouseleave',()=>{tt.style.display='none';});
+  });
+</script>
+</body>
+</html>
