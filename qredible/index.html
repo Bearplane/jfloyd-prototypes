@@ -261,6 +261,34 @@
 
   <div class="card-grid">
 
+    <!-- 2026-08-20 — Bundles: product structure + aggregate COA status (Product Compliance) -->
+
+    <a data-status="todo" data-category="product-compliance" data-date="2026-08-20"
+       href="qredible-tickets/bundles-product-compliance.html"
+       class="proto-card"
+       data-keywords="bundles bundle coa assignment level aggregate component products is_bundle pl_product_bundle_component product compliance kit composition picker create bundle derived status dashed chip expand collapse variants parent child kpi counts double counting quantity spec">
+      <div class="card-top">
+        <div class="card-icon">&#127873;</div>
+        <div class="card-meta">
+          <span class="card-category" onclick="event.preventDefault();filterByCategory('product-compliance')">Product Compliance</span>
+          <span class="card-ticket">SPEC &bull; SIGN-OFF</span>
+        </div>
+      </div>
+      <div class="card-name">Bundles &mdash; Product Structure &amp; Aggregate COA Status</div>
+      <p class="card-desc">Makes the long-declared <b>Bundle COA Assignment Level</b> finally work. Grounding: BUNDLE has lived in the enum + MySQL since release 3.20 but is explicitly <i>NOT wired</i> &mdash; no component relation exists, so a Bundle product renders a permanent "Missing (0)" placeholder and silently reads Compliant in the KPIs. Design: a minimal <b><code>is_bundle</code> identity flag</b> (not a new type taxonomy, not the classification) + an N:M <b>component table</b>; bundles compose from existing catalog products <b>or</b> products created for the bundle; the Bundle-level row becomes a true <b>aggregate</b> of member COA statuses (dashed multi-chip, worst-of disposition) reusing the shipped CHILD roll-up verbatim; expansion reuses the variant sub-row pattern; <b>zero double counting</b> &mdash; the KPI partition invariant is untouched. A bundle can still carry its own kit-level COA via level Individual.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">is_bundle flag</span>
+        <span class="pill pill-blue">Component table</span>
+        <span class="pill pill-yellow">Aggregate dashed chips</span>
+        <span class="pill pill-green">No double counting</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Aug 20, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
+
     <!-- 2026-08-19 - Classification 2.0: confidence-scored / description-gated / AI-tailed redesign (calibrated) -->
 
     <a data-status="todo" data-category="regulatory" data-date="2026-08-19"

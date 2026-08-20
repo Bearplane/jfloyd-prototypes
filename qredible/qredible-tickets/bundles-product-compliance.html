@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Trust — Bundles: Product Structure &amp; Aggregate COA Status Mockup</title>
+<style>
+  /* ── QT design tokens (from RTQ-Admin-UI styles/tokens.css, QP-4212 pipeline) ── */
+  :root{
+    --qt-surface-canvas:#F8FBFD; --qt-surface-raised:#FFFFFF; --qt-surface-sunken:#F1F5F9;
+    --qt-surface-rail:#F7F5FF; --qt-surface-selected:#EFF6FF; --qt-surface-hover:rgba(26,32,46,.04);
+    --qt-surface-brand:#1A202E;
+    --qt-text-primary:#1A202E; --qt-text-secondary:#4D5A78; --qt-text-muted:#657496;
+    --qt-text-on-brand:#FFFFFF; --qt-text-link:#2563EB;
+    --qt-border-subtle:#EBEDF2; --qt-border-default:#DDE2EA; --qt-border-strong:#B1B9CA; --qt-border-focus:#2563EB;
+    --qt-accent:#2563EB;
+    --qt-status-success-bg:#ECFDF5; --qt-status-success-fg:#065F46;
+    --qt-status-warning-bg:#FEF3C7; --qt-status-warning-fg:#92400E;
+    --qt-status-danger-bg:#FEE2E2;  --qt-status-danger-fg:#991B1B;
+    --qt-status-info-bg:#EFF6FF;    --qt-status-info-fg:#1E40AF;
+    --qt-status-neutral-bg:#EBEDF2; --qt-status-neutral-fg:#4D5A78;
+    --qt-kpi-compliant:#48D188; --qt-kpi-violative:#EE4040; --qt-kpi-missing:#ED834E;
+    --qt-legacy-link:#50A8FF; --qt-slate-muted:#64748B; --qt-ash:#989CA1;
+    --qt-panel-radius:8px; --qt-control-radius:6px; --qt-chip-radius:4px;
+    --qt-elev-1:0 1px 2px rgba(26,32,46,.05);
+    --qt-elev-2:0 4px 12px rgba(26,32,46,.08),0 1px 3px rgba(26,32,46,.06);
+    /* legacy chip colors (ProductDetailHelper.tsx) */
+    --chip-missing:#D32F2F; --chip-validated:#2E7D32; --chip-processing:#0288D1;
+    --chip-queue:#1A202E; --chip-review:#9C27B0; --chip-notreq:#1A202E; --chip-warn:#ED6C02;
+    --chip-unassigned:#ED834E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Uber Move",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       background:var(--qt-surface-canvas);color:var(--qt-text-primary);font-size:14px;line-height:1.45}
+
+  /* ── page chrome (mockup shell, not app) ── */
+  .topbar{background:#0b1e39;color:#fff;padding:14px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .topbar .logo{font-size:18px;font-weight:800;letter-spacing:.3px}
+  .topbar .logo span{color:#7fd1c0;font-weight:600}
+  .crumb{font-size:12.5px;color:#9db3d1}
+  .mock-banner{background:#FEF3C7;color:#92400E;border-bottom:1px solid #FDE68A;
+    padding:9px 28px;font-size:12.5px;font-weight:600}
+  .screen-nav{display:flex;gap:8px;padding:14px 28px 0;flex-wrap:wrap;max-width:1360px;margin:0 auto}
+  .screen-nav button{border:1px solid var(--qt-border-default);background:var(--qt-surface-raised);
+    color:var(--qt-text-secondary);font:inherit;font-size:13px;font-weight:600;padding:8px 14px;
+    border-radius:8px 8px 0 0;cursor:pointer}
+  .screen-nav button.on{background:var(--qt-surface-brand);color:#fff;border-color:var(--qt-surface-brand)}
+  .screen{display:none;max-width:1360px;margin:0 auto;padding:20px 28px 60px}
+  .screen.active{display:block}
+  .note{border:1.5px dashed #60A5FA;background:#EFF6FF;color:#1E40AF;border-radius:8px;
+    padding:10px 14px;font-size:12.5px;margin:14px 0;line-height:1.5}
+  .note b{color:#1E3A8A}
+  h2.sect{font-size:16px;font-weight:700;margin:26px 0 10px}
+  code{background:var(--qt-surface-sunken);border:1px solid var(--qt-border-subtle);
+    border-radius:4px;padding:1px 5px;font-size:12px;font-family:Consolas,Menlo,monospace}
+
+  /* ── faked app shell: rail + topbar + company bar ── */
+  .app{display:flex;border:1px solid var(--qt-border-default);border-radius:12px;overflow:hidden;
+    background:var(--qt-surface-canvas);box-shadow:var(--qt-elev-2);min-height:640px}
+  .rail{width:212px;flex:none;background:var(--qt-surface-rail);border-right:1px solid var(--qt-border-subtle);
+    padding:14px 10px;font-size:13px}
+  .rail .brand{font-weight:800;font-size:15px;padding:2px 8px 14px}
+  .rail .brand span{color:#1d7a6e}
+  .rail .grp{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--qt-text-muted);padding:12px 8px 4px}
+  .rail a{display:block;color:var(--qt-text-secondary);text-decoration:none;padding:6px 10px;
+    border-radius:var(--qt-control-radius);font-weight:500}
+  .rail a.on{background:var(--qt-surface-brand);color:#fff}
+  .rail a:not(.on):hover{background:var(--qt-surface-hover)}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .apptop{height:52px;background:var(--qt-surface-raised);border-bottom:1px solid var(--qt-border-subtle);
+    display:flex;align-items:center;gap:12px;padding:0 20px;font-size:13px;color:var(--qt-text-secondary)}
+  .apptop .bc b{color:var(--qt-text-primary)}
+  .apptop .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .avatar{width:26px;height:26px;border-radius:50%;background:#1d7a6e;color:#fff;font-size:11px;
+    font-weight:700;display:flex;align-items:center;justify-content:center}
+  .cobar{background:var(--qt-surface-raised);border-bottom:1px solid var(--qt-border-subtle);
+    display:flex;align-items:center;gap:12px;padding:8px 20px;min-height:46px}
+  .cobar .lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--qt-text-muted)}
+  .cobar .co{font-weight:700;font-size:14px}
+  .chip-active{background:var(--qt-status-success-bg);color:var(--qt-status-success-fg);
+    font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--qt-chip-radius)}
+  .body{padding:14px 20px 22px;overflow-x:auto}
+
+  /* ── KPI folder tabs + tiles ── */
+  .folders{display:flex;gap:4px;border-bottom:1px solid var(--qt-border-subtle);margin-bottom:10px}
+  .folders div{padding:7px 18px 6px;font-size:13px;font-weight:600;border-radius:8px 8px 0 0;margin-bottom:-1px}
+  .folders .on{background:var(--qt-surface-raised);color:var(--qt-text-primary);
+    border:1px solid var(--qt-border-subtle);border-bottom-color:var(--qt-surface-raised)}
+  .folders .off{background:var(--qt-surface-sunken);color:var(--qt-text-secondary)}
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px;min-width:900px}
+  .kpi{background:var(--qt-surface-raised);border:1px solid #e5e7eb;border-radius:8px;padding:7px 12px}
+  .kpi.sel{border-color:var(--qt-border-focus);background:var(--qt-surface-selected)}
+  .kpi .t{font-size:12px;font-weight:700;color:var(--qt-text-muted);display:flex;align-items:center;gap:6px}
+  .kpi .t i{width:8px;height:8px;border-radius:4px;display:inline-block;flex:none}
+  .kpi .n{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:1px}
+  .kpi .s{font-size:11px;font-weight:500;color:var(--qt-ash);margin-top:2px}
+
+  /* ── toolbar ── */
+  .toolrow{display:flex;gap:10px;align-items:center;margin-bottom:6px;min-width:900px}
+  .search{flex:1;display:flex;align-items:center;gap:8px;background:var(--qt-surface-raised);
+    border:1px solid var(--qt-border-default);border-radius:var(--qt-control-radius);padding:7px 12px;
+    color:var(--qt-text-muted);font-size:13px;min-width:320px}
+  .btn{background:var(--qt-surface-raised);border:1px solid var(--qt-border-default);
+    border-radius:var(--qt-control-radius);padding:7px 13px;font-size:13px;font-weight:600;
+    color:var(--qt-text-secondary);cursor:pointer;white-space:nowrap}
+  .btn.primary{background:var(--qt-surface-brand);color:#fff;border-color:var(--qt-surface-brand)}
+  .metarow{display:flex;gap:14px;align-items:center;font-size:12px;color:var(--qt-text-muted);margin:6px 0 8px;min-width:900px}
+  .metarow b{color:var(--qt-text-primary);font-weight:600}
+
+  /* ── table ── */
+  .tblwrap{overflow-x:auto;background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);
+    border-radius:var(--qt-panel-radius)}
+  table.pc{border-collapse:collapse;width:100%;min-width:1150px}
+  table.pc th{font-size:12px;font-weight:600;color:var(--qt-text-secondary);text-align:left;
+    background:var(--qt-surface-sunken);border-bottom:1px solid var(--qt-border-default);padding:8px 8px;white-space:nowrap}
+  table.pc td{font-size:13px;color:var(--qt-text-primary);border-bottom:1px solid var(--qt-border-subtle);
+    padding:6px 8px;vertical-align:middle}
+  tr.sub td{background:#F8FAFC}
+  tr.hl td{background:var(--qt-surface-selected)}
+  .imgbox{width:34px;height:34px;border-radius:8px;background:var(--qt-surface-sunken);
+    display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+  .pname{font-weight:600}
+  .sku{color:var(--qt-text-muted);font-size:12px}
+  .chev{cursor:pointer;color:var(--qt-text-muted);font-size:12px;user-select:none;width:18px;display:inline-block;text-align:center}
+  .kebab{color:var(--qt-text-muted);letter-spacing:1px;cursor:pointer}
+  .cb{width:14px;height:14px;border:1.5px solid var(--qt-border-strong);border-radius:3px;display:inline-block}
+
+  /* legacy outlined status chips (CoaStatusChip idiom) */
+  .pill{display:inline-block;background:#fff;border:1px solid;border-radius:16px;
+    font-weight:500;font-size:12px;line-height:20px;padding:0 6px;white-space:nowrap;margin:2px 2px 2px 0}
+  .pill.dash{border-style:dashed}
+  .p-val{color:var(--chip-validated);border-color:var(--chip-validated)}
+  .p-miss{color:var(--chip-missing);border-color:var(--chip-missing)}
+  .p-proc{color:var(--chip-processing);border-color:var(--chip-processing)}
+  .p-nr{color:var(--chip-notreq);border-color:var(--chip-notreq)}
+  .p-warn{color:var(--chip-warn);border-color:var(--chip-warn)}
+  .p-appr{color:var(--chip-validated);border-color:var(--chip-validated)}
+  .p-viol{color:var(--chip-missing);border-color:var(--chip-missing)}
+  .subline{font-size:11px;color:#94A3B8;margin-top:1px}
+
+  /* variant / bundle pills in Product Definition cell */
+  .vbox{display:inline-block;font-size:11px;font-weight:600;border-radius:var(--qt-chip-radius);
+    padding:1px 7px;margin-left:8px;vertical-align:1px}
+  .vbox.variant{background:var(--qt-status-neutral-bg);color:var(--qt-status-neutral-fg)}
+  .vbox.bundle{background:var(--qt-status-info-bg);color:var(--qt-status-info-fg);border:1px solid #BFDBFE}
+  .comp-affix{font-size:10.5px;font-weight:700;color:var(--qt-status-info-fg);background:var(--qt-status-info-bg);
+    border-radius:var(--qt-chip-radius);padding:1px 6px;margin-left:8px}
+  .qty{font-size:11.5px;color:var(--qt-text-muted);font-weight:600}
+
+  /* ── modal (screen 2) ── */
+  .modal-wrap{background:rgba(15,23,42,.45);border-radius:12px;padding:34px;display:flex;justify-content:center}
+  .modal{background:var(--qt-surface-raised);border-radius:12px;box-shadow:var(--qt-elev-2);
+    width:100%;max-width:760px;overflow:hidden}
+  .modal .mhead{padding:16px 22px;border-bottom:1px solid var(--qt-border-subtle);display:flex;align-items:center}
+  .modal .mhead h3{font-size:16px;font-weight:700}
+  .modal .mhead .x{margin-left:auto;color:var(--qt-text-muted);cursor:pointer}
+  .mtabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--qt-border-subtle);font-size:13px}
+  .mtabs div{padding:10px 14px;color:var(--qt-text-muted);font-weight:600}
+  .mtabs .on{color:var(--qt-text-primary);border-bottom:2px solid var(--qt-accent)}
+  .mbody{padding:18px 22px;max-height:none}
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-size:12px;font-weight:600;color:var(--qt-text-secondary);margin-bottom:5px}
+  .inp,.sel{width:100%;border:1px solid var(--qt-border-default);border-radius:var(--qt-control-radius);
+    padding:8px 11px;font:inherit;font-size:13px;color:var(--qt-text-primary);background:#fff}
+  .sel{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#657496 50%),linear-gradient(135deg,#657496 50%,transparent 50%);
+    background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+  .hint{font-size:11.5px;color:var(--qt-text-muted);margin-top:4px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .comp-panel{border:1px solid var(--qt-border-default);border-radius:var(--qt-panel-radius);overflow:hidden}
+  .comp-panel .ph{background:var(--qt-surface-sunken);padding:9px 14px;font-size:12.5px;font-weight:700;
+    display:flex;align-items:center}
+  .comp-row{display:flex;align-items:center;gap:10px;padding:8px 14px;border-top:1px solid var(--qt-border-subtle);font-size:13px}
+  .comp-row .grow{flex:1;min-width:0}
+  .qty-inp{width:52px;border:1px solid var(--qt-border-default);border-radius:var(--qt-control-radius);
+    padding:4px 6px;font:inherit;font-size:12.5px;text-align:center}
+  .rm{color:var(--qt-text-muted);cursor:pointer;font-size:15px}
+  .acresult{border:1px solid var(--qt-border-focus);border-radius:var(--qt-panel-radius);
+    box-shadow:var(--qt-elev-2);margin-top:6px;overflow:hidden}
+  .acresult .comp-row{border-top:none;border-bottom:1px solid var(--qt-border-subtle);cursor:pointer}
+  .acresult .comp-row:hover{background:var(--qt-surface-hover)}
+  .mfoot{padding:14px 22px;border-top:1px solid var(--qt-border-subtle);display:flex;gap:10px;justify-content:flex-end}
+
+  /* ── screen 3 matrices ── */
+  .card{background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);
+    border-radius:var(--qt-panel-radius);padding:16px 18px;margin-bottom:16px}
+  .card h3{font-size:14px;font-weight:700;margin-bottom:10px}
+  table.rules{border-collapse:collapse;width:100%}
+  table.rules th{font-size:12px;font-weight:600;color:var(--qt-text-secondary);text-align:left;
+    background:var(--qt-surface-sunken);padding:7px 10px;border-bottom:1px solid var(--qt-border-default)}
+  table.rules td{font-size:12.5px;padding:7px 10px;border-bottom:1px solid var(--qt-border-subtle);vertical-align:top}
+  .flowbox{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:8px 0}
+  .fnode{background:var(--qt-surface-sunken);border:1px solid var(--qt-border-default);border-radius:8px;
+    padding:8px 12px;font-size:12px;min-width:140px}
+  .fnode b{display:block;font-size:12.5px;margin-bottom:2px}
+  .arr{align-self:center;color:var(--qt-text-muted);font-weight:700}
+
+  /* prose (screen 4) */
+  .prose{max-width:880px;font-size:14px;line-height:1.62}
+  .prose h3{font-size:15px;font-weight:700;margin:22px 0 8px}
+  .prose p{margin-bottom:10px}
+  .prose ul{margin:0 0 10px 22px}
+  .prose li{margin-bottom:5px}
+  .footer{max-width:1360px;margin:0 auto;padding:0 28px 40px;font-size:12px;color:var(--qt-text-muted)}
+  .footer a{color:var(--qt-text-link)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Qredible <span>Q-Trust</span></div>
+  <div class="crumb">Q-Monitor &rsaquo; Product Compliance &rsaquo; <b>Bundles</b> &mdash; UI/UX proposal</div>
+</div>
+<div class="mock-banner">DESIGN MOCKUP — Bundles (product structure + aggregate COA status). Static illustration of proposed screens; all data is representative. Blue dashed boxes are design notes, not UI. Spec: qredible-brain docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md</div>
+
+<div class="screen-nav">
+  <button class="on" onclick="show(0,this)">1 &middot; Products table — bundle rows</button>
+  <button onclick="show(1,this)">2 &middot; Create Bundle — composition</button>
+  <button onclick="show(2,this)">3 &middot; Aggregate status &amp; counts</button>
+  <button onclick="show(3,this)">4 &middot; Full design explanation</button>
+</div>
+
+<!-- ════════════════════ SCREEN 1 ════════════════════ -->
+<div class="screen active">
+  <div class="note"><b>What changed on this screen:</b> two bundle rows in the Products table. A bundle renders exactly like a variant parent — chevron expand, member sub-rows — but with a <b>Bundle · N products</b> pill instead of the variants pill, and its COA Status is the <b>dashed aggregate</b> of its members. Everything else (columns, chips, KPI tiles, toolbar) is the app as it exists today in rail mode.</div>
+
+  <div class="app">
+    <div class="rail">
+      <div class="brand">Qredible <span>Q-Trust</span></div>
+      <div class="grp">My Business</div>
+      <a href="#" onclick="return false">MyCOA</a>
+      <a href="#" onclick="return false">Products &amp; Services</a>
+      <div class="grp">Monitoring</div>
+      <a href="#" onclick="return false">Dashboard</a>
+      <a href="#" onclick="return false">Findings</a>
+      <a class="on" href="#" onclick="return false">Product Compliance</a>
+      <a href="#" onclick="return false">We Monitor</a>
+      <a href="#" onclick="return false">Cases</a>
+      <a href="#" onclick="return false">Documents</a>
+    </div>
+    <div class="main">
+      <div class="apptop">
+        <span class="bc">Q-Monitor &rsaquo; <b>Product Compliance</b></span>
+        <div class="right"><span>&#128276;</span><div class="avatar">JD</div></div>
+      </div>
+      <div class="cobar">
+        <span class="lbl">Company</span><span class="co">Greenfield Botanicals</span>
+        <span class="chip-active">ACTIVE</span>
+      </div>
+      <div class="body">
+        <div class="folders"><div class="on">Products</div><div class="off">COAs</div></div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="t"><i style="background:var(--qt-legacy-link)"></i>Total Products</div>
+            <div class="n">42</div><div class="s">parent products &middot; +18 variants (60 total) &middot; incl. 2 bundles</div></div>
+          <div class="kpi"><div class="t"><i style="background:var(--qt-text-primary)"></i>Requires COA</div>
+            <div class="n">51</div><div class="s">of 60 total</div></div>
+          <div class="kpi"><div class="t"><i style="background:var(--qt-kpi-compliant)"></i>Compliant</div>
+            <div class="n">46</div><div class="s">of 60 total &middot; incl. 9 not requiring COA</div></div>
+          <div class="kpi"><div class="t"><i style="background:var(--qt-kpi-violative)"></i>Violative</div>
+            <div class="n">2</div><div class="s">of 51 requiring COA</div></div>
+          <div class="kpi"><div class="t"><i style="background:var(--qt-kpi-missing)"></i>Missing COA</div>
+            <div class="n">3</div><div class="s">of 51 requiring COA</div></div>
+          <div class="kpi"><div class="t"><i style="background:var(--qt-slate-muted)"></i>Inactive / Archived COAs</div>
+            <div class="n">4 <span style="font-size:13px;font-weight:500">inactive</span> &middot; 2 <span style="font-size:13px;font-weight:500">archived</span></div>
+            <div class="s">on file — not counted against products</div></div>
+        </div>
+
+        <div class="toolrow">
+          <div class="search">&#128269;&nbsp; Search products by definition, classification, SKU or COA file name...</div>
+          <button class="btn">Filter</button>
+          <button class="btn primary">Actions &#9662;</button>
+          <button class="btn">&#9881;</button>
+        </div>
+        <div class="metarow"><b>42 Products</b> <span>&middot; 18 variants &middot; 2 bundles</span>
+          <span style="margin-left:auto">Expand All &nbsp;|&nbsp; Collapse All &nbsp;&nbsp; Rows per page: 25</span></div>
+
+        <div class="tblwrap"><table class="pc">
+          <tr>
+            <th style="width:28px"><span class="cb"></span></th><th style="width:22px"></th><th style="width:42px"></th>
+            <th>SKU</th><th>Product Definition</th><th>Classification</th>
+            <th>COA Status</th><th>Disposition</th><th>COA Assignment Level</th><th>Sourced From /<br>Inherited From</th><th style="width:30px"></th>
+          </tr>
+
+          <!-- plain product -->
+          <tr>
+            <td><span class="cb"></span></td><td></td><td><div class="imgbox">&#129371;</div></td>
+            <td class="sku">GB-TINC-1000</td>
+            <td><span class="pname">Full Spectrum CBD Tincture 1000mg</span></td>
+            <td>Tinctures</td>
+            <td><span class="pill p-val">COA Validated</span></td>
+            <td><span class="pill p-appr">Approved</span></td>
+            <td>Individual</td><td>&mdash;</td>
+            <td class="kebab">&#8942;</td>
+          </tr>
+
+          <!-- variant parent (existing pattern, for contrast) -->
+          <tr>
+            <td><span class="cb"></span></td><td><span class="chev">&#9654;</span></td><td><div class="imgbox">&#127852;</div></td>
+            <td class="sku">GB-GUM</td>
+            <td><span class="pname">Delta-9 Gummies</span><span class="vbox variant">3 variants</span></td>
+            <td>Edibles</td>
+            <td><span class="pill p-val dash">COA Validated &#8629;</span></td>
+            <td><span class="pill p-appr">Approved</span></td>
+            <td>Child</td><td>&mdash;</td>
+            <td class="kebab">&#8942;</td>
+          </tr>
+
+          <!-- BUNDLE row, expanded -->
+          <tr class="hl">
+            <td><span class="cb"></span></td><td><span class="chev">&#9660;</span></td><td><div class="imgbox">&#127873;</div></td>
+            <td class="sku">GB-KIT-01</td>
+            <td><span class="pname">Relief Starter Kit</span><span class="vbox bundle">Bundle &middot; 4 products</span></td>
+            <td>Bundles</td>
+            <td>
+              <span class="pill p-val dash">COA Validated (3) &#8629;</span><span class="pill p-miss dash">Missing (1) &#8629;</span>
+              <div class="subline">derived from 4 component products</div>
+            </td>
+            <td><span class="pill p-warn">Pending Approval</span></td>
+            <td>Bundle</td><td>&mdash;</td>
+            <td class="kebab">&#8942;</td>
+          </tr>
+          <!-- components -->
+          <tr class="sub">
+            <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#129371;</div></td>
+            <td class="sku">GB-TINC-1000</td>
+            <td>Full Spectrum CBD Tincture 1000mg <span class="comp-affix">component</span> <span class="qty">&times;1</span></td>
+            <td>Tinctures</td>
+            <td><span class="pill p-val">COA Validated</span></td>
+            <td><span class="pill p-appr">Approved</span></td>
+            <td>Individual</td><td>&mdash;</td><td></td>
+          </tr>
+          <tr class="sub">
+            <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#129532;</div></td>
+            <td class="sku">GB-BALM-500</td>
+            <td>CBD Relief Balm 500mg <span class="comp-affix">component</span> <span class="qty">&times;2</span></td>
+            <td>Topicals</td>
+            <td><span class="pill p-val">COA Validated</span></td>
+            <td><span class="pill p-appr">Approved</span></td>
+            <td>Individual</td><td>&mdash;</td><td></td>
+          </tr>
+          <tr class="sub">
+            <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#127852;</div></td>
+            <td class="sku">GB-GUM-10</td>
+            <td>Delta-9 Gummies 10ct <span class="comp-affix">component</span> <span class="qty">&times;1</span></td>
+            <td>Edibles</td>
+            <td><span class="pill p-val dash">COA Validated &#8629;</span></td>
+            <td><span class="pill p-warn">Pending Approval</span></td>
+            <td>Parent</td><td>Delta-9 Gummies (GB-GUM)</td><td></td>
+          </tr>
+          <tr class="sub">
+            <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#128703;</div></td>
+            <td class="sku">GB-BATH-100</td>
+            <td>Lavender Bath Bomb 100mg <span class="comp-affix">component</span> <span class="qty">&times;1</span></td>
+            <td>Bath &amp; Body</td>
+            <td><span class="pill p-miss">Missing</span></td>
+            <td><span class="pill p-nr">N/A</span></td>
+            <td>Individual</td><td>&mdash;</td><td></td>
+          </tr>
+
+          <!-- BUNDLE with OWN COA (level = Individual) -->
+          <tr>
+            <td><span class="cb"></span></td><td><span class="chev">&#9654;</span></td><td><div class="imgbox">&#128230;</div></td>
+            <td class="sku">GB-SMP-4PK</td>
+            <td><span class="pname">Sampler 4-Pack</span><span class="vbox bundle">Bundle &middot; 3 products</span></td>
+            <td>Bundles</td>
+            <td><span class="pill p-val">COA Validated</span></td>
+            <td><span class="pill p-appr">Approved</span></td>
+            <td>Individual</td><td>&mdash;</td>
+            <td class="kebab">&#8942;</td>
+          </tr>
+
+          <!-- normal rows for context -->
+          <tr>
+            <td><span class="cb"></span></td><td></td><td><div class="imgbox">&#128062;</div></td>
+            <td class="sku">GB-PET-250</td>
+            <td><span class="pname">Calming Pet Drops 250mg</span></td>
+            <td>Pet Products</td>
+            <td><span class="pill p-proc">Processing</span></td>
+            <td><span class="pill p-nr">N/A</span></td>
+            <td>Individual</td><td>&mdash;</td>
+            <td class="kebab">&#8942;</td>
+          </tr>
+          <tr>
+            <td><span class="cb"></span></td><td></td><td><div class="imgbox">&#128085;</div></td>
+            <td class="sku">GB-TEE-L</td>
+            <td><span class="pname">Logo T-Shirt (L)</span></td>
+            <td>Merchandise</td>
+            <td><span class="pill p-nr">Not Required</span></td>
+            <td><span class="pill p-nr">N/A</span></td>
+            <td>Not Required</td><td>&mdash;</td>
+            <td class="kebab">&#8942;</td>
+          </tr>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><b>Row anatomy, called out:</b>
+    (1) <b>Relief Starter Kit</b> is <code>is_bundle=1, level=BUNDLE</code> — its COA Status is the dashed multi-chip aggregate <i>COA Validated (3) / Missing (1) ⤵</i> with a "derived from N component products" sub-line (same idiom as the existing "N inactive · M archived" sub-line). Disposition is worst-of across members (Pending here). No crosshair — the expand chevron <i>is</i> the go-to-source affordance, since a bundle has many sources.
+    (2) Component sub-rows show each member's <b>own real</b> chips (solid), its own assignment level — note the gummies component is itself <code>PARENT</code>-level and resolves through the existing chain — plus a <b>component</b> affix and <b>×qty</b>.
+    (3) <b>Sampler 4-Pack</b> is <code>is_bundle=1, level=INDIVIDUAL</code>: the kit carries its <b>own combined COA</b>, so it renders a solid chip and counts as a normal COA owner. Bundle identity (pill + expansion) is independent of COA level.
+    (4) Member products keep their untouched standalone rows (tincture appears both standalone and inside the kit) — no double counting, because the level-BUNDLE row stays outside the counted universe (see screen 3).
+    (5) KPI delta is one sub-label: "incl. 2 bundles" on Total Products (QP-4407 informational-split pattern). The partition invariant is untouched.</div>
+</div>
+
+<!-- ════════════════════ SCREEN 2 ════════════════════ -->
+<div class="screen">
+  <div class="note"><b>What this screen shows:</b> the "Create Bundle" flow. Entry point: <b>Actions ▾ → Create Bundle</b> next to Add Product. It is the existing Product Builder modal in <b>bundle mode</b>: Parent/Child fields are hidden (a bundle can't be either), the level dropdown is constrained, and a <b>Components</b> section appears with (a) a search-first catalog picker and (b) "+ New product for this bundle".</div>
+
+  <div class="modal-wrap"><div class="modal">
+    <div class="mhead"><h3>Create Bundle</h3><span class="x">&#10005;</span></div>
+    <div class="mtabs"><div class="on">Basic</div><div>Details</div><div>Attributes</div><div>Composition</div><div>Packaging</div></div>
+    <div class="mbody">
+      <div class="two">
+        <div class="fld"><label>SKU</label><input class="inp" value="GB-KIT-01"></div>
+        <div class="fld"><label>Classification</label>
+          <select class="sel"><option>Bundles</option></select>
+          <div class="hint">Auto-suggested; classification stays a normal category — bundle identity comes from the bundle flag, not the category.</div></div>
+      </div>
+      <div class="fld"><label>Title</label><input class="inp" value="Relief Starter Kit"></div>
+      <div class="two">
+        <div class="fld"><label>Does this product require a COA?</label>
+          <select class="sel"><option>Yes</option><option>No</option></select></div>
+        <div class="fld"><label>COA Assignment Level</label>
+          <select class="sel"><option>Bundle — derives status from component products</option><option>Individual — this kit has its own combined COA</option><option>Not Required — no COA needed</option></select>
+          <div class="hint">Bundles offer only these three. <b>Bundle</b> (default) aggregates member status; <b>Individual</b> lets the assembled kit carry its own COA. Bundle requires &ge;1 component to save.</div></div>
+      </div>
+
+      <div class="fld"><label>Components</label>
+        <div class="comp-panel">
+          <div class="ph">4 components <span style="margin-left:auto;font-weight:500;color:var(--qt-text-muted)">Qty</span></div>
+          <div class="comp-row"><div class="imgbox">&#129371;</div>
+            <div class="grow"><b>Full Spectrum CBD Tincture 1000mg</b> <span class="sku">GB-TINC-1000</span></div>
+            <span class="pill p-val">COA Validated</span><input class="qty-inp" value="1"><span class="rm">&#10005;</span></div>
+          <div class="comp-row"><div class="imgbox">&#129532;</div>
+            <div class="grow"><b>CBD Relief Balm 500mg</b> <span class="sku">GB-BALM-500</span></div>
+            <span class="pill p-val">COA Validated</span><input class="qty-inp" value="2"><span class="rm">&#10005;</span></div>
+          <div class="comp-row"><div class="imgbox">&#127852;</div>
+            <div class="grow"><b>Delta-9 Gummies 10ct</b> <span class="sku">GB-GUM-10</span></div>
+            <span class="pill p-val dash">COA Validated &#8629;</span><input class="qty-inp" value="1"><span class="rm">&#10005;</span></div>
+          <div class="comp-row"><div class="imgbox">&#128703;</div>
+            <div class="grow"><b>Lavender Bath Bomb 100mg</b> <span class="sku">GB-BATH-100</span></div>
+            <span class="pill p-miss">Missing</span><input class="qty-inp" value="1"><span class="rm">&#10005;</span></div>
+        </div>
+      </div>
+
+      <div class="fld"><label>Add a component</label>
+        <input class="inp" value="bath" placeholder="Search this company's catalog...">
+        <div class="acresult">
+          <div class="comp-row"><div class="imgbox">&#128703;</div>
+            <div class="grow"><b>Eucalyptus Bath Soak 200mg</b> <span class="sku">GB-BATH-200</span></div>
+            <span class="pill p-val">COA Validated</span></div>
+          <div class="comp-row"><div class="imgbox">&#129524;</div>
+            <div class="grow"><b>Bath Oil Sampler</b> <span class="sku">GB-OIL-SMP</span> <span class="vbox bundle" style="margin-left:6px">Bundle</span></div>
+            <span style="font-size:11.5px;color:var(--qt-text-muted)">bundles can't be components (v1)</span></div>
+          <div class="comp-row" style="color:var(--qt-text-link);font-weight:600">&#65291;&nbsp; New product for this bundle&hellip;</div>
+        </div>
+        <div class="hint">Search-first (no full-catalog fetch). Rich options show photo, SKU and current COA status. "+ New product" opens the standard add-product form and links the result as a component — it becomes a normal catalog row (that's where its COA gets uploaded), stamped <code>created_source = BUNDLE_COMPOSER</code>.</div>
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn">Cancel</button><button class="btn primary">Create Bundle</button></div>
+  </div></div>
+
+  <div class="note"><b>Editing an existing bundle:</b> same modal via Edit Product. Membership changes ride the existing <code>upsertProduct</code> write path (new <code>bundleComponents</code> DTO field beside <code>childProductIds</code>), so activity logging and permission gating come for free. Deleting a product that belongs to bundles is blocked with a friendly list of them (archive is allowed; archived components drop out of the aggregate with a muted note). Bundles cannot contain bundles in v1 — mirrors the single-level parent/child rule and keeps status resolution single-hop.</div>
+</div>
+
+<!-- ════════════════════ SCREEN 3 ════════════════════ -->
+<div class="screen">
+  <div class="note"><b>What this screen shows:</b> exactly how the aggregate is computed and how counts stay honest. This is design documentation rendered as UI-adjacent panels — the rules live in the spec; the visible surface is screens 1–2.</div>
+
+  <div class="card">
+    <h3>Aggregate resolution — the row carrying level = Bundle</h3>
+    <div class="flowbox">
+      <div class="fnode"><b>1 · Collect members</b>active, non-archived components of the bundle</div>
+      <div class="arr">&rarr;</div>
+      <div class="fnode"><b>2 · Resolve each member</b>use its <i>effective</i> COA status — Individual reads own COAs; Shared/Inherited/Parent resolve through the existing owner chain</div>
+      <div class="arr">&rarr;</div>
+      <div class="fnode"><b>3 · Fold</b>none require a COA &rarr; Not Required<br>any Missing/unresolvable &rarr; Missing surfaces<br>else representative status</div>
+      <div class="arr">&rarr;</div>
+      <div class="fnode"><b>4 · Disposition</b>worst-of across member COA pairs:<br>Violative &#8827; Rejected &#8827; Pending &#8827; Approved</div>
+    </div>
+    <table class="rules">
+      <tr><th>Members' effective states</th><th>Bundle row renders</th></tr>
+      <tr><td>All members COA Validated, all Approved</td><td><span class="pill p-val dash">COA Validated (4) &#8629;</span> &nbsp;<span class="pill p-appr">Approved</span></td></tr>
+      <tr><td>One member Missing (bath bomb)</td><td><span class="pill p-val dash">COA Validated (3) &#8629;</span><span class="pill p-miss dash">Missing (1) &#8629;</span> &nbsp;<span class="pill p-warn">Pending Approval</span></td></tr>
+      <tr><td>One member's COA Violative</td><td><span class="pill p-val dash">COA Validated (3) &#8629;</span><span class="pill p-miss dash">Missing (1) &#8629;</span> &nbsp;<span class="pill p-viol">Violative</span></td></tr>
+      <tr><td>No member requires a COA (merch gift set)</td><td><span class="pill p-nr">Not Required</span></td></tr>
+      <tr><td>Bundle set to level Individual instead</td><td><span class="pill p-val">COA Validated</span> — its <b>own</b> COA; members don't roll up</td></tr>
+    </table>
+    <div class="note" style="margin-bottom:0">This reuses the shipped CHILD parent roll-up verbatim (any-missing &rarr; Missing, else representative status; worst-of disposition) — swapping "variant children" for "bundle components". Dashed chips + ⤵ are the platform's existing "derived" vocabulary; per-status counts are the existing multi-chip idiom. Nothing new to learn.</div>
+  </div>
+
+  <div class="card">
+    <h3>Count reconciliation — no double counting, by construction</h3>
+    <table class="rules">
+      <tr><th>Row</th><th>Counted in Compliant / Violative / Missing partition?</th><th>Why</th></tr>
+      <tr><td>Component products (standalone rows)</td><td><b>Yes</b> — unchanged</td><td>They are real catalog products counting against their own (or owner's) COAs, exactly as today.</td></tr>
+      <tr><td>Bundle row, level = Bundle</td><td><b>No</b> — outside the counted universe</td><td>Owner stays NULL (today's SQL behavior, kept). Its red/green truth lives on the row chip and the expansion — counting it too would double-count every member COA.</td></tr>
+      <tr><td>Bundle row, level = Individual</td><td><b>Yes</b> — like any product</td><td>It owns a real COA for the assembled kit.</td></tr>
+    </table>
+    <p style="font-size:12.5px;margin-top:10px;color:var(--qt-text-secondary)">
+      The KPI partition invariant (<code>compliant + violative + rejected + missing = total &minus; archived &minus; removed</code>) is untouched.
+      The statistic gains an informational <code>bundleActiveCount</code> split — the same pattern the Total Products tile already uses for parents vs. variants —
+      surfacing as "&middot; incl. N bundles" in the sub-label. One honesty fix rides along: today a level-Bundle product silently folds into the
+      not-required bucket and <i>reads Compliant</i> even if a member is violative; with the aggregate wired, the row itself finally tells the truth.</p>
+  </div>
+
+  <div class="card">
+    <h3>Filter &amp; COAs-tab touchpoints</h3>
+    <table class="rules">
+      <tr><th>Surface</th><th>Delta</th></tr>
+      <tr><td>Filter panel</td><td>New facet <b>"Bundles only"</b> backed by the bundle flag (unambiguous — avoids overloading the "COA Level: Bundle" chip, which stays for level filtering).</td></tr>
+      <tr><td>COAs tab</td><td><b>No structural change.</b> A level-Bundle bundle owns no COA rows; a level-Individual bundle's COA appears normally with Product Assignment = the bundle.</td></tr>
+      <tr><td>Bulk edit</td><td>Bundle rows selectable for case/archive actions; excluded from level bulk-edit to Shared/Inherited (no single source), matching existing constraints.</td></tr>
+      <tr><td>Family-tree view (2026-08-19 spec)</td><td>Bundles slot in as a second edge type (bundle&rarr;components beside parent&rarr;variants) — flagged into that spec's Wave-4 endpoint so the aggregation query is written with both edges.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════ SCREEN 4 ════════════════════ -->
+<div class="screen">
+  <div class="prose">
+    <h3>Why a bundle flag, not a new product type taxonomy (and not the classification)</h3>
+    <p>Grounding correction first: there is <b>no "bundle" classification in code</b>. Classification in Q-Trust is a data-driven category list (<code>pl_category</code> rows); no category named Bundle exists in code or seed SQL. The only BUNDLE in the codebase is the <b>COA Assignment Level</b> value — declared, labeled ("Bundle — derives status from component products"), stored in MySQL since release 3.20, and explicitly marked <i>NOT wired</i> in the API: the component relation was left as an open decision, so a Bundle-level product today renders a permanent "Missing (0)" placeholder and silently reads Compliant in the KPIs. The product <code>type</code> column is a free-text cosmetic field (Broad/Full Spectrum) and can't carry structure.</p>
+    <p>Joseph's instinct — that COA level alone can't drive bundle logic — is confirmed by three code facts: (1) the requires-COA invariant coerces levels on every write, so a non-cannabis gift set would lose Bundle-ness on save; (2) the level is freely mutable from three surfaces, and composition rows must not be conjured or orphaned by a dropdown; (3) display and parent/child logic need identity independent of COA state. But a full new type <i>taxonomy</i> is more than the job needs. The smallest change that works, matching codebase idiom (<code>is_cannabis</code>, <code>is_archived</code>):</p>
+    <ul>
+      <li><b><code>pl_product.is_bundle</code></b> — structural identity flag, set at creation. Invariants: a bundle has no parent and is nobody's child; level <code>BUNDLE</code> becomes settable only on bundles (one-time healing script normalizes stray rows).</li>
+      <li><b><code>pl_product_bundle_component</code></b> — N:M join table (bundle, component, quantity, sort order; unique pair). A component may sit in many bundles; bundles-of-bundles are forbidden in v1, keeping aggregation single-hop like single-level parent/child.</li>
+      <li><b>The BUNDLE assignment level keeps its exact published meaning</b> and finally works: default for bundles requiring a COA, aggregate computed by a sibling branch to the shipped CHILD roll-up.</li>
+    </ul>
+
+    <h3>Composition — Joseph's (a) and (b)</h3>
+    <p>(a) <b>Pick from catalog</b>: search-first multi-select autocomplete (no full-catalog fetch), rich options with photo/SKU/COA chip, excluding self and other bundle rows. (b) <b>Create for the bundle</b>: "+ New product" opens the standard add-product form; the result is auto-linked as a component and remains a <b>normal catalog row</b> — that standalone row is exactly where its COA gets uploaded and managed. No shadow products, no hiding; provenance stamped via the created-source framework. Catalog products keep their standalone rows untouched while belonging to bundles.</p>
+
+    <h3>COAs for the bundle — validating the aggregate model</h3>
+    <p>Joseph's model holds: the row with the Bundle assignment level is an <b>aggregate of its members</b>. Each member contributes its <i>effective</i> status (Shared/Inherited/Parent members resolve through the existing owner chain — reused, never re-implemented). Fold rules: none-require → Not Required; any missing/unresolvable → Missing surfaces; else representative status. Disposition is worst-of. Rendered with the platform's existing derived vocabulary — dashed chips, ⤵, per-status counts, tooltip — and audited via expand-to-components. And the bundle <b>can</b> carry its own COA: set level Individual on the bundle (kit-level combined COA); identity and COA behavior are decoupled, so no new resolution semantics were invented.</p>
+
+    <h3>Least disruption, tallied</h3>
+    <p><b>New:</b> one column, one table, one DTO field, one roll-up branch beside an existing template, one informational statistic split, one modal section, one expansion branch, one pill. <b>Untouched:</b> the assignment-level enum (no new members), chain-walking constants, the KPI partition invariant, parent/child relations, member standalone rows, the COAs tab, every existing chip and column. <b>Fixed for free:</b> the Bundle "Missing (0)" placeholder and its silent Compliant fold.</p>
+
+    <h3>Open decisions</h3>
+    <ul>
+      <li><b>Quantity in v1?</b> Column + one input, ignored by COA logic. Recommend yes (Transact/EDR will want it).</li>
+      <li><b>Seed a "Bundle" category?</b> Recommend no — the flag backs an unambiguous "Bundles only" facet instead, avoiding the level/category naming collision.</li>
+      <li><b>Non-cannabis bundles?</b> Supported (level Not Required). Confirm desired.</li>
+      <li><b>Archiving a component in an active bundle</b> — v1 excludes it from the aggregate with a muted note (vs. blocking). Confirm.</li>
+      <li><b>"Bundles at risk" KPI sub-line</b> — recommend fast-follow once real data exists.</li>
+    </ul>
+
+    <h3>Build sequence (ticket-shaped)</h3>
+    <ul>
+      <li><b>B-1 API — identity + composition schema:</b> flag, join table, invariants, upsert DTO/handlers, healing script, listing RO fields.</li>
+      <li><b>B-2 API — aggregate status + statistic split:</b> Bundle roll-up branch, disposition worst-of, bundle counts (coordinate with the pending parent-split statistic work), export-text drive-by fix.</li>
+      <li><b>B-3 UI — create/edit bundle:</b> Actions ▾ entry, modal bundle mode, component picker + create-for-bundle, level constraints, dark-launch gate.</li>
+      <li><b>B-4 UI — table rendering:</b> Bundle pill, expansion, component sub-rows, aggregate chips, KPI sub-label, "Bundles only" facet.</li>
+      <li><b>B-5 Follow-ons:</b> "In N bundles" badge, at-risk KPI, family-tree edge type, quantity consumption downstream.</li>
+    </ul>
+    <p style="color:var(--qt-text-muted);font-size:12.5px">Everything downstream of B-1 keys off the identity-flag decision — it is the only true fork in the design.</p>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="https://jfloyd-qredible.netlify.app/">&larr; All Mockups</a> &nbsp;&middot;&nbsp;
+  Bundles — product structure &amp; aggregate COA status &nbsp;&middot;&nbsp; Aug 20, 2026 &nbsp;&middot;&nbsp;
+  Spec: qredible-brain <code>docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md</code> &nbsp;&middot;&nbsp;
+  All data representative.
+</div>
+
+<script>
+function show(i, btn){
+  document.querySelectorAll('.screen').forEach(function(s,idx){ s.classList.toggle('active', idx===i); });
+  document.querySelectorAll('.screen-nav button').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
