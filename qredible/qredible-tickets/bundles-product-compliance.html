@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q-Trust — Bundles: Product Structure &amp; Aggregate COA Status Mockup</title>
+<title>Q-Trust — Bundles: Product Type Taxonomy &amp; Aggregate COA Status Mockup (Rev 2)</title>
 <style>
   /* ── QT design tokens (from RTQ-Admin-UI styles/tokens.css, QP-4212 pipeline) ── */
   :root{
@@ -19,6 +19,7 @@
     --qt-status-danger-bg:#FEE2E2;  --qt-status-danger-fg:#991B1B;
     --qt-status-info-bg:#EFF6FF;    --qt-status-info-fg:#1E40AF;
     --qt-status-neutral-bg:#EBEDF2; --qt-status-neutral-fg:#4D5A78;
+    --qt-status-violet-bg:#F5F3FF;  --qt-status-violet-fg:#5B21B6;
     --qt-kpi-compliant:#48D188; --qt-kpi-violative:#EE4040; --qt-kpi-missing:#ED834E;
     --qt-legacy-link:#50A8FF; --qt-slate-muted:#64748B; --qt-ash:#989CA1;
     --qt-panel-radius:8px; --qt-control-radius:6px; --qt-chip-radius:4px;
@@ -27,7 +28,6 @@
     /* legacy chip colors (ProductDetailHelper.tsx) */
     --chip-missing:#D32F2F; --chip-validated:#2E7D32; --chip-processing:#0288D1;
     --chip-queue:#1A202E; --chip-review:#9C27B0; --chip-notreq:#1A202E; --chip-warn:#ED6C02;
-    --chip-unassigned:#ED834E;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:"Uber Move",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -50,7 +50,6 @@
   .note{border:1.5px dashed #60A5FA;background:#EFF6FF;color:#1E40AF;border-radius:8px;
     padding:10px 14px;font-size:12.5px;margin:14px 0;line-height:1.5}
   .note b{color:#1E3A8A}
-  h2.sect{font-size:16px;font-weight:700;margin:26px 0 10px}
   code{background:var(--qt-surface-sunken);border:1px solid var(--qt-border-subtle);
     border-radius:4px;padding:1px 5px;font-size:12px;font-family:Consolas,Menlo,monospace}
 
@@ -90,7 +89,6 @@
   .folders .off{background:var(--qt-surface-sunken);color:var(--qt-text-secondary)}
   .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px;min-width:900px}
   .kpi{background:var(--qt-surface-raised);border:1px solid #e5e7eb;border-radius:8px;padding:7px 12px}
-  .kpi.sel{border-color:var(--qt-border-focus);background:var(--qt-surface-selected)}
   .kpi .t{font-size:12px;font-weight:700;color:var(--qt-text-muted);display:flex;align-items:center;gap:6px}
   .kpi .t i{width:8px;height:8px;border-radius:4px;display:inline-block;flex:none}
   .kpi .n{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:1px}
@@ -111,7 +109,7 @@
   /* ── table ── */
   .tblwrap{overflow-x:auto;background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);
     border-radius:var(--qt-panel-radius)}
-  table.pc{border-collapse:collapse;width:100%;min-width:1150px}
+  table.pc{border-collapse:collapse;width:100%;min-width:1180px}
   table.pc th{font-size:12px;font-weight:600;color:var(--qt-text-secondary);text-align:left;
     background:var(--qt-surface-sunken);border-bottom:1px solid var(--qt-border-default);padding:8px 8px;white-space:nowrap}
   table.pc td{font-size:13px;color:var(--qt-text-primary);border-bottom:1px solid var(--qt-border-subtle);
@@ -139,14 +137,18 @@
   .p-viol{color:var(--chip-missing);border-color:var(--chip-missing)}
   .subline{font-size:11px;color:#94A3B8;margin-top:1px}
 
-  /* variant / bundle pills in Product Definition cell */
+  /* type + variant / bundle pills */
   .vbox{display:inline-block;font-size:11px;font-weight:600;border-radius:var(--qt-chip-radius);
     padding:1px 7px;margin-left:8px;vertical-align:1px}
   .vbox.variant{background:var(--qt-status-neutral-bg);color:var(--qt-status-neutral-fg)}
   .vbox.bundle{background:var(--qt-status-info-bg);color:var(--qt-status-info-fg);border:1px solid #BFDBFE}
+  .vbox.kit{background:var(--qt-status-violet-bg);color:var(--qt-status-violet-fg);border:1px solid #DDD6FE}
+  .vbox.container{background:transparent;color:var(--qt-text-muted);border:1px dashed var(--qt-border-strong)}
   .comp-affix{font-size:10.5px;font-weight:700;color:var(--qt-status-info-fg);background:var(--qt-status-info-bg);
     border-radius:var(--qt-chip-radius);padding:1px 6px;margin-left:8px}
   .qty{font-size:11.5px;color:var(--qt-text-muted);font-weight:600}
+  .tcell{font-size:12.5px}
+  .tcell small{display:block;font-size:10.5px;color:var(--qt-text-muted)}
 
   /* ── modal (screen 2) ── */
   .modal-wrap{background:rgba(15,23,42,.45);border-radius:12px;padding:34px;display:flex;justify-content:center}
@@ -158,7 +160,7 @@
   .mtabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--qt-border-subtle);font-size:13px}
   .mtabs div{padding:10px 14px;color:var(--qt-text-muted);font-weight:600}
   .mtabs .on{color:var(--qt-text-primary);border-bottom:2px solid var(--qt-accent)}
-  .mbody{padding:18px 22px;max-height:none}
+  .mbody{padding:18px 22px}
   .fld{margin-bottom:14px}
   .fld label{display:block;font-size:12px;font-weight:600;color:var(--qt-text-secondary);margin-bottom:5px}
   .inp,.sel{width:100%;border:1px solid var(--qt-border-default);border-radius:var(--qt-control-radius);
@@ -181,21 +183,43 @@
   .acresult .comp-row:hover{background:var(--qt-surface-hover)}
   .mfoot{padding:14px 22px;border-top:1px solid var(--qt-border-subtle);display:flex;gap:10px;justify-content:flex-end}
 
-  /* ── screen 3 matrices ── */
+  /* segmented type picker */
+  .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .seg div{border:1px solid var(--qt-border-default);border-radius:var(--qt-panel-radius);padding:9px 11px;cursor:pointer}
+  .seg div.on{border-color:var(--qt-border-focus);background:var(--qt-surface-selected)}
+  .seg b{display:block;font-size:12.5px}
+  .seg span{font-size:11px;color:var(--qt-text-muted);line-height:1.35;display:block;margin-top:2px}
+
+  /* ── cards / rule tables ── */
   .card{background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);
     border-radius:var(--qt-panel-radius);padding:16px 18px;margin-bottom:16px}
   .card h3{font-size:14px;font-weight:700;margin-bottom:10px}
-  table.rules{border-collapse:collapse;width:100%}
+  .rwrap{overflow-x:auto}
+  table.rules{border-collapse:collapse;width:100%;min-width:640px}
   table.rules th{font-size:12px;font-weight:600;color:var(--qt-text-secondary);text-align:left;
     background:var(--qt-surface-sunken);padding:7px 10px;border-bottom:1px solid var(--qt-border-default)}
   table.rules td{font-size:12.5px;padding:7px 10px;border-bottom:1px solid var(--qt-border-subtle);vertical-align:top}
   .flowbox{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:8px 0}
   .fnode{background:var(--qt-surface-sunken);border:1px solid var(--qt-border-default);border-radius:8px;
-    padding:8px 12px;font-size:12px;min-width:140px}
+    padding:8px 12px;font-size:12px;min-width:140px;flex:1}
   .fnode b{display:block;font-size:12.5px;margin-bottom:2px}
   .arr{align-self:center;color:var(--qt-text-muted);font-weight:700}
 
-  /* prose (screen 4) */
+  /* suggested-action card (screen 4) */
+  .sa-card{border:1px solid var(--qt-border-default);border-radius:var(--qt-panel-radius);
+    background:var(--qt-surface-raised);padding:12px 14px;margin:10px 0;max-width:640px}
+  .sa-card .sa-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+  .sa-conf{font-size:10px;font-weight:700;padding:1px 7px;border-radius:var(--qt-chip-radius)}
+  .sa-conf.low{background:var(--qt-status-warning-bg);color:var(--qt-status-warning-fg)}
+  .sa-conf.high{background:var(--qt-status-success-bg);color:var(--qt-status-success-fg)}
+  .sa-ev{font-size:11.5px;color:var(--qt-text-muted);margin:5px 0 8px}
+  .sa-row{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:4px 0;border-top:1px dashed var(--qt-border-subtle)}
+  .lvl{display:inline-block;color:#475569;border:1px solid #94a3b8;border-radius:16px;font-size:12px;
+    line-height:20px;padding:0 6px}
+  .sa-actions{display:flex;gap:8px;margin-top:10px}
+  .sa-actions .btn{padding:5px 11px;font-size:12px}
+
+  /* prose */
   .prose{max-width:880px;font-size:14px;line-height:1.62}
   .prose h3{font-size:15px;font-weight:700;margin:22px 0 8px}
   .prose p{margin-bottom:10px}
@@ -209,20 +233,21 @@
 
 <div class="topbar">
   <div class="logo">Qredible <span>Q-Trust</span></div>
-  <div class="crumb">Q-Monitor &rsaquo; Product Compliance &rsaquo; <b>Bundles</b> &mdash; UI/UX proposal</div>
+  <div class="crumb">Q-Monitor &rsaquo; Product Compliance &rsaquo; <b>Bundles</b> &mdash; UI/UX proposal (Rev 2)</div>
 </div>
-<div class="mock-banner">DESIGN MOCKUP — Bundles (product structure + aggregate COA status). Static illustration of proposed screens; all data is representative. Blue dashed boxes are design notes, not UI. Spec: qredible-brain docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md</div>
+<div class="mock-banner">DESIGN MOCKUP — Bundles Rev 2 (product TYPE taxonomy aligned to Q-Transact + aggregate COA status + scan auto-establish). Static illustration; all data is representative. Blue dashed boxes are design notes, not UI. Spec: qredible-brain docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md (rev 2)</div>
 
 <div class="screen-nav">
-  <button class="on" onclick="show(0,this)">1 &middot; Products table — bundle rows</button>
-  <button onclick="show(1,this)">2 &middot; Create Bundle — composition</button>
-  <button onclick="show(2,this)">3 &middot; Aggregate status &amp; counts</button>
-  <button onclick="show(3,this)">4 &middot; Full design explanation</button>
+  <button class="on" onclick="show(0,this)">1 &middot; Products table — types &amp; bundles</button>
+  <button onclick="show(1,this)">2 &middot; Create Bundle / Kit</button>
+  <button onclick="show(2,this)">3 &middot; Type taxonomy, containers &amp; counts</button>
+  <button onclick="show(3,this)">4 &middot; Auto-establish at ingestion</button>
+  <button onclick="show(4,this)">5 &middot; Full design explanation</button>
 </div>
 
 <!-- ════════════════════ SCREEN 1 ════════════════════ -->
 <div class="screen active">
-  <div class="note"><b>What changed on this screen:</b> two bundle rows in the Products table. A bundle renders exactly like a variant parent — chevron expand, member sub-rows — but with a <b>Bundle · N products</b> pill instead of the variants pill, and its COA Status is the <b>dashed aggregate</b> of its members. Everything else (columns, chips, KPI tiles, toolbar) is the app as it exists today in rail mode.</div>
+  <div class="note"><b>Rev 2 delta on this screen:</b> bundle is a <b>product TYPE</b> (Q-Transact-aligned: Simple / Variable / Bundle, with Kit = Bundle + is_kit), never a classification — the Classification column stays per-item and compliance-driving. New opt-in <b>Type</b> column; <b>Variable</b> parents get an explicit <i>container</i> affix; the <b>Relief Starter Kit</b> is type Bundle (aggregate COA), the <b>Sampler 4-Pack</b> is type <b>Kit</b> (own combined COA). Everything else is the live app in rail mode.</div>
 
   <div class="app">
     <div class="rail">
@@ -278,8 +303,8 @@
         <div class="tblwrap"><table class="pc">
           <tr>
             <th style="width:28px"><span class="cb"></span></th><th style="width:22px"></th><th style="width:42px"></th>
-            <th>SKU</th><th>Product Definition</th><th>Classification</th>
-            <th>COA Status</th><th>Disposition</th><th>COA Assignment Level</th><th>Sourced From /<br>Inherited From</th><th style="width:30px"></th>
+            <th>SKU</th><th>Product Definition</th><th>Type</th><th>Classification</th>
+            <th>COA Status</th><th>Disposition</th><th>COA Assignment Level</th><th style="width:30px"></th>
           </tr>
 
           <!-- plain product -->
@@ -287,22 +312,37 @@
             <td><span class="cb"></span></td><td></td><td><div class="imgbox">&#129371;</div></td>
             <td class="sku">GB-TINC-1000</td>
             <td><span class="pname">Full Spectrum CBD Tincture 1000mg</span></td>
+            <td class="tcell">Simple</td>
             <td>Tinctures</td>
             <td><span class="pill p-val">COA Validated</span></td>
             <td><span class="pill p-appr">Approved</span></td>
-            <td>Individual</td><td>&mdash;</td>
+            <td>Individual</td>
             <td class="kebab">&#8942;</td>
           </tr>
 
-          <!-- variant parent (existing pattern, for contrast) -->
+          <!-- VARIABLE container parent (existing variant pattern + explicit container) -->
           <tr>
             <td><span class="cb"></span></td><td><span class="chev">&#9654;</span></td><td><div class="imgbox">&#127852;</div></td>
             <td class="sku">GB-GUM</td>
-            <td><span class="pname">Delta-9 Gummies</span><span class="vbox variant">3 variants</span></td>
+            <td><span class="pname">Delta-9 Gummies</span><span class="vbox variant">3 variants</span><span class="vbox container">container</span></td>
+            <td class="tcell">Variable<small>explicit container</small></td>
             <td>Edibles</td>
             <td><span class="pill p-val dash">COA Validated &#8629;</span></td>
             <td><span class="pill p-appr">Approved</span></td>
-            <td>Child</td><td>&mdash;</td>
+            <td>Child</td>
+            <td class="kebab">&#8942;</td>
+          </tr>
+
+          <!-- non-container SIMPLE parent -->
+          <tr>
+            <td><span class="cb"></span></td><td><span class="chev">&#9654;</span></td><td><div class="imgbox">&#129380;</div></td>
+            <td class="sku">GB-SODA</td>
+            <td><span class="pname">Sparkling CBD Soda 12oz</span><span class="vbox variant">2 variants</span></td>
+            <td class="tcell">Simple<small>real product w/ variants</small></td>
+            <td>Beverages</td>
+            <td><span class="pill p-val">COA Validated</span></td>
+            <td><span class="pill p-appr">Approved</span></td>
+            <td>Individual</td>
             <td class="kebab">&#8942;</td>
           </tr>
 
@@ -311,84 +351,81 @@
             <td><span class="cb"></span></td><td><span class="chev">&#9660;</span></td><td><div class="imgbox">&#127873;</div></td>
             <td class="sku">GB-KIT-01</td>
             <td><span class="pname">Relief Starter Kit</span><span class="vbox bundle">Bundle &middot; 4 products</span></td>
-            <td>Bundles</td>
+            <td class="tcell">Bundle</td>
+            <td><span style="color:var(--qt-text-muted)">&mdash;</span></td>
             <td>
               <span class="pill p-val dash">COA Validated (3) &#8629;</span><span class="pill p-miss dash">Missing (1) &#8629;</span>
-              <div class="subline">derived from 4 component products</div>
+              <div class="subline">derived from 4 member products</div>
             </td>
             <td><span class="pill p-warn">Pending Approval</span></td>
-            <td>Bundle</td><td>&mdash;</td>
+            <td>Bundle</td>
             <td class="kebab">&#8942;</td>
           </tr>
-          <!-- components -->
+          <!-- members -->
           <tr class="sub">
             <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#129371;</div></td>
             <td class="sku">GB-TINC-1000</td>
-            <td>Full Spectrum CBD Tincture 1000mg <span class="comp-affix">component</span> <span class="qty">&times;1</span></td>
+            <td>Full Spectrum CBD Tincture 1000mg <span class="comp-affix">member</span> <span class="qty">&times;1</span></td>
+            <td class="tcell">Simple</td>
             <td>Tinctures</td>
             <td><span class="pill p-val">COA Validated</span></td>
             <td><span class="pill p-appr">Approved</span></td>
-            <td>Individual</td><td>&mdash;</td><td></td>
+            <td>Individual</td><td></td>
           </tr>
           <tr class="sub">
             <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#129532;</div></td>
             <td class="sku">GB-BALM-500</td>
-            <td>CBD Relief Balm 500mg <span class="comp-affix">component</span> <span class="qty">&times;2</span></td>
+            <td>CBD Relief Balm 500mg <span class="comp-affix">member</span> <span class="qty">&times;2</span></td>
+            <td class="tcell">Simple</td>
             <td>Topicals</td>
             <td><span class="pill p-val">COA Validated</span></td>
             <td><span class="pill p-appr">Approved</span></td>
-            <td>Individual</td><td>&mdash;</td><td></td>
+            <td>Individual</td><td></td>
           </tr>
           <tr class="sub">
             <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#127852;</div></td>
             <td class="sku">GB-GUM-10</td>
-            <td>Delta-9 Gummies 10ct <span class="comp-affix">component</span> <span class="qty">&times;1</span></td>
+            <td>Delta-9 Gummies 10ct <span class="comp-affix">member</span> <span class="qty">&times;1</span></td>
+            <td class="tcell">Simple<small>variant of GB-GUM</small></td>
             <td>Edibles</td>
             <td><span class="pill p-val dash">COA Validated &#8629;</span></td>
             <td><span class="pill p-warn">Pending Approval</span></td>
-            <td>Parent</td><td>Delta-9 Gummies (GB-GUM)</td><td></td>
+            <td>Parent</td><td></td>
           </tr>
           <tr class="sub">
             <td></td><td><span class="cb" style="margin-left:2px"></span></td><td><div class="imgbox">&#128703;</div></td>
             <td class="sku">GB-BATH-100</td>
-            <td>Lavender Bath Bomb 100mg <span class="comp-affix">component</span> <span class="qty">&times;1</span></td>
+            <td>Lavender Bath Bomb 100mg <span class="comp-affix">member</span> <span class="qty">&times;1</span></td>
+            <td class="tcell">Simple</td>
             <td>Bath &amp; Body</td>
             <td><span class="pill p-miss">Missing</span></td>
             <td><span class="pill p-nr">N/A</span></td>
-            <td>Individual</td><td>&mdash;</td><td></td>
+            <td>Individual</td><td></td>
           </tr>
 
-          <!-- BUNDLE with OWN COA (level = Individual) -->
+          <!-- KIT with OWN COA (BUNDLE + is_kit, level = Individual) -->
           <tr>
             <td><span class="cb"></span></td><td><span class="chev">&#9654;</span></td><td><div class="imgbox">&#128230;</div></td>
             <td class="sku">GB-SMP-4PK</td>
-            <td><span class="pname">Sampler 4-Pack</span><span class="vbox bundle">Bundle &middot; 3 products</span></td>
-            <td>Bundles</td>
+            <td><span class="pname">Sampler 4-Pack</span><span class="vbox kit">Kit &middot; 3 products</span></td>
+            <td class="tcell">Kit<small>Bundle + is_kit</small></td>
+            <td><span style="color:var(--qt-text-muted)">&mdash;</span></td>
             <td><span class="pill p-val">COA Validated</span></td>
             <td><span class="pill p-appr">Approved</span></td>
-            <td>Individual</td><td>&mdash;</td>
+            <td>Individual</td>
             <td class="kebab">&#8942;</td>
           </tr>
 
           <!-- normal rows for context -->
           <tr>
-            <td><span class="cb"></span></td><td></td><td><div class="imgbox">&#128062;</div></td>
-            <td class="sku">GB-PET-250</td>
-            <td><span class="pname">Calming Pet Drops 250mg</span></td>
-            <td>Pet Products</td>
-            <td><span class="pill p-proc">Processing</span></td>
-            <td><span class="pill p-nr">N/A</span></td>
-            <td>Individual</td><td>&mdash;</td>
-            <td class="kebab">&#8942;</td>
-          </tr>
-          <tr>
             <td><span class="cb"></span></td><td></td><td><div class="imgbox">&#128085;</div></td>
             <td class="sku">GB-TEE-L</td>
             <td><span class="pname">Logo T-Shirt (L)</span></td>
+            <td class="tcell">Simple</td>
             <td>Merchandise</td>
             <td><span class="pill p-nr">Not Required</span></td>
             <td><span class="pill p-nr">N/A</span></td>
-            <td>Not Required</td><td>&mdash;</td>
+            <td>Not Required</td>
             <td class="kebab">&#8942;</td>
           </tr>
         </table></div>
@@ -397,39 +434,49 @@
   </div>
 
   <div class="note"><b>Row anatomy, called out:</b>
-    (1) <b>Relief Starter Kit</b> is <code>is_bundle=1, level=BUNDLE</code> — its COA Status is the dashed multi-chip aggregate <i>COA Validated (3) / Missing (1) ⤵</i> with a "derived from N component products" sub-line (same idiom as the existing "N inactive · M archived" sub-line). Disposition is worst-of across members (Pending here). No crosshair — the expand chevron <i>is</i> the go-to-source affordance, since a bundle has many sources.
-    (2) Component sub-rows show each member's <b>own real</b> chips (solid), its own assignment level — note the gummies component is itself <code>PARENT</code>-level and resolves through the existing chain — plus a <b>component</b> affix and <b>×qty</b>.
-    (3) <b>Sampler 4-Pack</b> is <code>is_bundle=1, level=INDIVIDUAL</code>: the kit carries its <b>own combined COA</b>, so it renders a solid chip and counts as a normal COA owner. Bundle identity (pill + expansion) is independent of COA level.
-    (4) Member products keep their untouched standalone rows (tincture appears both standalone and inside the kit) — no double counting, because the level-BUNDLE row stays outside the counted universe (see screen 3).
-    (5) KPI delta is one sub-label: "incl. 2 bundles" on Total Products (QP-4407 informational-split pattern). The partition invariant is untouched.</div>
+    (1) <b>Type column</b> (opt-in, Identity group): Simple / Variable / Bundle / Kit — Q-Transact's exact vocabulary. Kit is stored as <code>product_type=BUNDLE, is_kit=1</code> and inflated for display, exactly as Q-Transact's admin UI does.
+    (2) <b>Delta-9 Gummies</b> is <code>VARIABLE</code>: an explicit <i>container</i> — the row isn't a real sellable product; its children are. Its COA level (Child) stays what it always was: the COA topology. <b>Sparkling CBD Soda</b> shows the other kind of parent — a real product (Simple) that happens to have variants; no container affix.
+    (3) <b>Relief Starter Kit</b> (type Bundle, level Bundle): dashed aggregate multi-chip from member effective statuses; worst-of disposition; classification is "—" — <b>bundle is not a classification</b>; family/classification live on each member and keep driving that member's compliance.
+    (4) Member sub-rows show each member's own solid chips, own classification, own level (the gummies member resolves through the existing Parent chain), plus <b>member</b> affix and <b>×qty</b>.
+    (5) <b>Sampler 4-Pack</b> (type Kit, level Individual): the assembled kit is one labeled unit carrying its <b>own combined COA</b> — solid chip, counts as a normal owner. Kit defaults to this; Bundle defaults to the aggregate. Either can switch via the level.
+    (6) No double counting: members count individually as today; a level-Bundle row stays outside the counted universe. The KPI delta is one informational sub-label.</div>
 </div>
 
 <!-- ════════════════════ SCREEN 2 ════════════════════ -->
 <div class="screen">
-  <div class="note"><b>What this screen shows:</b> the "Create Bundle" flow. Entry point: <b>Actions ▾ → Create Bundle</b> next to Add Product. It is the existing Product Builder modal in <b>bundle mode</b>: Parent/Child fields are hidden (a bundle can't be either), the level dropdown is constrained, and a <b>Components</b> section appears with (a) a search-first catalog picker and (b) "+ New product for this bundle".</div>
+  <div class="note"><b>Rev 2 delta:</b> the modal leads with a <b>Product Type</b> picker (Q-Transact's four choices). Bundle/Kit mode hides Parent/Child fields, shows the <b>Members</b> section, and constrains the COA level per type. Members must already exist in the catalog (Joseph's linking model, matching Q-Transact) — or be created on the spot via "+ New product", which makes a normal catalog row and links it.</div>
 
   <div class="modal-wrap"><div class="modal">
-    <div class="mhead"><h3>Create Bundle</h3><span class="x">&#10005;</span></div>
-    <div class="mtabs"><div class="on">Basic</div><div>Details</div><div>Attributes</div><div>Composition</div><div>Packaging</div></div>
+    <div class="mhead"><h3>Create Product</h3><span class="x">&#10005;</span></div>
+    <div class="mtabs"><div class="on">Basic</div><div>Details</div><div>Attributes</div><div>Members</div><div>Packaging</div></div>
     <div class="mbody">
+      <div class="fld"><label>Product Type</label>
+        <div class="seg">
+          <div><b>Simple</b><span>A single product. Default.</span></div>
+          <div><b>Variable</b><span>Container — the variants are the real products.</span></div>
+          <div class="on"><b>Bundle</b><span>Links existing catalog products sold together.</span></div>
+          <div><b>Kit</b><span>Bundle assembled &amp; labeled as one unit.</span></div>
+        </div>
+        <div class="hint">Same taxonomy as Q-Transact (<code>SIMPLE | VARIABLE | BUNDLE</code> + <code>is_kit</code>). Convertible only while the product has no parent, children, members, or COAs.</div>
+      </div>
       <div class="two">
         <div class="fld"><label>SKU</label><input class="inp" value="GB-KIT-01"></div>
         <div class="fld"><label>Classification</label>
-          <select class="sel"><option>Bundles</option></select>
-          <div class="hint">Auto-suggested; classification stays a normal category — bundle identity comes from the bundle flag, not the category.</div></div>
+          <select class="sel"><option>&mdash; (not applicable)</option></select>
+          <div class="hint"><b>Bundle is not a classification.</b> Family &amp; classification stay on each member and drive that member's compliance.</div></div>
       </div>
       <div class="fld"><label>Title</label><input class="inp" value="Relief Starter Kit"></div>
       <div class="two">
         <div class="fld"><label>Does this product require a COA?</label>
           <select class="sel"><option>Yes</option><option>No</option></select></div>
         <div class="fld"><label>COA Assignment Level</label>
-          <select class="sel"><option>Bundle — derives status from component products</option><option>Individual — this kit has its own combined COA</option><option>Not Required — no COA needed</option></select>
-          <div class="hint">Bundles offer only these three. <b>Bundle</b> (default) aggregates member status; <b>Individual</b> lets the assembled kit carry its own COA. Bundle requires &ge;1 component to save.</div></div>
+          <select class="sel"><option>Bundle — derives status from member products</option><option>Individual — this bundle has its own combined COA</option><option>Not Required — no COA needed</option></select>
+          <div class="hint">Bundle type defaults to the aggregate; <b>Kit defaults to Individual</b> (one labeled unit → its own combined COA). Both remain selectable — type picks the container mechanics, level picks the COA topology. Bundle level requires &ge;1 member.</div></div>
       </div>
 
-      <div class="fld"><label>Components</label>
+      <div class="fld"><label>Members</label>
         <div class="comp-panel">
-          <div class="ph">4 components <span style="margin-left:auto;font-weight:500;color:var(--qt-text-muted)">Qty</span></div>
+          <div class="ph">4 members <span style="margin-left:auto;font-weight:500;color:var(--qt-text-muted)">Qty</span></div>
           <div class="comp-row"><div class="imgbox">&#129371;</div>
             <div class="grow"><b>Full Spectrum CBD Tincture 1000mg</b> <span class="sku">GB-TINC-1000</span></div>
             <span class="pill p-val">COA Validated</span><input class="qty-inp" value="1"><span class="rm">&#10005;</span></div>
@@ -437,7 +484,7 @@
             <div class="grow"><b>CBD Relief Balm 500mg</b> <span class="sku">GB-BALM-500</span></div>
             <span class="pill p-val">COA Validated</span><input class="qty-inp" value="2"><span class="rm">&#10005;</span></div>
           <div class="comp-row"><div class="imgbox">&#127852;</div>
-            <div class="grow"><b>Delta-9 Gummies 10ct</b> <span class="sku">GB-GUM-10</span></div>
+            <div class="grow"><b>Delta-9 Gummies 10ct</b> <span class="sku">GB-GUM-10</span> <span class="sku" style="margin-left:6px">variant of GB-GUM</span></div>
             <span class="pill p-val dash">COA Validated &#8629;</span><input class="qty-inp" value="1"><span class="rm">&#10005;</span></div>
           <div class="comp-row"><div class="imgbox">&#128703;</div>
             <div class="grow"><b>Lavender Bath Bomb 100mg</b> <span class="sku">GB-BATH-100</span></div>
@@ -445,7 +492,7 @@
         </div>
       </div>
 
-      <div class="fld"><label>Add a component</label>
+      <div class="fld"><label>Add a member</label>
         <input class="inp" value="bath" placeholder="Search this company's catalog...">
         <div class="acresult">
           <div class="comp-row"><div class="imgbox">&#128703;</div>
@@ -453,116 +500,175 @@
             <span class="pill p-val">COA Validated</span></div>
           <div class="comp-row"><div class="imgbox">&#129524;</div>
             <div class="grow"><b>Bath Oil Sampler</b> <span class="sku">GB-OIL-SMP</span> <span class="vbox bundle" style="margin-left:6px">Bundle</span></div>
-            <span style="font-size:11.5px;color:var(--qt-text-muted)">bundles can't be components (v1)</span></div>
+            <span style="font-size:11.5px;color:var(--qt-text-muted)">bundles/kits can't be members</span></div>
           <div class="comp-row" style="color:var(--qt-text-link);font-weight:600">&#65291;&nbsp; New product for this bundle&hellip;</div>
         </div>
-        <div class="hint">Search-first (no full-catalog fetch). Rich options show photo, SKU and current COA status. "+ New product" opens the standard add-product form and links the result as a component — it becomes a normal catalog row (that's where its COA gets uploaded), stamped <code>created_source = BUNDLE_COMPOSER</code>.</div>
+        <div class="hint">Members must pre-exist (or be created here as normal catalog rows, stamped <code>created_source = BUNDLE_COMPOSER</code>). Only Simple/Variable products can be members — same no-nesting rule as Q-Transact's picker. Picking a Variable member means its own child roll-up feeds the aggregate; picking a specific variant is preferred when known.</div>
       </div>
     </div>
     <div class="mfoot"><button class="btn">Cancel</button><button class="btn primary">Create Bundle</button></div>
   </div></div>
 
-  <div class="note"><b>Editing an existing bundle:</b> same modal via Edit Product. Membership changes ride the existing <code>upsertProduct</code> write path (new <code>bundleComponents</code> DTO field beside <code>childProductIds</code>), so activity logging and permission gating come for free. Deleting a product that belongs to bundles is blocked with a friendly list of them (archive is allowed; archived components drop out of the aggregate with a muted note). Bundles cannot contain bundles in v1 — mirrors the single-level parent/child rule and keeps status resolution single-hop.</div>
+  <div class="note"><b>Editing:</b> same modal via Edit Product; membership rides <code>upsertProduct</code> (new <code>bundleMembers</code> DTO field) so activity logging and permissions come free. Deleting a member of a bundle is blocked with a friendly bundle list; archiving is allowed (member drops out of the aggregate with a muted note). Q-Transact locks type after creation; Q-Trust allows conversion while structurally empty — scan-built catalogs need correction room.</div>
 </div>
 
 <!-- ════════════════════ SCREEN 3 ════════════════════ -->
 <div class="screen">
-  <div class="note"><b>What this screen shows:</b> exactly how the aggregate is computed and how counts stay honest. This is design documentation rendered as UI-adjacent panels — the rules live in the spec; the visible surface is screens 1–2.</div>
+  <div class="note"><b>What this screen shows:</b> the type taxonomy, the container reconciliation with COA levels, the aggregate rules, and count honesty. Design documentation rendered as panels — the visible product surface is screens 1–2.</div>
+
+  <div class="card">
+    <h3>Product-type taxonomy — mirrored from Q-Transact</h3>
+    <div class="rwrap"><table class="rules">
+      <tr><th>Type</th><th>Storage</th><th>Meaning</th><th>COA levels allowed</th></tr>
+      <tr><td><b>Simple</b> (default)</td><td><code>SIMPLE</code></td><td>A real product — standalone, a variant child, or a parent that is itself sellable</td><td>Individual, Not Required, Shared, Inherited, Parent</td></tr>
+      <tr><td><b>Variable</b></td><td><code>VARIABLE</code></td><td><b>Explicit container</b> — the row isn't a real product; the children are (Q-Transact: variants are the sellable units)</td><td>Child (children hold COAs) · Individual (container holds the family COA; children use Parent) · Not Required</td></tr>
+      <tr><td><b>Bundle</b></td><td><code>BUNDLE</code>, <code>is_kit=0</code></td><td>Links existing catalog products sold together; members individually labeled</td><td><b>Bundle</b> (aggregate, default) · Individual · Not Required</td></tr>
+      <tr><td><b>Kit</b></td><td><code>BUNDLE</code>, <code>is_kit=1</code></td><td>Same composite, <b>assembled &amp; labeled as one unit</b> (Q-Transact: one combined label artwork, stricter publish gate)</td><td><b>Individual</b> (own combined COA, default) · Bundle · Not Required</td></tr>
+    </table></div>
+    <div class="note" style="margin-bottom:0"><b>Bundle vs Kit, resolved from Q-Transact's code:</b> commerce-mechanically identical (same member table, both explode into member order lines, neither separately stocked). The real difference is <b>assembly/labeling</b> — a Kit composes member labels into one artwork and can't publish until every member is published &amp; labeled. That maps 1:1 onto COAs: members individually labeled → aggregate their COAs (Bundle); assembled into one labeled unit → it plausibly has its own combined COA (Kit → Individual default). Defaults, not rules — the level stays selectable.</div>
+  </div>
+
+  <div class="card">
+    <h3>The container question — explicit at last</h3>
+    <div class="rwrap"><table class="rules">
+      <tr><th>Today (inferred)</th><th>Rev 2 (explicit)</th></tr>
+      <tr><td>Parent with COA level <b>Child</b> ⇒ probably a container whose children hold COAs</td><td>Type <b>Variable</b> marks the container; level Child keeps meaning "children hold COAs, roll up"</td></tr>
+      <tr><td>Children with level <b>Parent</b> ⇒ probably a container holding the family COA</td><td>Type <b>Variable</b> + container level <b>Individual</b>; children keep level Parent (QP-4145 auto-source)</td></tr>
+      <tr><td>Parent that is itself a real product — indistinguishable</td><td>Type <b>Simple</b> with children; no container affix</td></tr>
+    </table></div>
+    <p style="font-size:12.5px;margin-top:10px;color:var(--qt-text-secondary)">
+      Backfill: a one-time script converts the two unambiguous patterns (level-Child parents; all-children-Parent families) to Variable; the ambiguous tail becomes
+      "mark as container?" suggestions through the existing Tidy Up engine — humans adjudicate, scripts don't guess. Type = structure; level = COA topology. Neither steals the other's job.</p>
+  </div>
 
   <div class="card">
     <h3>Aggregate resolution — the row carrying level = Bundle</h3>
     <div class="flowbox">
-      <div class="fnode"><b>1 · Collect members</b>active, non-archived components of the bundle</div>
+      <div class="fnode"><b>1 · Collect members</b>active, non-archived rows of <code>pl_product_bundle</code></div>
       <div class="arr">&rarr;</div>
-      <div class="fnode"><b>2 · Resolve each member</b>use its <i>effective</i> COA status — Individual reads own COAs; Shared/Inherited/Parent resolve through the existing owner chain</div>
+      <div class="fnode"><b>2 · Resolve each member</b>its <i>effective</i> status — Individual reads own COAs; Shared/Inherited/Parent resolve through the existing owner chain; a Variable member contributes its child roll-up</div>
       <div class="arr">&rarr;</div>
       <div class="fnode"><b>3 · Fold</b>none require a COA &rarr; Not Required<br>any Missing/unresolvable &rarr; Missing surfaces<br>else representative status</div>
       <div class="arr">&rarr;</div>
       <div class="fnode"><b>4 · Disposition</b>worst-of across member COA pairs:<br>Violative &#8827; Rejected &#8827; Pending &#8827; Approved</div>
     </div>
-    <table class="rules">
+    <div class="rwrap"><table class="rules">
       <tr><th>Members' effective states</th><th>Bundle row renders</th></tr>
       <tr><td>All members COA Validated, all Approved</td><td><span class="pill p-val dash">COA Validated (4) &#8629;</span> &nbsp;<span class="pill p-appr">Approved</span></td></tr>
       <tr><td>One member Missing (bath bomb)</td><td><span class="pill p-val dash">COA Validated (3) &#8629;</span><span class="pill p-miss dash">Missing (1) &#8629;</span> &nbsp;<span class="pill p-warn">Pending Approval</span></td></tr>
       <tr><td>One member's COA Violative</td><td><span class="pill p-val dash">COA Validated (3) &#8629;</span><span class="pill p-miss dash">Missing (1) &#8629;</span> &nbsp;<span class="pill p-viol">Violative</span></td></tr>
       <tr><td>No member requires a COA (merch gift set)</td><td><span class="pill p-nr">Not Required</span></td></tr>
-      <tr><td>Bundle set to level Individual instead</td><td><span class="pill p-val">COA Validated</span> — its <b>own</b> COA; members don't roll up</td></tr>
-    </table>
-    <div class="note" style="margin-bottom:0">This reuses the shipped CHILD parent roll-up verbatim (any-missing &rarr; Missing, else representative status; worst-of disposition) — swapping "variant children" for "bundle components". Dashed chips + ⤵ are the platform's existing "derived" vocabulary; per-status counts are the existing multi-chip idiom. Nothing new to learn.</div>
+      <tr><td>Kit at level Individual instead</td><td><span class="pill p-val">COA Validated</span> — its <b>own</b> combined COA; members don't roll up</td></tr>
+    </table></div>
+    <div class="note" style="margin-bottom:0">Reuses the shipped CHILD parent roll-up verbatim, swapping variant children for bundle members. Each member's family/classification keeps driving <i>that member's</i> compliance — the bundle aggregates outcomes, never determinations. Dashed chips + ⤵ are the platform's existing "derived" vocabulary.</div>
   </div>
 
   <div class="card">
     <h3>Count reconciliation — no double counting, by construction</h3>
-    <table class="rules">
-      <tr><th>Row</th><th>Counted in Compliant / Violative / Missing partition?</th><th>Why</th></tr>
-      <tr><td>Component products (standalone rows)</td><td><b>Yes</b> — unchanged</td><td>They are real catalog products counting against their own (or owner's) COAs, exactly as today.</td></tr>
-      <tr><td>Bundle row, level = Bundle</td><td><b>No</b> — outside the counted universe</td><td>Owner stays NULL (today's SQL behavior, kept). Its red/green truth lives on the row chip and the expansion — counting it too would double-count every member COA.</td></tr>
-      <tr><td>Bundle row, level = Individual</td><td><b>Yes</b> — like any product</td><td>It owns a real COA for the assembled kit.</td></tr>
-    </table>
+    <div class="rwrap"><table class="rules">
+      <tr><th>Row</th><th>In the Compliant / Violative / Missing partition?</th><th>Why</th></tr>
+      <tr><td>Member products (standalone rows)</td><td><b>Yes</b> — unchanged</td><td>Real catalog products counting against their own (or owner's) COAs, exactly as today.</td></tr>
+      <tr><td>Bundle row, level = Bundle</td><td><b>No</b> — outside the counted universe</td><td>Owner stays NULL (today's SQL, kept). Counting it would double-count every member COA. Its truth lives on the row chip + expansion.</td></tr>
+      <tr><td>Bundle/Kit row, level = Individual</td><td><b>Yes</b> — like any product</td><td>It owns a real combined COA.</td></tr>
+      <tr><td>Variable container</td><td>Per its level — unchanged from today's Child / Parent behavior</td><td>Type adds no count semantics.</td></tr>
+    </table></div>
     <p style="font-size:12.5px;margin-top:10px;color:var(--qt-text-secondary)">
-      The KPI partition invariant (<code>compliant + violative + rejected + missing = total &minus; archived &minus; removed</code>) is untouched.
-      The statistic gains an informational <code>bundleActiveCount</code> split — the same pattern the Total Products tile already uses for parents vs. variants —
-      surfacing as "&middot; incl. N bundles" in the sub-label. One honesty fix rides along: today a level-Bundle product silently folds into the
-      not-required bucket and <i>reads Compliant</i> even if a member is violative; with the aggregate wired, the row itself finally tells the truth.</p>
-  </div>
-
-  <div class="card">
-    <h3>Filter &amp; COAs-tab touchpoints</h3>
-    <table class="rules">
-      <tr><th>Surface</th><th>Delta</th></tr>
-      <tr><td>Filter panel</td><td>New facet <b>"Bundles only"</b> backed by the bundle flag (unambiguous — avoids overloading the "COA Level: Bundle" chip, which stays for level filtering).</td></tr>
-      <tr><td>COAs tab</td><td><b>No structural change.</b> A level-Bundle bundle owns no COA rows; a level-Individual bundle's COA appears normally with Product Assignment = the bundle.</td></tr>
-      <tr><td>Bulk edit</td><td>Bundle rows selectable for case/archive actions; excluded from level bulk-edit to Shared/Inherited (no single source), matching existing constraints.</td></tr>
-      <tr><td>Family-tree view (2026-08-19 spec)</td><td>Bundles slot in as a second edge type (bundle&rarr;components beside parent&rarr;variants) — flagged into that spec's Wave-4 endpoint so the aggregation query is written with both edges.</td></tr>
-    </table>
+      The partition invariant (<code>compliant + violative + rejected + missing = total &minus; archived &minus; removed</code>) is untouched. The statistic gains an
+      informational <code>bundleActiveCount</code> split (same pattern as the parents-vs-variants split on the Total Products tile). One honesty fix rides along:
+      today a level-Bundle product silently folds into not-required and <i>reads Compliant</i> even with a violative member; with the aggregate wired, the row tells the truth.</p>
   </div>
 </div>
 
 <!-- ════════════════════ SCREEN 4 ════════════════════ -->
 <div class="screen">
+  <div class="note"><b>What this screen shows:</b> auto-establishing types, containers, and bundle membership at scan ingestion — what's automatic on day one, what arrives as a suggestion, and what needs the spider contract widened. Grounded in the real pipeline: ingestion is 100% Zyte-schema; platform product types (Woo bundle/grouped, Shopify types) are currently discarded <i>upstream</i> of Middleware; parent/child comes only from explicit variant data.</div>
+
+  <div class="card">
+    <h3>What happens at scan time, staged by evidence strength</h3>
+    <div class="rwrap"><table class="rules">
+      <tr><th>Signal</th><th>Action</th><th>Confidence &amp; gate</th></tr>
+      <tr><td>Page has explicit <code>variants[]</code> (platform variant data)</td><td>Parent stamped <b>Variable</b> (container) at creation — the evidence is explicit; children created as today</td><td><b>Auto-apply</b>, day one (deterministic)</td></tr>
+      <tr><td>Title/description tokens <code>bundle · kit · set · combo · duo · trio · sampler · starter · gift</code> <b>+</b> &ge;2 distinct existing catalog products matched in the title/description</td><td>Proposal: type Bundle + member list + level Bundle</td><td><b>Suggestion only</b> (LOW/HIGH by evidence) — never auto-applied from title heuristics</td></tr>
+      <tr><td>Bare <code>pack / ct / count</code> tokens</td><td>Stay <b>weight/size variant</b> semantics (the existing regex already claims them). Rule: multi-count of the <i>same</i> product = variant; composition of <i>different</i> products = bundle</td><td>Unchanged — the bundle detector only overrides on confirmed member evidence</td></tr>
+      <tr><td>Platform product type carried through the spider (Stage I-0: Woo <code>bundle</code>/<code>grouped</code>, component lists, structured variant axes)</td><td>Deterministic type mapping + member resolution; verbatim type preserved in <code>source_product_type</code> (Q-Transact's own precedent)</td><td><b>Auto-apply</b> with an <code>AUTO_APPLIED_AT_INGEST</code> audit stamp — the reserved enum finally earns its keep</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>How a suggestion lands — the existing Tidy Up drawer, one new group type</h3>
+    <div class="sa-card">
+      <div class="sa-h">&#127873; Bundle composition detected <span class="sa-conf high">HIGH</span></div>
+      <div class="sa-ev">Scan of <b>greenfieldbotanicals.com/products/relief-starter-kit</b> &middot; title token "kit" &middot; description matched 4 existing catalog products &middot; price $89 &ge; max member $34</div>
+      <div class="sa-row"><b style="min-width:170px">Relief Starter Kit</b> <span class="lvl">Simple</span> <span style="color:var(--qt-text-muted)">&rarr;</span> <span class="lvl" style="border-style:dashed">Bundle · level Bundle</span></div>
+      <div class="sa-row" style="padding-left:16px">+ member &nbsp;Full Spectrum CBD Tincture 1000mg <span class="qty">&times;1</span></div>
+      <div class="sa-row" style="padding-left:16px">+ member &nbsp;CBD Relief Balm 500mg <span class="qty">&times;1</span></div>
+      <div class="sa-row" style="padding-left:16px">+ member &nbsp;Delta-9 Gummies 10ct <span class="qty">&times;1</span></div>
+      <div class="sa-row" style="padding-left:16px">+ member &nbsp;Lavender Bath Bomb 100mg <span class="qty">&times;1</span></div>
+      <div class="sa-actions"><button class="btn primary">Apply</button><button class="btn">Modify</button><button class="btn">Dismiss</button><span style="margin-left:auto;font-size:11.5px;color:var(--qt-text-muted);align-self:center">Locate in table</span></div>
+    </div>
+    <p style="font-size:12.5px;color:var(--qt-text-secondary)">
+      New <code>CoaActionGroupType.BUNDLE_COMPOSITION</code> generated by the <b>one existing engine</b> (same path scan and Tidy Up already share), with the reserved
+      <code>SCAN_AUTO_INGEST</code> producer — the DB enums already accept both values, so no migration. Apply sets type + membership + level in one transaction. Dark-launched behind <code>bundleIngest_01</code>.</p>
+  </div>
+
+  <div class="card">
+    <h3>Feasibility, stated honestly</h3>
+    <div class="rwrap"><table class="rules">
+      <tr><th>Capability</th><th>Verdict</th></tr>
+      <tr><td>Container (Variable) stamping</td><td><b>Near-perfect immediately</b> — every scan-created parent comes from explicit platform variant data; the evidence is already in hand.</td></tr>
+      <tr><td>Bundle detection from titles + catalog matching (Stage I-1)</td><td><b>Decent precision, modest recall</b> — finds title-advertised bundles whose members name-match the catalog. Suggestion-gated; humans adjudicate.</td></tr>
+      <tr><td>Deterministic bundle detection (Stage I-0)</td><td><b>Requires widening the spider contract</b> — platform types &amp; component lists are discarded before Middleware sees a byte today. Cross-team ticket (Zyte / q-scrapy owners). Side benefit: structured variant axes unblock the reserved strain/weight two-level suggestions too.</td></tr>
+    </table></div>
+  </div>
+</div>
+
+<!-- ════════════════════ SCREEN 5 ════════════════════ -->
+<div class="screen">
   <div class="prose">
-    <h3>Why a bundle flag, not a new product type taxonomy (and not the classification)</h3>
-    <p>Grounding correction first: there is <b>no "bundle" classification in code</b>. Classification in Q-Trust is a data-driven category list (<code>pl_category</code> rows); no category named Bundle exists in code or seed SQL. The only BUNDLE in the codebase is the <b>COA Assignment Level</b> value — declared, labeled ("Bundle — derives status from component products"), stored in MySQL since release 3.20, and explicitly marked <i>NOT wired</i> in the API: the component relation was left as an open decision, so a Bundle-level product today renders a permanent "Missing (0)" placeholder and silently reads Compliant in the KPIs. The product <code>type</code> column is a free-text cosmetic field (Broad/Full Spectrum) and can't carry structure.</p>
-    <p>Joseph's instinct — that COA level alone can't drive bundle logic — is confirmed by three code facts: (1) the requires-COA invariant coerces levels on every write, so a non-cannabis gift set would lose Bundle-ness on save; (2) the level is freely mutable from three surfaces, and composition rows must not be conjured or orphaned by a dropdown; (3) display and parent/child logic need identity independent of COA state. But a full new type <i>taxonomy</i> is more than the job needs. The smallest change that works, matching codebase idiom (<code>is_cannabis</code>, <code>is_archived</code>):</p>
+    <h3>Why a product type — and why not a classification (Rev 2 grounding)</h3>
+    <p>Classification's job is per-item compliance determination: the category tree is family &rarr; classification (self-hierarchical), each classification carries a COA-requirement, and classification effectively propagates to children. A bundle is the same concept in every family and <b>links</b> items rather than describing what an item is — a "bundle" classification would both fail to map (one per family?) and wrongly stamp bundle-ness onto every member. So bundle lives on a new structural axis: <b>product type</b>, leaving family/classification free to drive compliance for each bundle member individually.</p>
+    <p>Rev 1 proposed a bare <code>is_bundle</code> flag; rev 2 upgrades it to the full taxonomy because Q-Trust also needs the <b>container</b> distinction (which a bundle-only flag can't carry) and because Joseph wants consistency with Q-Transact.</p>
+
+    <h3>The taxonomy, read from Q-Transact's code — not invented</h3>
     <ul>
-      <li><b><code>pl_product.is_bundle</code></b> — structural identity flag, set at creation. Invariants: a bundle has no parent and is nobody's child; level <code>BUNDLE</code> becomes settable only on bundles (one-time healing script normalizes stray rows).</li>
-      <li><b><code>pl_product_bundle_component</code></b> — N:M join table (bundle, component, quantity, sort order; unique pair). A component may sit in many bundles; bundles-of-bundles are forbidden in v1, keeping aggregation single-hop like single-level parent/child.</li>
-      <li><b>The BUNDLE assignment level keeps its exact published meaning</b> and finally works: default for bundles requiring a COA, aggregate computed by a sibling branch to the shipped CHILD roll-up.</li>
+      <li>Persisted enum is exactly <b><code>SIMPLE | VARIABLE | BUNDLE</code></b> (default SIMPLE). There is no persisted KIT: <b>Kit = <code>BUNDLE + is_kit=1</code></b>, inflated to a fourth choice in the admin UI and deflated on save. Q-Trust mirrors this contract literally — same words, same storage trick — so the two products can never drift apart on vocabulary, and a future catalog crosswalk is the identity function.</li>
+      <li><b>Bundle vs Kit, answered:</b> mechanically identical (same member table, both explode into member order lines, neither separately stocked). A Kit differs only in <i>assembly</i>: member labels composed into one artwork, a combined mockup, and a stricter publish gate. Compliance mapping: Bundle &rarr; members individually labeled &rarr; <b>aggregate their COAs</b>; Kit &rarr; one labeled unit &rarr; <b>own combined COA</b> by default. Defaults, not rules.</li>
+      <li><b>Variable = the explicit container flag</b> Joseph asked for. Today container-ness is only inferred from COA levels (a level-Child parent, or children at level Parent). Rev 2: type Variable marks the container; the level keeps expressing which COA topology the family uses — children-hold-COAs (Child) or container-holds-the-family-COA (Individual + children at Parent). A parent that is itself a real product stays Simple. Backfill converts the two unambiguous patterns by script and routes the ambiguous tail to Tidy Up suggestions.</li>
+      <li><b>Linking model kept</b> (Joseph's point 3): members are existing catalog products, stored in <code>pl_product_bundle(main_product_id, include_product_id, quantity, sort_order)</code> — Q-Transact's table shape plus quantity. Members must pre-exist (or be created inline as normal catalog rows); only Simple/Variable can be members — no nesting, same as Q-Transact's picker. Member standalone rows are untouched.</li>
     </ul>
 
-    <h3>Composition — Joseph's (a) and (b)</h3>
-    <p>(a) <b>Pick from catalog</b>: search-first multi-select autocomplete (no full-catalog fetch), rich options with photo/SKU/COA chip, excluding self and other bundle rows. (b) <b>Create for the bundle</b>: "+ New product" opens the standard add-product form; the result is auto-linked as a component and remains a <b>normal catalog row</b> — that standalone row is exactly where its COA gets uploaded and managed. No shadow products, no hiding; provenance stamped via the created-source framework. Catalog products keep their standalone rows untouched while belonging to bundles.</p>
+    <h3>COAs and counts (carried from rev 1, unchanged in substance)</h3>
+    <p>The row carrying the Bundle assignment level is an aggregate of its members' <i>effective</i> statuses — the shipped variant-parent roll-up applied to the member set, with worst-of disposition, dashed derived chips, and expand-to-members as the audit affordance. Members that are themselves Shared/Inherited/Parent resolve through the existing owner chain. No double counting: members count individually; the level-Bundle row stays outside the counted universe; a Kit at level Individual counts as a normal COA owner. The KPI partition invariant is untouched; one informational "incl. N bundles" split is added. Fixed for free: today's silent lie where a level-Bundle product reads Compliant even with a violative member.</p>
 
-    <h3>COAs for the bundle — validating the aggregate model</h3>
-    <p>Joseph's model holds: the row with the Bundle assignment level is an <b>aggregate of its members</b>. Each member contributes its <i>effective</i> status (Shared/Inherited/Parent members resolve through the existing owner chain — reused, never re-implemented). Fold rules: none-require → Not Required; any missing/unresolvable → Missing surfaces; else representative status. Disposition is worst-of. Rendered with the platform's existing derived vocabulary — dashed chips, ⤵, per-status counts, tooltip — and audited via expand-to-components. And the bundle <b>can</b> carry its own COA: set level Individual on the bundle (kit-level combined COA); identity and COA behavior are decoupled, so no new resolution semantics were invented.</p>
-
-    <h3>Least disruption, tallied</h3>
-    <p><b>New:</b> one column, one table, one DTO field, one roll-up branch beside an existing template, one informational statistic split, one modal section, one expansion branch, one pill. <b>Untouched:</b> the assignment-level enum (no new members), chain-walking constants, the KPI partition invariant, parent/child relations, member standalone rows, the COAs tab, every existing chip and column. <b>Fixed for free:</b> the Bundle "Missing (0)" placeholder and its silent Compliant fold.</p>
+    <h3>Auto-establish at ingestion — the feasibility answer</h3>
+    <p><b>Partially automatable now; deterministically automatable after one contract change.</b> The scan pipeline is entirely platform-agnostic — the spider normalizes every site into one product shape and <i>discards platform product types and component lists before Middleware sees them</i>; parent/child is built only from explicit variant data (precise, zero discovery); the only surviving signal for bundles is the title string. Hence the staged plan: (I-1, buildable now) stamp <b>Variable</b> automatically wherever explicit variant data exists — near-perfect; detect bundles from title tokens + &ge;2 catalog-member matches and surface them as <b>suggestions</b> through the existing engine (new BUNDLE_COMPOSITION group, reserved SCAN_AUTO_INGEST producer, no migration) — never auto-applied from heuristics. (I-0, the real unlock) widen the spider contract to carry platform types, component lists, and structured variant axes; then type mapping is deterministic and earns auto-apply with the reserved AUTO_APPLIED_AT_INGEST audit stamp. One collision handled deliberately: bare "pack/ct/count" titles stay weight/size variants (the existing regex already claims them); multi-count of the same product is a variant, composition of different products is a bundle.</p>
 
     <h3>Open decisions</h3>
     <ul>
-      <li><b>Quantity in v1?</b> Column + one input, ignored by COA logic. Recommend yes (Transact/EDR will want it).</li>
-      <li><b>Seed a "Bundle" category?</b> Recommend no — the flag backs an unambiguous "Bundles only" facet instead, avoiding the level/category naming collision.</li>
-      <li><b>Non-cannabis bundles?</b> Supported (level Not Required). Confirm desired.</li>
-      <li><b>Archiving a component in an active bundle</b> — v1 excludes it from the aggregate with a muted note (vs. blocking). Confirm.</li>
-      <li><b>"Bundles at risk" KPI sub-line</b> — recommend fast-follow once real data exists.</li>
+      <li><b>Quantity in v1?</b> Column + one input, ignored by COA logic (Q-Transact has none; ours is a superset). Recommend yes.</li>
+      <li><b>Adopt <code>is_kit</code> in v1</b> or ship Bundle-only first? Recommend adopt — one tinyint, settles the taxonomy permanently.</li>
+      <li><b>Container backfill aggressiveness</b> — script the unambiguous, suggest the rest. Confirm.</li>
+      <li><b>Member archive semantics</b> — exclude-with-note (recommended) vs block.</li>
+      <li><b>I-0 ownership</b> — the spider contract lives outside these repos; needs the spider owners before that ticket is fileable.</li>
+      <li><b>Pack-token blast radius</b> — leave the shared weight/size regex untouched in v1; the bundle detector overrides per-row on confirmed member evidence.</li>
     </ul>
 
     <h3>Build sequence (ticket-shaped)</h3>
     <ul>
-      <li><b>B-1 API — identity + composition schema:</b> flag, join table, invariants, upsert DTO/handlers, healing script, listing RO fields.</li>
-      <li><b>B-2 API — aggregate status + statistic split:</b> Bundle roll-up branch, disposition worst-of, bundle counts (coordinate with the pending parent-split statistic work), export-text drive-by fix.</li>
-      <li><b>B-3 UI — create/edit bundle:</b> Actions ▾ entry, modal bundle mode, component picker + create-for-bundle, level constraints, dark-launch gate.</li>
-      <li><b>B-4 UI — table rendering:</b> Bundle pill, expansion, component sub-rows, aggregate chips, KPI sub-label, "Bundles only" facet.</li>
-      <li><b>B-5 Follow-ons:</b> "In N bundles" badge, at-risk KPI, family-tree edge type, quantity consumption downstream.</li>
+      <li><b>B-1 API — type taxonomy + membership schema:</b> product_type + is_kit + source_product_type columns, pl_product_bundle table, invariants + convertibility, container backfill + suggestion sweep, upsert DTO/handlers, healing script for stray level-Bundle rows.</li>
+      <li><b>B-2 API — aggregate status + statistic split:</b> Bundle roll-up branch, worst-of disposition, bundle counts (coordinate the pending parent-split statistic work), export-text drive-by fix.</li>
+      <li><b>B-3 UI — create/edit with type picker:</b> four-way type selector (Kit inflate/deflate), Variable/Bundle modal modes, member picker + create-for-bundle, level constraints per type, bundles_01 gate.</li>
+      <li><b>B-4 UI — table rendering:</b> Bundle/Kit pills, member expansion, aggregate chips, container affix, optional Type column, KPI sub-label, "Bundles only" facet.</li>
+      <li><b>B-5 MW — ingest (I-1):</b> Variable auto-stamp, bundle detector + BUNDLE_COMPOSITION suggestions, bundleIngest_01 gate.</li>
+      <li><b>B-6 cross-team — spider contract (I-0):</b> platform types, component lists, structured variant axes; deterministic mapping + auto-apply stamp.</li>
+      <li><b>B-7 follow-ons:</b> "In N bundles" badge, at-risk KPI, family-tree second edge type, strain/weight two-level enablement, Transact crosswalk.</li>
     </ul>
-    <p style="color:var(--qt-text-muted);font-size:12.5px">Everything downstream of B-1 keys off the identity-flag decision — it is the only true fork in the design.</p>
   </div>
 </div>
 
 <div class="footer">
   <a href="https://jfloyd-qredible.netlify.app/">&larr; All Mockups</a> &nbsp;&middot;&nbsp;
-  Bundles — product structure &amp; aggregate COA status &nbsp;&middot;&nbsp; Aug 20, 2026 &nbsp;&middot;&nbsp;
+  Bundles — product type taxonomy &amp; aggregate COA status (Rev 2) &nbsp;&middot;&nbsp; Aug 21, 2026 &nbsp;&middot;&nbsp;
   Spec: qredible-brain <code>docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md</code> &nbsp;&middot;&nbsp;
   All data representative.
 </div>
