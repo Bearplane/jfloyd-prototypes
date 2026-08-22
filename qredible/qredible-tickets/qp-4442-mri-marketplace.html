@@ -170,6 +170,15 @@
   .tag.free{background:#ECFDF5;color:#065F46}
   .tag.paid{background:#FEF3C7;color:#92400E}
   .tag.plan{background:#EEF2FF;color:#4338CA}
+  .tag.avail{background:#F1F5F9;color:#475569}
+  /* a processor-level standing rule — distinct from a per-merchant toggle */
+  .tag.rule{background:#EEF2FF;color:#4338CA}
+  .srow.avail{border-style:dashed}
+  .rulebox{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;margin:0 16px 4px;
+    border:1px solid #C7D2FE;background:#EEF2FF;border-radius:8px}
+  .rulebox input{margin-top:2px;accent-color:#4338CA;width:14px;height:14px;flex:none}
+  .rulebox .rt{font-size:12px;font-weight:600;color:#3730A3}
+  .rulebox .rs{font-size:11.5px;color:#4338CA;margin-top:2px;line-height:1.45}
   /* QPSwitch — 40x24, thumb 18, track #b1b9ca / checked #8DC63F */
   .qsw{width:40px;height:24px;border-radius:12px;background:var(--qt-switch-off);border:1px solid var(--qt-grey-light);
     position:relative;flex:none;cursor:pointer}
@@ -222,6 +231,7 @@
   .cellv.na{background:var(--qt-grey-smoke);color:#c3c9d4}
   .cellv.paid{background:#FEF3C7;color:#92400E}
   .cellv.soon{background:#EEF2FF;color:#818CF8}
+  .cellv.avail{background:#fff;color:#64748B;border:1px dashed #B1B9CA}
   .mccpill{font-size:10px;font-weight:600;padding:1px 5px;border-radius:4px;background:#EEF2FF;color:#4338CA;margin-left:6px}
   .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--qt-subtitle);margin:10px 0 4px;align-items:center}
   .legend span{display:inline-flex;align-items:center;gap:6px}
@@ -381,12 +391,12 @@
       <div class="mri-tab">Business Risk <span class="ppill grey">Partial</span></div>
       <div class="mri-tab on">Sources <span class="ppill blue">New</span></div>
     </div>
-    <div class="mri-info"><b>Data Sources</b> &mdash; which external checks run for this merchant. Defaults come from the <b>Online Lending</b> industry profile; your processor settings and add-ons override them.</div>
+    <div class="mri-info"><b>Data Sources</b> &mdash; which external checks run for this merchant. Defaults come from the <b>Online Lending</b> industry profile; your rules for that industry and your per-merchant settings override them.</div>
     <div class="mri-cards">
       <div class="mri-card" style="border-top-color:#16A34A"><div class="n" style="color:#16A34A">5</div><div class="l">Active</div></div>
-      <div class="mri-card" style="border-top-color:#D97706"><div class="n" style="color:#D97706">2</div><div class="l">Available as add-on</div></div>
-      <div class="mri-card" style="border-top-color:#94A3B8"><div class="n" style="color:#94A3B8">3</div><div class="l">Not applicable</div></div>
-      <div class="mri-card" style="border-top-color:#3B82F6"><div class="n" style="color:#3B82F6">1</div><div class="l">Coming soon</div></div>
+      <div class="mri-card" style="border-top-color:#D97706"><div class="n" style="color:#D97706">2</div><div class="l">Available to enable</div></div>
+      <div class="mri-card" style="border-top-color:#94A3B8"><div class="n" style="color:#94A3B8">2</div><div class="l">Not applicable</div></div>
+      <div class="mri-card" style="border-top-color:#3B82F6"><div class="n" style="color:#3B82F6">2</div><div class="l">Coming soon</div></div>
     </div>
     <div class="mri-body">
 
@@ -396,7 +406,7 @@
         <div class="ic">&#127963;</div>
         <div class="mid">
           <div class="nm">CFPB Consumer Complaint Database <span class="newchip">New</span> <span class="tag free">Free</span></div>
-          <div class="pv">Consumer Financial Protection Bureau &middot; public API &middot; weekly</div>
+          <div class="pv">Consumer Financial Protection Bureau &middot; public API &middot; weekly &middot; industry default</div>
         </div>
         <div class="meta">Last pulled 2 days ago<br><span style="color:#16A34A;font-weight:600">Matched · confidence 0.91</span></div>
         <div class="ctl"><span class="qsw on"><i></i></span></div>
@@ -432,13 +442,13 @@
         <div class="ctl"><span class="qsw dis"><i></i></span></div>
       </div>
 
-      <div class="srcgrp">Reputation <span class="ct">2 active · 1 not applicable</span></div>
+      <div class="srcgrp">Reputation <span class="ct">2 active · 1 coming soon</span></div>
 
       <div class="srow">
         <div class="ic">&#127970;</div>
         <div class="mid">
           <div class="nm">Better Business Bureau <span class="tag free">Free</span></div>
-          <div class="pv">BBB public profile scrape &middot; continuous round-robin</div>
+          <div class="pv">BBB public profile scrape &middot; continuous round-robin &middot; industry default</div>
         </div>
         <div class="meta">Last scanned 4 days ago<br><span style="color:var(--mri-muted)">Grade B · 11 complaints (12m)</span></div>
         <div class="ctl"><span class="qsw on"><i></i></span></div>
@@ -447,8 +457,8 @@
       <div class="srow">
         <div class="ic">&#11088;</div>
         <div class="mid">
-          <div class="nm">Google reviews <span class="tag free">Free</span></div>
-          <div class="pv">Google Places &middot; daily</div>
+          <div class="nm">Google reviews <span class="tag free">Free</span> <span class="tag rule">Your rule</span></div>
+          <div class="pv">Google Places &middot; daily &middot; available but off by default for Online Lending &mdash; on by <b>your rule</b></div>
         </div>
         <div class="meta">Last pulled yesterday<br><span style="color:var(--mri-muted)">4 open signals</span></div>
         <div class="ctl"><span class="qsw on"><i></i></span></div>
@@ -551,7 +561,7 @@
         </div>
         <div class="indbar">
           <span>&#9432;</span>
-          <span>Industry profile: <b>Online Lending</b>. 5 sources on by default, 3 not applicable.
+          <span>Industry profile: <b>Online Lending</b> &mdash; set by Qredible. 4 on by default, 2 not applicable.
           <span class="mri-link" style="font-size:11.5px">Change industry</span></span>
         </div>
         <div style="padding:0 24px 10px;display:flex;align-items:center;justify-content:space-between">
@@ -583,8 +593,12 @@
             <div class="ctl" style="min-width:46px"><span class="qsw on"><i></i></span></div>
           </div>
           <div class="srow" style="padding:7px 9px">
-            <div class="mid"><div class="nm" style="font-size:12.5px">Google reviews</div><div class="pv">Turned off for this merchant</div></div>
-            <div class="ctl" style="min-width:46px"><span class="qsw"><i></i></span></div>
+            <div class="mid"><div class="nm" style="font-size:12.5px">Google reviews <span class="tag rule">Your rule</span></div><div class="pv">Available, off by default &mdash; on by <b>your Online Lending rule</b></div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw on"><i></i></span></div>
+          </div>
+          <div class="srow avail" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px;color:var(--qt-subtitle)">Trustpilot / Yelp</div><div class="pv">Coming soon &mdash; later MRI phase</div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw dis"><i></i></span></div>
           </div>
 
           <div class="srcgrp">Business Risk</div>
@@ -597,6 +611,13 @@
             <div class="ctl" style="min-width:46px"><span class="lockup"><span class="lk">&#128274;</span><span class="up">Upgrade</span></span></div>
           </div>
         </div>
+        <div class="rulebox">
+          <input type="checkbox" checked>
+          <div>
+            <div class="rt">Also apply these changes to all my Online Lending merchants</div>
+            <div class="rs">Saves a <b>standing rule</b>, not a one-off bulk edit &mdash; it applies to your 23 current Online Lending merchants <b>and to any you add later</b>. Merchants where you have set a source by hand keep their own setting.</div>
+          </div>
+        </div>
         <div class="pf">
           <button class="btn primary">Save</button>
           <button class="btn">Cancel</button>
@@ -606,7 +627,15 @@
     </div>
   </div>
 
-  <div class="note"><b>Precedence, made visible.</b> Each row's sub-label states <i>why</i> it is in its current state &mdash; "Industry default", "Turned off for this merchant", "Add-on &middot; not in plan", "Not applicable to this industry". That string is the resolver's own <code>source</code> field rendered back to the user, so support can answer "why isn't this pulling?" without a database query. A human or paid override is never silently overwritten when the industry profile is recomputed.</div>
+  <div class="note"><b>Three tiers, and the panel writes the bottom two.</b>
+  <b>1 &mdash; Qredible</b> sets the industry default in Global Settings (screen 4): on / available / add-on / not applicable / coming soon.
+  <b>2 &mdash; the processor</b> sets a standing rule for a whole industry ("on for all my Online Lending merchants, including future ones") via the checkbox above.
+  <b>3 &mdash; the processor</b> overrides one merchant with the toggles themselves.
+  Most specific wins: merchant beats rule beats industry default. <code>Not applicable</code> is the one thing a processor cannot lift &mdash; it means the source has no jurisdiction over that industry, so enabling it would spend API calls to guarantee zero results and put a misleading empty card back in the report.</div>
+
+  <div class="note"><b>Precedence, made visible.</b> Each row's sub-label states <i>why</i> it is in its current state &mdash; "Industry default", "on by <b>your Online Lending rule</b>", "Turned off for this merchant", "Add-on &middot; not in plan", "Not applicable to this industry". That string is the resolver's own provenance field rendered back to the user, so support can answer "why isn't this pulling?" without a database query. A per-merchant toggle or a purchase is never silently overwritten when the industry profile or a processor rule is recomputed.</div>
+
+  <div class="note warn"><b>A standing rule is not a bulk edit &mdash; that distinction is the whole point.</b> Selecting merchants in the We-Monitor bulk bar and toggling writes N rows once; a merchant onboarded next month inherits nothing. The rule is evaluated at materialisation time, so it reaches merchants that do not exist yet &mdash; including the Flex merchant whose industry Q-Recon only works out after its first scan.</div>
 </div>
 
 <!-- ════════════════════════════ SCREEN 4 ════════════════════════════ -->
@@ -618,9 +647,10 @@
 
   <div class="legend">
     <span><i class="cellv on">Y</i> On by default</span>
+    <span><i class="cellv avail">A</i> Available &mdash; off by default, processor may enable</span>
     <span><i class="cellv paid">$</i> Add-on</span>
     <span><i class="cellv soon">&middot;</i> Coming soon</span>
-    <span><i class="cellv na">&ndash;</i> Not applicable</span>
+    <span><i class="cellv na">&ndash;</i> Not applicable &mdash; processor cannot lift</span>
   </div>
 
   <div class="gridwrap">
@@ -656,19 +686,19 @@
           <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
         <tr style="background:#FFFBEB"><td class="v">On-Line Lending <span class="mccpill">6012</span></td>
           <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
-          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv avail">A</i></td><td><i class="cellv soon">&middot;</i></td>
           <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
         <tr style="background:#FFFBEB"><td class="v">Short-Term Consumer Lending <span class="mccpill">6012</span></td>
           <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
-          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv avail">A</i></td><td><i class="cellv soon">&middot;</i></td>
           <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
         <tr><td class="v">Debt Relief <span class="mccpill">7277</span></td>
           <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
-          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv avail">A</i></td><td><i class="cellv soon">&middot;</i></td>
           <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
         <tr><td class="v">Debt Collection <span class="mccpill">7322</span></td>
           <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
-          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv avail">A</i></td><td><i class="cellv soon">&middot;</i></td>
           <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
         <tr><td class="v">Firearms — CNP B2B <span class="mccpill">5723</span></td>
           <td><i class="cellv na">&ndash;</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
@@ -700,7 +730,9 @@
 
   <div class="note warn"><b>These cells are a proposal, not a decision.</b> CFPB is on for the six financial-services verticals because CFPB only accepts complaints about consumer financial products; FDA is on for the ingestible/product verticals; COA/lab follows the master file's own 8-vertical COA column. Every cell needs compliance sign-off before seeding &mdash; the grid is the artefact that makes that review possible in one pass instead of thirty-four.</div>
 
-  <div class="note"><b>Where this lives in the data model.</b> The grid is <b>not</b> a new industry-keyed table. Each row is the <code>mriSources[]</code> field of that industry's policy document; saving materialises per-company rows that the Middleware cron can join set-wise. That keeps the compliance engine policy-first &mdash; rules as data read by the deterministic resolver that already exists &mdash; while still giving the nightly cron a plain indexed table to filter on.</div>
+  <div class="note"><b>This grid is tier 1 only.</b> It is what <b>Qredible</b> sets, and it is the same for every processor. A processor never edits this screen &mdash; they layer a standing rule for one of their industries (screen 3's checkbox) or a per-merchant override (screen 3's toggles) on top of it. The two states a processor cannot move are <code>Not applicable</code> and <code>Coming soon</code>; <code>Available</code> exists precisely so Qredible can say "this source is meaningful here but we are not turning it on for everyone" and let each processor decide.</div>
+
+  <div class="note"><b>Where this lives in the data model.</b> The grid is <b>not</b> a new industry-keyed table. Each row is the <code>mriSources[]</code> field of that industry's policy document; saving materialises per-company rows that the Middleware cron can join set-wise. Processor rules materialise into the same per-company rows, tagged with their own provenance so a later recompute cannot clobber a per-merchant choice. That keeps the compliance engine policy-first &mdash; rules as data read by the deterministic resolver that already exists &mdash; while still giving the nightly cron a plain indexed table to filter on.</div>
 </div>
 
 <!-- ════════════════════════════ SCREEN 5 ════════════════════════════ -->
@@ -722,9 +754,20 @@
       <tr><td>Row Actions menu items</td><td><b>Real</b> &mdash; "Manage Sources" is the single new entry</td></tr>
       <tr><td><b>Sources tab</b></td><td><b>NEW</b></td></tr>
       <tr><td><b>Manage Sources panel</b></td><td><b>NEW</b> (existing panel chrome)</td></tr>
+      <tr><td><b>Processor standing rule per industry</b></td><td><b>NEW</b> &mdash; one checkbox, no new screen</td></tr>
       <tr><td><b>Industry &rarr; source profile grid</b></td><td><b>NEW</b></td></tr>
       <tr><td><b>CFPB as a source</b></td><td><b>NEW</b> &mdash; nothing named CFPB exists in any repo today</td></tr>
     </table>
+
+    <h4>Who sets what</h4>
+    <table class="rules">
+      <tr><th style="width:22%">Tier</th><th style="width:16%">Who</th><th style="width:20%">Scope</th><th>Surface</th></tr>
+      <tr><td><b>1 &middot; Industry default</b></td><td>Qredible</td><td>a vertical, every processor</td><td>Global Settings grid (screen 4). Values: on / available / add-on / not applicable / coming soon.</td></tr>
+      <tr><td><b>2 &middot; Processor rule</b></td><td>Processor</td><td>their merchants in one vertical, <b>including future ones</b></td><td>The checkbox in the Manage Sources footer (screen 3). May move <i>available</i> and <i>add-on</i> sources; may not lift <i>not applicable</i>.</td></tr>
+      <tr><td><b>3 &middot; Merchant override</b></td><td>Processor</td><td>one merchant</td><td>The toggles in Manage Sources (screen 3). Beats the rule; survives any recompute.</td></tr>
+    </table>
+    <p>Most specific wins. Purchases sit alongside tier 3 &mdash; buying an add-on is a per-merchant fact, and like a manual toggle it is never overwritten by a tier-1 or tier-2 recompute.</p>
+    <p><b>Two processors, one merchant.</b> A merchant monitored by two processors can have two different answers for the same source. The <i>pull</i> stays company-global &mdash; it runs if <b>any</b> monitoring processor has it on, so it is fetched once, not twice &mdash; while each processor sees only their own resolved state in the UI and only their own entitled sources contribute to the risk aggregate they are shown.</p>
 
     <h4>The three things that make this buildable</h4>
     <ul>
@@ -743,6 +786,8 @@
       <li><b>Consumer complaint narratives.</b> CFPB publishes consumer-written narrative text. The proposal stores it but shows it only to operators, never in a merchant-visible EDR PDF. Confirm.</li>
       <li><b>Add-on pricing.</b> Which paid sources, at what price, billed through what &mdash; the columns exist, the numbers do not.</li>
       <li><b>Kava has no product family.</b> It carries the same 13 controls as Hemp-Derived CBD but nothing in the product taxonomy matches it, so product-driven inference cannot see it.</li>
+      <li><b>Can a processor rule cover an industry they have no merchants in yet?</b> Allowing it means Westtown can pre-configure Online Lending before onboarding their first lender &mdash; useful, but it also means rules accumulate for verticals nobody is monitoring. Recommend allowing it and showing a "0 merchants today" hint rather than blocking.</li>
+      <li><b>Does an <i>available</i> source still cost anything when off?</b> No pull, so no API cost &mdash; but it does occupy a row in every Sources tab. If the catalog grows past ~15 sources the tab needs the "Active only" filter on by default.</li>
     </ul>
   </div>
 </div>
