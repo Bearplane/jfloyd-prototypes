@@ -261,6 +261,33 @@
 
   <div class="card-grid">
 
+    <!-- 2026-08-21 — QP-4442: MRI marketplace, CFPB source, per-industry profiles (WeMonitor) -->
+
+    <a data-status="todo" data-category="wemonitor" data-date="2026-08-21"
+       href="qredible-tickets/qp-4442-mri-marketplace.html"
+       class="proto-card"
+       data-keywords="qp-4442 mri marketplace merchant risk intelligence cfpb consumer complaint database ccdb online lending fda swap not applicable industry profile data sources tab manage sources panel free paid add-on upgrade lock toggle qpswitch entitlement pl_source pl_feature_source plan restriction q-recon industry inference mcc mismatch vertical master 34 verticals pl_segment canonical industry key edr legal regulatory factor bbb courtlistener vital4 licenseiq spec">
+      <div class="card-top">
+        <div class="card-icon">&#128225;</div>
+        <div class="card-meta">
+          <span class="card-category" onclick="event.preventDefault();filterByCategory('wemonitor')">WeMonitor</span>
+          <span class="card-ticket">QP-4442 &bull; SPEC</span>
+        </div>
+      </div>
+      <div class="card-name">MRI Marketplace &mdash; CFPB, Per-Industry Sources, Free / Paid / Add-on</div>
+      <p class="card-desc">Three linked pieces on one spine. <b>(1) CFPB into the EDR for Online Lending</b>, taking the slot FDA occupies today &mdash; but as a <b>per-company pull cloning the BBB module</b>, never the FDA global-feed pattern (that one creates a company row per unmatched firm; CCDB holds 17M complaints). <b>(2) A configurable MRI marketplace</b>: a new <b>Sources</b> tab in the existing MRI modal plus a <b>Manage Sources</b> panel, reusing the app's real lock + <code>Upgrade</code> + <code>QPSwitch</code> pattern from the column-management panel. <b>(3) Q-Recon industry inference</b> as the third rung of the classification ladder (product family &rarr; company MCC &rarr; company industry), not a parallel engine. The keystone: the platform has <b>no canonical industry key</b> &mdash; <code>pl_segment</code> has 6 seeded rows, the scanner's "industry" is a free-text category, and the EDR prints <i>type of company</i> under the heading "Industry Type". The Industry Vertical Master's 34 verticals settle the list; all 91 of its MCCs already exist verbatim in <code>pl_mcc_code</code>, and the MCC&harr;segment join is built but empty.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">CFPB CCDB (live-probed)</span>
+        <span class="pill pill-yellow">NOT_APPLICABLE as a state</span>
+        <span class="pill pill-green">Reuses existing entitlement tables</span>
+        <span class="pill pill-blue">34-vertical profile grid</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Aug 21, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
     <!-- 2026-08-20 — Bundles: product structure + aggregate COA status (Product Compliance) -->
 
     <a data-status="todo" data-category="product-compliance" data-date="2026-08-20"
