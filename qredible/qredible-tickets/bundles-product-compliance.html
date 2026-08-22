@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q-Trust — Bundles: Product Type Taxonomy &amp; Aggregate COA Status Mockup (Rev 2)</title>
+<title>Q-Trust — Bundles: Product Type Taxonomy &amp; Aggregate COA Status Mockup (Rev 2.1)</title>
 <style>
   /* ── QT design tokens (from RTQ-Admin-UI styles/tokens.css, QP-4212 pipeline) ── */
   :root{
@@ -233,9 +233,9 @@
 
 <div class="topbar">
   <div class="logo">Qredible <span>Q-Trust</span></div>
-  <div class="crumb">Q-Monitor &rsaquo; Product Compliance &rsaquo; <b>Bundles</b> &mdash; UI/UX proposal (Rev 2)</div>
+  <div class="crumb">Q-Monitor &rsaquo; Product Compliance &rsaquo; <b>Bundles</b> &mdash; UI/UX proposal (Rev 2.1)</div>
 </div>
-<div class="mock-banner">DESIGN MOCKUP — Bundles Rev 2 (product TYPE taxonomy aligned to Q-Transact + aggregate COA status + scan auto-establish). Static illustration; all data is representative. Blue dashed boxes are design notes, not UI. Spec: qredible-brain docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md (rev 2)</div>
+<div class="mock-banner">DESIGN MOCKUP — Bundles Rev 2.1 (product TYPE taxonomy aligned to Q-Transact + aggregate COA status + scan auto-establish; migration-challenged). Static illustration; all data is representative. Blue dashed boxes are design notes, not UI. Spec: qredible-brain docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md (rev 2.1)</div>
 
 <div class="screen-nav">
   <button class="on" onclick="show(0,this)">1 &middot; Products table — types &amp; bundles</button>
@@ -471,7 +471,7 @@
           <select class="sel"><option>Yes</option><option>No</option></select></div>
         <div class="fld"><label>COA Assignment Level</label>
           <select class="sel"><option>Bundle — derives status from member products</option><option>Individual — this bundle has its own combined COA</option><option>Not Required — no COA needed</option></select>
-          <div class="hint">Bundle type defaults to the aggregate; <b>Kit defaults to Individual</b> (one labeled unit → its own combined COA). Both remain selectable — type picks the container mechanics, level picks the COA topology. Bundle level requires &ge;1 member.</div></div>
+          <div class="hint">The picker's short list is a <b>UI default, not an API restriction</b> — the level system remains the COA authority. Bundle type defaults to the aggregate; <b>Kit defaults to Individual</b> (one labeled unit → its own combined COA). The single hard rule: level Bundle requires type Bundle + &ge;1 member.</div></div>
       </div>
 
       <div class="fld"><label>Members</label>
@@ -519,13 +519,14 @@
   <div class="card">
     <h3>Product-type taxonomy — mirrored from Q-Transact</h3>
     <div class="rwrap"><table class="rules">
-      <tr><th>Type</th><th>Storage</th><th>Meaning</th><th>COA levels allowed</th></tr>
+      <tr><th>Type</th><th>Storage</th><th>Meaning</th><th>COA level defaults (UI-soft &mdash; see note)</th></tr>
       <tr><td><b>Simple</b> (default)</td><td><code>SIMPLE</code></td><td>A real product — standalone, a variant child, or a parent that is itself sellable</td><td>Individual, Not Required, Shared, Inherited, Parent</td></tr>
       <tr><td><b>Variable</b></td><td><code>VARIABLE</code></td><td><b>Explicit container</b> — the row isn't a real product; the children are (Q-Transact: variants are the sellable units)</td><td>Child (children hold COAs) · Individual (container holds the family COA; children use Parent) · Not Required</td></tr>
       <tr><td><b>Bundle</b></td><td><code>BUNDLE</code>, <code>is_kit=0</code></td><td>Links existing catalog products sold together; members individually labeled</td><td><b>Bundle</b> (aggregate, default) · Individual · Not Required</td></tr>
       <tr><td><b>Kit</b></td><td><code>BUNDLE</code>, <code>is_kit=1</code></td><td>Same composite, <b>assembled &amp; labeled as one unit</b> (Q-Transact: one combined label artwork, stricter publish gate)</td><td><b>Individual</b> (own combined COA, default) · Bundle · Not Required</td></tr>
     </table></div>
-    <div class="note" style="margin-bottom:0"><b>Bundle vs Kit, resolved from Q-Transact's code:</b> commerce-mechanically identical (same member table, both explode into member order lines, neither separately stocked). The real difference is <b>assembly/labeling</b> — a Kit composes member labels into one artwork and can't publish until every member is published &amp; labeled. That maps 1:1 onto COAs: members individually labeled → aggregate their COAs (Bundle); assembled into one labeled unit → it plausibly has its own combined COA (Kit → Individual default). Defaults, not rules — the level stays selectable.</div>
+    <div class="note" style="margin-bottom:0"><b>Bundle vs Kit, resolved from Q-Transact's code:</b> commerce-mechanically identical (same member table, both explode into member order lines, neither separately stocked). The real difference is <b>assembly/labeling</b> — a Kit composes member labels into one artwork and can't publish until every member is published &amp; labeled. That maps 1:1 onto COAs: members individually labeled → aggregate their COAs (Bundle); assembled into one labeled unit → it plausibly has its own combined COA (Kit → Individual default).<br><br>
+    <b>Rev 2.1 — these are UI defaults, not API restrictions.</b> The level system remains the single COA authority; the type field is never read by COA-requirement, individual-vs-shared assignment, or count logic. Exactly <b>one</b> hard rule exists: level <i>Bundle</i> requires type Bundle + &ge;1 member. Everything else in this column is what the picker offers by default — an admin can still set any level the platform allows today.</div>
   </div>
 
   <div class="card">
@@ -537,8 +538,9 @@
       <tr><td>Parent that is itself a real product — indistinguishable</td><td>Type <b>Simple</b> with children; no container affix</td></tr>
     </table></div>
     <p style="font-size:12.5px;margin-top:10px;color:var(--qt-text-secondary)">
-      Backfill: a one-time script converts the two unambiguous patterns (level-Child parents; all-children-Parent families) to Variable; the ambiguous tail becomes
-      "mark as container?" suggestions through the existing Tidy Up engine — humans adjudicate, scripts don't guess. Type = structure; level = COA topology. Neither steals the other's job.</p>
+      <b>Rev 2.1 — no retroactive backfill.</b> Nothing in the COA or count logic reads the type, so stamping existing parents has zero functional value. Containers get marked three ways only:
+      an explicit user edit, scan ingest for <i>newly created</i> variant parents (the evidence is explicit there), and opt-in "mark as container?" Tidy Up suggestions once the affix ships —
+      humans adjudicate, scripts don't guess. Type = structure; level = COA topology. Neither steals the other's job.</p>
   </div>
 
   <div class="card">
@@ -577,6 +579,17 @@
       informational <code>bundleActiveCount</code> split (same pattern as the parents-vs-variants split on the Total Products tile). One honesty fix rides along:
       today a level-Bundle product silently folds into not-required and <i>reads Compliant</i> even with a violative member; with the aggregate wired, the row tells the truth.</p>
   </div>
+
+  <div class="card">
+    <h3>Migration &amp; blast radius — the sign-off answer to "what does this break?"</h3>
+    <div class="rwrap"><table class="rules">
+      <tr><th>Question</th><th>Answer (verified against the code, spec &sect;2.6)</th></tr>
+      <tr><td>Does the type field change COA-requirement or individual-vs-shared assignment logic?</td><td><b>No.</b> The requirement master (requires-COA), the assignment/source validation, status resolution, and both count queries read only <code>is_cannabis</code> + <code>coa_assignment_level</code> + the effective owner. Zero of them read a type. The level system stays the single COA authority.</td></tr>
+      <tr><td>What migration do existing products need?</td><td><b>None.</b> The column lands with <code>DEFAULT 'SIMPLE'</code>, and Simple describes exactly today's behavior — no UPDATE statement, no inference. (Easier than the assignment-level column's own launch, which needed a backfill to keep counts identical.)</td></tr>
+      <tr><td>Only data touch</td><td>Stray rows already at level Bundle (preflight-counted; expected &asymp;0 — nothing automated ever wrote it). Healed per row; a healed COA-less cannabis row becomes a visible <i>Missing</i> — that's today's hidden truth surfacing, flagged in release notes.</td></tr>
+      <tr><td>Hard coupling introduced</td><td>Exactly one write-path rule: level <i>Bundle</i> &rArr; type Bundle + &ge;1 member. All other per-type level relationships are UI defaults.</td></tr>
+    </table></div>
+  </div>
 </div>
 
 <!-- ════════════════════ SCREEN 4 ════════════════════ -->
@@ -587,7 +600,7 @@
     <h3>What happens at scan time, staged by evidence strength</h3>
     <div class="rwrap"><table class="rules">
       <tr><th>Signal</th><th>Action</th><th>Confidence &amp; gate</th></tr>
-      <tr><td>Page has explicit <code>variants[]</code> (platform variant data)</td><td>Parent stamped <b>Variable</b> (container) at creation — the evidence is explicit; children created as today</td><td><b>Auto-apply</b>, day one (deterministic)</td></tr>
+      <tr><td>Page has explicit <code>variants[]</code> (platform variant data)</td><td><b>Newly created</b> parent stamped <b>Variable</b> (container) at creation — the evidence is explicit; children created as today. Existing rows are never retro-stamped (rev 2.1: no backfill)</td><td><b>Auto-apply</b>, day one (deterministic, new rows only)</td></tr>
       <tr><td>Title/description tokens <code>bundle · kit · set · combo · duo · trio · sampler · starter · gift</code> <b>+</b> &ge;2 distinct existing catalog products matched in the title/description</td><td>Proposal: type Bundle + member list + level Bundle</td><td><b>Suggestion only</b> (LOW/HIGH by evidence) — never auto-applied from title heuristics</td></tr>
       <tr><td>Bare <code>pack / ct / count</code> tokens</td><td>Stay <b>weight/size variant</b> semantics (the existing regex already claims them). Rule: multi-count of the <i>same</i> product = variant; composition of <i>different</i> products = bundle</td><td>Unchanged — the bundle detector only overrides on confirmed member evidence</td></tr>
       <tr><td>Platform product type carried through the spider (Stage I-0: Woo <code>bundle</code>/<code>grouped</code>, component lists, structured variant axes)</td><td>Deterministic type mapping + member resolution; verbatim type preserved in <code>source_product_type</code> (Q-Transact's own precedent)</td><td><b>Auto-apply</b> with an <code>AUTO_APPLIED_AT_INGEST</code> audit stamp — the reserved enum finally earns its keep</td></tr>
@@ -633,12 +646,12 @@
     <ul>
       <li>Persisted enum is exactly <b><code>SIMPLE | VARIABLE | BUNDLE</code></b> (default SIMPLE). There is no persisted KIT: <b>Kit = <code>BUNDLE + is_kit=1</code></b>, inflated to a fourth choice in the admin UI and deflated on save. Q-Trust mirrors this contract literally — same words, same storage trick — so the two products can never drift apart on vocabulary, and a future catalog crosswalk is the identity function.</li>
       <li><b>Bundle vs Kit, answered:</b> mechanically identical (same member table, both explode into member order lines, neither separately stocked). A Kit differs only in <i>assembly</i>: member labels composed into one artwork, a combined mockup, and a stricter publish gate. Compliance mapping: Bundle &rarr; members individually labeled &rarr; <b>aggregate their COAs</b>; Kit &rarr; one labeled unit &rarr; <b>own combined COA</b> by default. Defaults, not rules.</li>
-      <li><b>Variable = the explicit container flag</b> Joseph asked for. Today container-ness is only inferred from COA levels (a level-Child parent, or children at level Parent). Rev 2: type Variable marks the container; the level keeps expressing which COA topology the family uses — children-hold-COAs (Child) or container-holds-the-family-COA (Individual + children at Parent). A parent that is itself a real product stays Simple. Backfill converts the two unambiguous patterns by script and routes the ambiguous tail to Tidy Up suggestions.</li>
+      <li><b>Variable = the explicit container flag</b> Joseph asked for. Today container-ness is only inferred from COA levels (a level-Child parent, or children at level Parent). Rev 2: type Variable marks the container; the level keeps expressing which COA topology the family uses — children-hold-COAs (Child) or container-holds-the-family-COA (Individual + children at Parent). A parent that is itself a real product stays Simple. <b>Rev 2.1: no retroactive backfill</b> — containers get marked by user edits, scan ingest for newly created parents, and opt-in Tidy Up suggestions; existing rows are untouched.</li>
       <li><b>Linking model kept</b> (Joseph's point 3): members are existing catalog products, stored in <code>pl_product_bundle(main_product_id, include_product_id, quantity, sort_order)</code> — Q-Transact's table shape plus quantity. Members must pre-exist (or be created inline as normal catalog rows); only Simple/Variable can be members — no nesting, same as Q-Transact's picker. Member standalone rows are untouched.</li>
     </ul>
 
     <h3>COAs and counts (carried from rev 1, unchanged in substance)</h3>
-    <p>The row carrying the Bundle assignment level is an aggregate of its members' <i>effective</i> statuses — the shipped variant-parent roll-up applied to the member set, with worst-of disposition, dashed derived chips, and expand-to-members as the audit affordance. Members that are themselves Shared/Inherited/Parent resolve through the existing owner chain. No double counting: members count individually; the level-Bundle row stays outside the counted universe; a Kit at level Individual counts as a normal COA owner. The KPI partition invariant is untouched; one informational "incl. N bundles" split is added. Fixed for free: today's silent lie where a level-Bundle product reads Compliant even with a violative member.</p>
+    <p>The row carrying the Bundle assignment level is an aggregate of its members' <i>effective</i> statuses — the shipped variant-parent roll-up applied to the member set, with worst-of disposition, dashed derived chips, and expand-to-members as the audit affordance. Members that are themselves Shared/Inherited/Parent resolve through the existing owner chain. No double counting: members count individually; the level-Bundle row stays outside the counted universe; a Kit at level Individual counts as a normal COA owner. The KPI partition invariant is untouched; one informational "incl. N bundles" split is added. Fixed for free: today's silent lie where a level-Bundle product reads Compliant even with a violative member. <b>Migration (rev 2.1):</b> existing rows need none — the type column lands as SIMPLE-by-default, which is exactly today's behavior, and the type is read by zero COA-requirement, assignment, or count paths; the only data touch is a preflight-counted heal of any stray level-Bundle rows.</p>
 
     <h3>Auto-establish at ingestion — the feasibility answer</h3>
     <p><b>Partially automatable now; deterministically automatable after one contract change.</b> The scan pipeline is entirely platform-agnostic — the spider normalizes every site into one product shape and <i>discards platform product types and component lists before Middleware sees them</i>; parent/child is built only from explicit variant data (precise, zero discovery); the only surviving signal for bundles is the title string. Hence the staged plan: (I-1, buildable now) stamp <b>Variable</b> automatically wherever explicit variant data exists — near-perfect; detect bundles from title tokens + &ge;2 catalog-member matches and surface them as <b>suggestions</b> through the existing engine (new BUNDLE_COMPOSITION group, reserved SCAN_AUTO_INGEST producer, no migration) — never auto-applied from heuristics. (I-0, the real unlock) widen the spider contract to carry platform types, component lists, and structured variant axes; then type mapping is deterministic and earns auto-apply with the reserved AUTO_APPLIED_AT_INGEST audit stamp. One collision handled deliberately: bare "pack/ct/count" titles stay weight/size variants (the existing regex already claims them); multi-count of the same product is a variant, composition of different products is a bundle.</p>
@@ -647,7 +660,7 @@
     <ul>
       <li><b>Quantity in v1?</b> Column + one input, ignored by COA logic (Q-Transact has none; ours is a superset). Recommend yes.</li>
       <li><b>Adopt <code>is_kit</code> in v1</b> or ship Bundle-only first? Recommend adopt — one tinyint, settles the taxonomy permanently.</li>
-      <li><b>Container backfill aggressiveness</b> — script the unambiguous, suggest the rest. Confirm.</li>
+      <li><b>Container backfill</b> — <b>decided (rev 2.1): none.</b> Nothing reads the type in COA/count paths, so retro-stamping has zero functional value; marking happens via edits, ingest of new parents, and opt-in suggestions.</li>
       <li><b>Member archive semantics</b> — exclude-with-note (recommended) vs block.</li>
       <li><b>I-0 ownership</b> — the spider contract lives outside these repos; needs the spider owners before that ticket is fileable.</li>
       <li><b>Pack-token blast radius</b> — leave the shared weight/size regex untouched in v1; the bundle detector overrides per-row on confirmed member evidence.</li>
@@ -655,7 +668,7 @@
 
     <h3>Build sequence (ticket-shaped)</h3>
     <ul>
-      <li><b>B-1 API — type taxonomy + membership schema:</b> product_type + is_kit + source_product_type columns, pl_product_bundle table, invariants + convertibility, container backfill + suggestion sweep, upsert DTO/handlers, healing script for stray level-Bundle rows.</li>
+      <li><b>B-1 API — type taxonomy + membership schema:</b> product_type (DEFAULT SIMPLE, no backfill UPDATE) + is_kit + source_product_type columns, pl_product_bundle table, the single hard invariant + convertibility rule, upsert DTO/handlers, stray-level-Bundle preflight + conditional heal.</li>
       <li><b>B-2 API — aggregate status + statistic split:</b> Bundle roll-up branch, worst-of disposition, bundle counts (coordinate the pending parent-split statistic work), export-text drive-by fix.</li>
       <li><b>B-3 UI — create/edit with type picker:</b> four-way type selector (Kit inflate/deflate), Variable/Bundle modal modes, member picker + create-for-bundle, level constraints per type, bundles_01 gate.</li>
       <li><b>B-4 UI — table rendering:</b> Bundle/Kit pills, member expansion, aggregate chips, container affix, optional Type column, KPI sub-label, "Bundles only" facet.</li>
@@ -668,7 +681,7 @@
 
 <div class="footer">
   <a href="https://jfloyd-qredible.netlify.app/">&larr; All Mockups</a> &nbsp;&middot;&nbsp;
-  Bundles — product type taxonomy &amp; aggregate COA status (Rev 2) &nbsp;&middot;&nbsp; Aug 21, 2026 &nbsp;&middot;&nbsp;
+  Bundles — product type taxonomy &amp; aggregate COA status (Rev 2.1) &nbsp;&middot;&nbsp; Aug 21, 2026 &nbsp;&middot;&nbsp;
   Spec: qredible-brain <code>docs/specs/bundles-product-structure-coa-aggregate-spec-2026-08-20.md</code> &nbsp;&middot;&nbsp;
   All data representative.
 </div>
