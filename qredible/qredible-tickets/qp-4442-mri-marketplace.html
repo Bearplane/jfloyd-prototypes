@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP-4442 — MRI Marketplace: per-industry data sources, free / paid / add-on</title>
+<style>
+  /* ══════════════════════════════════════════════════════════════════════
+     TOKENS
+     Two families, deliberately kept apart:
+       --mri-*  = literal hex read out of components/qmonitor/mri/MriModal.tsx.
+                  The modal uses NO design tokens; every colour there is inline.
+                  Reproduced verbatim so the mockup is the real modal.
+       --qt-*   = the app-wide vocabulary (enum-constants.ts ColorQP,
+                  ColorEnum, ButtonComponent, QPSwitch, ColumnManagementPanel)
+                  used for the NEW marketplace surfaces.
+     ══════════════════════════════════════════════════════════════════════ */
+  :root{
+    /* --- MriModal.tsx verbatim --- */
+    --mri-header-bg:#f7f5ff;      --mri-header-border:#ede9fe;
+    --mri-indigo:#4338CA;         --mri-tab-idle:#94A3B8;
+    --mri-refresh-bg:#EEF2FF;     --mri-refresh-border:#C7D2FE;
+    --mri-info-bg:#eff6ff;        --mri-info-border:#bfdbfe;   --mri-info-fg:#1d4ed8;
+    --mri-summary-bg:#fafafa;     --mri-border:#e2e8f0;        --mri-hairline:#f1f5f9;
+    --mri-th-bg:#1e3a5f;
+    --mri-title:#111827;          --mri-subtitle:#4b5563;      --mri-muted:#64748B;
+    --mri-slate-700:#334155;      --mri-slate-100:#F1F5F9;
+    --mri-pill-blue-bg:#DBEAFE;   --mri-pill-blue-fg:#1D4ED8;
+    --mri-pill-green-bg:#DCFCE7;  --mri-pill-green-fg:#166534;
+    --mri-pill-grey-bg:#F1F5F9;   --mri-pill-grey-fg:#64748B;
+    --mri-open-fg:#B91C1C;  --mri-open-bg:#FEE2E2;  --mri-open-bd:#FECACA;
+    --mri-res-fg:#166534;   --mri-res-bg:#DCFCE7;   --mri-res-bd:#BBF7D0;
+    --mri-link:#2563EB;     --mri-placeholder-bg:#FAFAFC;
+    /* severity dots (MriBadgeHelper.getMriSeverityDotColor) */
+    --mri-sev-high:#DC2626; --mri-sev-med:#D97706; --mri-sev-low:#2563EB;
+    --mri-sev-ok:#16A34A;   --mri-sev-none:#94A3B8;
+    /* --- app-wide (ColorQP / ColorEnum / component CSS) --- */
+    --qt-black:#1A202E;           --qt-black-hover:#1F3569;
+    --qt-canvas:#F8FBFD;          --qt-grey-light:#EBEDF2;   --qt-grey-smoke:#F1F5F9;
+    --qt-slate:#B1B9CA;           --qt-subtitle:#657496;     --qt-ash:#9BA09C;
+    --qt-blue-light:#50A8FF;      --qt-blue-bg:#DCEEFF;      --qt-link:#376fd0;
+    --qt-red-light:#F05252;       /* the real "Upgrade" link colour */
+    --qt-switch-on:#8DC63F;       --qt-switch-off:#b1b9ca;
+    --qt-lock:#9ca3af;            --qt-group-tag:#9ca3af;
+    --qt-panel-radius:8px;        --qt-control-radius:6px;
+    --qt-elev-card:10px 10px 30px rgb(0 0 0 / 0.1);
+    --qt-elev-menu:1px 5px 30px rgb(0 0 0 / 0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Uber Move",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       background:var(--qt-canvas);color:var(--qt-black);font-size:13px;line-height:1.45}
+
+  /* ── page chrome (mockup shell, not app) ── */
+  .topbar{background:#0b1e39;color:#fff;padding:14px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .topbar .logo{font-size:18px;font-weight:800;letter-spacing:.3px}
+  .topbar .logo span{color:#7fd1c0;font-weight:600}
+  .crumb{font-size:12.5px;color:#9db3d1}
+  .mock-banner{background:#FEF3C7;color:#92400E;border-bottom:1px solid #FDE68A;
+    padding:9px 28px;font-size:12.5px;font-weight:600}
+  .screen-nav{display:flex;gap:8px;padding:14px 28px 0;flex-wrap:wrap;max-width:1360px;margin:0 auto}
+  .screen-nav button{border:1px solid var(--qt-grey-light);background:#fff;
+    color:var(--qt-subtitle);font:inherit;font-size:13px;font-weight:600;padding:8px 14px;
+    border-radius:8px 8px 0 0;cursor:pointer}
+  .screen-nav button.on{background:var(--qt-black);color:#fff;border-color:var(--qt-black)}
+  .screen{display:none;max-width:1360px;margin:0 auto;padding:20px 28px 60px}
+  .screen.active{display:block}
+  .note{border:1.5px dashed #60A5FA;background:#EFF6FF;color:#1E40AF;border-radius:8px;
+    padding:10px 14px;font-size:12.5px;margin:14px 0;line-height:1.5}
+  .note b{color:#1E3A8A}
+  .note.warn{border-color:#FBBF24;background:#FFFBEB;color:#92400E}
+  .note.warn b{color:#78350F}
+  code{background:var(--qt-grey-smoke);border:1px solid var(--qt-grey-light);
+    border-radius:4px;padding:1px 5px;font-size:12px;font-family:Consolas,Menlo,monospace}
+  h2.sh{font-size:15px;font-weight:700;margin:22px 0 4px}
+  p.sub{font-size:12.5px;color:var(--qt-subtitle);margin-bottom:10px;max-width:900px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  @media (max-width:1100px){.row2{grid-template-columns:1fr}}
+
+  /* ══════════════════════════════════════════════════════════════════════
+     THE REAL MRI MODAL  —  geometry from MriModal.tsx styled-components
+     ══════════════════════════════════════════════════════════════════════ */
+  .mri{width:min(960px,100%);height:720px;background:#fff;border-radius:8px;overflow:hidden;
+    display:flex;flex-direction:column;box-shadow:var(--qt-elev-card);border:1px solid var(--mri-border)}
+  .mri.short{height:auto;min-height:520px}
+  .mri-head{background:var(--mri-header-bg);border-bottom:1px solid var(--mri-header-border);
+    padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .mri-head .shield{font-size:24px;color:var(--mri-indigo);line-height:1}
+  .mri-head .t{font-size:20px;font-weight:600;color:var(--mri-title)}
+  .mri-head .s{font-size:14px;font-weight:500;color:var(--mri-subtitle)}
+  .mri-refresh{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:6px;
+    font-size:12.5px;font-weight:600;font-family:inherit;white-space:nowrap;
+    border:1px solid var(--mri-refresh-border);color:var(--mri-indigo);background:var(--mri-refresh-bg);cursor:pointer}
+  .mri-refresh.off{border-color:var(--mri-border);color:var(--mri-tab-idle);background:#F8FAFC;cursor:not-allowed}
+  .mri-x{color:#6B7280;font-size:17px;padding:4px 6px;cursor:pointer}
+  .mri-tabs{background:var(--mri-header-bg);border-bottom:1px solid var(--mri-header-border);
+    padding:0 20px;display:flex;align-items:center;flex-shrink:0;overflow-x:auto}
+  .mri-tab{padding:10px 14px;font-size:13px;font-weight:500;color:var(--mri-tab-idle);
+    border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .mri-tab.on{font-weight:600;color:var(--mri-indigo);border-bottom-color:var(--mri-indigo)}
+  .ppill{font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.04em;text-transform:uppercase}
+  .ppill.blue{background:var(--mri-pill-blue-bg);color:var(--mri-pill-blue-fg)}
+  .ppill.green{background:var(--mri-pill-green-bg);color:var(--mri-pill-green-fg)}
+  .ppill.grey{background:var(--mri-pill-grey-bg);color:var(--mri-pill-grey-fg)}
+  .mri-info{background:var(--mri-info-bg);border-bottom:1px solid var(--mri-info-border);
+    padding:9px 20px;font-size:12.5px;color:var(--mri-info-fg);flex-shrink:0}
+  .mri-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px 20px;
+    background:var(--mri-summary-bg);border-bottom:1px solid var(--mri-border);flex-shrink:0}
+  .mri-card{background:#fff;border:1px solid var(--mri-border);border-radius:8px;padding:10px 13px;border-top:3px solid #94A3B8}
+  .mri-card .n{font-size:24px;font-weight:700;line-height:1}
+  .mri-card .l{font-size:11.5px;color:var(--mri-muted);font-weight:500}
+  .mri-body{flex:1;overflow-y:auto;padding:18px 20px}
+  .mri-foot{padding:12px 20px;border-top:1px solid var(--mri-border);display:flex;align-items:center;gap:10px;
+    flex-shrink:0;background:var(--mri-summary-bg);font-size:12px;color:var(--mri-muted)}
+  /* ContactsTable */
+  table.ct{width:100%;border-collapse:collapse;font-size:13px}
+  table.ct th{background:var(--mri-th-bg);color:#fff;font-size:11px;font-weight:600;text-align:left;
+    padding:9px 12px;white-space:nowrap}
+  table.ct td{padding:10px 12px;border-bottom:1px solid var(--mri-hairline);vertical-align:middle}
+  .tblbox{border:1px solid var(--mri-border);border-radius:8px;overflow:hidden}
+  .spill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;
+    font-size:11.5px;font-weight:600;border:1px solid transparent}
+  .spill.open{color:var(--mri-open-fg);background:var(--mri-open-bg);border-color:var(--mri-open-bd)}
+  .spill.res{color:var(--mri-res-fg);background:var(--mri-res-bg);border-color:var(--mri-res-bd)}
+  .spill.neu{color:var(--mri-slate-700);background:var(--mri-slate-100);border-color:var(--mri-border)}
+  /* FactorCard */
+  .fcard{border:1px solid var(--mri-border);border-radius:8px;padding:14px 16px;background:#fff}
+  .fcard.ph{border-style:dashed;background:var(--mri-placeholder-bg);opacity:.92}
+  .fcard h4{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .fcard p{font-size:12.5px;color:var(--mri-muted);margin-top:6px}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .sevtag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 9px;
+    border-radius:10px;margin-left:auto;background:#F8FAFC;border:1px solid var(--mri-border);color:#475569}
+  .sevtag i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+  .cspill{font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.04em;
+    text-transform:uppercase;background:var(--mri-pill-grey-bg);color:var(--mri-pill-grey-fg);margin-left:auto}
+  .bignum{font-size:22px;font-weight:700;margin:6px 0 2px}
+  .bignum span{font-size:12px;font-weight:500;color:var(--mri-muted)}
+  .fine{font-size:11.5px;color:#94A3B8;margin-top:6px}
+  .mri-link{color:var(--mri-link);font-weight:600;cursor:pointer;font-size:12px}
+
+  /* ══════════════════════════════════════════════════════════════════════
+     NEW — Sources tab rows + Manage Checks panel
+     Visual vocabulary lifted from components/table/column-management/
+     ColumnManagementPanel.tsx (the app's existing locked-row + Upgrade
+     pattern) and components/QPSwitch.tsx.
+     ══════════════════════════════════════════════════════════════════════ */
+  .srcgrp{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--mri-muted);margin:16px 0 6px;display:flex;align-items:center;gap:8px}
+  .srcgrp:first-child{margin-top:0}
+  .srcgrp .ct{font-size:10px;font-weight:600;color:var(--qt-group-tag);letter-spacing:0;text-transform:none}
+  .srow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;margin-bottom:4px;
+    border:1px solid var(--mri-border);background:#fff}
+  .srow:hover{background:#f9fafb}
+  .srow.na{background:var(--qt-canvas);opacity:.65;border-style:dashed}
+  .srow.locked{opacity:.92}
+  .srow .ic{width:26px;height:26px;border-radius:6px;background:var(--mri-slate-100);display:flex;
+    align-items:center;justify-content:center;font-size:13px;flex:none}
+  .srow .nm{font-size:13px;font-weight:600;color:var(--qt-black);display:flex;align-items:center;gap:7px}
+  .srow .pv{font-size:11px;color:var(--qt-group-tag);margin-top:1px}
+  .srow .mid{flex:1;min-width:0}
+  .srow .meta{font-size:11.5px;color:var(--mri-muted);white-space:nowrap;text-align:right;min-width:150px}
+  .srow .ctl{display:flex;align-items:center;gap:6px;min-width:112px;justify-content:flex-end}
+  .newchip{font-size:10px;font-weight:600;height:18px;line-height:18px;padding:0 7px;border-radius:9px;
+    background:#DBEAFE;color:#1E40AF}
+  .tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:var(--mri-slate-100);color:var(--mri-muted)}
+  .tag.free{background:#ECFDF5;color:#065F46}
+  .tag.paid{background:#FEF3C7;color:#92400E}
+  .tag.plan{background:#EEF2FF;color:#4338CA}
+  /* QPSwitch — 40x24, thumb 18, track #b1b9ca / checked #8DC63F */
+  .qsw{width:40px;height:24px;border-radius:12px;background:var(--qt-switch-off);border:1px solid var(--qt-grey-light);
+    position:relative;flex:none;cursor:pointer}
+  .qsw i{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}
+  .qsw.on{background:var(--qt-switch-on);border-color:var(--qt-switch-on)}
+  .qsw.on i{left:18px}
+  .qsw.dis{opacity:.12}
+  .lockup{display:flex;align-items:center;gap:4px}
+  .lockup .lk{font-size:13px;color:var(--qt-lock);line-height:1}
+  .lockup .up{font-size:11px;font-weight:600;color:var(--qt-red-light);cursor:pointer}
+  .naword{font-size:11px;font-weight:600;color:var(--qt-ash)}
+
+  /* buttons — ButtonComponent.tsx resolved defaults */
+  .btn{background:#fff;border:1px solid var(--qt-grey-light);border-radius:var(--qt-control-radius);
+    padding:7px 13px;font:inherit;font-size:12px;font-weight:600;color:var(--qt-subtitle);cursor:pointer;white-space:nowrap}
+  .btn.primary{background:var(--qt-black);color:#fff;border-color:var(--qt-black);height:32px;
+    border-radius:5px;padding:0 24px;font-weight:700;filter:drop-shadow(0px 3px 6px rgba(0,0,0,.16))}
+  .btn.sm{padding:5px 11px;font-size:11.5px}
+
+  /* Manage Checks side panel — ColumnManagementPanel chrome */
+  .panel{width:420px;max-width:100%;background:#fff;border:1px solid var(--qt-grey-light);
+    border-radius:12px;box-shadow:var(--qt-elev-menu);display:flex;flex-direction:column;overflow:hidden}
+  .panel .ph{padding:24px 24px 12px}
+  .panel .ph .pt{font-size:20px;font-weight:600;color:var(--qt-black)}
+  .panel .ph .ps{font-size:12px;color:#6b7280;margin-top:2px}
+  .panel .pb{padding:0 16px 12px;overflow-y:auto;max-height:520px}
+  .panel .pf{border-top:1px solid #eef0f3;padding:16px 24px;display:flex;gap:10px;align-items:center}
+  .segtog{display:inline-flex;gap:4px;background:var(--qt-grey-smoke);border-radius:7px;padding:3px}
+  .segtog span{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;color:var(--qt-subtitle);cursor:pointer}
+  .segtog span.on{background:#fff;color:var(--qt-black);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .indbar{display:flex;align-items:center;gap:8px;background:#EEF2FF;border:1px solid #C7D2FE;
+    border-radius:8px;padding:8px 12px;margin:0 16px 10px;font-size:12px;color:#3730A3}
+  .indbar b{font-weight:700}
+
+  /* admin grid (screen 4) */
+  .gridwrap{overflow:auto;border:1px solid var(--qt-grey-light);border-radius:var(--qt-panel-radius);background:#fff;max-height:560px}
+  table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:1080px;font-size:12px}
+  table.mx th{position:sticky;top:0;z-index:2;background:var(--qt-grey-smoke);color:var(--qt-subtitle);
+    font-size:11px;font-weight:600;text-align:center;padding:8px 6px;border-bottom:1px solid var(--qt-grey-light);white-space:nowrap}
+  table.mx th.v{text-align:left;left:0;z-index:3;background:var(--qt-grey-smoke);min-width:220px}
+  table.mx td{padding:6px;border-bottom:1px solid #f1f5f9;text-align:center}
+  table.mx td.v{text-align:left;position:sticky;left:0;background:#fff;z-index:1;font-weight:600;
+    color:var(--qt-black);white-space:nowrap;border-right:1px solid var(--qt-grey-light)}
+  table.mx tr:hover td{background:#f9fafb}
+  table.mx tr:hover td.v{background:#f4f6f9}
+  .cellv{display:inline-flex;width:22px;height:22px;border-radius:5px;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700}
+  .cellv.on{background:#ECFDF5;color:#065F46}
+  .cellv.na{background:var(--qt-grey-smoke);color:#c3c9d4}
+  .cellv.paid{background:#FEF3C7;color:#92400E}
+  .cellv.soon{background:#EEF2FF;color:#818CF8}
+  .mccpill{font-size:10px;font-weight:600;padding:1px 5px;border-radius:4px;background:#EEF2FF;color:#4338CA;margin-left:6px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--qt-subtitle);margin:10px 0 4px;align-items:center}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+
+  /* prose */
+  .prose{max-width:900px;font-size:13.5px;line-height:1.62}
+  .prose h3{font-size:15px;font-weight:700;margin:22px 0 8px}
+  .prose h4{font-size:13.5px;font-weight:700;margin:16px 0 6px}
+  .prose p{margin-bottom:10px}
+  .prose ul{margin:0 0 10px 22px}
+  .prose li{margin-bottom:5px}
+  table.rules{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px}
+  table.rules th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--qt-subtitle);
+    background:var(--qt-grey-smoke);padding:7px 10px;border-bottom:1px solid var(--qt-grey-light)}
+  table.rules td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+  .footer{max-width:1360px;margin:0 auto;padding:0 28px 40px;font-size:12px;color:var(--qt-subtitle)}
+  .footer a{color:var(--qt-link)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Qredible <span>Q-Trust</span></div>
+  <div class="crumb">Q-Monitor &rsaquo; We Monitor &rsaquo; <b>MRI</b> &mdash; QP-4442 marketplace &amp; CFPB proposal</div>
+</div>
+<div class="mock-banner">DESIGN MOCKUP — QP-4442. Static illustration built off the REAL <code>components/qmonitor/mri/MriModal.tsx</code> (960&times;720, its own hex palette, 4 tabs + phase pills). Every merchant name, count and price is invented sample data. Blue dashed boxes are design notes, not UI. Spec: qredible-brain <code>docs/specs/qp4442-cfpb-mri-marketplace-qrecon-e2e-spec-2026-08-21.md</code></div>
+
+<div class="screen-nav">
+  <button class="on" onclick="show(0,this)">1 &middot; Legal tab — FDA &rarr; CFPB swap</button>
+  <button onclick="show(1,this)">2 &middot; New "Sources" tab (marketplace)</button>
+  <button onclick="show(2,this)">3 &middot; Manage Sources panel</button>
+  <button onclick="show(3,this)">4 &middot; Per-industry profile (admin)</button>
+  <button onclick="show(4,this)">5 &middot; What's real vs what's new</button>
+</div>
+
+<!-- ════════════════════════════ SCREEN 1 ════════════════════════════ -->
+<div class="screen active">
+  <div class="note"><b>The delta on this screen:</b> the Legal &amp; Regulatory tab is unchanged in structure — same <code>ContactsTable</code>, same five columns <i>Type · Title · Reference · Date · Status</i>, same Open/Resolved pills. What changes is <b>which source fills it</b>. Today FDA warning letters and recalls are unconditional for every merchant. Under QP-4442 the row set is driven by the merchant's <b>industry source profile</b>, so an Online Lending merchant gets CFPB complaints and no FDA card at all &mdash; not an empty FDA card.</div>
+
+  <div class="row2">
+    <div>
+      <h2 class="sh">Today &mdash; hemp merchant (FDA applies)</h2>
+      <p class="sub">This is the live modal, unmodified. Included as the fidelity baseline.</p>
+      <div class="mri short">
+        <div class="mri-head">
+          <span class="shield">&#128737;</span>
+          <div style="flex:1">
+            <div class="t">Merchant Risk Intelligence</div>
+            <div class="s">Sanctions &middot; Reputation &middot; Legal &middot; Business Risk &mdash; Greenfield Botanicals</div>
+          </div>
+          <button class="mri-refresh">&#10227; Refresh</button>
+          <span class="mri-x">&times;</span>
+        </div>
+        <div class="mri-tabs">
+          <div class="mri-tab">Sanctions <span class="ppill blue">Vital4 pending</span></div>
+          <div class="mri-tab">Reputation <span class="ppill green">Live</span></div>
+          <div class="mri-tab on">Legal &amp; Regulatory <span class="ppill green">Live</span></div>
+          <div class="mri-tab">Business Risk <span class="ppill grey">Partial</span></div>
+        </div>
+        <div class="mri-info"><b>Legal &amp; Regulatory</b> &mdash; FDA warning letters, recalls and CourtListener litigation already collected daily for every monitored company.</div>
+        <div class="mri-body">
+          <div class="tblbox">
+            <table class="ct">
+              <thead><tr><th>Type</th><th>Title</th><th>Reference</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="white-space:nowrap">FDA Warning Letter</td><td style="font-weight:600">Unapproved new drug claims &mdash; topical line</td><td style="font-size:12;color:#64748B"><span class="mri-link">CMS-000000 &#8599;</span></td><td style="font-size:12px">Mar 4, 2026</td><td><span class="spill open">Open</span></td></tr>
+                <tr><td style="white-space:nowrap">FDA Recall</td><td style="font-weight:600">Voluntary recall &mdash; lot mislabelling</td><td style="font-size:12;color:#64748B"><span class="mri-link">F-0000-2026 &#8599;</span></td><td style="font-size:12px">Jan 22, 2026</td><td><span class="spill res">Resolved</span></td></tr>
+                <tr><td style="white-space:nowrap">Litigation</td><td style="font-weight:600">Sample Holdings LLC v. Greenfield Botanicals<div style="margin-top:2px;font-size:11.5px;font-weight:400;color:#64748B">D. Sample &middot; Contract &middot; 12 documents</div></td><td style="font-size:12px;color:#64748B">1:26-cv-00000</td><td style="font-size:12px">Feb 11, 2026</td><td><span class="spill open">Open</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="mri-foot">Click a litigation row for full Case Details. FTC actions, state regulatory and AG feeds are planned (MRI Phase 3).</div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="sh">QP-4442 &mdash; lending merchant (CFPB applies, FDA does not)</h2>
+      <p class="sub">Same component. The InfoBar sentence, the Type values and the footer provenance line are composed from the resolved profile instead of being hardcoded.</p>
+      <div class="mri short">
+        <div class="mri-head">
+          <span class="shield">&#128737;</span>
+          <div style="flex:1">
+            <div class="t">Merchant Risk Intelligence</div>
+            <div class="s">Sanctions &middot; Reputation &middot; Legal &middot; Business Risk &mdash; Northgate Lending Co.</div>
+          </div>
+          <button class="mri-refresh">&#10227; Refresh</button>
+          <span class="mri-x">&times;</span>
+        </div>
+        <div class="mri-tabs">
+          <div class="mri-tab">Sanctions <span class="ppill blue">Vital4 pending</span></div>
+          <div class="mri-tab">Reputation <span class="ppill green">Live</span></div>
+          <div class="mri-tab on">Legal &amp; Regulatory <span class="ppill green">Live</span></div>
+          <div class="mri-tab">Business Risk <span class="ppill grey">Partial</span></div>
+          <div class="mri-tab">Sources <span class="ppill blue">New</span></div>
+        </div>
+        <div class="mri-info"><b>Legal &amp; Regulatory</b> &mdash; CFPB consumer complaints and CourtListener litigation, per the <b>Online Lending</b> source profile. FDA is not applicable to this industry.</div>
+        <div class="mri-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+            <div class="fcard">
+              <h4>CFPB Consumer Complaints <span class="sevtag"><i style="background:var(--mri-sev-med)"></i>medium</span></h4>
+              <div class="bignum">34<span> complaints (12m)</span></div>
+              <div style="font-size:12px;color:var(--mri-muted)">128 total (36m) &middot; 41 with narrative &middot; 96% timely</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">
+                <span class="tag">Payday / personal loan 19</span>
+                <span class="tag">Debt collection 9</span>
+                <span class="tag">Credit reporting 6</span>
+              </div>
+              <div class="fine">Matched as <b>Northgate Lending Company, Inc.</b> &middot; confidence 0.91 &middot; last pulled 2 days ago</div>
+            </div>
+            <div class="fcard">
+              <h4>Litigation <span class="sevtag"><i style="background:var(--mri-sev-low)"></i>low</span></h4>
+              <div class="bignum">1<span> open of 3 cases</span></div>
+              <div style="font-size:12px;color:var(--mri-muted)">CourtListener / RECAP docket monitoring.</div>
+              <div class="fine">Last pulled 6 days ago</div>
+            </div>
+          </div>
+          <div class="tblbox">
+            <table class="ct">
+              <thead><tr><th>Type</th><th>Title</th><th>Reference</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="white-space:nowrap">CFPB Complaint</td><td style="font-weight:600">Struggling to repay your loan &mdash; charged fees you didn't expect<div style="margin-top:2px;font-size:11.5px;font-weight:400;color:#64748B">Payday loan, title loan, personal loan, or advance loan &middot; narrative on file</div></td><td style="font-size:12px;color:#64748B"><span class="mri-link">00000000 &#8599;</span></td><td style="font-size:12px">Aug 11, 2026</td><td><span class="spill open">Open</span></td></tr>
+                <tr><td style="white-space:nowrap">CFPB Complaint</td><td style="font-weight:600">Attempts to collect debt not owed<div style="margin-top:2px;font-size:11.5px;font-weight:400;color:#64748B">Debt collection &middot; closed with monetary relief</div></td><td style="font-size:12px;color:#64748B"><span class="mri-link">00000000 &#8599;</span></td><td style="font-size:12px">Jul 29, 2026</td><td><span class="spill res">Resolved</span></td></tr>
+                <tr><td style="white-space:nowrap">Litigation</td><td style="font-weight:600">Sample Borrower v. Northgate Lending Co.<div style="margin-top:2px;font-size:11.5px;font-weight:400;color:#64748B">D. Sample &middot; Consumer Credit &middot; 7 documents</div></td><td style="font-size:12px;color:#64748B">1:26-cv-00000</td><td style="font-size:12px">May 2, 2026</td><td><span class="spill open">Open</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="mri-foot">CFPB Consumer Complaint Database (CC0, weekly) &middot; CourtListener. FDA not applicable to Online Lending.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><b>Why "not applicable" has to be its own state.</b> The live FDA card's empty copy reads <i>"Daily-ingested FDA databases contain no records matched to this merchant."</i> For a lender that sentence is not merely useless &mdash; it reads as a <b>clean bill of health from a regulator that was never going to have a record</b>. <code>NOT_APPLICABLE</code> renders no card, contributes nothing to the Legal score, and is visible only in the Sources tab (screen 2) so nobody thinks the check silently vanished.</div>
+
+  <div class="note warn"><b>Scoring note carried from the spec.</b> CFPB complaint volume scales with a lender's book size, not its misconduct, so the Legal contribution is <b>banded</b> (0 / 1–9 / 10–49 / 50–199 / 200+), and the discriminating terms are <b>untimely responses</b> and <b>monetary-relief rate</b>, not raw count. The numbers above are illustrative only &mdash; bands need calibrating against a real lender cohort before any of this reaches a customer report.</div>
+</div>
+
+<!-- ════════════════════════════ SCREEN 2 ════════════════════════════ -->
+<div class="screen">
+  <div class="note"><b>The delta on this screen:</b> one new tab, <b>Sources</b>, inside the existing modal. It is the marketplace where it is actually useful &mdash; next to the data it governs. Rows are grouped by the four <b>existing</b> MRI factors (<code>MriFactorKey</code>: Sanctions / Reputation / Legal &amp; Regulatory / Business Risk), because a source's only job is to feed a factor. Nothing here invents a new grouping.</div>
+
+  <div class="mri">
+    <div class="mri-head">
+      <span class="shield">&#128737;</span>
+      <div style="flex:1">
+        <div class="t">Merchant Risk Intelligence</div>
+        <div class="s">Sanctions &middot; Reputation &middot; Legal &middot; Business Risk &mdash; Northgate Lending Co.</div>
+      </div>
+      <button class="mri-refresh off">&#10227; Available in 47m</button>
+      <span class="mri-x">&times;</span>
+    </div>
+    <div class="mri-tabs">
+      <div class="mri-tab">Sanctions <span class="ppill blue">Vital4 pending</span></div>
+      <div class="mri-tab">Reputation <span class="ppill green">Live</span></div>
+      <div class="mri-tab">Legal &amp; Regulatory <span class="ppill green">Live</span></div>
+      <div class="mri-tab">Business Risk <span class="ppill grey">Partial</span></div>
+      <div class="mri-tab on">Sources <span class="ppill blue">New</span></div>
+    </div>
+    <div class="mri-info"><b>Data Sources</b> &mdash; which external checks run for this merchant. Defaults come from the <b>Online Lending</b> industry profile; your processor settings and add-ons override them.</div>
+    <div class="mri-cards">
+      <div class="mri-card" style="border-top-color:#16A34A"><div class="n" style="color:#16A34A">5</div><div class="l">Active</div></div>
+      <div class="mri-card" style="border-top-color:#D97706"><div class="n" style="color:#D97706">2</div><div class="l">Available as add-on</div></div>
+      <div class="mri-card" style="border-top-color:#94A3B8"><div class="n" style="color:#94A3B8">3</div><div class="l">Not applicable</div></div>
+      <div class="mri-card" style="border-top-color:#3B82F6"><div class="n" style="color:#3B82F6">1</div><div class="l">Coming soon</div></div>
+    </div>
+    <div class="mri-body">
+
+      <div class="srcgrp">Legal &amp; Regulatory <span class="ct">2 active · 1 add-on · 1 not applicable</span></div>
+
+      <div class="srow">
+        <div class="ic">&#127963;</div>
+        <div class="mid">
+          <div class="nm">CFPB Consumer Complaint Database <span class="newchip">New</span> <span class="tag free">Free</span></div>
+          <div class="pv">Consumer Financial Protection Bureau &middot; public API &middot; weekly</div>
+        </div>
+        <div class="meta">Last pulled 2 days ago<br><span style="color:#16A34A;font-weight:600">Matched · confidence 0.91</span></div>
+        <div class="ctl"><span class="qsw on"><i></i></span></div>
+      </div>
+
+      <div class="srow">
+        <div class="ic">&#9878;</div>
+        <div class="mid">
+          <div class="nm">CourtListener litigation <span class="tag free">Free</span></div>
+          <div class="pv">Free Law Project / RECAP &middot; monthly</div>
+        </div>
+        <div class="meta">Last pulled 6 days ago<br><span style="color:var(--mri-muted)">3 cases on file</span></div>
+        <div class="ctl"><span class="qsw on"><i></i></span></div>
+      </div>
+
+      <div class="srow locked">
+        <div class="ic">&#128200;</div>
+        <div class="mid">
+          <div class="nm">State AG &amp; regulatory actions <span class="tag paid">Add-on</span></div>
+          <div class="pv">Aggregated state enforcement feeds &middot; monthly</div>
+        </div>
+        <div class="meta">Not enabled<br><span style="color:var(--qt-ash)">$— / merchant / mo</span></div>
+        <div class="ctl"><span class="lockup"><span class="lk">&#128274;</span><span class="up">Upgrade</span></span></div>
+      </div>
+
+      <div class="srow na">
+        <div class="ic" style="background:#fff">&#128138;</div>
+        <div class="mid">
+          <div class="nm" style="color:var(--qt-subtitle)">FDA warning letters &amp; recalls</div>
+          <div class="pv">Not applicable to Online Lending &mdash; set by the industry profile</div>
+        </div>
+        <div class="meta"><span class="naword">NOT APPLICABLE</span></div>
+        <div class="ctl"><span class="qsw dis"><i></i></span></div>
+      </div>
+
+      <div class="srcgrp">Reputation <span class="ct">2 active · 1 not applicable</span></div>
+
+      <div class="srow">
+        <div class="ic">&#127970;</div>
+        <div class="mid">
+          <div class="nm">Better Business Bureau <span class="tag free">Free</span></div>
+          <div class="pv">BBB public profile scrape &middot; continuous round-robin</div>
+        </div>
+        <div class="meta">Last scanned 4 days ago<br><span style="color:var(--mri-muted)">Grade B · 11 complaints (12m)</span></div>
+        <div class="ctl"><span class="qsw on"><i></i></span></div>
+      </div>
+
+      <div class="srow">
+        <div class="ic">&#11088;</div>
+        <div class="mid">
+          <div class="nm">Google reviews <span class="tag free">Free</span></div>
+          <div class="pv">Google Places &middot; daily</div>
+        </div>
+        <div class="meta">Last pulled yesterday<br><span style="color:var(--mri-muted)">4 open signals</span></div>
+        <div class="ctl"><span class="qsw on"><i></i></span></div>
+      </div>
+
+      <div class="srow na">
+        <div class="ic" style="background:#fff">&#128172;</div>
+        <div class="mid">
+          <div class="nm" style="color:var(--qt-subtitle)">Trustpilot / Yelp</div>
+          <div class="pv">Coming soon &mdash; later MRI phase</div>
+        </div>
+        <div class="meta"><span class="naword">COMING SOON</span></div>
+        <div class="ctl"><span class="qsw dis"><i></i></span></div>
+      </div>
+
+      <div class="srcgrp">Sanctions <span class="ct">1 coming soon</span></div>
+
+      <div class="srow na">
+        <div class="ic" style="background:#fff">&#128737;</div>
+        <div class="mid">
+          <div class="nm" style="color:var(--qt-subtitle)">Vital4 &mdash; OFAC / PEP / adverse media <span class="tag paid">Add-on</span></div>
+          <div class="pv">Vital4 &middot; API integration in progress</div>
+        </div>
+        <div class="meta"><span class="naword">COMING SOON</span></div>
+        <div class="ctl"><span class="qsw dis"><i></i></span></div>
+      </div>
+
+      <div class="srcgrp">Business Risk <span class="ct">1 active · 1 add-on · 1 not applicable</span></div>
+
+      <div class="srow">
+        <div class="ic">&#128196;</div>
+        <div class="mid">
+          <div class="nm">Licence status (LicenseIQ) <span class="tag free">Free</span></div>
+          <div class="pv">Qredible LicenseIQ &middot; on change</div>
+        </div>
+        <div class="meta">2 licences on file<br><span style="color:var(--mri-muted)">1 expiring in 41 days</span></div>
+        <div class="ctl"><span class="qsw on"><i></i></span></div>
+      </div>
+
+      <div class="srow locked">
+        <div class="ic">&#127991;</div>
+        <div class="mid">
+          <div class="nm">MCC mismatch verdict (Q-Recon) <span class="tag paid">Add-on</span></div>
+          <div class="pv">Qredible &middot; declared vs product/content-inferred MCC &middot; nightly</div>
+        </div>
+        <div class="meta">Not enabled<br><span style="color:var(--qt-ash)">$— / merchant / mo</span></div>
+        <div class="ctl"><span class="lockup"><span class="lk">&#128274;</span><span class="up">Upgrade</span></span></div>
+      </div>
+
+      <div class="srow na">
+        <div class="ic" style="background:#fff">&#127808;</div>
+        <div class="mid">
+          <div class="nm" style="color:var(--qt-subtitle)">COA / lab validation</div>
+          <div class="pv">Not applicable to Online Lending &mdash; no product catalogue</div>
+        </div>
+        <div class="meta"><span class="naword">NOT APPLICABLE</span></div>
+        <div class="ctl"><span class="qsw dis"><i></i></span></div>
+      </div>
+
+    </div>
+    <div class="mri-foot" style="justify-content:space-between">
+      <span>Turning a source off stops the pull and greys its factor &mdash; it never counts as "screened clear".</span>
+      <button class="btn sm">Manage sources &rarr;</button>
+    </div>
+  </div>
+
+  <div class="note"><b>Reused, not invented.</b> The lock + red <b>Upgrade</b> affordance and the green toggle are the app's existing pattern, lifted from <code>components/table/column-management/ColumnManagementPanel.tsx</code> (locked column rows) and <code>components/QPSwitch.tsx</code> (40&times;24 track, 18px thumb, <code>#8DC63F</code> when on, <code>#b1b9ca</code> when off). The <code>Upgrade</code> link colour <code>#F05252</code> is the same one that panel uses. The dashed, 65%-opacity "not applicable" row mirrors that panel's <code>SystemRow</code> treatment for rows a user cannot act on.</div>
+
+  <div class="note warn"><b>Deliberately NOT shown:</b> a price on a paid row. Pricing is an open decision (billing integration is unresolved), so the mockup shows <code>$—</code> placeholders. The columns exist; the numbers are a product call, not a design one.</div>
+</div>
+
+<!-- ════════════════════════════ SCREEN 3 ════════════════════════════ -->
+<div class="screen">
+  <div class="note"><b>The delta on this screen:</b> a <b>Manage Sources</b> item added to the existing We-Monitor row Actions menu (<code>MonitoredCompaniesTableRow.tsx</code>, which today holds Scan / Run License Check / Create License Case / Generate EDR Report / Archive / Delete). It opens a 420px side panel using the app's existing panel chrome. This is the processor-facing surface: per-merchant overrides on top of the industry default.</div>
+
+  <div class="row2">
+    <div>
+      <h2 class="sh">Entry point &mdash; existing row Actions menu</h2>
+      <p class="sub">One new item. Nothing else in the menu moves.</p>
+      <div style="background:#fff;border:1px solid var(--qt-grey-light);border-radius:8px;box-shadow:var(--qt-elev-menu);width:250px;padding:6px">
+        <div style="padding:8px 12px;font-size:13px;color:var(--qt-black)">Scan</div>
+        <div style="padding:8px 12px;font-size:13px;color:var(--qt-black)">Run License Check</div>
+        <div style="padding:8px 12px;font-size:13px;color:var(--qt-black)">Create License Case</div>
+        <div style="padding:8px 12px;font-size:13px;color:var(--qt-black)">Generate EDR Report</div>
+        <div style="padding:8px 12px;font-size:13px;color:var(--qt-black);background:#EEF2FF;border-radius:6px;font-weight:600">Manage Sources <span class="newchip" style="margin-left:6px">New</span></div>
+        <div style="height:1px;background:var(--qt-grey-light);margin:5px 8px"></div>
+        <div style="padding:8px 12px;font-size:13px;color:var(--qt-black)">Archive Company</div>
+      </div>
+
+      <div class="note" style="margin-top:18px"><b>Bulk path.</b> The same panel opens from the We-Monitor bulk bar when several merchants are selected, in which case rows that differ across the selection render an indeterminate toggle and a <i>"mixed — N of M on"</i> meta line. Not drawn here; it is the same component with a tri-state switch.</div>
+    </div>
+
+    <div>
+      <h2 class="sh">Manage Sources panel</h2>
+      <p class="sub">420px, <code>Uber Move</code>, 20px/600 title over a 12px/#6b7280 subtitle &mdash; the chrome <code>ColumnManagementPanel</code> already establishes.</p>
+      <div class="panel">
+        <div class="ph">
+          <div class="pt">Manage Sources</div>
+          <div class="ps">Northgate Lending Co. &mdash; external checks that feed this merchant's MRI.</div>
+        </div>
+        <div class="indbar">
+          <span>&#9432;</span>
+          <span>Industry profile: <b>Online Lending</b>. 5 sources on by default, 3 not applicable.
+          <span class="mri-link" style="font-size:11.5px">Change industry</span></span>
+        </div>
+        <div style="padding:0 24px 10px;display:flex;align-items:center;justify-content:space-between">
+          <span class="segtog"><span class="on">All</span><span>Active only</span><span>Available</span></span>
+          <span style="font-size:11.5px;color:var(--qt-subtitle)">9 sources</span>
+        </div>
+        <div class="pb">
+          <div class="srcgrp">Legal &amp; Regulatory</div>
+          <div class="srow" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px">CFPB Consumer Complaints</div><div class="pv">Industry default &middot; free</div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw on"><i></i></span></div>
+          </div>
+          <div class="srow" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px">CourtListener litigation</div><div class="pv">Industry default &middot; free</div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw on"><i></i></span></div>
+          </div>
+          <div class="srow locked" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px">State AG &amp; regulatory actions</div><div class="pv">Add-on &middot; not in plan</div></div>
+            <div class="ctl" style="min-width:46px"><span class="lockup"><span class="lk">&#128274;</span><span class="up">Upgrade</span></span></div>
+          </div>
+          <div class="srow na" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px;color:var(--qt-subtitle)">FDA warning letters &amp; recalls</div><div class="pv">Not applicable to this industry</div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw dis"><i></i></span></div>
+          </div>
+
+          <div class="srcgrp">Reputation</div>
+          <div class="srow" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px">Better Business Bureau</div><div class="pv">Industry default &middot; free</div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw on"><i></i></span></div>
+          </div>
+          <div class="srow" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px">Google reviews</div><div class="pv">Turned off for this merchant</div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw"><i></i></span></div>
+          </div>
+
+          <div class="srcgrp">Business Risk</div>
+          <div class="srow" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px">Licence status (LicenseIQ)</div><div class="pv">Industry default &middot; free</div></div>
+            <div class="ctl" style="min-width:46px"><span class="qsw on"><i></i></span></div>
+          </div>
+          <div class="srow locked" style="padding:7px 9px">
+            <div class="mid"><div class="nm" style="font-size:12.5px">MCC mismatch verdict (Q-Recon)</div><div class="pv">Add-on &middot; not in plan</div></div>
+            <div class="ctl" style="min-width:46px"><span class="lockup"><span class="lk">&#128274;</span><span class="up">Upgrade</span></span></div>
+          </div>
+        </div>
+        <div class="pf">
+          <button class="btn primary">Save</button>
+          <button class="btn">Cancel</button>
+          <span style="margin-left:auto;font-size:11.5px;color:var(--qt-subtitle)">Reset to industry default</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><b>Precedence, made visible.</b> Each row's sub-label states <i>why</i> it is in its current state &mdash; "Industry default", "Turned off for this merchant", "Add-on &middot; not in plan", "Not applicable to this industry". That string is the resolver's own <code>source</code> field rendered back to the user, so support can answer "why isn't this pulling?" without a database query. A human or paid override is never silently overwritten when the industry profile is recomputed.</div>
+</div>
+
+<!-- ════════════════════════════ SCREEN 4 ════════════════════════════ -->
+<div class="screen">
+  <div class="note"><b>The delta on this screen:</b> the admin authoring surface, in Q-Audit / Global Settings alongside the existing COA-Validity-Rules and Classification-Settings cards. Rows are the <b>34 verticals from the Industry Vertical Master</b>; columns are MRI sources. A cell is the industry <i>default</i>, which then materialises per company. Fifteen representative rows shown &mdash; the real grid scrolls all 34.</div>
+
+  <h2 class="sh">Industry &rarr; MRI source profile</h2>
+  <p class="sub">Primary MCC is shown beside each vertical because it is the strongest single inference signal Q-Recon uses, and because a merchant boarded under a catch-all code (5999, 5969, 5964, 5968) is exactly the mismatch case the verdict source exists to catch.</p>
+
+  <div class="legend">
+    <span><i class="cellv on">Y</i> On by default</span>
+    <span><i class="cellv paid">$</i> Add-on</span>
+    <span><i class="cellv soon">&middot;</i> Coming soon</span>
+    <span><i class="cellv na">&ndash;</i> Not applicable</span>
+  </div>
+
+  <div class="gridwrap">
+    <table class="mx">
+      <thead>
+        <tr>
+          <th class="v">Vertical</th>
+          <th>CFPB</th><th>FDA</th><th>Court&shy;Listener</th><th>State AG</th>
+          <th>BBB</th><th>Google</th><th>Trust&shy;pilot</th>
+          <th>Vital4</th><th>Licence</th><th>MCC verdict</th><th>COA / lab</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="v">Hemp-Derived CBD Products <span class="mccpill">5912</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
+        <tr><td class="v">Hemp — Seeds, Oils, Cultivation <span class="mccpill">5261</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
+        <tr><td class="v">Mushrooms <span class="mccpill">5499</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
+        <tr><td class="v">Kava <span class="mccpill">5499</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
+        <tr><td class="v">Kratom <span class="mccpill">5499</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
+        <tr style="background:#FFFBEB"><td class="v">On-Line Lending <span class="mccpill">6012</span></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+        <tr style="background:#FFFBEB"><td class="v">Short-Term Consumer Lending <span class="mccpill">6012</span></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+        <tr><td class="v">Debt Relief <span class="mccpill">7277</span></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+        <tr><td class="v">Debt Collection <span class="mccpill">7322</span></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+        <tr><td class="v">Firearms — CNP B2B <span class="mccpill">5723</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+        <tr><td class="v">Supplements / Nutraceuticals <span class="mccpill">5122</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
+        <tr><td class="v">GLP-1 — Peptides <span class="mccpill">5122</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv on">Y</i></td></tr>
+        <tr><td class="v">Telemedicine <span class="mccpill">8011</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+        <tr><td class="v">Timeshare Sales <span class="mccpill">7012</span></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+        <tr><td class="v">Certified Charitable Crowdfunding <span class="mccpill">8398</span></td>
+          <td><i class="cellv na">&ndash;</i></td><td><i class="cellv na">&ndash;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td>
+          <td><i class="cellv on">Y</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv soon">&middot;</i></td>
+          <td><i class="cellv soon">&middot;</i></td><td><i class="cellv on">Y</i></td><td><i class="cellv paid">$</i></td><td><i class="cellv na">&ndash;</i></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note warn"><b>These cells are a proposal, not a decision.</b> CFPB is on for the six financial-services verticals because CFPB only accepts complaints about consumer financial products; FDA is on for the ingestible/product verticals; COA/lab follows the master file's own 8-vertical COA column. Every cell needs compliance sign-off before seeding &mdash; the grid is the artefact that makes that review possible in one pass instead of thirty-four.</div>
+
+  <div class="note"><b>Where this lives in the data model.</b> The grid is <b>not</b> a new industry-keyed table. Each row is the <code>mriSources[]</code> field of that industry's policy document; saving materialises per-company rows that the Middleware cron can join set-wise. That keeps the compliance engine policy-first &mdash; rules as data read by the deterministic resolver that already exists &mdash; while still giving the nightly cron a plain indexed table to filter on.</div>
+</div>
+
+<!-- ════════════════════════════ SCREEN 5 ════════════════════════════ -->
+<div class="screen">
+  <div class="prose">
+    <h3>What is real in this mockup, and what is the proposal</h3>
+    <p>Everything on screens 1&ndash;3 that is drawn in the modal's indigo/slate palette is the shipped component. The proposal is deliberately small: <b>one new tab, one new menu item, one new panel, one new admin card</b> &mdash; and one change of shape in the EDR/MRI data contract.</p>
+
+    <h4>Verified against the running code</h4>
+    <table class="rules">
+      <tr><th style="width:38%">Element</th><th>Status</th></tr>
+      <tr><td>Modal shell 960&times;720, 8px radius, <code>#f7f5ff</code> header, shield icon <code>#4338CA</code></td><td><b>Real</b> &mdash; <code>MriModal.tsx</code> <code>ModalContainer</code>/<code>ModalHeader</code></td></tr>
+      <tr><td>Four tabs + phase pills "Vital4 pending" / "Live" / "Live" / "Partial"</td><td><b>Real</b> &mdash; pills are uppercase via <code>text-transform</code>, exactly as drawn</td></tr>
+      <tr><td>Active tab <code>#4338CA</code> with a 2px underline; idle <code>#94A3B8</code></td><td><b>Real</b> &mdash; note this is a modal-local styled div, not the app-wide MUI Tabs indicator</td></tr>
+      <tr><td>Refresh button + its cooldown state ("Available in 47m")</td><td><b>Real</b> &mdash; 1-hour per-source cooldown, live countdown</td></tr>
+      <tr><td>InfoBar, SummaryCards (4-up), ContactsTable with the navy <code>#1e3a5f</code> header</td><td><b>Real</b> &mdash; SummaryCards exists only on Sanctions today; screen 2 reuses it on Sources</td></tr>
+      <tr><td>Legal table columns <i>Type · Title · Reference · Date · Status</i>, Open/Resolved pills</td><td><b>Real</b> &mdash; verbatim</td></tr>
+      <tr><td>Lock + red <b>Upgrade</b> link, green toggle</td><td><b>Real pattern, new placement</b> &mdash; from the column-management panel and <code>QPSwitch</code></td></tr>
+      <tr><td>Row Actions menu items</td><td><b>Real</b> &mdash; "Manage Sources" is the single new entry</td></tr>
+      <tr><td><b>Sources tab</b></td><td><b>NEW</b></td></tr>
+      <tr><td><b>Manage Sources panel</b></td><td><b>NEW</b> (existing panel chrome)</td></tr>
+      <tr><td><b>Industry &rarr; source profile grid</b></td><td><b>NEW</b></td></tr>
+      <tr><td><b>CFPB as a source</b></td><td><b>NEW</b> &mdash; nothing named CFPB exists in any repo today</td></tr>
+    </table>
+
+    <h4>The three things that make this buildable</h4>
+    <ul>
+      <li><b>The entitlement substrate already exists.</b> <code>pl_source</code> (with <code>element_identity</code>), <code>pl_feature_new</code> (with <code>subscription_price</code>, <code>addon_price</code>, <code>list_in_addons</code>), <code>pl_feature_source</code> and <code>pl_plan_feature_source_restriction</code> are all in the schema. Free / paid / add-on is a matter of seeding rows and adding price columns to the join edge &mdash; not a new billing model. <i>One correction to the earlier design note: the trial-delay columns live on <code>pl_plan_feature_restriction</code> (per feature), not on the source-restriction row, so a per-source trial delay is not free.</i></li>
+      <li><b>The factor roll-up already has the seam.</b> The aggregate ignores factors marked inactive, but every factor is currently hardcoded active. Replacing that one literal with the resolver's answer is what makes a turned-off source render as "not screened" instead of "screened clear".</li>
+      <li><b>The collector pattern already exists.</b> CFPB clones the BBB module shape (search client &rarr; fuzzy resolver &rarr; processor &rarr; one summary row with freshness + fetch-status columns) and the litigation cron shape (find-outdated &rarr; per-company producer). It must <i>not</i> clone the FDA pattern, which downloads a global feed and creates a company row for every unmatched firm &mdash; against a 17-million-record complaint database that would manufacture tens of thousands of junk merchants.</li>
+    </ul>
+
+    <h4>The one hard dependency</h4>
+    <p>None of the per-industry behaviour can resolve until the platform has a <b>canonical industry key</b>. Today "industry" means three unrelated things that share no foreign key: the six seeded <code>pl_segment</code> rows, a free-text scanner category name, and the company's <i>type of company</i> &mdash; which the EDR currently prints under the heading "Industry Type". The Industry Vertical Master's 34 verticals settle what the list should be; seeding them onto <code>pl_segment</code>, and filling the already-built-but-empty MCC&harr;segment join with the master file's Primary and Possible codes, is the first ticket and it blocks the rest.</p>
+
+    <h4>Open questions for this review</h4>
+    <ul>
+      <li><b>Two lending rows.</b> The master file carries both "Short-Term Consumer Lending /Online Lending" and "On-Line Lending" with the same Primary MCC and the same Possible list but different control sets (10 vs 12). One is presumably meant to subsume the other &mdash; which?</li>
+      <li><b>Slash-separated Primary MCCs.</b> Seven verticals list two Primary codes ("5912 / 5499"). Does a vertical get one primary and the rest possible, or genuinely two co-primaries?</li>
+      <li><b>Consumer complaint narratives.</b> CFPB publishes consumer-written narrative text. The proposal stores it but shows it only to operators, never in a merchant-visible EDR PDF. Confirm.</li>
+      <li><b>Add-on pricing.</b> Which paid sources, at what price, billed through what &mdash; the columns exist, the numbers do not.</li>
+      <li><b>Kava has no product family.</b> It carries the same 13 controls as Hemp-Derived CBD but nothing in the product taxonomy matches it, so product-driven inference cannot see it.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="https://jfloyd-qredible.netlify.app/">&larr; All Mockups</a> &nbsp;&middot;&nbsp;
+  QP-4442 &mdash; MRI Marketplace, CFPB source, per-industry profiles &nbsp;&middot;&nbsp; Aug 21, 2026 &nbsp;&middot;&nbsp;
+  Spec: qredible-brain <code>docs/specs/qp4442-cfpb-mri-marketplace-qrecon-e2e-spec-2026-08-21.md</code> &nbsp;&middot;&nbsp;
+  All merchant names, counts and prices are invented sample data.
+</div>
+
+<script>
+function show(i, btn){
+  document.querySelectorAll('.screen').forEach(function(s,idx){ s.classList.toggle('active', idx===i); });
+  document.querySelectorAll('.screen-nav button').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
