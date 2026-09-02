@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Merge — super-admin wizard for duplicate company records (Q-Audit)</title>
+<style>
+  /* ── tokens: enum-constants.ts ColorQP + theme/* (RTQ-Admin-UI) ── */
+  :root{
+    --qt-black:#1A202E; --qt-black-hover:#1F3569;
+    --qt-canvas:#FFFFFF; --qt-field:#F8FBFD; --qt-grey-light:#EBEDF2; --qt-grey-smoke:#F1F5F9;
+    --qt-slate:#B1B9CA; --qt-subtitle:#657496; --qt-ash:#9BA09C; --qt-input-border:#C5C5C5;
+    --qt-link:#376fd0; --qt-blue-light:#50A8FF; --qt-blue-bg:#DCEEFF;
+    --qt-red:#ff404a; --qt-red-light:#F05252; --qt-red-text:#d32f2f;
+    --qt-green:#00d581; --qt-green-hub:#48D188; --qt-yellow:#FFDD50; --qt-yellow-hub:#E4AE3C;
+    --qt-modal-wash:#F7F5FF;
+    --qt-shadow-flat:0px 1px 2px 0px rgba(0,0,0,.05);
+    --qt-shadow-card:rgba(50,50,93,.025) 0px 2px 5px -1px, rgba(0,0,0,.05) 0px 1px 3px -1px;
+    --qt-shadow-backend:1px 5px 30px rgb(0 0 0 / 0.1);
+    --qt-btn-shadow:0px 3px 6px rgba(0,0,0,.16);
+    --chip-pending-fg:#92400E; --chip-pending-bg:#FEF3C7;
+    --chip-flag-fg:#991B1B;    --chip-flag-bg:#FEE2E2;
+    --chip-ok-fg:#166534;      --chip-ok-bg:#DCFCE7;
+    --chip-state-fg:#1E40AF;   --chip-state-bg:#DBEAFE;
+    --chip-co-fg:#1F2937;      --chip-co-bg:#E5E7EB;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Uber Move","Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--qt-canvas);color:var(--qt-black);font-size:13px;line-height:1.45}
+  a{color:var(--qt-link);text-decoration:none}a:hover{text-decoration:underline}
+  code{background:var(--qt-grey-smoke);border:1px solid var(--qt-grey-light);border-radius:4px;padding:1px 5px;
+       font-size:11.5px;font-family:Consolas,Menlo,monospace;white-space:nowrap}
+
+  /* ── mockup shell (not app) ── */
+  .topbar{background:#0b1e39;color:#fff;padding:14px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .topbar .logo{font-size:18px;font-weight:800;letter-spacing:.3px}
+  .topbar .logo span{color:#7fd1c0;font-weight:600}
+  .crumb{font-size:12.5px;color:#9db3d1;min-width:0;max-width:100%}
+  /* the spec path is long: let it wrap on narrow viewports instead of widening the page */
+  .topbar code{white-space:normal;overflow-wrap:anywhere}
+  .mock-banner{background:#FEF3C7;color:#92400E;border-bottom:1px solid #FDE68A;padding:9px 28px;font-size:12.5px;font-weight:600}
+  .screen-nav{display:flex;gap:6px;padding:14px 28px 0;flex-wrap:wrap;max-width:1360px;margin:0 auto}
+  .screen-nav button{border:1px solid var(--qt-grey-light);background:#fff;color:var(--qt-subtitle);font:inherit;
+    font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:8px 8px 0 0;cursor:pointer}
+  .screen-nav button.on{background:var(--qt-black);color:#fff;border-color:var(--qt-black)}
+  .screen{display:none;max-width:1360px;margin:0 auto;padding:20px 28px 60px}
+  .screen.active{display:block}
+  .note{border:1.5px dashed #60A5FA;background:#EFF6FF;color:#1E40AF;border-radius:8px;padding:10px 14px;
+    font-size:12.5px;margin:14px 0;line-height:1.5}
+  .note b{color:#1E3A8A}
+  .note.warn{border-color:#FBBF24;background:#FFFBEB;color:#92400E}.note.warn b{color:#78350F}
+  .note.bad{border-color:#F87171;background:#FEF2F2;color:#991B1B}.note.bad b{color:#7F1D1D}
+  h2.sh{font-size:15px;font-weight:700;margin:22px 0 4px}
+  p.sub{font-size:12.5px;color:var(--qt-subtitle);margin-bottom:10px;max-width:960px}
+  .row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+  .row2>*{min-width:0}
+  @media (max-width:1000px){.row2{grid-template-columns:minmax(0,1fr)}}
+  .footer{max-width:1360px;margin:0 auto;padding:14px 28px 40px;font-size:12px;color:var(--qt-subtitle)}
+
+  /* ── REAL Q-Audit page chrome (pages/backend/index.tsx) ── */
+  .qa-page{background:#fff;border-radius:30px;box-shadow:var(--qt-shadow-backend);width:100%;max-width:100%;overflow:hidden}
+  .qa-title{padding:28px 40px 12px 40px;display:flex;align-items:center;gap:10px}
+  .qa-logo{display:inline-flex;align-items:center;gap:8px;font-size:22px;font-weight:700;letter-spacing:-.2px}
+  .qa-logo i{width:26px;height:26px;border-radius:7px;background:var(--qt-black);display:inline-block;position:relative}
+  .qa-logo i::after{content:"";position:absolute;left:8px;top:8px;width:10px;height:10px;border-radius:50%;background:#7fd1c0}
+  .qa-tabs{display:flex;gap:2px;padding:0 40px;border-bottom:1px solid var(--qt-grey-light);overflow-x:auto;scrollbar-width:none}
+  .qa-tabs::-webkit-scrollbar{display:none}
+  .qa-tab{padding:10px 14px;font-size:13px;font-weight:500;color:var(--qt-subtitle);border-bottom:3px solid transparent;
+    white-space:nowrap;cursor:pointer}
+  .qa-tab.on{color:var(--qt-black);font-weight:600;border-bottom-color:var(--qt-red-light)}
+  .qa-tab.new{position:relative}
+  .qa-tab.new::after{content:"NEW";position:absolute;top:2px;right:-2px;font-size:8px;font-weight:800;letter-spacing:.06em;
+    background:var(--qt-blue-bg);color:#1D4ED8;padding:1px 4px;border-radius:4px}
+  .qa-body{padding:20px 40px 28px}
+  @media (max-width:700px){.qa-title,.qa-tabs,.qa-body{padding-left:16px;padding-right:16px}}
+
+  /* controls */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 22px;border-radius:5px;
+    background:var(--qt-black);color:#fff;font-size:12px;font-weight:700;border:0;cursor:pointer;font-family:inherit;
+    filter:drop-shadow(var(--qt-btn-shadow));white-space:nowrap}
+  .btn:hover{background:var(--qt-black-hover)}
+  .btn.ghost{background:#fff;color:var(--qt-black);border:1px solid var(--qt-input-border);filter:none}
+  .btn.danger{background:var(--qt-red-light)}
+  .btn.disabled,.btn:disabled{background:rgba(0,0,0,.12);color:rgba(0,0,0,.26);filter:none;cursor:not-allowed}
+  .btn.sm{height:26px;padding:0 12px;font-size:11.5px}
+  .inp{height:44px;border-radius:15px;background:var(--qt-field);border:0;padding:0 14px;font:inherit;font-size:12px;
+    font-weight:500;color:var(--qt-black);width:100%;display:flex;align-items:center;gap:8px}
+  .inp .ph{color:var(--qt-ash);font-weight:600}
+  .chip{display:inline-flex;align-items:center;height:22px;padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600;white-space:nowrap}
+  .chip.pending{color:var(--chip-pending-fg);background:var(--chip-pending-bg)}
+  .chip.flag{color:var(--chip-flag-fg);background:var(--chip-flag-bg)}
+  .chip.ok{color:var(--chip-ok-fg);background:var(--chip-ok-bg)}
+  .chip.state{color:var(--chip-state-fg);background:var(--chip-state-bg)}
+  .chip.co{color:var(--chip-co-fg);background:var(--chip-co-bg)}
+  .chip.proc{color:#E4AE3C;background:rgba(255,206,0,.1)}
+  .lock{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--qt-subtitle)}
+
+  /* real-style table (components/table/*) */
+  .tblbox{border:1px solid var(--qt-grey-light);border-radius:6px;overflow:auto;box-shadow:var(--qt-shadow-flat)}
+  table.qt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+  table.qt th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--qt-subtitle);
+    text-align:left;padding:10px 12px;background:var(--qt-grey-smoke);border-bottom:1px solid var(--qt-grey-light);white-space:nowrap}
+  table.qt td{padding:10px 12px;border-bottom:1px solid var(--qt-grey-light);vertical-align:middle}
+  table.qt tr:last-child td{border-bottom:0}
+  table.qt tr.hl td{background:#FFFBEB}
+  table.qt td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .dots{display:inline-block;width:24px;height:24px;border-radius:6px;text-align:center;line-height:22px;color:var(--qt-subtitle);
+    border:1px solid var(--qt-grey-light);cursor:pointer;font-weight:700;letter-spacing:1px}
+  .menu{position:relative;display:inline-block}
+  .menu .pop{position:absolute;right:0;top:28px;background:#fff;border:1px solid var(--qt-grey-light);border-radius:6px;
+    box-shadow:var(--qt-shadow-backend);min-width:190px;z-index:5;padding:4px 0}
+  .menu .pop div{padding:8px 14px;font-size:12.5px;white-space:nowrap}
+  .menu .pop div:hover{background:var(--qt-grey-smoke)}
+  .menu .pop div.new{color:var(--qt-link);font-weight:600}
+  .menu .pop div.dis{color:rgba(0,0,0,.3);cursor:not-allowed}
+
+  /* cards */
+  .card{background:#fff;border-radius:6px;box-shadow:var(--qt-shadow-card);border:1px solid var(--qt-grey-light);padding:16px 18px}
+  .card h4{font-size:16px;font-weight:500;margin-bottom:8px}
+  .card .kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:4px 10px;font-size:12.5px}
+  .card .kv dt{color:var(--qt-subtitle)}.card .kv dd{min-width:0;overflow-wrap:anywhere}
+  .co-card{border:2px solid var(--qt-grey-light);border-radius:6px;padding:14px 16px;background:#fff;position:relative}
+  .co-card.surv{border-color:var(--qt-green-hub);background:#F5FDF8}
+  .co-card.abs{border-color:var(--qt-slate);background:#FAFBFC}
+  .co-card .tag{position:absolute;top:-10px;left:12px;font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 8px;
+    border-radius:4px;background:var(--qt-green-hub);color:#fff}
+  .co-card.abs .tag{background:var(--qt-slate)}
+  .co-card h5{font-size:15px;font-weight:600;margin:2px 0 6px}
+  .co-card .id{font-size:11.5px;color:var(--qt-subtitle);font-family:Consolas,Menlo,monospace}
+  .co-card ul{list-style:none;margin-top:8px;font-size:12.5px}
+  .co-card li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed var(--qt-grey-light)}
+  .co-card li span:last-child{font-weight:600;text-align:right}
+  .radio{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer}
+  .radio i{width:14px;height:14px;border-radius:50%;border:2px solid var(--qt-input-border);display:inline-block;position:relative;flex:none}
+  .radio.on i{border-color:var(--qt-link)}
+  .radio.on i::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--qt-link)}
+  .check{display:inline-flex;align-items:center;gap:8px;font-size:12.5px}
+  .check i{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--qt-input-border);display:inline-flex;align-items:center;
+    justify-content:center;font-size:11px;font-weight:800;color:#fff;flex:none;font-style:normal}
+  .check.on i{background:var(--qt-green-hub);border-color:var(--qt-green-hub)}
+  .check.bad i{background:var(--qt-red-light);border-color:var(--qt-red-light)}
+  .check.warn i{background:var(--qt-yellow-hub);border-color:var(--qt-yellow-hub)}
+
+  /* wizard */
+  .wiz{background:#fff;border:1px solid var(--qt-grey-light);border-radius:6px;box-shadow:var(--qt-shadow-card);overflow:hidden}
+  .wiz-head{background:var(--qt-modal-wash);border-bottom:1px solid #ede9fe;padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .wiz-head .t{font-size:17px;font-weight:600}
+  .wiz-head .s{font-size:12.5px;color:var(--qt-subtitle)}
+  .steps{display:flex;gap:0;padding:0 20px;border-bottom:1px solid var(--qt-grey-light);overflow-x:auto;scrollbar-width:none}
+  .steps::-webkit-scrollbar{display:none}
+  .step{display:flex;align-items:center;gap:7px;padding:10px 14px 10px 0;font-size:12px;color:var(--qt-subtitle);white-space:nowrap}
+  .step b{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--qt-slate);display:inline-flex;align-items:center;
+    justify-content:center;font-size:11px;font-weight:700;color:var(--qt-subtitle);flex:none}
+  .step.done b{background:var(--qt-green-hub);border-color:var(--qt-green-hub);color:#fff}
+  .step.on{color:var(--qt-black);font-weight:600}.step.on b{background:var(--qt-black);border-color:var(--qt-black);color:#fff}
+  .step.lock b{border-style:dashed}
+  .step::after{content:"›";margin-left:10px;color:var(--qt-slate)}
+  .step:last-child::after{content:""}
+  .wiz-body{padding:18px 20px}
+  .wiz-foot{padding:12px 20px;border-top:1px solid var(--qt-grey-light);display:flex;align-items:center;gap:10px;background:#FAFBFC;flex-wrap:wrap}
+  .wiz-foot .sp{flex:1}
+  .sec{border:1px solid var(--qt-grey-light);border-radius:6px;margin-bottom:12px;overflow:hidden}
+  .sec-h{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--qt-grey-smoke);font-weight:600;font-size:12.5px;flex-wrap:wrap}
+  .sec-h .cnt{margin-left:auto;font-weight:500;color:var(--qt-subtitle)}
+  .sec-b{padding:10px 14px}
+  .rule{font-size:12px;color:var(--qt-subtitle);margin-top:4px}
+  .pick{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .pick>*{min-width:0}
+  @media (max-width:700px){.pick{grid-template-columns:minmax(0,1fr)}}
+  .pick .opt{border:1.5px solid var(--qt-grey-light);border-radius:6px;padding:8px 10px;font-size:12.5px;display:flex;gap:8px;align-items:flex-start;cursor:pointer;background:#fff}
+  .pick .opt.on{border-color:var(--qt-link);background:#F3F8FF}
+  .pick .opt .who{font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--qt-subtitle);display:block;margin-bottom:2px}
+  .pick .opt .val{overflow-wrap:anywhere}
+  .progress{height:8px;border-radius:999px;background:var(--qt-grey-smoke);overflow:hidden}
+  .progress i{display:block;height:100%;background:var(--qt-green-hub)}
+  .phase{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--qt-grey-light);font-size:12.5px}
+  .phase .st{margin-left:auto;font-size:11.5px;font-weight:600}
+  .banner{border:1px solid #FDE68A;background:#FFFBEB;color:#92400E;border-radius:6px;padding:10px 14px;font-size:12.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .banner.grey{border-color:var(--qt-grey-light);background:var(--qt-grey-smoke);color:var(--qt-black)}
+  .banner.red{border-color:#FECACA;background:#FEF2F2;color:#991B1B}
+  .json{background:#0f172a;color:#e2e8f0;border-radius:6px;padding:12px 14px;font-family:Consolas,Menlo,monospace;font-size:11.5px;
+    line-height:1.5;overflow:auto;white-space:pre}
+  .json .k{color:#7dd3fc}.json .s{color:#bbf7d0}.json .n{color:#fde68a}.json .c{color:#94a3b8}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .grid3>*{min-width:0}
+  @media (max-width:900px){.grid3{grid-template-columns:minmax(0,1fr)}}
+  .flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+  .flow .box{border:1px solid var(--qt-grey-light);border-radius:6px;padding:8px 10px;font-size:12px;background:#fff;min-width:0;flex:1 1 150px}
+  .flow .box b{display:block;font-size:12.5px;margin-bottom:2px}
+  .flow .box.gate{border-color:var(--qt-yellow-hub);background:#FFFBEB}
+  .flow .box.bad{border-color:#FCA5A5;background:#FEF2F2}
+  .flow .box.ok{border-color:var(--qt-green-hub);background:#F5FDF8}
+  .kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .kpi>*{min-width:0}
+  @media (max-width:800px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .kpi .k{border:1px solid var(--qt-grey-light);border-radius:6px;padding:10px 12px;background:#fff}
+  .kpi .k .n{font-size:22px;font-weight:700;line-height:1.1}
+  .kpi .k .l{font-size:11.5px;color:var(--qt-subtitle)}
+  .drawer{border:1px solid var(--qt-grey-light);border-radius:6px;background:#fff;box-shadow:var(--qt-shadow-backend)}
+  .drawer .dh{padding:12px 16px;border-bottom:1px solid var(--qt-grey-light);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .drawer .db{padding:12px 16px}
+  .tt{position:relative;display:inline-block}
+  .tt .tip{position:absolute;left:0;top:36px;background:var(--qt-black);color:#fff;font-size:11.5px;padding:8px 10px;border-radius:6px;
+    width:min(300px,80vw);z-index:4;line-height:1.4;font-weight:500}
+  .tt .tip::before{content:"";position:absolute;top:-5px;left:14px;border:5px solid transparent;border-top:0;border-bottom-color:var(--qt-black)}
+  .mono{font-family:Consolas,Menlo,monospace;font-size:11.5px}
+  .muted{color:var(--qt-subtitle)}
+  .evid{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--qt-grey-light);font-size:12.5px}
+  .evid .ic{width:28px;height:28px;border-radius:6px;background:var(--qt-grey-smoke);display:inline-flex;align-items:center;justify-content:center;flex:none;font-size:14px}
+  .evid .b{flex:1;min-width:0}
+  .evid .b small{display:block;color:var(--qt-subtitle)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Q-<span>Trust</span></div>
+  <div class="crumb">Q-Audit (super admin) → Companies → <b style="color:#fff">Merge duplicate company</b></div>
+  <div class="crumb" style="margin-left:auto">Spec: <code style="background:#122b4f;border-color:#1f3a63;color:#cfe3ff">brain/docs/specs/company-merge-duplicate-company-spec-2026-09-02.md</code></div>
+</div>
+<div class="mock-banner">MOCKUP · clickable · placeholder data only (Greenfield Botanicals / Northwind Payments are not real merchants). Nothing here is built. Screens 1–8 follow Joseph's five asks: where it lives · ownership gate · storage · wizard flow · failure.</div>
+
+<div class="screen-nav">
+  <button class="on" onclick="show(0,this)">1 · Where it lives</button>
+  <button onclick="show(1,this)">2 · Ownership proof (gate)</button>
+  <button onclick="show(2,this)">3 · Wizard: records + survivor</button>
+  <button onclick="show(3,this)">4 · Wizard: what goes where</button>
+  <button onclick="show(4,this)">5 · Gate check + preview + confirm</button>
+  <button onclick="show(5,this)">6 · Execute → result</button>
+  <button onclick="show(6,this)">7 · Storage (merge record)</button>
+  <button onclick="show(7,this)">8 · Failure &amp; rollback</button>
+</div>
+
+<!-- ═══════════════════ SCREEN 1 · WHERE IT LIVES ═══════════════════ -->
+<div class="screen active">
+  <h2 class="sh">Recommended home: Q-Audit → Companies (super admin only)</h2>
+  <p class="sub">This is the real <code>/backend</code> page — its <code>&lt;title&gt;</code> is already <b>Q-Audit</b>, it is gated by the <code>SuperAdmin</code> role, and it already owns the <b>Companies</b> table (Edit · View Summary) and the <b>Activity Log</b>. The merge adds one row action and one new tab. Nothing else in the app changes.</p>
+
+  <div class="qa-page">
+    <div class="qa-title"><span class="qa-logo"><i></i>Q-Audit</span></div>
+    <div class="qa-tabs">
+      <div class="qa-tab">Audit</div><div class="qa-tab">Global Settings</div><div class="qa-tab">Paywall</div><div class="qa-tab">Import</div>
+      <div class="qa-tab">Finances</div><div class="qa-tab on">Companies</div><div class="qa-tab">Prospects</div><div class="qa-tab">Sales</div>
+      <div class="qa-tab">Promotions</div><div class="qa-tab">Activity Log</div><div class="qa-tab">Q-M Settings</div><div class="qa-tab">Display Settings</div>
+      <div class="qa-tab">Scan Operations</div><div class="qa-tab new">Company Merges</div>
+    </div>
+    <div class="qa-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <div class="inp" style="max-width:320px"><span class="ph">Search company…</span></div>
+        <span class="chip co">Status: All</span><span class="chip co">Membership: All</span>
+        <span style="margin-left:auto" class="lock">🔒 Row action visible to SuperAdmin only</span>
+      </div>
+      <div class="tblbox">
+        <table class="qt">
+          <thead><tr><th>Company</th><th>Sales ID</th><th>Plan</th><th>Rate</th><th>Frequency</th><th>Status</th><th>Payment Status</th><th>Joined</th><th>Duration</th><th>Imported</th><th>Admin</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Greenfield Botanicals<br><span class="muted mono">C-10488</span></td><td>—</td><td>Growth</td><td>paid</td><td>Monthly</td><td><span class="chip ok">ACTIVE</span></td><td><span class="chip ok">Paid</span></td><td>Sep 2, 2026</td><td>1 d</td><td>—</td><td>Dana Whitfield</td>
+              <td><div class="menu"><span class="dots">···</span>
+                <div class="pop"><div>Edit</div><div>View Summary</div><div class="new">Merge duplicate company…</div></div></div></td></tr>
+            <tr class="hl"><td>Greenfield Botanicals, LLC<br><span class="muted mono">C-10421</span></td><td>—</td><td>Case Management</td><td>$0</td><td>Annual</td><td><span class="chip pending">PENDING</span></td><td>N/A</td><td>—</td><td>—</td><td>Northwind (pre-UW)</td><td>support@ (placeholder)</td>
+              <td><span class="dots">···</span></td></tr>
+            <tr><td>Harbor Leaf Supply<br><span class="muted mono">C-10390</span></td><td>—</td><td>Case Management</td><td>$0</td><td>Annual</td><td><span class="chip ok">JOINED</span></td><td>N/A</td><td>Aug 14, 2026</td><td>19 d</td><td>—</td><td>Priya Raman</td><td><span class="dots">···</span></td></tr>
+            <tr><td>Cedar &amp; Sage Wellness<br><span class="muted mono">C-10377</span></td><td>—</td><td>Growth</td><td>paid</td><td>Annual</td><td><span class="chip ok">ACTIVE</span></td><td><span class="chip ok">Paid</span></td><td>Jul 30, 2026</td><td>34 d</td><td>—</td><td>Marcus Bell</td><td><span class="dots">···</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note" style="margin-top:14px"><b>What is added on this tab:</b> one row-action <b>"Merge duplicate company…"</b> (opens the wizard with this company pre-filled as record A), and the highlighted row shows the "suspected duplicate" hint the planner surfaces (same normalized name / email / MID). <b>New tab "Company Merges"</b> is the ledger — see screen 7.</div>
+    </div>
+  </div>
+
+  <div class="row2" style="margin-top:18px">
+    <div class="card">
+      <h4>Why Q-Audit, not Q-Config</h4>
+      <ul style="padding-left:18px;font-size:12.5px;line-height:1.6">
+        <li><b>Audience.</b> Q-Config is what a <i>processor</i> (and merchant) configures for their own tenancy — Sources → Features → Plans, invite configuration, scanner settings. A merge is Qredible acting on <i>someone else's</i> records. That is a super-admin operation, and Q-Audit is the only surface already role-gated to <code>SuperAdmin</code>.</li>
+        <li><b>The data is already here.</b> The Companies table, company summary view (Summary · Locations · Products · Monitor · Billing · RTQ) and the Activity Log all live on this page. The wizard pulls from and writes to exactly these.</li>
+        <li><b>Blast radius.</b> Q-Config renders inside tenant-facing navigation; putting a destructive cross-tenant tool there invites accidental exposure via a plan/feature toggle. Q-Audit is never entitlement-driven.</li>
+        <li><b>Not merchant self-service, not a notification.</b> Merchants never see a "merge" control. The only merchant-visible artefact is the ownership-proof request they complete (screen 2).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Who does what</h4>
+      <div class="flow">
+        <div class="box"><b>Merchant</b>completes the ownership-proof request when Qredible sends it (uploads / attests). Nothing else.</div>
+        <div class="box gate"><b>Qredible ops (SuperAdmin)</b>reviews the proof → Approve / Reject. Approval unlocks "Merge duplicate company…".</div>
+        <div class="box"><b>Qredible ops (SuperAdmin)</b>runs the wizard: records → survivor → decisions → preview → confirm.</div>
+        <div class="box ok"><b>System</b>applies in one transaction, journals every row, writes the ledger + audit, can reverse for 30 days.</div>
+      </div>
+      <div class="note warn" style="margin-bottom:0"><b>Initiated by us, always.</b> There is no merchant-side "merge" button and no notification the merchant has to act on to trigger a merge. The processor (e.g. the referring ISO) also cannot initiate — they can only tell us.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCREEN 2 · OWNERSHIP PROOF GATE ═══════════════════ -->
+<div class="screen">
+  <h2 class="sh">Ownership proof — the gate in front of the merge</h2>
+  <p class="sub">Before a merge can even be <i>initialised</i>, Qredible must be satisfied that the person on the surviving login truly is the company that owns the other record's data. This is a manual, admin-reviewed step with its own record (<code>pl_company_ownership_proof</code>). The merge row action stays disabled until a proof for this pair is <b>APPROVED</b>.</p>
+
+  <div class="qa-page">
+    <div class="qa-title"><span class="qa-logo"><i></i>Q-Audit</span><span class="muted" style="margin-left:6px">› Companies › Greenfield Botanicals (C-10488) › Ownership proof</span></div>
+    <div class="qa-tabs"><div class="qa-tab">Summary</div><div class="qa-tab">Locations</div><div class="qa-tab">Products</div><div class="qa-tab">Monitor</div><div class="qa-tab">Billing</div><div class="qa-tab">RTQ</div><div class="qa-tab on new">Ownership proof</div></div>
+    <div class="qa-body">
+      <div class="row2">
+        <div>
+          <div class="card">
+            <h4>Proof request <span class="chip pending" style="margin-left:6px">IN REVIEW</span></h4>
+            <dl class="kv">
+              <dt>Claimant</dt><dd><b>Dana Whitfield</b> · owner of <b>Greenfield Botanicals</b> <span class="mono muted">C-10488</span> (self-registered, ACTIVE login)</dd>
+              <dt>Claims to own</dt><dd><b>Greenfield Botanicals, LLC</b> <span class="mono muted">C-10421</span> (added by Northwind Payments during pre-underwriting; owner is a placeholder)</dd>
+              <dt>Raised by</dt><dd>Qredible ops (SuperAdmin) · Sep 2, 2026 · reason: <i>"ISO sent the public signup link; merchant self-registered a second company"</i></dd>
+              <dt>Sent to merchant</dt><dd>Sep 2, 2026 via the platform (email + in-app task on the surviving login) · completed Sep 3</dd>
+            </dl>
+          </div>
+          <div class="card" style="margin-top:12px">
+            <h4>Evidence captured</h4>
+            <div class="evid"><span class="ic">✉️</span><div class="b"><b>Domain e-mail match</b> <span class="chip ok">AUTO · PASS</span><small>Claimant login <code>dana@greenfieldbotanicals.example</code> shares the domain of the LLC record's website <code>greenfieldbotanicals.example</code>.</small></div></div>
+            <div class="evid"><span class="ic">🏷️</span><div class="b"><b>Merchant ID match</b> <span class="chip ok">AUTO · PASS</span><small>MID ending <code>••4471</code> entered by the claimant equals the MID on the LLC record's DBA (from the processor's onboarding file).</small></div></div>
+            <div class="evid"><span class="ic">📄</span><div class="b"><b>Business licence upload</b> <span class="chip pending">MANUAL</span><small>State licence PDF, licensee "Greenfield Botanicals, LLC" — reviewer to compare against the LLC record's verified licence (LicenseIQ result on file).</small></div></div>
+            <div class="evid"><span class="ic">🤝</span><div class="b"><b>Processor confirmation</b> <span class="chip ok">RECEIVED</span><small>Northwind Payments confirmed by e-mail that C-10421 and C-10488 are the same merchant (attached to the proof record).</small></div></div>
+            <div class="evid" style="border-bottom:0"><span class="ic">✍️</span><div class="b"><b>Signed attestation</b> <span class="chip ok">SIGNED</span><small>Claimant attested (checkbox + typed name + timestamp + IP) that they are authorised to act for the LLC and accept that its data will be transferred to their account.</small></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h4>Reviewer decision</h4>
+            <p class="sub" style="margin-bottom:8px">Decision is recorded with reviewer, timestamp and notes. Only <b>APPROVED</b> unlocks the merge for <i>this exact pair</i> (survivor C-10488 ← absorbed C-10421). A proof does not transfer to any other pair.</p>
+            <div style="display:grid;gap:8px">
+              <label class="check on"><i>✓</i> Licence PDF matches the LLC record's verified licence number</label>
+              <label class="check on"><i>✓</i> MID and domain checks passed automatically</label>
+              <label class="check on"><i>✓</i> Processor confirmation on file</label>
+              <label class="check"><i></i> Called the merchant back on the number on file <span class="muted">(optional)</span></label>
+            </div>
+            <div class="inp" style="height:auto;min-height:60px;align-items:flex-start;padding:10px 14px;margin-top:10px"><span class="ph">Reviewer notes…</span></div>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+              <button class="btn">Approve proof</button>
+              <button class="btn ghost">Request more evidence</button>
+              <button class="btn ghost" style="color:var(--qt-red-text)">Reject</button>
+            </div>
+          </div>
+          <div class="card" style="margin-top:12px">
+            <h4>The gate, as the operator sees it</h4>
+            <p class="sub" style="margin-bottom:8px">On the Companies row menu, before approval:</p>
+            <div class="menu" style="display:block">
+              <div class="pop" style="position:static;display:inline-block;min-width:260px"><div>Edit</div><div>View Summary</div>
+                <div class="dis tt">Merge duplicate company… 🔒<span class="tip">Locked — no APPROVED ownership proof for this company. Start one from the company's <b>Ownership proof</b> tab.</span></div></div>
+            </div>
+            <p class="sub" style="margin:44px 0 8px">After approval:</p>
+            <div class="menu" style="display:block">
+              <div class="pop" style="position:static;display:inline-block;min-width:260px"><div>Edit</div><div>View Summary</div><div class="new">Merge duplicate company… (proof #P-2031 ✔)</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="note"><b>Why a separate record and not a wizard step:</b> proof review can take days (merchant uploads, a call to the processor), so it must survive across sessions and reviewers, be auditable on its own, and be reusable if the wizard is abandoned and restarted. The wizard only <i>reads</i> it (screen 5, step 4). Proof statuses: <code>REQUESTED → SUBMITTED → IN_REVIEW → APPROVED | REJECTED | EXPIRED</code> (approval expires after 30 days unused).</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCREEN 3 · WIZARD: RECORDS + SURVIVOR ═══════════════════ -->
+<div class="screen">
+  <h2 class="sh">Wizard · steps 1–2: identify the two records, choose the survivor</h2>
+  <p class="sub">Opened from the Companies row action. Record A is pre-filled from the row; record B is searched or taken from the suspected-duplicates hint. Step 2 is an explicit choice — the system only <i>suggests</i>.</p>
+
+  <div class="wiz">
+    <div class="wiz-head"><span class="t">Merge duplicate company</span><span class="s">Proof #P-2031 approved · SuperAdmin: Qredible ops</span><span style="margin-left:auto" class="muted">✕</span></div>
+    <div class="steps">
+      <div class="step on"><b>1</b>Records</div><div class="step"><b>2</b>Survivor</div><div class="step"><b>3</b>What goes where</div>
+      <div class="step lock"><b>4</b>Gate check</div><div class="step"><b>5</b>Preview</div><div class="step"><b>6</b>Confirm &amp; run</div><div class="step"><b>7</b>Result</div>
+    </div>
+    <div class="wiz-body">
+      <div class="row2">
+        <div>
+          <div class="inp"><span class="ph">Record A —</span> <b>Greenfield Botanicals, LLC</b> <span class="mono muted">C-10421</span></div>
+          <div class="co-card abs" style="margin-top:12px"><span class="tag">RECORD A</span>
+            <h5>Greenfield Botanicals, LLC</h5><div class="id">C-10421 · created Aug 12, 2026 · by Northwind Payments (pre-underwriting)</div>
+            <ul>
+              <li><span>Owner login</span><span>support@ placeholder <span class="chip co">PLACEHOLDER</span></span></li>
+              <li><span>Plan / billing</span><span>Case Management ($0) · no payment method</span></li>
+              <li><span>Products</span><span>20 parents + 14 variants (scanned, URLs live)</span></li>
+              <li><span>COAs</span><span>31 on file · 31 unassigned</span></li>
+              <li><span>Licences</span><span>1 verified (LicenseIQ)</span></li>
+              <li><span>DBAs / MIDs</span><span>1 DBA · MID ••4471</span></li>
+              <li><span>Processor link</span><span>Northwind Payments · PRE_UNDERWRITING</span></li>
+              <li><span>Scans / findings</span><span>4 web-scan jobs · 12 findings</span></li>
+              <li><span>Cases</span><span>1 open compliance case</span></li>
+              <li><span>Members / contacts</span><span>2 contacts (no logins)</span></li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="inp"><span class="ph">Record B —</span> <b>Greenfield Botanicals</b> <span class="mono muted">C-10488</span> <span class="chip pending" style="margin-left:auto">suspected duplicate · MID + e-mail domain</span></div>
+          <div class="co-card surv" style="margin-top:12px"><span class="tag">RECORD B</span>
+            <h5>Greenfield Botanicals</h5><div class="id">C-10488 · created Sep 2, 2026 · self-registered (public signup)</div>
+            <ul>
+              <li><span>Owner login</span><span>Dana Whitfield <span class="chip ok">ACTIVE</span></span></li>
+              <li><span>Plan / billing</span><span>Growth (paid, monthly) · card on file (vault ✔)</span></li>
+              <li><span>Products</span><span>17 parents (manual, no product URLs)</span></li>
+              <li><span>COAs</span><span>17 manually uploaded · 17 assigned</span></li>
+              <li><span>Licences</span><span>none</span></li>
+              <li><span>DBAs / MIDs</span><span>none</span></li>
+              <li><span>Processor link</span><span>Northwind Payments · ACTIVE (added manually, Sep 2)</span></li>
+              <li><span>Scans / findings</span><span>1 web-scan job · 0 findings</span></li>
+              <li><span>Cases</span><span>none</span></li>
+              <li><span>Members / contacts</span><span>1 member (owner)</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sh" style="margin-top:20px">Step 2 · Choose the surviving record</h2>
+      <div class="row2">
+        <div class="pick" style="grid-template-columns:minmax(0,1fr)">
+          <div class="opt on"><span class="radio on"><i></i></span><div><span class="who">SUGGESTED · SURVIVOR</span><b>Greenfield Botanicals</b> (C-10488) <span class="muted">— keeps its login, subscription, payment method untouched; absorbs A's data.</span></div></div>
+          <div class="opt"><span class="radio"><i></i></span><div><span class="who">ALTERNATIVE</span><b>Greenfield Botanicals, LLC</b> (C-10421) <span class="muted">— would need A's owner replaced by Dana's login and B's subscription + payment method re-pointed. Allowed, but every step below flips.</span></div></div>
+        </div>
+        <div class="note" style="margin:0"><b>Suggestion rule (in order):</b> (1) the record holding a live payment method / paid subscription; (2) the record whose owner is a real, ACTIVE login; (3) the older record. Verified: the payment gateway is keyed by our subscription and payment-method row ids, not by company id — so the direction is a genuine choice, and choosing the payment-bound record means billing rows are never touched at all.</div>
+      </div>
+    </div>
+    <div class="wiz-foot"><button class="btn ghost">Cancel</button><span class="sp"></span><span class="muted">Nothing is written until step 6.</span><button class="btn">Next: what goes where →</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCREEN 4 · WIZARD: WHAT GOES WHERE ═══════════════════ -->
+<div class="screen">
+  <h2 class="sh">Wizard · step 3: decide what goes where</h2>
+  <p class="sub">Two parts: <b>field-level conflicts</b> on the company record itself, then <b>every family of child data</b> with the rule that applies and a choice where one exists. Defaults are pre-selected so the common case is "review and Next"; every choice is stored on the merge record (screen 7).</p>
+
+  <div class="wiz">
+    <div class="wiz-head"><span class="t">Merge duplicate company</span><span class="s">Survivor: Greenfield Botanicals (C-10488) ← absorbing Greenfield Botanicals, LLC (C-10421)</span></div>
+    <div class="steps">
+      <div class="step done"><b>✓</b>Records</div><div class="step done"><b>✓</b>Survivor</div><div class="step on"><b>3</b>What goes where</div>
+      <div class="step lock"><b>4</b>Gate check</div><div class="step"><b>5</b>Preview</div><div class="step"><b>6</b>Confirm &amp; run</div><div class="step"><b>7</b>Result</div>
+    </div>
+    <div class="wiz-body">
+      <div class="sec">
+        <div class="sec-h">A · Company fields in conflict <span class="cnt">7 of 86 columns differ and are operator-chosen · identity/billing fields never change</span></div>
+        <div class="sec-b">
+          <div class="tblbox"><table class="qt">
+            <thead><tr><th>Field</th><th>Survivor · Greenfield Botanicals</th><th>Absorbed · Greenfield Botanicals, LLC</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Legal name</td><td><label class="radio"><i></i>Greenfield Botanicals</label></td><td><label class="radio on"><i></i>Greenfield Botanicals, LLC</label></td><td class="muted">use absorbed (legal entity name)</td></tr>
+              <tr><td>Company e-mail</td><td><label class="radio on"><i></i>dana@greenfieldbotanicals.example</label></td><td><label class="radio"><i></i>support+greenfield@… (placeholder)</label></td><td class="muted">keep survivor</td></tr>
+              <tr><td>Business type</td><td><label class="radio"><i></i>Retailer</label></td><td><label class="radio on"><i></i>Distributor <span class="chip proc" style="margin-left:4px">set by processor</span></label></td><td class="muted">use absorbed · history appended</td></tr>
+              <tr><td>Description</td><td><label class="radio"><i></i><span class="muted">(empty)</span></label></td><td><label class="radio on"><i></i>"Hemp-derived botanicals, DTC + wholesale"</label></td><td class="muted">fill from absorbed (blank rule)</td></tr>
+              <tr><td>State / incorporation</td><td><label class="radio"><i></i>CO / (empty)</label></td><td><label class="radio on"><i></i>CO / LLC</label></td><td class="muted">fill blanks from absorbed</td></tr>
+              <tr><td>Logo / cover</td><td><label class="radio on"><i></i>uploaded Sep 2</label></td><td><label class="radio"><i></i>none</label></td><td class="muted">keep survivor</td></tr>
+              <tr><td>Social channels</td><td><label class="radio"><i></i>1 (Instagram)</label></td><td><label class="radio"><i></i>2 (Instagram, TikTok)</label></td><td class="muted">merge → union (3 distinct)</td></tr>
+            </tbody></table></div>
+          <div class="rule">Never changed on the survivor: <code>id</code>, <code>company_number</code>, owner <code>user_id</code>, claim pointers, <code>status</code>, <code>created_at</code>, anything billing-adjacent. All other blank survivor fields are auto-filled from the absorbed record and journaled.</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h">B · Products, variants &amp; COAs <span class="cnt">move 20 + 14 + 31 (A) · keep 17 + 17 (B) · 6 suspected overlaps</span></div>
+        <div class="sec-b">
+          <div class="pick">
+            <div class="opt on"><span class="radio on"><i></i></span><div><span class="who">DEFAULT</span><span class="val">Move everything to the survivor; <b>do not delete</b> either side's products. Report the 6 name-matched pairs with the scanned (URL-bearing) row marked <b>canonical</b> and the manual-upload row marked <i>suggested for Tidy-Up</i>.</span></div></div>
+            <div class="opt"><span class="radio"><i></i></span><div><span class="who">LATER PHASE</span><span class="val">Also retire the 6 manual duplicates and re-assign their COAs to the canonical products (one-click, journaled). Not in Phase 1 — a wrong auto-delete loses a COA assignment.</span></div></div>
+          </div>
+          <div class="rule">Product families move whole (parent → variant, COA-owner pointers are intra-company, nothing to rewrite). COAs (<code>vault_coa</code>, uploads, product↔COA links, comments, conversations) follow their products. Scanned lineage from A is preserved in full — it is the source of truth going forward.</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h">C · DBAs, MIDs, locations, licences <span class="cnt">move 1 DBA (MID ••4471) · 2 locations · 1 verified licence · 3 LVR results</span></div>
+        <div class="sec-b"><div class="rule">Straight move. MID collision check: no other <i>active</i> company carries ••4471 (an MID already under a third company would stop the merge). Licence verification history and the licence case re-verification rows travel with the licence.</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h">D · Subscriptions, payment methods, invoices <span class="cnt">survivor: Growth (paid) · absorbed: Case Management ($0, no card)</span></div>
+        <div class="sec-b">
+          <div class="pick">
+            <div class="opt on"><span class="radio on"><i></i></span><div><span class="who">DEFAULT</span><span class="val">Survivor's subscription, payment method (card vault), transactions and invoices are <b>never touched</b>. Absorbed's $0 subscription is closed and kept for history under the survivor.</span></div></div>
+            <div class="opt" style="opacity:.55"><span class="radio"><i></i></span><div><span class="who">ONLY IF ABSORBED IS PAID</span><span class="val">Cancel the absorbed subscription at the gateway (irreversible, runs after commit, listed as manual in any reversal). Disabled here — absorbed has no paid plan.</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h">E · Owner, members, contacts &amp; invites <span class="cnt">survivor owner kept · absorbed placeholder retired · 2 contacts reconciled</span></div>
+        <div class="sec-b"><div class="rule"><b>Owner:</b> Dana Whitfield stays the owner. The absorbed record's placeholder "support@" owner is retired (existing routine). If the absorbed owner had been a real login, they would become a <i>Company Admin member</i> of the survivor — never deleted, never displacing the owner. <b>Contacts:</b> matched by login, then by e-mail — a match keeps the survivor's row and moves any pending invite onto it; no match → moved as-is. Two logins on one e-mail address would stop the merge (that is a user-identity problem, fixed elsewhere).</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h">F · Scans, findings &amp; compliance cases <span class="cnt">move 4 scan jobs · 12 findings · 1 open case · scan config: survivor has none → absorbed's is adopted</span></div>
+        <div class="sec-b"><div class="rule">Web-scan jobs, findings, screenshots and the scan-COA references move. The open case's <i>merchant</i> pointer moves; its <i>tenant</i> (the processor) and case number do not change. Web-scan configuration is a per-company singleton: the survivor has none, so the absorbed record's configuration (set up by Northwind during pre-underwriting) is <b>adopted</b>; had both existed you would choose here.</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h">G · We Monitor / pre-underwriting (processor link) <span class="cnt">both records sit under Northwind Payments → collapse to one row</span></div>
+        <div class="sec-b">
+          <div class="pick">
+            <div class="opt on"><span class="radio on"><i></i></span><div><span class="who">DEFAULT</span><span class="val">Keep the survivor's Northwind row (its invite status and any invite links hang off it). Copy forward from the absorbed row where the survivor is empty: assigned tier, partner code, contact name/e-mail, marketing notes. Absorbed row archived with a pointer.</span></div></div>
+            <div class="opt"><span class="radio"><i></i></span><div><span class="who">ALTERNATIVE</span><span class="val">Keep the absorbed row's <i>status</i> too (PRE_UNDERWRITING instead of ACTIVE) so Northwind's We Monitor pipeline stage is preserved. Choose this if the processor still has underwriting to finish.</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" style="margin-bottom:0">
+        <div class="sec-h">H · Settings that exist once per company <span class="cnt">invite config · e-mail templates · MyCOA theme · notification preferences · tier pin</span></div>
+        <div class="sec-b"><div class="rule">Survivor's setting wins when both exist; absorbed-only settings are adopted. Every displaced absorbed setting is journaled so a reversal restores it. Conflicts (both exist) are listed in the preview.</div></div>
+      </div>
+    </div>
+    <div class="wiz-foot"><button class="btn ghost">← Back</button><span class="sp"></span><span class="muted">8 families · 3 operator choices · 7 field picks</span><button class="btn">Next: gate check →</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCREEN 5 · GATE CHECK + PREVIEW + CONFIRM ═══════════════════ -->
+<div class="screen">
+  <h2 class="sh">Wizard · steps 4–6: gate check, preview of exactly what will move, confirm</h2>
+  <p class="sub">Step 4 is the hard stop: every guard must be green, including the approved ownership proof for <i>this pair</i>. Step 5 is the dry-run the executor will replay verbatim. Step 6 requires typing the survivor's name.</p>
+
+  <div class="row2">
+    <div class="wiz">
+      <div class="wiz-head"><span class="t">Step 4 · Gate check</span><span class="s">planner runs read-only; nothing written</span></div>
+      <div class="wiz-body">
+        <div style="display:grid;gap:9px">
+          <label class="check on"><i>✓</i> <b>Ownership proof #P-2031 APPROVED</b> for survivor C-10488 ← absorbed C-10421 · reviewed by Qredible ops, Sep 3</label>
+          <label class="check on"><i>✓</i> Neither record already merged or deleted</label>
+          <label class="check on"><i>✓</i> Neither record is a processor / tenant (merchant-only merge)</label>
+          <label class="check on"><i>✓</i> No running scans or queued jobs on the absorbed record</label>
+          <label class="check on"><i>✓</i> Same processor on both sides (Northwind Payments)</label>
+          <label class="check on"><i>✓</i> Absorbed subscription is $0 / not live-paid</label>
+          <label class="check on"><i>✓</i> No shared login e-mail between the two owners</label>
+          <label class="check on"><i>✓</i> MID ••4471 not active under a third company</label>
+        </div>
+        <div class="note warn" style="margin-bottom:0"><b>If any line is red the wizard stops here</b> with the reason and what to do (e.g. "wait for 2 running scans", "start an ownership proof", "cancel the paid subscription on C-10421 first"). Nothing has been written.</div>
+      </div>
+    </div>
+
+    <div class="wiz">
+      <div class="wiz-head"><span class="t">Step 6 · Confirm &amp; run</span><span class="s">last chance</span></div>
+      <div class="wiz-body">
+        <div class="banner grey">You are about to move <b>1,214 rows across 41 tables</b> onto <b>Greenfield Botanicals (C-10488)</b> and archive <b>Greenfield Botanicals, LLC (C-10421)</b>. Runs as one transaction; reversible for 30 days except the items marked ⚠ below.</div>
+        <p class="sub" style="margin:12px 0 6px">Type the survivor's company name to confirm</p>
+        <div class="inp"><span class="ph">Greenfield Botanicals</span></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn ghost">← Back to preview</button><button class="btn">Merge now</button></div>
+        <div class="rule" style="margin-top:10px">Also written: one Activity Log entry on each company, and the merge record moves <code>PLANNED → APPLYING</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wiz" style="margin-top:18px">
+    <div class="wiz-head"><span class="t">Step 5 · Preview — exactly what will move</span><span class="s">this plan is stored on the merge record and replayed verbatim by the executor</span></div>
+    <div class="wiz-body">
+      <div class="kpi" style="margin-bottom:12px">
+        <div class="k"><div class="n">41</div><div class="l">tables touched</div></div>
+        <div class="k"><div class="n">1,214</div><div class="l">rows re-pointed</div></div>
+        <div class="k"><div class="n">9</div><div class="l">rows collapsed (both sides had one)</div></div>
+        <div class="k"><div class="n">2</div><div class="l">⚠ not reversible automatically</div></div>
+      </div>
+      <div class="tblbox"><table class="qt">
+        <thead><tr><th>Family</th><th>Table</th><th class="num">Rows</th><th>Action</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Products &amp; COAs</td><td class="mono">pl_product</td><td class="num">34</td><td>re-point</td><td>6 overlaps reported (canonical = scanned)</td></tr>
+          <tr><td></td><td class="mono">vault_coa · pl_user_upload_coa · pl_product_vault_coa</td><td class="num">93</td><td>re-point</td><td></td></tr>
+          <tr><td>DBAs / MIDs / licences</td><td class="mono">pl_company_dba · pl_company_location · pl_company_license · pl_license_verification_*</td><td class="num">9</td><td>re-point</td><td>MID ••4471</td></tr>
+          <tr><td>Billing</td><td class="mono">pl_company_subscription (absorbed, $0)</td><td class="num">1</td><td>re-point + close</td><td>survivor's billing rows: <b>untouched</b></td></tr>
+          <tr><td>People</td><td class="mono">pl_company_member · pl_contact_invite</td><td class="num">3</td><td>reconcile</td><td>placeholder owner retired · 2 contacts moved</td></tr>
+          <tr><td>Scans &amp; findings</td><td class="mono">pl_web_scan_job · pl_compliance_finding · pl_scan_coa_reference · …</td><td class="num">1,041</td><td>re-point</td><td></td></tr>
+          <tr><td>Cases</td><td class="mono">pl_compliance_case.merchant_company_id</td><td class="num">1</td><td>re-point</td><td>tenant + case number unchanged</td></tr>
+          <tr><td>We Monitor</td><td class="mono">pl_merchant_processor_client</td><td class="num">2 → 1</td><td>collapse</td><td>survivor row kept; tier + partner code copied</td></tr>
+          <tr><td>Singleton settings</td><td class="mono">pl_company_web_scan_config (+ finding types)</td><td class="num">7</td><td>adopt</td><td>survivor had none</td></tr>
+          <tr><td></td><td class="mono">pl_invite_config · pl_company_email_template · pl_notification_preference</td><td class="num">6</td><td>survivor wins</td><td>absorbed copies journaled</td></tr>
+          <tr><td>Company record</td><td class="mono">pl_company (survivor)</td><td class="num">7 fields</td><td>copy</td><td>per step 3 picks</td></tr>
+          <tr><td></td><td class="mono">pl_company (absorbed)</td><td class="num">1</td><td>archive</td><td>status DELETED · merged_into = C-10488</td></tr>
+          <tr class="hl"><td>⚠ Not auto-reversible</td><td class="mono">e-mails already sent carrying C-10421 links</td><td class="num">—</td><td>redirect</td><td>old id resolves to survivor at link entry points</td></tr>
+          <tr class="hl"><td>⚠ Not auto-reversible</td><td class="mono">cache eviction (RTQ / Middleware / Comms)</td><td class="num">—</td><td>post-commit</td><td>re-run if it fails; harmless to repeat</td></tr>
+        </tbody></table></div>
+      <div class="note" style="margin-bottom:0"><b>Drift guard:</b> the planner enumerates every column named like a company id in the live schema and refuses to plan if one is missing from its catalogue — so a table added next month cannot be silently left behind.</div>
+    </div>
+    <div class="wiz-foot"><button class="btn ghost">← Back</button><span class="sp"></span><button class="btn ghost">Export plan (xlsx)</button><button class="btn">Next: confirm →</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCREEN 6 · EXECUTE → RESULT ═══════════════════ -->
+<div class="screen">
+  <h2 class="sh">Wizard · step 7: execute, then the result</h2>
+  <p class="sub">The executor replays the stored plan inside one database transaction, journaling every row before it changes it. Progress is shown per phase; the merchant notices nothing except more data on their next login.</p>
+
+  <div class="row2">
+    <div class="wiz">
+      <div class="wiz-head"><span class="t">Applying merge #M-118</span><span class="s">started 14:42:07 · one transaction</span></div>
+      <div class="wiz-body">
+        <div class="progress" style="margin-bottom:12px"><i style="width:72%"></i></div>
+        <div class="phase"><span>1 · Lock both company rows</span><span class="st" style="color:var(--chip-ok-fg)">done</span></div>
+        <div class="phase"><span>2 · Owner &amp; members reconciled</span><span class="st" style="color:var(--chip-ok-fg)">done · 3 rows</span></div>
+        <div class="phase"><span>3 · Re-point owned data (products, COAs, DBAs, licences, scans, cases…)</span><span class="st" style="color:var(--chip-ok-fg)">done · 1,187 rows</span></div>
+        <div class="phase"><span>4 · Collapse relationship rows (We Monitor, watchlists)</span><span class="st" style="color:var(--chip-ok-fg)">done · 2 → 1</span></div>
+        <div class="phase"><span>5 · Singleton settings (adopt / survivor wins)</span><span class="st" style="color:var(--qt-link)">running…</span></div>
+        <div class="phase"><span>6 · Copy chosen company fields</span><span class="st muted">pending</span></div>
+        <div class="phase"><span>7 · Archive absorbed record · write Activity Log on both</span><span class="st muted">pending</span></div>
+        <div class="phase" style="border-bottom:0"><span>8 · Commit → post-commit: evict caches, resolve old-id links</span><span class="st muted">pending</span></div>
+        <div class="rule" style="margin-top:10px">If anything in 1–7 throws, the whole transaction rolls back — see screen 8.</div>
+      </div>
+    </div>
+
+    <div class="wiz">
+      <div class="wiz-head"><span class="t">Result · merge #M-118</span><span class="chip ok">APPLIED</span><span class="s">14:42:19 · 12 s</span></div>
+      <div class="wiz-body">
+        <div class="kpi" style="margin-bottom:12px">
+          <div class="k"><div class="n">1,214</div><div class="l">rows moved</div></div>
+          <div class="k"><div class="n">9</div><div class="l">collapsed</div></div>
+          <div class="k"><div class="n">6</div><div class="l">product overlaps to tidy</div></div>
+          <div class="k"><div class="n">30 d</div><div class="l">reversal window</div></div>
+        </div>
+        <div style="display:grid;gap:6px;font-size:12.5px">
+          <label class="check on"><i>✓</i> Survivor's login, subscription and payment method verified unchanged (row ids identical before/after)</label>
+          <label class="check on"><i>✓</i> Greenfield Botanicals, LLC (C-10421) archived → points to C-10488</label>
+          <label class="check on"><i>✓</i> Northwind Payments now sees one company in We Monitor</label>
+          <label class="check on"><i>✓</i> Activity Log written on both companies · ledger M-118 with 1,223 journal lines</label>
+          <label class="check warn"><i>!</i> Post-commit: cache eviction on Middleware returned a timeout — retried automatically, succeeded on 2nd attempt</label>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn">Open survivor company</button><button class="btn ghost">Open Tidy-Up for 6 overlaps</button><button class="btn ghost">Export report (xlsx)</button><button class="btn ghost" style="color:var(--qt-red-text)">Reverse merge…</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sh" style="margin-top:22px">What the archived record looks like afterwards</h2>
+  <div class="qa-page">
+    <div class="qa-title"><span class="qa-logo"><i></i>Q-Audit</span><span class="muted" style="margin-left:6px">› Companies › Greenfield Botanicals, LLC (C-10421)</span></div>
+    <div class="qa-body" style="padding-top:14px">
+      <div class="banner">🗂️ <b>Merged into Greenfield Botanicals (C-10488)</b> on Sep 3, 2026 by Qredible ops · merge #M-118 · <a href="#">view merge record</a> · <a href="#">open survivor</a> · reversible until Oct 3, 2026</div>
+      <p class="sub" style="margin-top:10px">Every list in the app excludes it (status DELETED). Links in old e-mails that carry C-10421 (activation, invite, notification deep links, MyCOA public page) resolve to the survivor via the tombstone pointer. Internal queries are <i>not</i> silently redirected — a DELETED company reading as another company would hide bugs.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SCREEN 7 · STORAGE ═══════════════════ -->
+<div class="screen">
+  <h2 class="sh">Storage — the merge operation record, its decisions, its journal, its audit trail</h2>
+  <p class="sub">Three new tables and two columns. Everything the wizard decided, everything the executor changed, and the reversal all live here; the Activity Log gets a one-line pointer per company.</p>
+
+  <div class="grid3">
+    <div class="card">
+      <h4><code>pl_company_ownership_proof</code></h4>
+      <p class="sub" style="margin-bottom:6px">The gate (screen 2). One per (claimant login, claimed company).</p>
+      <div class="json"><span class="k">id</span>: <span class="n">2031</span>
+<span class="k">claimant_user_id</span>: <span class="n">88102</span>   <span class="c">// Dana</span>
+<span class="k">claimant_company_id</span>: <span class="n">10488</span>
+<span class="k">claimed_company_id</span>: <span class="n">10421</span>
+<span class="k">status</span>: <span class="s">"APPROVED"</span>       <span class="c">// REQUESTED→SUBMITTED→IN_REVIEW→APPROVED|REJECTED|EXPIRED</span>
+<span class="k">evidence</span>: [ {<span class="k">type</span>:<span class="s">"DOMAIN_EMAIL"</span>,<span class="k">result</span>:<span class="s">"PASS"</span>},
+             {<span class="k">type</span>:<span class="s">"MID_MATCH"</span>,<span class="k">result</span>:<span class="s">"PASS"</span>},
+             {<span class="k">type</span>:<span class="s">"LICENSE_UPLOAD"</span>,<span class="k">s3_resource_id</span>:<span class="n">…</span>},
+             {<span class="k">type</span>:<span class="s">"PROCESSOR_CONFIRMATION"</span>,<span class="k">s3_resource_id</span>:<span class="n">…</span>},
+             {<span class="k">type</span>:<span class="s">"ATTESTATION"</span>,<span class="k">signed_name</span>:<span class="s">"…"</span>,<span class="k">ip</span>:<span class="s">"…"</span>,<span class="k">at</span>:<span class="s">"…"</span>} ]
+<span class="k">requested_by_user_id</span>, <span class="k">reviewed_by_user_id</span>, <span class="k">reviewer_notes</span>,
+<span class="k">submitted_at</span>, <span class="k">reviewed_at</span>, <span class="k">expires_at</span>   <span class="c">// 30 d after approval</span></div>
+    </div>
+    <div class="card">
+      <h4><code>pl_company_merge</code></h4>
+      <p class="sub" style="margin-bottom:6px">The operation. Status machine drives the UI.</p>
+      <div class="json"><span class="k">id</span>: <span class="n">118</span>
+<span class="k">survivor_company_id</span>: <span class="n">10488</span>
+<span class="k">absorbed_company_id</span>: <span class="n">10421</span>
+<span class="k">pl_company_ownership_proof_id</span>: <span class="n">2031</span>   <span class="c">// the gate, FK</span>
+<span class="k">status</span>: <span class="s">"APPLIED"</span>   <span class="c">// PLANNED→APPLYING→APPLIED|FAILED→REVERSING→REVERSED</span>
+<span class="k">plan</span>: { <span class="c">// the step-5 preview, verbatim</span>
+  <span class="k">tables</span>: [ {<span class="k">t</span>:<span class="s">"pl_product"</span>,<span class="k">rows</span>:<span class="n">34</span>,<span class="k">action</span>:<span class="s">"REPOINT"</span>}, … ],
+  <span class="k">guards</span>: { … all true … }, <span class="k">overlaps</span>: [ … 6 pairs … ] }
+<span class="k">field_choices</span>: { <span class="k">name</span>:<span class="s">"ABSORBED"</span>, <span class="k">company_email</span>:<span class="s">"SURVIVOR"</span>,
+                 <span class="k">pl_business_type_id</span>:<span class="s">"ABSORBED"</span>, <span class="k">social_channels</span>:<span class="s">"UNION"</span>, … }
+<span class="k">family_choices</span>: { <span class="k">products</span>:<span class="s">"MOVE_ALL_REPORT_OVERLAPS"</span>,
+                  <span class="k">billing</span>:<span class="s">"KEEP_SURVIVOR"</span>, <span class="k">processor_link</span>:<span class="s">"KEEP_SURVIVOR_ROW"</span> }
+<span class="k">requested_by_user_id</span>, <span class="k">confirmed_at</span>, <span class="k">applied_at</span>, <span class="k">duration_ms</span>: <span class="n">12140</span>
+<span class="k">reversible_until</span>: <span class="s">"2026-10-03"</span>, <span class="k">reversed_at</span>, <span class="k">reversed_by_user_id</span>
+<span class="k">error</span>: <span class="n">null</span>, <span class="k">post_commit_warnings</span>: [ <span class="s">"MW cache evict retried ×1"</span> ]</div>
+    </div>
+    <div class="card">
+      <h4><code>pl_company_merge_item</code> + tombstone</h4>
+      <p class="sub" style="margin-bottom:6px">Row-level journal — the reversal source. One line per changed row.</p>
+      <div class="json"><span class="k">pl_company_merge_id</span>: <span class="n">118</span>, <span class="k">seq</span>: <span class="n">417</span>
+<span class="k">table_name</span>: <span class="s">"pl_product"</span>, <span class="k">pk_value</span>: <span class="n">5581203</span>
+<span class="k">action</span>: <span class="s">"REPOINT"</span>   <span class="c">// REPOINT | COLLAPSE | FIELD_COPY | OWNER_RETIRE | MEMBER_LINK | JSON_REWRITE | SOFT_DELETE</span>
+<span class="k">column_name</span>: <span class="s">"pl_company_id"</span>
+<span class="k">old_value</span>: <span class="n">10421</span>, <span class="k">new_value</span>: <span class="n">10488</span>
+<span class="k">row_snapshot</span>: <span class="n">null</span>   <span class="c">// full row JSON for COLLAPSE, so undo can re-insert</span>
+
+<span class="c">-- and on pl_company (absorbed side):</span>
+<span class="k">merged_into_company_id</span>: <span class="n">10488</span>
+<span class="k">merged_at</span>: <span class="s">"2026-09-03 14:42:19"</span>
+
+<span class="c">-- and one row each in pl_company_audit_log (10488, 10421):</span>
+<span class="k">metadata</span>: { <span class="k">type</span>:<span class="s">"COMPANY_MERGE"</span>, <span class="k">merge_id</span>:<span class="n">118</span>, <span class="k">direction</span>:<span class="s">"SURVIVOR"</span>, <span class="k">rows</span>:<span class="n">1214</span> }</div>
+    </div>
+  </div>
+
+  <h2 class="sh" style="margin-top:22px">The "Company Merges" tab (ledger) and a record drawer</h2>
+  <div class="qa-page">
+    <div class="qa-title"><span class="qa-logo"><i></i>Q-Audit</span></div>
+    <div class="qa-tabs"><div class="qa-tab">Audit</div><div class="qa-tab">Global Settings</div><div class="qa-tab">Paywall</div><div class="qa-tab">Import</div><div class="qa-tab">Finances</div><div class="qa-tab">Companies</div><div class="qa-tab">Prospects</div><div class="qa-tab">Sales</div><div class="qa-tab">Promotions</div><div class="qa-tab">Activity Log</div><div class="qa-tab">Q-M Settings</div><div class="qa-tab">Display Settings</div><div class="qa-tab">Scan Operations</div><div class="qa-tab on new">Company Merges</div></div>
+    <div class="qa-body">
+      <div class="tblbox"><table class="qt">
+        <thead><tr><th>Merge</th><th>Survivor</th><th>Absorbed</th><th>Proof</th><th>Status</th><th class="num">Rows</th><th>Requested by</th><th>Applied</th><th>Reversible until</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">M-118</td><td>Greenfield Botanicals <span class="mono muted">C-10488</span></td><td>Greenfield Botanicals, LLC <span class="mono muted">C-10421</span></td><td><span class="chip ok">P-2031</span></td><td><span class="chip ok">APPLIED</span></td><td class="num">1,214</td><td>Qredible ops</td><td>Sep 3, 14:42</td><td>Oct 3</td><td><span class="dots">···</span></td></tr>
+          <tr><td class="mono">M-117</td><td>Harbor Leaf Supply <span class="mono muted">C-10390</span></td><td>Harbor Leaf <span class="mono muted">C-10402</span></td><td><span class="chip ok">P-2027</span></td><td><span class="chip flag">FAILED</span></td><td class="num">0</td><td>Qredible ops</td><td>—</td><td>—</td><td><span class="dots">···</span></td></tr>
+          <tr><td class="mono">M-116</td><td>Cedar &amp; Sage Wellness <span class="mono muted">C-10377</span></td><td>Cedar and Sage <span class="mono muted">C-10366</span></td><td><span class="chip ok">P-2019</span></td><td><span class="chip co">REVERSED</span></td><td class="num">402</td><td>Qredible ops</td><td>Aug 21</td><td>—</td><td><span class="dots">···</span></td></tr>
+          <tr><td class="mono">M-115</td><td>Bluewater Peptides <span class="mono muted">C-10301</span></td><td>Blue Water Peptides <span class="mono muted">C-10298</span></td><td><span class="chip pending">P-2015 in review</span></td><td><span class="chip pending">PLANNED</span></td><td class="num">—</td><td>Qredible ops</td><td>—</td><td>—</td><td><span class="dots">···</span></td></tr>
+        </tbody></table></div>
+      <div class="drawer" style="margin-top:14px">
+        <div class="dh"><b>Merge #M-118</b><span class="chip ok">APPLIED</span><span class="muted">journal · 1,223 lines · filter by table</span><span style="margin-left:auto" class="muted">✕</span></div>
+        <div class="db">
+          <div class="tblbox"><table class="qt">
+            <thead><tr><th class="num">#</th><th>Table</th><th>PK</th><th>Action</th><th>Column</th><th>Old</th><th>New</th></tr></thead>
+            <tbody>
+              <tr><td class="num">1</td><td class="mono">pl_company_member</td><td class="mono">771204</td><td>OWNER_RETIRE</td><td class="mono">(snapshot)</td><td class="mono">support@ placeholder</td><td class="mono">retired</td></tr>
+              <tr><td class="num">2</td><td class="mono">pl_company_member</td><td class="mono">771205</td><td>MEMBER_LINK</td><td class="mono">pl_company_id</td><td class="mono">10421</td><td class="mono">10488</td></tr>
+              <tr><td class="num">…</td><td class="mono">pl_product</td><td class="mono">5581203</td><td>REPOINT</td><td class="mono">pl_company_id</td><td class="mono">10421</td><td class="mono">10488</td></tr>
+              <tr><td class="num">…</td><td class="mono">pl_merchant_processor_client</td><td class="mono">40911</td><td>COLLAPSE</td><td class="mono">(snapshot)</td><td class="mono">row kept in journal</td><td class="mono">archived</td></tr>
+              <tr><td class="num">1,222</td><td class="mono">pl_company</td><td class="mono">10421</td><td>SOFT_DELETE</td><td class="mono">status · merged_into</td><td class="mono">PENDING · null</td><td class="mono">DELETED · 10488</td></tr>
+              <tr><td class="num">1,223</td><td class="mono">pl_company_audit_log</td><td class="mono">—</td><td>INSERT ×2</td><td class="mono">metadata.type</td><td class="mono">—</td><td class="mono">COMPANY_MERGE</td></tr>
+            </tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note"><b>Reversibility is a property of the journal, not of the wizard.</b> Reverse replays the items in reverse order in one transaction (re-point back, re-insert collapsed rows from their snapshots, restore field values, un-archive). It refuses if the survivor has gained rows since the merge whose ancestry is ambiguous (e.g. new products) — the operator can override ("reverse anyway, new rows stay on the survivor"). Post-commit side effects that were irreversible (a gateway cancellation) are listed as manual.</div>
+</div>
+
+<!-- ═══════════════════ SCREEN 8 · FAILURE & ROLLBACK ═══════════════════ -->
+<div class="screen">
+  <h2 class="sh">Failure — what happens when it can't complete</h2>
+  <p class="sub">Four distinct failure points, each with a different guarantee. The design rule: <b>the database is never left half-merged</b>; the only things that can be "partial" are post-commit side effects, and those are idempotent and retryable.</p>
+
+  <div class="flow" style="margin-bottom:16px">
+    <div class="box ok"><b>① Planner refuses</b>a guard is red · nothing written · merge row stays PLANNED with the reason</div>
+    <div class="box bad"><b>② Apply throws mid-way</b>transaction rolls back · DB identical to before · merge row → FAILED with error + phase</div>
+    <div class="box gate"><b>③ Post-commit side effect fails</b>DB is merged (APPLIED) · warning recorded · "Retry side effects" button · safe to repeat</div>
+    <div class="box"><b>④ Reverse fails</b>reverse is its own transaction · rolls back to APPLIED · nothing half-reversed</div>
+  </div>
+
+  <div class="row2">
+    <div class="wiz">
+      <div class="wiz-head"><span class="t">② Applying merge #M-117</span><span class="chip flag">FAILED</span><span class="s">rolled back · 14:11:52</span></div>
+      <div class="wiz-body">
+        <div class="progress" style="margin-bottom:12px"><i style="width:38%;background:var(--qt-red-light)"></i></div>
+        <div class="phase"><span>1 · Lock both company rows</span><span class="st" style="color:var(--chip-ok-fg)">done</span></div>
+        <div class="phase"><span>2 · Owner &amp; members reconciled</span><span class="st" style="color:var(--chip-ok-fg)">done</span></div>
+        <div class="phase"><span>3 · Re-point owned data</span><span class="st" style="color:var(--qt-red-text)">failed at pl_company_dba</span></div>
+        <div class="phase" style="border-bottom:0"><span>4–8</span><span class="st muted">not started</span></div>
+        <div class="banner red" style="margin-top:12px"><b>Rolled back.</b> Duplicate MID ••9018: a third active company (C-10250) acquired this MID after the plan was made. No rows were changed. <a href="#" style="color:#991B1B;text-decoration:underline">Re-plan</a> to see the new guard result.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn">Re-plan (re-runs step 4–5)</button><button class="btn ghost">Open C-10250</button><button class="btn ghost">Discard merge</button></div>
+        <div class="rule" style="margin-top:10px">Why re-plan and not retry: the stored plan was computed against the data as it was. Anything that changed since (a new MID, a scan that started, a new product) can make it wrong, so a failed apply always goes back through the gate check. Retrying the identical plan is never offered.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h4>Guarantees, by failure point</h4>
+        <div class="tblbox"><table class="qt">
+          <thead><tr><th>Point</th><th>DB state after</th><th>Merge record</th><th>Operator next step</th></tr></thead>
+          <tbody>
+            <tr><td>① Guard red</td><td>unchanged</td><td>PLANNED + reason</td><td>fix the cause (finish scans, start proof, cancel paid plan…) → re-run gate check</td></tr>
+            <tr><td>② Exception in phases 1–7</td><td>unchanged (rollback)</td><td>FAILED + phase + error</td><td>Re-plan → new preview → confirm again</td></tr>
+            <tr><td>② Timeout / lock wait</td><td>unchanged (rollback)</td><td>FAILED · "lock timeout"</td><td>Re-plan; a concurrent merge on either company is blocked by the row lock, second one fails guard 1</td></tr>
+            <tr><td>② API process dies mid-transaction</td><td>unchanged (InnoDB rollback)</td><td>stuck in APPLYING</td><td>a sweeper marks APPLYING &gt; 10 min as FAILED("interrupted"); Re-plan</td></tr>
+            <tr><td>③ Cache eviction / redirect map / notification fails</td><td>merged</td><td>APPLIED + warnings</td><td>"Retry side effects" (idempotent); the app is correct without caches, just slower until they expire</td></tr>
+            <tr><td>③ Gateway cancel of a paid absorbed plan fails</td><td>merged</td><td>APPLIED + warning</td><td>manual cancel in the gateway; warning stays until an operator marks it resolved</td></tr>
+            <tr><td>④ Reverse throws</td><td>still merged (rollback of the reverse)</td><td>APPLIED · reverse_error</td><td>inspect the journal line it stopped on; a snapshot re-insert that collides gets a fresh PK on retry</td></tr>
+          </tbody></table></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h4>What makes ② safe</h4>
+        <ul style="padding-left:18px;font-size:12.5px;line-height:1.6">
+          <li>One <code>queryRunner</code> transaction for phases 1–7; <code>SELECT … FOR UPDATE</code> on both company rows first.</li>
+          <li>The journal is written <i>inside</i> the same transaction, so a rollback also discards the journal — no orphan "undo" lines.</li>
+          <li>Post-commit work (phase 8) is queued from the commit callback, not run inside the transaction — a slow cache cannot hold row locks.</li>
+          <li>Unique-key collisions are pre-computed in the plan; a collision that appears between plan and apply is exactly case ② and surfaces as a clear error, not a half-merge.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="note warn"><b>Human failure is handled by the same machinery:</b> "we merged the wrong pair" is a Reverse within 30 days (screen 7). "We merged the right pair but chose the wrong survivor" is Reverse, then a new merge in the other direction — the ownership proof is still valid for the pair.</div>
+</div>
+
+<div class="footer">← <a href="../index.html">All prototypes</a> · Company Merge wizard · spec <code>company-merge-duplicate-company-spec-2026-09-02.md</code> · placeholder data only</div>
+
+<script>
+  function show(i,btn){
+    document.querySelectorAll('.screen').forEach((s,j)=>s.classList.toggle('active',j===i));
+    document.querySelectorAll('.screen-nav button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    window.scrollTo({top:0});
+  }
+</script>
+</body>
+</html>
