@@ -261,6 +261,33 @@
 
   <div class="card-grid">
 
+    <!-- 2026-09-02 — Company Merge: super-admin wizard for duplicate company records (Q-Audit) -->
+
+    <a data-status="todo" data-category="q-audit" data-date="2026-09-02"
+       href="qredible-tickets/company-merge-wizard.html"
+       class="proto-card"
+       data-keywords="company merge duplicate company records merge duplicate dedup survivor absorbed ownership proof claim validation gate super admin q-audit backend companies tab company merges ledger journal reverse rollback failure transaction pl_company_merge pl_company_merge_item merged_into_company_id products coas mids dbas subscriptions invites scans cases members we monitor pre-underwriting processor link field-level conflicts preview confirm westtown palmgate spec">
+      <div class="card-top">
+        <div class="card-icon">&#129516;</div>
+        <div class="card-meta">
+          <span class="card-category" onclick="event.preventDefault();filterByCategory('q-audit')">Q-Audit</span>
+          <span class="card-ticket">COMPANY MERGE &bull; DESIGN</span>
+        </div>
+      </div>
+      <div class="card-name">Company Merge &mdash; Super-Admin Wizard for Duplicate Company Records</div>
+      <p class="card-desc">A merchant already on file under a processor's pre-underwriting self-registers through the public site and becomes a <b>second company record</b>. This is the super-admin tool that fixes it: it lives on <b>Q-Audit &rarr; Companies</b> as a row action plus a new <b>Company Merges</b> ledger tab, is <b>initiated by Qredible only</b>, and is <b>gated on an admin-reviewed ownership proof</b> before it can even be started. Eight screens: where it lives (and why not Q-Config), the proof gate, identify the two records and pick the survivor, decide what goes where (field-level conflicts + products, COAs, MIDs/DBAs, billing, members/invites, scans, cases, We Monitor link, singleton settings), the guard check + exact preview + typed confirm, execute &rarr; result with the tombstone banner, the storage model (<code>pl_company_merge</code>, row-level journal, tombstone, audit), and every failure point with its rollback/retry guarantee.</p>
+      <div class="card-pills">
+        <span class="pill pill-blue">Q-Audit, SuperAdmin only</span>
+        <span class="pill pill-yellow">Ownership proof gate</span>
+        <span class="pill pill-green">One transaction, journaled, reversible 30 d</span>
+        <span class="pill pill-blue">Billing rows never touched</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">Sep 2, 2026</span>
+        <span class="card-cta">View mockup &#8594;</span>
+      </div>
+    </a>
+
     <!-- 2026-08-21 — QP-4442: MRI marketplace, CFPB source, per-industry profiles (WeMonitor) -->
 
     <a data-status="todo" data-category="wemonitor" data-date="2026-08-21"
