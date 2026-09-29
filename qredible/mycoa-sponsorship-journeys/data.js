@@ -1,14 +1,19 @@
 window.JOURNEYS = {
   "title": "MyCOA & sponsorship — journey review",
-  "assembled": "2026-09-28",
-  "total": 140,
+  "assembled": "2026-09-29",
+  "total": 141,
   "chapters": [
     {
       "title": "The merchant paywall",
       "audience": "Merchant",
       "route": "QTrust → required paywall",
-      "boundary": "Earlier local paywall checkpoint · September 18. Actual application routes; synthetic prices and blocked outbound payments. This is not a fresh staging validation.",
+      "boundary": "First screen was supplied by Joseph on September 29; its capture environment was not independently verified for this gallery. Remaining screens are earlier local September 18 checkpoints with synthetic prices and blocked outbound payments. This is not a fresh staging validation.",
       "slides": [
+        {
+          "title": "Sponsored offer visible before activation",
+          "caption": "The plan card shows the first three sponsored monthly cycles at $0 for the test merchant and the later $199/month merchant price before Activate MyCOA is clicked. User-provided screenshot; no activation or charge is proved by this image.",
+          "src": "assets/141-sponsored-plan-card-before-activation-user-capture.png"
+        },
         {
           "title": "Required paywall, compact desktop",
           "caption": "The refined one-plan card sits inside the processor layout. Required enrollment has no dismiss action.",
@@ -912,5 +917,5 @@ window.JOURNEYS = {
       ]
     }
   ],
-  "coverage": "This collection assembles existing actual-application captures; it is not a new end-to-end run. Current existing-subscriber repricing screens ($199 to $175: notice preview, scheduling, cancellation and notice history) were not located in the evidence set and are not represented as proven here. Gateway settlement, real external email delivery, deployed staging behavior and a real elapsed billing handoff remain separate validation items."
+  "coverage": "This collection assembles existing application captures plus one user-provided sponsored-plan screenshot; it is not a new product end-to-end run. The user-provided capture's environment was not independently verified for this gallery. Current existing-subscriber repricing screens ($199 to $175: notice preview, scheduling, cancellation and notice history) were not located in the evidence set and are not represented as proven here. Gateway settlement, real external email delivery, deployed staging behavior and a real elapsed billing handoff remain separate validation items."
 };
