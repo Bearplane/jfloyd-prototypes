@@ -27,6 +27,7 @@ node validation/mycoa-gallery/validate.cjs
 The validator requires Playwright and Chromium installed. If Playwright is not
 available through Node's normal module resolution, set `PLAYWRIGHT_MODULE` to
 its module path. `CHROMIUM_PATH` can select a specific Chromium binary.
-`result.json` and the two PNGs in this folder record the local full-site
-route run on September 29, 2026. This validates gallery integrity and
+`result.json` and the three PNGs in this folder record the deployed Netlify
+PR-preview route run on September 29, 2026. The same checks passed first
+against the local full-site route. This validates gallery integrity and
 navigation only, not the underlying QTrust/Q-Config product workflows.
