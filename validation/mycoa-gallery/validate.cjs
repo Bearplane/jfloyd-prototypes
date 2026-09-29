@@ -23,6 +23,12 @@ const output = __dirname;
   await galleryLink.click();
   await page.waitForURL('**/mycoa-sponsorship-journeys/');
   await page.locator('#shot').evaluate((image) => image.decode());
+  if (!(await page.locator('#caption').textContent()).includes('Sponsored offer visible before activation')) {
+    throw new Error('Sponsored offer is not the first gallery step');
+  }
+  if (!(await page.locator('#shot').getAttribute('src')).includes('141-sponsored-plan-card-before-activation')) {
+    throw new Error('Sponsored offer screenshot is not displayed');
+  }
   const imagesDecoded = await page.evaluate(async () => {
     let count = 0;
     for (const chapter of window.JOURNEYS.chapters) {
@@ -39,14 +45,14 @@ const output = __dirname;
     }
     return count;
   });
-  if (imagesDecoded !== 140) throw new Error(`Expected 140 images, found ${imagesDecoded}`);
+  if (imagesDecoded !== 141) throw new Error(`Expected 141 images, found ${imagesDecoded}`);
   await page.screenshot({ path: path.join(output, 'gallery-desktop.png') });
 
   await page.locator('#next').click();
   if (await page.locator('#step').inputValue() !== '1') throw new Error('Next failed');
   await page.keyboard.press('ArrowLeft');
   if (await page.locator('#step').inputValue() !== '0') throw new Error('Keyboard navigation failed');
-  await page.locator('#step').selectOption('4');
+  await page.locator('#step').selectOption('5');
   await page.locator('#next').click();
   if (await page.locator('#journey').inputValue() !== '1') throw new Error('Chapter navigation failed');
   await page.locator('#grid').click();

@@ -1,8 +1,8 @@
 {
   "passed": true,
   "scope": "Static gallery and Qredible index route only; not product E2E",
-  "baseUrl": "https://deploy-preview-96--jfloyd-qredible.netlify.app",
-  "imagesDecoded": 140,
+  "baseUrl": "http://127.0.0.1:4318",
+  "imagesDecoded": 141,
   "journeys": 26,
-  "testedAt": "2026-09-29T20:34:50.804Z"
+  "testedAt": "2026-09-29T21:48:10.533Z"
 }
