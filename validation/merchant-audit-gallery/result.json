@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "scope": "Static gallery and Qredible index only; application acceptance is documented separately",
+  "baseUrl": "http://127.0.0.1:4337",
+  "imagesDecoded": 111,
+  "journeys": 13,
+  "testedAt": "2026-10-12T23:22:55.205Z",
+  "javascriptErrors": []
+}
