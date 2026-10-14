@@ -1,8 +1,16 @@
 {
-  "passed": true,
-  "scope": "Static gallery and Qredible index route only; not product E2E",
-  "baseUrl": "https://deploy-preview-97--jfloyd-qredible.netlify.app",
-  "imagesDecoded": 141,
+  "at": "2026-10-14T22:24:33.447Z",
+  "baseUrl": "http://127.0.0.1:4328",
+  "browser": "155.0.8059.79",
+  "scope": "Full static jfloyd-prototypes site route and user controls; not a new product billing E2E run",
+  "screenshots": 200,
   "journeys": 26,
-  "testedAt": "2026-09-29T21:49:33.445Z"
+  "checks": [
+    "All 200 images visited through chapter and Next controls, decoded, with matching captions, provenance and Q-Config notes",
+    "Next/Previous, keyboard, cross-chapter transitions, thumbnails, text-reading view, presentation/Esc, wording guide jumps, clipboard deep links, filtered paths and evidence dialog",
+    "1600px / 1280px / 390px responsive layouts, mobile chapter selection, guide and presentation"
+  ],
+  "pageErrors": [],
+  "failedResponses": [],
+  "passed": true
 }

@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-14T22:23:38.414Z",
+  "environment": "Deployed config.qrediblestaging.com / normal routes / Playwright Chromium / no HTTP mocks / read-only review",
+  "screens": [
+    {
+      "name": "01-programs.png",
+      "title": "Q-Config Sponsorships: programs and terms",
+      "url": "https://config.qrediblestaging.com/sponsorships?processor=164920"
+    },
+    {
+      "name": "02-program-form.png",
+      "title": "Configurable sponsorship terms, reviewed without saving",
+      "url": "https://config.qrediblestaging.com/sponsorships?processor=164920"
+    },
+    {
+      "name": "03-merchants.png",
+      "title": "Q-Config Merchants",
+      "url": "https://config.qrediblestaging.com/sponsorships?processor=164920"
+    },
+    {
+      "name": "04-promo-codes.png",
+      "title": "Q-Config Promo codes",
+      "url": "https://config.qrediblestaging.com/sponsorships?processor=164920"
+    },
+    {
+      "name": "05-invoices.png",
+      "title": "Q-Config Invoices & payments",
+      "url": "https://config.qrediblestaging.com/sponsorships?processor=164920"
+    },
+    {
+      "name": "06-paywall-layout.png",
+      "title": "Global paywall configuration",
+      "url": "https://config.qrediblestaging.com/invite-config"
+    },
+    {
+      "name": "11-activation-invite-banner.png",
+      "title": "Activation-invite banner headline and message; separate from sponsorship status",
+      "url": "https://config.qrediblestaging.com/invite-config"
+    },
+    {
+      "name": "07-paywall-copy-controls.png",
+      "title": "Paywall wording and presentation controls; unsaved review",
+      "url": "https://config.qrediblestaging.com/invite-config"
+    },
+    {
+      "name": "08-plan-card-controls.png",
+      "title": "Plan-card wording and annual savings controls",
+      "url": "https://config.qrediblestaging.com/invite-config"
+    },
+    {
+      "name": "09-card-html.png",
+      "title": "Editable card copy and protected billing tokens; unsaved",
+      "url": "https://config.qrediblestaging.com/invite-config"
+    },
+    {
+      "name": "10-annual-savings-copy.png",
+      "title": "Editable annual savings heading and calculated values; unsaved",
+      "url": "https://config.qrediblestaging.com/invite-config"
+    }
+  ],
+  "checks": [
+    "Normal sign-in succeeded; credentials and browser state are not saved",
+    "Program, merchant, promo and invoice tabs reviewed; no saves or financial submissions",
+    "Global layout and card controls reviewed; unsaved form only"
+  ],
+  "pageErrors": [],
+  "passed": true
+}

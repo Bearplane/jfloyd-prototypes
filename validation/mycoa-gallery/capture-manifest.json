@@ -1,0 +1,360 @@
+{
+  "assembled": "2026-10-14",
+  "note": "Source-relative paths and SHA-256 for newly copied unchanged captures; the 141 older assets are retained from merged gallery PR97.",
+  "captures": [
+    {
+      "asset": "assets/staging-approved-split-01-initial-offer.png",
+      "source": "docs/validation/qp4802/post2803-20260930/approved-split-01-initial-offer.png",
+      "sha256": "aed8462f1977d7876b358b3d9802fc1204792a7aa68054a102e2770bffa8151d",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-layout-01-global-monthly-required.png",
+      "source": "docs/validation/qp4802/post2803-20260930/layout-01-global-monthly-required.png",
+      "sha256": "ce4d84fcb58f7406a579a8b933126ea9234e161cc8b9892c7ea178baa7204cfc",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-layout-02-global-annual.png",
+      "source": "docs/validation/qp4802/post2803-20260930/layout-02-global-annual.png",
+      "sha256": "4b4087adda22341a6ec6454abb7797bae152df4bf33ccc0072f57509faf62f59",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-layout-05-global-mobile.png",
+      "source": "docs/validation/qp4802/post2803-20260930/layout-05-global-mobile.png",
+      "sha256": "31bc26c5e6df727a4ba715fa659cc1e1d7b37d04ded7386183fc1e2e8d36d606",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-06-paywall-layout.png",
+      "source": "validation/mycoa-gallery/staging-20261014/06-paywall-layout.png",
+      "sha256": "b6cd180d5e1cd9edbb1553d4e84b7ca33794d780af724a706e5bc09bada3b238",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-07-paywall-copy-controls.png",
+      "source": "validation/mycoa-gallery/staging-20261014/07-paywall-copy-controls.png",
+      "sha256": "9e9aace23b623ac4e2ff0a3bf941150c663d51dd73119ff60964fa809cfbf7ef",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-11-activation-invite-banner.png",
+      "source": "validation/mycoa-gallery/staging-20261014/11-activation-invite-banner.png",
+      "sha256": "fd9f664385fe32f7dd5e59b825d6b5b4be1bee5dd1c44c223959d1aea45a11b4",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-08-plan-card-controls.png",
+      "source": "validation/mycoa-gallery/staging-20261014/08-plan-card-controls.png",
+      "sha256": "b37a6f1b0681d34c25932a739cda91efb1b79c4cf4b2e394d96f8ae0eb211d1c",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-09-card-html.png",
+      "source": "validation/mycoa-gallery/staging-20261014/09-card-html.png",
+      "sha256": "8242e68045d5528a8dca71f81283c23ae1075763e213a0bbf2f309dbee84bb72",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-10-annual-savings-copy.png",
+      "source": "validation/mycoa-gallery/staging-20261014/10-annual-savings-copy.png",
+      "sha256": "8b1cdf793b4a53dc49c50ab59580133a46ee1546fd23c34899a8e839833c0507",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-01-programs.png",
+      "source": "validation/mycoa-gallery/staging-20261014/01-programs.png",
+      "sha256": "e071da6eee0a7e707f5e0dd88be80a8d263ef92e9ae5570e6de8a6232fd32e29",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-02-program-form.png",
+      "source": "validation/mycoa-gallery/staging-20261014/02-program-form.png",
+      "sha256": "6c95808dde592ef03059a541c5f446e37783094d1a42449e95701c2d89ef6331",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-03-merchants.png",
+      "source": "validation/mycoa-gallery/staging-20261014/03-merchants.png",
+      "sha256": "83219d833f9cefda88545959f6d2e68a89164a2de3f5da7a11d882c97d3f3cbe",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-04-promo-codes.png",
+      "source": "validation/mycoa-gallery/staging-20261014/04-promo-codes.png",
+      "sha256": "469131691e3811be157242e446ff3a07ee7000b732588dc02749fc8853fa2a88",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/20261014-05-invoices.png",
+      "source": "validation/mycoa-gallery/staging-20261014/05-invoices.png",
+      "sha256": "16f824ed49bff4234bba8ec93372373926ff8968bf842990d1d386b56597cd26",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-05-qconfig-split-exact-quote.png",
+      "source": "docs/validation/qp4802/post2803-20260930/05-qconfig-split-exact-quote.png",
+      "sha256": "2fc896ef944512efb03a16848f6a228921019ed98785f610fe39037747226be7",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-07-fresh-split-offer-selected.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../post2800-20260930/07-fresh-split-offer-selected.png",
+      "sha256": "10cf42acd5872bac8bbc0bc6454112ce40901ef334690cc75588e08f855d0498",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-08-fresh-split-offer-review.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../post2800-20260930/08-fresh-split-offer-review.png",
+      "sha256": "12f0960e9f81ab7adb9901ef108866fc6bf332a69017fd0246e9ae32002ee2db",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-09-fresh-split-pending-roster.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../post2800-20260930/09-fresh-split-pending-roster.png",
+      "sha256": "b4c0c7b29fe3ddd45c6c73d5193a878a584dfe4a89f8b5b647f47e5dd79799b5",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-promo-cap-01-no-assigned-sponsorship.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../release-readiness-20260930/promo-cap-01-no-assigned-sponsorship.png",
+      "sha256": "2562d48476b221507b220ffe2fd1dc9a9abb3248260d2bb6e66752aad7357603",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-promo-cap-02-code-validation.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../release-readiness-20260930/promo-cap-02-code-validation.png",
+      "sha256": "70c33b1157307330c5d9eaa766e34be98dc85d6f273ce6a57b52d06803ba3980",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-promo-cap-03-code-only-activation-review.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../release-readiness-20260930/promo-cap-03-code-only-activation-review.png",
+      "sha256": "f017a18a5a564951de1fcf6a49da2b2da12749ea504b2ab39c4347360165b58a",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-promo-cap-04-approved-code-billing-consent.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../release-readiness-20260930/promo-cap-04-approved-code-billing-consent.png",
+      "sha256": "398787d6fb9bd97b692d8e7ead571932e1fefe6e9d2bf8b656d2d487793e48ca",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-promo-cap-05-code-activated-subscription.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../release-readiness-20260930/promo-cap-05-code-activated-subscription.png",
+      "sha256": "2857ca8f2cd858fba0ad86e13af4c01f59884924efd59faedb1a8dafd7348a0d",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-promo-cap-06-second-merchant-rejected.png",
+      "source": "docs/validation/qp4802/post2803-20260930/promo-cap-06-second-merchant-rejected.png",
+      "sha256": "f853eeae6e395ed0dc5d202c5cc2097ec7d443428f831eefbdffb46cb0443ba4",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-approved-split-02-exact-consent-before.png",
+      "source": "docs/validation/qp4802/post2803-20260930/approved-split-02-exact-consent-before.png",
+      "sha256": "798c2c5e12de2b514aace1b416426e6572dd6dd779f0a3c058ea50a51b0e4205",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-approved-split-03-approved-consent.png",
+      "source": "docs/validation/qp4802/post2803-20260930/approved-split-03-approved-consent.png",
+      "sha256": "3ca85ad9039624b7672bd089fec82a7e28bbed30a17e15d5f24bcb8e949f46fc",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-approved-split-04-pending-0.png",
+      "source": "docs/validation/qp4802/post2803-20260930/approved-split-04-pending-0.png",
+      "sha256": "24c3fb5bdec7adaeb95b91c2bd3558d43007d573f369a6e68826c474b7da7384",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-active-Split80-desktop.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-active-Split80-desktop.png",
+      "sha256": "90db616cb600f9e0b8ec2d3e4a0faac98fe75eef161ae05b1a8ed5ac0c66ed5b",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-active-Split80-mobile.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-active-Split80-mobile.png",
+      "sha256": "6b1712f9baf79290fd118ce32edbf9bb5d4ee0faee90dd6eae0f89e2b4837c70",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-paid-review-04-merchant-offer.png",
+      "source": "docs/validation/qp4802/post2803-20260930/paid-review-04-merchant-offer.png",
+      "sha256": "08d21244997a4009d2017e7f3453311c9caf2d700afc2db121397711e26e097a",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-paid-review-05-exact-unchecked-consent.png",
+      "source": "docs/validation/qp4802/post2803-20260930/paid-review-05-exact-unchecked-consent.png",
+      "sha256": "168c712c293c2dfc8af3f6e949ba9d89f2ee32d132cbaa11a755388948657736",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-active-PromoB-after-mail-01-status.png",
+      "source": "docs/validation/qp4802/post2803-20260930/active-PromoB-after-mail-01-status.png",
+      "sha256": "136f6e7b94f6fef7afdb98f9de7e863f271074add266287bae38ebea2a8dcf9d",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-active-PromoB-after-mail-02-annual-comparison.png",
+      "source": "docs/validation/qp4802/post2803-20260930/active-PromoB-after-mail-02-annual-comparison.png",
+      "sha256": "3c1d9c6481a3b91a40001a42020fa081d9463c38f1aa78e1e669f1e01b27eb26",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-active-PromoB-after-mail-03-annual-consent-unchecked.png",
+      "source": "docs/validation/qp4802/post2803-20260930/active-PromoB-after-mail-03-annual-consent-unchecked.png",
+      "sha256": "fd5f475b4a5345d026678113163d0ad241b70c9b31ec837b3e3898ffd99535d3",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-active-PromoB-after-mail-04-mobile-annual-review.png",
+      "source": "docs/validation/qp4802/post2803-20260930/active-PromoB-after-mail-04-mobile-annual-review.png",
+      "sha256": "b52cdf2469bf502f79330449a59e9f11495e37377b54f3b96a71001daa259240",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-active-PromoB-after-mail-05-monthly-kept.png",
+      "source": "docs/validation/qp4802/post2803-20260930/active-PromoB-after-mail-05-monthly-kept.png",
+      "sha256": "5fd34e7144a400c1eb9c219f99d734983c80103a5fedef758ed0e9eaec27f044",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-invoice-01-program.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-invoice-01-program.png",
+      "sha256": "bb5d35eb22d63a8ab94494d2a18ab155d97d5e6b2ad1fe0108d053b24ac9091f",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-invoice-02-due-cycle-preview.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-invoice-02-due-cycle-preview.png",
+      "sha256": "10b9118ebe2c06e3e407fd9fedba52b845c0506089b34e91e60bcc07e53e7128",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-invoice-03-mobile-preview.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-invoice-03-mobile-preview.png",
+      "sha256": "848ae2396738e5d8550d1f8f0c37147ed839c148d1697d42eacd3f409c717766",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-invoice-04-draft-confirmation.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-invoice-04-draft-confirmation.png",
+      "sha256": "34690c30afe55a987deb5c24fcdcbbb6cd360665e87e5c700bd22567d43d794a",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-invoice-05-draft-only.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-invoice-05-draft-only.png",
+      "sha256": "210c573fcb25b4f91509889076a4af2a726e59f7989304cc3e08803831e289d4",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-invoice-06-invoice-destination-preview.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-invoice-06-invoice-destination-preview.png",
+      "sha256": "36cee1399e4b706dd01c7fe61c281e5c800e0d24984dec9f0f5a67e6d6f3cb4c",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-approved-invoice-01-exact-destination.png",
+      "source": "docs/validation/qp4802/post2803-20260930/approved-invoice-01-exact-destination.png",
+      "sha256": "08feb92b754679f986e4b1a03eb0e815861621efe2e3eb08d03d19d011f272f8",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-approved-invoice-02-unconfirmed-disabled.png",
+      "source": "docs/validation/qp4802/post2803-20260930/approved-invoice-02-unconfirmed-disabled.png",
+      "sha256": "91cf425e8d7dc83fa474b1df315220efb276448f1235ae12f42ee77536eefb84",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-approved-invoice-03-exact-confirmed.png",
+      "source": "docs/validation/qp4802/post2803-20260930/approved-invoice-03-exact-confirmed.png",
+      "sha256": "d2d32869c143dfeb1c45dda4992c5a402641c6f11b5a3158fba19829fcfacb0c",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-finance-01-issued-no-cash.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-finance-01-issued-no-cash.png",
+      "sha256": "17e8ed657f18673aa7bf07113f06f1ecc9df2be1506a5cf16a35a247441da75f",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-finance-02-issued-mobile.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-finance-02-issued-mobile.png",
+      "sha256": "5b4722c9d82a2c5338d55c3ed42a9d893daf86a3751c3335d8fda067eb04784d",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-fresh-finance-03-qaudit-october.png",
+      "source": "docs/validation/qp4802/post2803-20260930/fresh-finance-03-qaudit-october.png",
+      "sha256": "14eb46f57057cfd46e7b2561713cda56036a73b7e04ed65375b3d27a1719ac9b",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-received-invoice-SP000004.png",
+      "source": "docs/validation/qp4802/post2803-20260930/received-invoice-SP000004.png",
+      "sha256": "85762cf4567387422ad1b76c36ddfb11fe910bf6d217307abb0b67083c7dcf99",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-13-qconfig-card-invoice-approved-not-settled.jpg",
+      "source": "docs/validation/qp4802/post2803-20260930/../post2800-20260930/13-qconfig-card-invoice-approved-not-settled.jpg",
+      "sha256": "3de1af4db1790676d2aa86dc2d935d19a09b20bfbeeb52235d8aaee58c585da3",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-14-qconfig-card-check-no-new-charge.jpg",
+      "source": "docs/validation/qp4802/post2803-20260930/../post2800-20260930/14-qconfig-card-check-no-new-charge.jpg",
+      "sha256": "259ba091eec8d147e898f60fab728f9836e1912fa9d00e9bd946e19e1f827d27",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-full-report-01-partner-overview.png",
+      "source": "docs/validation/qp4802/post2803-20260930/full-report-01-partner-overview.png",
+      "sha256": "7b2a36398f34584e8be9530fca3c763f1a8944c74121beed40e869025fbc032b",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-full-report-02-qaudit-finances.png",
+      "source": "docs/validation/qp4802/post2803-20260930/full-report-02-qaudit-finances.png",
+      "sha256": "9982c7e638953e7f350993bb52dff7456dc023eb1dd426601cfa845f22fcd752",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-full-report-03-qaudit-processor-invoices.png",
+      "source": "docs/validation/qp4802/post2803-20260930/full-report-03-qaudit-processor-invoices.png",
+      "sha256": "06fb64dc422d9528aed5d0588181d086bf48563581b2b68fb4619d6276a9218c",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-full-report-04-october-utc-carry-forward.png",
+      "source": "docs/validation/qp4802/post2803-20260930/full-report-04-october-utc-carry-forward.png",
+      "sha256": "2eb73ab27d1f973ffd5441fa6b358a23765d251884176a52e27322e68fae0fa9",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-partner-test5-02-detail.png",
+      "source": "docs/validation/qp4802/post2803-20260930/partner-test5-02-detail.png",
+      "sha256": "03a39fdfb43a4410157ee0cf7f04b81ebfa67b791b15ba0d8390d897ba0e988a",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-received-enrollment-email.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../release-readiness-20260930/received-enrollment-email.png",
+      "sha256": "6bf021afd0b902e772cdc792bfbca92eac6d0c5993e88806c7f74027aa73e467",
+      "unchanged": true
+    },
+    {
+      "asset": "assets/staging-received-invoice-email.png",
+      "source": "docs/validation/qp4802/post2803-20260930/../release-readiness-20260930/received-invoice-email.png",
+      "sha256": "3d6ac5550172291db6590caa5fa4f74b70a9ebb2d7446500caaa6125725e2b64",
+      "unchanged": true
+    }
+  ]
+}
