@@ -2,6 +2,8 @@
 
 The requested Bearplane/jfloyd-prototypes walkthrough is served from
 `qredible/mycoa-sponsorship-journeys/` (Netlify publish directory: `qredible`).
+Shareable deployed preview: https://deploy-preview-99--jfloyd-qredible.netlify.app/mycoa-sponsorship-journeys/
+Reviewable PR: https://github.com/Bearplane/jfloyd-prototypes/pull/99
 It contains **26 journeys / 200 captures**, with merchant, Q-Config/wording and
 invoice/finance review paths. Presentation mode, keyboard navigation, per-step
 share links, original-image downloads and a wording/control matrix are included.
@@ -53,6 +55,12 @@ clipboard/deep-link reload, filtered paths, evidence dialog and desktop/mobile
 layouts at 1600, 1280 and 390 pixels. `result.json` and the site screenshots are the
 local full-site result. Hosted preview proof is recorded separately under `hosted/`.
 This is website E2E, not a repeat of product payment E2E.
+
+Hosted Chromium validation passed on the Netlify preview above: 200/200 images,
+26 journeys, all listed controls and responsive widths, zero page errors and zero
+failed responses. The tested site source was commit `66ad2d6033a36d8c555bc8d296f639fe376dc3a2`;
+the subsequent proof commit only records test artifacts, documentation and the
+harness wait for initial image-source readiness. It does not change the site.
 
 ```powershell
 $env:GALLERY_URL = '<verified Netlify preview origin>'

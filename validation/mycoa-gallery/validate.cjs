@@ -15,7 +15,7 @@ fs.mkdirSync(output,{recursive:true});
  page.on('pageerror',e=>result.pageErrors.push(e.message));
  page.on('response',r=>{if(r.status()>=400)result.failedResponses.push({url:r.url(),status:r.status()});});
  const snap=async name=>page.screenshot({path:path.join(output,name),fullPage:true});
- const decoded=async()=>{await page.locator('#shot').evaluate(img=>img.decode());await expect.poll(()=>page.locator('#shot').evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);};
+ const decoded=async()=>{await expect(page.locator('#shot')).toHaveAttribute('src',/^assets\//);await page.locator('#shot').evaluate(img=>img.decode());await expect.poll(()=>page.locator('#shot').evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);};
  const choose=async id=>{const idx=await page.evaluate(id=>window.JOURNEYS.chapters.findIndex(c=>c.id===id),id);await page.locator('#chapters button').nth(idx).click();await decoded();return idx;};
  try {
   await page.goto(baseUrl+'/',{waitUntil:'networkidle'});
