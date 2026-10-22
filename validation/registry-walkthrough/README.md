@@ -1,54 +1,67 @@
-# QP-5004 — New Q-Registry product design
+# QP-5004 — MyCOA → Q-Registry, a familiar first release
 
-Live preview: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/?design=registry-v2#screen=overview&scenario=mixed
+Review URL: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/?design=minimal-v3#section=screens&screen=products&scenario=mixed
 
+Jira: https://qredible.atlassian.net/browse/QP-5004
 PR: https://github.com/Bearplane/jfloyd-prototypes/pull/100
 
-The primary route now opens an **interactive proposal with 18 newly designed views**. It uses the existing Qredible platform's shell, color/table conventions and product context. Q-Registry owns the navigation and workspace; MyCOA is the lab-evidence feature under Evidence. It does not use current-process screenshots as the proposed UI.
+## Current proposal
 
-## Proposed views
+The product currently called MyCOA becomes Q-Registry. Keep the existing navigation structure and reuse its working surfaces. The previous expanded design introduced too many new destinations and obscured what was being reused. This revision makes the migration explicit:
 
-1. Registry overview — product metrics, next tasks, access and optional tools.
-2. Processor merchant workspace — invitation/account, Registry access, catalog and product tasks separately.
-3. Registry invitation composer — recipient, account path, existing illustrative offer and lab tools.
-4. New merchant invitation email — Q-Registry forward, MyCOA inside.
-5. Registry offer/capabilities — product catalog and evidence tasks before lab-library packaging.
-6. Product-first onboarding — add, import, website scan entry or return later.
-7. Registry catalog — product identity, classification, assessment, next task and publication.
-8. Product record — facts, policy/evidence context and product-specific lab applicability.
-9. Policy assessments — scoped illustrative rows with incomplete/review states.
-10. Evidence hub — labels, facts, documents and required lab evidence.
-11. MyCOA — optional broader lab library inside Registry, never the parent product.
-12. Merchant tasks / information requests — product-specific responses and review.
-13. Product publication workspace — explicit fields, preview and in-memory publication/withdrawal.
-14. Q-Registered stamp / embed — product-specific example links, separate certificate mode.
-15. Public product record — registration, truthful incomplete assessment and optional evidence.
-16. Registry subscription / features — commercial access distinct from product outcome.
-17. Capability model — Registry Core, optional MyCOA and later public capabilities.
-18. Future shipping information — explicit destination scope, always Not assessed in this prototype.
+- **Eight screen families:** Products/navigation, Dashboard, gated Overview, COAs, Display, processor invitation/status, merchant activation/entry and Settings/Subscription.
+- **Each screen:** labeled current-source reconstruction or proposed first-release design, plus a permanent Today → Release 1 explanation and Reuse / Rename / Adjust / New work / Later tags.
+- **Direct access:** COAs keeps its familiar tab, with MyCOA as its feature heading. No extra Evidence hub. Display keeps Branding, Content, Template, Embed & Links, Advanced and existing certificate outputs.
+- **Five catalogs:** mixed, no-COA, required-COA, undetermined and empty. Product-level relevance changes prompts/defaults, not the merchant's commercial type. Unknown applicability stays undetermined in the proposed design; the real legacy fallback still needs implementation.
+- **What moves where:** 13 explicit current-to-proposed mappings.
+- **Plans & MyCOA:** three compared options. Recommend preserving the existing bundle/access for the smallest release. An optional MyCOA add-on or two plan variants needs a real capability split first; current feature 7 is the wider workspace identity.
+- **Q-Config:** a source-verified capability map, not an invented admin screen or a deployed workflow claim.
+- **Release scope:** exact initial changes, continuity checks, open decisions and deferred public product/stamp/shipping features.
 
-The reviewer can select mixed/no-COA/required-COA/empty catalogs; switch MyCOA tools off; create/edit an illustrative product; import CSV names locally; attach a filename to a requested evidence task; respond to a task; preview/publish/withdraw a sample record; copy example links; and follow invitation → offer → onboarding. What changed? opens per-screen design rationale and decisions. Deep links preserve the view, scenario, product and capability selection.
+Sample interactions include product creation/search/filter, optional COA filename submission without changing plans, pending-review report state, Display controls/preview/example snippet, invitation-wording preview → existing entry concept → Products, current/proposed selection, Overview gate selection, packaging comparison and deep links. State is browser-memory only and resets on reload. Switching catalog resets sample additions/reports. Copy links retain the review section/screen/catalog/view/Overview/packaging selection, not unsaved sample records or Display edits.
 
-## Evidence and implementation boundary
+## Evidence and limits
 
-**These are rendered proposed interfaces with illustrative records and browser-memory interactions. They are not deployed product screens, actual policy decisions, or Q-Config acceptance evidence.** No authentication, payment, email, production API, policy activation, public registration or shipping service is called. File contents are not uploaded or persisted. No network-backed persistence is implemented.
+**This is a static proposed-design website. It is not deployed Qredible product functionality.** Chromium screenshots validate the actual running website through its normal route. Source sketches are explicitly labeled reconstructions, not current production screenshots. Supporting actual-app captures are unchanged historical October 22 full-local Next/Nest screenshots with synthetic records; individual captions distinguish baseline flag OFF from the earlier flag-ON proposal.
 
-The existing $199 monthly illustrative offer is preserved as an example, not proposed new pricing. MyCOA capability packaging, Registry Core remediation access, names/mark meaning, public authority and shipping are decisions for owners. Core/later/future phases are labeled above the interface. Unknown applicability is shown as undetermined in this design; the real platform backend's legacy fallback is not repaired by this prototype.
+No Qredible application or Q-Config source was changed. No product API, authentication, email, billing, provider, policy, public publication or shipping service is connected. No service responses are mocked to impersonate those services; all example records and interactions live in the prototype. File content is never uploaded or parsed; only a chosen filename is shown. Real application workflows, enforcement, provider continuity, email delivery, entitlement migration and Q-Config operation remain unverified by these tests. The earlier RTQ-Admin-UI PR4206 is not implementation of this revised proposal.
 
-The earlier 26-chapter/29-capture current-process/source audit is preserved at [reference.html](../../qredible/registry-user-journeys/reference.html), accessed only as secondary context. Its capture manifests, source coverage map and previous local/hosted proof remain historical evidence. [SCREENSHOT-AUDIT-README.md](SCREENSHOT-AUDIT-README.md) records that earlier deliverable. RTQ-Admin-UI PR4206 remains the separate earlier gated platform preview, not implementation of these18 new designs.
+Source checks for this revision: Merchant UI `3519ccfb03b1166e4bafb5c2c3edfba3a09ad78f`, Q-Config UI `021615ba66815b8856c24cd03c6a1c3a8213b47c`, Q-Config API `5aa4090f906a21ba82bff8059066133aae3e54cb`. These local source versions do not establish current deployed capabilities. Prior policy/billing audit and the production configuration snapshot at **2026-10-22 19:33:07 UTC** support the documented entitlement and plan constraints. That snapshot is not refreshed by this revision and does not establish actual merchant charges or effective access.
 
-## Validation
+No new price, automatic permission grant, plan switch, mandatory COA-based merchant segmentation, public compliance claim or shipping permission is proposed for the initial rebrand. Naming and commercial choices remain team decisions.
 
-Actual normal-route Playwright Chromium tests of this **prototype website** cover all18 new views (asserting no screenshot image is used as their interface), all4 scenarios, search/filter, product-first creation/import, required evidence with premium MyCOA OFF, pending-review states, explicit sample publication/withdrawal, stamp clipboard, invitation/offer/onboarding, merchant response, future shipping staying Not assessed, per-view notes, deep links/keyboard, and nine key views at1600/1280/390px. It also smoke-tests the secondary reference gallery. These checks are not underlying Qredible application E2E.
+## Reproduce website validation
 
-Reproduce locally:
+In the repo root, start a local static server:
 
 ```powershell
 python -m http.server 4339 --bind 127.0.0.1 --directory qredible
-# Set PLAYWRIGHT_MODULE to installed @playwright/test and CHROMIUM_PATH to installed Chrome.
-node validation/registry-walkthrough/validate-design.cjs
 ```
 
-For the hosted run, set WALKTHROUGH_ORIGIN to the verified Netlify preview origin and DESIGN_VALIDATION_OUTPUT to validation/registry-walkthrough/design-hosted before running the same script. Local proof is under design-local; hosted proof is recorded separately under design-hosted. Earlier local/hosted directories belong to the archived screenshot walkthrough.
+In a second shell:
 
-Hosted Chromium validation passed against source `f3910d84f1a83644866f6d4fa2c45f35e80f55b5`: all18 views, all4 scenarios, the listed product/evidence/invitation/publication flows and nine key views at1600/1280/390px, plus the secondary reference gallery. Zero page errors, failed same-origin responses or product API requests. Netlify's own deploy-view telemetry is separately recorded as hostingTelemetry; it is not a product API or a simulated service response. The subsequent evidence/documentation commit does not alter the proposed interface source.
+```powershell
+$env:PLAYWRIGHT_MODULE='E:\Qredible\registry-platform-preview-20261022\ui\node_modules\@playwright\test'
+$env:CHROMIUM_PATH='C:\Program Files\Google\Chrome\Application\chrome.exe'
+node validation/registry-walkthrough/validate-migration.cjs
+```
+
+Use an installed `@playwright/test` and Chromium path on another machine; these exact paths record this run's environment. Playwright 1.44.1 / installed Chromium 156.0.8078.47.
+
+Hosted run:
+
+```powershell
+$env:WALKTHROUGH_ORIGIN='https://deploy-preview-100--jfloyd-qredible.netlify.app'
+$env:MIGRATION_VALIDATION_OUTPUT='validation/registry-walkthrough/migration-hosted'
+node validation/registry-walkthrough/validate-migration.cjs
+```
+
+`migration-local/result.json` and screenshots record local proof. The harness covers all eight current/proposed screen families, all five catalogs, direct COAs access, optional no-COA report receipt, product creation/search/filter/column control, empty catalogs, required-COA dashboard drilldown, all five Display sections, content preview and snippet clipboard, invite/entry navigation, a labeled actual baseline capture, all review sections/packaging options, deep-link/reload/legacy sharing compatibility, desktop/mobile widths 1600/1280/390 and the archived references. Each full run captures 39 screenshots. Product API calls, failed same-origin responses and browser errors must be empty. Netlify's narrowly identified deploy-view telemetry is recorded separately.
+
+Hosted proof is added after the source deploy succeeds; its result and source SHA are recorded below.
+
+## Retained historical artifacts
+
+- `future-concept.html`, `registry-design.js/css`, `design-local/hosted`, `EXPANDED-DESIGN-README.md`: earlier 18-view expanded concept, explicitly outside release 1. `validate-design.cjs` now targets that archive; only its route smoke test is rerun by the current harness.
+- `reference.html`, original app/data/styles/coverage/capture assets, `SCREENSHOT-AUDIT-README.md`, older local/hosted proof: earlier 26-chapter source/capture audit. Original capture files are not edited.
+- Current primary implementation: `migration.js`, `migration.css`, `index.html`, `validate-migration.cjs`.
