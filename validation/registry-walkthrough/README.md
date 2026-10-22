@@ -1,6 +1,6 @@
 # QP-5004 — New Q-Registry product design
 
-Live preview: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/#screen=overview&scenario=mixed
+Live preview: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/?design=registry-v2#screen=overview&scenario=mixed
 
 PR: https://github.com/Bearplane/jfloyd-prototypes/pull/100
 
@@ -50,3 +50,5 @@ node validation/registry-walkthrough/validate-design.cjs
 ```
 
 For the hosted run, set WALKTHROUGH_ORIGIN to the verified Netlify preview origin and DESIGN_VALIDATION_OUTPUT to validation/registry-walkthrough/design-hosted before running the same script. Local proof is under design-local; hosted proof is recorded separately under design-hosted. Earlier local/hosted directories belong to the archived screenshot walkthrough.
+
+Hosted Chromium validation passed against source `f3910d84f1a83644866f6d4fa2c45f35e80f55b5`: all18 views, all4 scenarios, the listed product/evidence/invitation/publication flows and nine key views at1600/1280/390px, plus the secondary reference gallery. Zero page errors, failed same-origin responses or product API requests. Netlify's own deploy-view telemetry is separately recorded as hostingTelemetry; it is not a product API or a simulated service response. The subsequent evidence/documentation commit does not alter the proposed interface source.
