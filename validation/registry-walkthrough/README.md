@@ -2,6 +2,10 @@
 
 Served route: `qredible/registry-user-journeys/` (existing Netlify publish root: `qredible`). Added to the existing Qredible hub. No hosting settings or existing galleries change.
 
+Live walkthrough: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/
+
+Reviewable PR: https://github.com/Bearplane/jfloyd-prototypes/pull/100
+
 The walkthrough contains **26 journey chapters, 29 original application screenshots and a 26-file source coverage map**. The sequence covers processor invitations, identity/access, subscriptions and configured plans, four merchant welcome/catalog scenarios, MyCOA, public sharing, a private product-record proposal, hidden/source-only labels and the wider phased proposal. Presentation mode, keyboard navigation, chapter/role filters, an all-image overview, full-size image reading, original-image links, clipboard deep links, evidence notes and source-to-chapter jumps are included.
 
 ## Evidence boundaries
@@ -37,7 +41,7 @@ node validation/registry-walkthrough/validate.cjs
 
 Local Chromium156 verification passed: all26 chapters, all29 images decoded and hash-verified against the served manifest, all26 coverage entries; keyboard/back/next, full-size mode, clipboard/deep-link reload, overview selection, presentation/Escape, source-map jumps, evidence dialog, role filters and1600/1280/390px layouts. No page errors, same-origin failed responses or mobile horizontal overflow. `local/result.json` and actual website screenshots record that run.
 
-Hosted Netlify proof is recorded separately under `hosted/` once available:
+Hosted Netlify Chromium verification also passed, recorded under `hosted/`: all26 chapters, all29 original images/hash checks,26 coverage entries, every listed control and1600/1280/390px layouts; zero page errors or failed same-origin responses. The tested website source is `db6f5d19e9fa1c53f1dfe132a495f6deb96c475a`; the subsequent proof commit adds only evidence/documentation and does not change the site. Netlify's Qredible deploy-preview status reported SUCCESS before the hosted run.
 
 ```powershell
 $env:WALKTHROUGH_ORIGIN='<verified deploy-preview origin>'
