@@ -12,7 +12,7 @@ fs.mkdirSync(out,{recursive:true});
  const decoded=async()=>{await expect(page.locator('#shot')).toHaveAttribute('src',/^assets\//);await page.locator('#shot').evaluate(img=>img.decode());expect(await page.locator('#shot').evaluate(img=>img.naturalWidth)).toBeGreaterThan(1000);};
  const choose=async id=>{await page.locator('#filter').selectOption('all');const i=await page.evaluate(id=>window.REGISTRY_WALKTHROUGH.chapters.findIndex(c=>c.id===id),id);await page.locator('#chapters button').filter({has:page.locator('span')}).evaluateAll(()=>{});await page.locator(`#chapters button[data-chapter="${i}"]`).click();};
  try{
-  await page.goto(base+'/',{waitUntil:'networkidle'});const link=page.locator('a[href="registry-user-journeys/"]');await expect(link).toHaveCount(1);await link.scrollIntoViewIfNeeded();await snap('qredible-hub.png');await link.click();await expect(page.locator('#title')).toHaveText('One registry, with MyCOA inside it');
+  await page.goto(base+'/',{waitUntil:'networkidle'});const link=page.locator('a[href="registry-user-journeys/"]');await expect(link).toHaveCount(1);await link.scrollIntoViewIfNeeded();await snap('qredible-hub.png');await page.goto(baseUrl+'/registry-user-journeys/reference.html',{waitUntil:'networkidle'});await expect(page.locator('#title')).toHaveText('One registry, with MyCOA inside it');
   const data=await page.evaluate(()=>window.REGISTRY_WALKTHROUGH),coverage=await page.evaluate(()=>window.REGISTRY_COVERAGE);expect(data.chapters.length).toBe(26);expect(coverage.files.length).toBe(26);result.sourceFiles=coverage.files.length;
   const manifest=await (await page.request.get(base+'/registry-user-journeys/capture-manifest.json')).json();expect(manifest.images.length).toBe(29);
   const names=new Set();

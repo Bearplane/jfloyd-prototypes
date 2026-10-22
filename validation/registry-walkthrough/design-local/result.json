@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-22T21:21:35.835Z",
+  "origin": "http://127.0.0.1:4339",
+  "browser": "156.0.8078.47",
+  "scope": "New proposed interface website, illustrative browser-memory behavior; NOT deployed Qredible/Registry/Q-Config acceptance",
+  "views": 18,
+  "scenarioChecks": 4,
+  "checks": [
+    "All18 proposed views render as interactive new interfaces, not current screenshot images; Registry global identity retained, core/later/future phases labeled",
+    "Four catalog scenarios, search/filter, unknown applicability explicit; MyCOA optional feature gate does not block required-evidence attachment; file receipt remains Needs review, never PASS",
+    "Product-first onboarding creates a record with no COA; local CSV import creates unassessed illustrative records",
+    "Explicit in-memory public preview/publication/withdrawal for no-COA record, example stamp clipboard, processor invite review → Registry email → offer → product onboarding",
+    "Merchant response remains review-pending; shipping stays Not assessed; notes, deep links, keyboard tour; nine key views at1600/1280/390px with no document overflow",
+    "Earlier screenshot audit remains available only at secondary reference.html route"
+  ],
+  "pageErrors": [],
+  "failedResponses": [],
+  "apiRequests": [],
+  "pass": true
+}
