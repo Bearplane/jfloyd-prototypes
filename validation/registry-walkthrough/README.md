@@ -58,7 +58,7 @@ node validation/registry-walkthrough/validate-migration.cjs
 
 `migration-local/result.json` and screenshots record local proof. The harness covers all eight current/proposed screen families, all five catalogs, direct COAs access, optional no-COA report receipt, product creation/search/filter/column control, empty catalogs, required-COA dashboard drilldown, all five Display sections, content preview and snippet clipboard, invite/entry navigation, a labeled actual baseline capture, all review sections/packaging options, deep-link/reload/legacy sharing compatibility, desktop/mobile widths 1600/1280/390 and the archived references. Each full run captures 39 screenshots. Product API calls, failed same-origin responses and browser errors must be empty. Netlify's narrowly identified deploy-view telemetry is recorded separately.
 
-Hosted proof is added after the source deploy succeeds; its result and source SHA are recorded below.
+**Hosted PASS:** the full Chromium run completed at 2026-10-22 23:18:47 UTC against source `5f28817210459e219759c0d10b215ca284eba3e4`, Netlify Qredible deploy `6ada99bc59c13cd9fdf3a3a1`. `migration-hosted/result.json` and 39 screenshots record the same journeys on the live PR preview. Zero browser errors, failed same-origin responses and product API calls; four hosting telemetry requests are listed separately. The follow-up evidence commit changes only proof/documentation, not the tested website source.
 
 ## Retained historical artifacts
 
