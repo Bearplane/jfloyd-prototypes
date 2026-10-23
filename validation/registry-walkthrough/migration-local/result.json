@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-23T01:17:30.879Z",
+  "at": "2026-10-23T01:31:48.467Z",
   "origin": "http://127.0.0.1:4339",
   "browser": "156.0.8078.47",
   "scope": "Minimal-change migration prototype website; sample data and browser memory, not actual Qredible/Q-Config/provider acceptance",
@@ -22,6 +22,12 @@
     "current-structure-entry.png",
     "proposed-subscription.png",
     "current-structure-subscription.png",
+    "navigation-desktop.png",
+    "navigation-coming-soon.png",
+    "navigation-390-start.png",
+    "navigation-390-display.png",
+    "navigation-320-start.png",
+    "navigation-320-display.png",
     "catalog-mixed.png",
     "catalog-no-coa.png",
     "catalog-required.png",
@@ -48,6 +54,7 @@
   ],
   "checks": [
     "All nine screen families: labeled current-source sketch versus proposed UI, permanent per-screen reuse/rename/adjust mapping; COAs and Display remain direct tabs",
+    "Horizontal navigation: strong selected state, quiet future-section disclosure with unchanged current sketch, Overview gate, no reduced font on320/390px, arrow and native wheel/touch overflow, Home/End/arrow keyboard focus and activation, active-tab reveal on reload/resize, reduced-motion support.",
     "Five catalog states; optional Overview gate; no-COA relevance preset without removing direct COAs access; unknown applicability never treated as an exemption in the proposal",
     "No-COA merchant uploads optional sample filename without plan switch; report stays review-pending. Product creation, escaped input, search, manual COA column and unknown filter work; empty catalog controls do not crash",
     "Dashboard missing-COA drilldown; all five Display sections; content preview, existing Button/Inline mode and example clipboard. Display stays certificate-focused; no product publication or payment action",

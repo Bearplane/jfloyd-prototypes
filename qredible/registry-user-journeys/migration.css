@@ -3,3 +3,22 @@
 @media(max-width:1250px){.walkthrough{grid-template-columns:minmax(0,1fr) 275px}.app{grid-template-columns:135px minmax(0,1fr)}.app-content{padding:15px}.app-sidebar .navitem{font-size:10px}.app-topbar .ask{display:none}.display-layout{grid-template-columns:110px minmax(0,1fr)}.public-preview{grid-column:2}.kpi{padding:8px}.kpi small{font-size:8px}}
 @media(max-width:1000px){.walkthrough{display:block}.change-rail{border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:0 20px}.change-rail>h2,.change-rail>.eyebrow,.change-rail>.source-note,.change-rail>.source-image-link{grid-column:1/-1}.review-label{max-width:240px}.app{min-height:650px}.display-layout{grid-template-columns:135px minmax(0,1fr) minmax(180px,.8fr)}.public-preview{grid-column:auto}}
 @media(max-width:650px){.review-header{padding:18px;display:block}.review-header h1{font-size:23px}.review-label{text-align:left;margin-top:9px;max-width:none;font-size:10px}#review-nav{padding:0 8px}#review-nav button{font-size:11px;padding:11px}#review-controls{padding:12px;gap:10px;display:grid;grid-template-columns:1fr}#review-controls label{justify-content:space-between}#review-controls select{max-width:220px;width:65%;min-width:0}#review-controls .small{margin-left:0}.app{display:block}.app-sidebar{display:none}.app-topbar{padding:12px;gap:8px}.app-topbar .account{font-size:9px}.app-content{padding:14px 10px}.app-heading h2{font-size:23px}.app-heading p{font-size:10px}.app-heading select{max-width:105px}.folder-tabs button{font-size:10px;padding:7px 11px}.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi span{font-size:8px}.searchbar{flex-wrap:wrap}.searchbar input{flex-basis:100%}.filter-foot{align-items:start;flex-direction:column}.cards{grid-template-columns:1fr}.display-layout{grid-template-columns:1fr}.display-nav{display:flex;overflow:auto}.display-nav button{min-width:94px}.public-preview{grid-column:1}.change-rail{display:block;padding:20px}.review-page{padding:24px 15px}.review-page h2{font-size:21px}.choice-tabs{display:grid}.choice-grid,.release-list,.onboarding-list{grid-template-columns:1fr}.choice-panel{padding:17px}.review-footer{padding:18px;font-size:10px}.onboarding-list button{padding:18px}.table-wrap table{min-width:700px}.email{padding:18px}.baseline-note{font-size:10px}.coa-feature{align-items:start;gap:10px}.coa-feature h3{font-size:14px}}
+
+/* Proposed navigation: keep familiar horizontal sections and readable touch targets. */
+.workspace-navigation{margin:18px 0 16px;min-width:0}
+.workspace-tab-row{display:flex;align-items:stretch;gap:5px;min-width:0;border-bottom:1px solid #cbd6e7}
+.workspace-tab-row .folder-tabs{flex:1;min-width:0;margin:0;border:0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#9aaac2 transparent;scroll-padding-inline:4px}
+.workspace-tab-row .folder-tabs button{flex:0 0 auto;min-height:44px;padding:10px 14px;font-size:12px;border:0;border-bottom:3px solid transparent;border-radius:5px 5px 0 0;background:transparent;color:#435a75}
+.workspace-tab-row .folder-tabs button:hover{background:#edf3fc;color:#174f99}
+.workspace-tab-row .folder-tabs button.active{color:#174f99;border-bottom-color:#2868e8;background:#eaf2ff;font-weight:750}
+.workspace-tab-row .folder-tabs button:focus-visible{outline-offset:-3px}
+.workspace-tab-row .tab-scroll{display:none;flex:0 0 36px;width:36px;min-height:44px;padding:0;align-items:center;justify-content:center;font-size:25px;color:#315c95;border-color:#dce3ed;background:white}
+.workspace-tab-row[data-overflow="true"] .tab-scroll{display:flex}
+.workspace-tab-row .tab-scroll:disabled{cursor:default;color:#9ba8ba;background:#f3f5f8;opacity:.7}
+.upcoming-sections{margin:7px 0 0 auto;width:fit-content;max-width:100%;color:#64748a;font-size:11px;text-align:right}
+.upcoming-sections summary{cursor:pointer;padding:6px 4px;min-height:28px;list-style-position:inside;border-radius:4px}
+.upcoming-sections summary:focus-visible{outline:3px solid #9177d1;outline-offset:2px}
+.upcoming-sections[open]{padding:0 10px 9px;border:1px solid #e1e6ef;border-radius:5px;background:#f4f6f9}
+.upcoming-sections p{display:flex;gap:18px;justify-content:flex-end;margin:2px 0;color:#586b83}
+.upcoming-sections small{font-size:10px}
+@media(max-width:650px){.workspace-tab-row .folder-tabs button{font-size:12px;padding:10px 12px}.upcoming-sections summary{min-height:36px;padding-top:8px}}

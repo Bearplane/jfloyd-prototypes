@@ -1,9 +1,19 @@
 # QP-5004 — MyCOA → Q-Registry, a familiar first release
 
-Review URL: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/?design=labels-v4#section=screens&screen=products&scenario=mixed
+Review URL: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/?design=navigation-v5#section=screens&screen=products&scenario=mixed
 
 Jira: https://qredible.atlassian.net/browse/QP-5004
 PR: https://github.com/Bearplane/jfloyd-prototypes/pull/100
+
+## Horizontal navigation refinement — review-ready direction
+
+The chosen design keeps horizontal workspace tabs, short names, the existing Overview visibility gate and direct COAs / Products / Labels / Display access. The active tab now has a stronger underline/background and `aria-current`. Labs and Distributors move to a quiet, closed-by-default **Coming soon** disclosure below the working tabs, retaining the current-source sketch for comparison. This changes prominence, not integration readiness or actual access.
+
+On small screens, 12px tab labels and 44px targets are retained. The tab row supports native horizontal wheel/touch scrolling, explicit previous/next buttons with end states, automatic selected-tab reveal, keyboard Home/End/arrow focus with Enter activation, preserved focus after activation, and reduced-motion preferences. The proposal's movement map and Release scope now record this direction.
+
+Current local suites pass with **66 screenshots: 47 migration/navigation + 19 Labels**. Additional navigation checks cover 320/390px, actual Chromium touch input, Overview on/off, current versus proposed placeholders, deep-link reload, desktop resize and reduced motion. Current hosted proof for this navigation revision is pending deployment; the prior Labels-only hosted result below is historical until refreshed.
+
+After merge, the stable team review link is https://jfloyd-qredible.netlify.app/registry-user-journeys/?design=navigation-v5#section=screens&screen=products&scenario=mixed. The existing PR100 preview remains the pre-merge review link above. Merging/publishing this static proposal does not implement the Qredible product changes.
 
 ## Current proposal
 
@@ -22,7 +32,7 @@ Sample interactions include product creation/search/filter, optional COA filenam
 
 ## Labels addition — existing versus new
 
-Open the Labels proposal directly: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/?design=labels-v4#section=screens&screen=labels&scenario=mixed
+Open the Labels proposal directly: https://deploy-preview-100--jfloyd-qredible.netlify.app/registry-user-journeys/?design=navigation-v5#section=screens&screen=labels&scenario=mixed
 
 The **Label column stays in Products**, including when a no-COA view hides the COA column. Its viewer/upload links and the new Labels table operate on the same in-memory records. The new tab is marked **New**; current-source mode explicitly explains there is no standalone Labels tab and routes back to the existing Products entry points.
 
@@ -42,9 +52,9 @@ $env:LABELS_VALIDATION_OUTPUT='validation/registry-walkthrough/labels-hosted'
 node validation/registry-walkthrough/validate-labels.cjs
 ```
 
-Both local runs passed: 41 migration screenshots + 19 Labels screenshots, zero page errors/failed same-origin responses/product API requests. Labels checks exercise all described flows, invalid filename-extension refusal, escaped text, no-COA and empty catalogs, ambiguous SKU manual resolution, deep links/reload and 1600/1280/390px layouts including the matching dialog. All sample input remains browser memory and is reset on reload or catalog change; only filenames are inspected, never file contents, extracted text or uploaded documents. No service is mocked to impersonate real application persistence/extraction/authorization/policy behavior.
+Both current local runs passed: 47 migration/navigation screenshots + 19 Labels screenshots, zero page errors/failed same-origin responses/product API requests. Labels checks exercise all described flows, invalid filename-extension refusal, escaped text, no-COA and empty catalogs, ambiguous SKU manual resolution, deep links/reload and 1600/1280/390px layouts including the matching dialog. All sample input remains browser memory and is reset on reload or catalog change; only filenames are inspected, never file contents, extracted text or uploaded documents. No service is mocked to impersonate real application persistence/extraction/authorization/policy behavior.
 
-**Current hosted Chromium PASS:** both full suites passed on the live PR preview against website source `c07c261be6d9962aed3ca42c95c75b951c2b3c9e`, Netlify Qredible deploy `6adab6354d415e3baa86531b`. Results dated `2026-10-23T01:20:08.585Z` (Labels) and `2026-10-23T01:20:08.655Z` (migration) contain 19 + 41 hosted screenshots, zero page errors, failed same-origin responses or product API calls. Two Labels and four migration Netlify deploy-view telemetry requests are recorded separately. Proof is in `labels-hosted/` and `migration-hosted/`. The following proof/documentation commit changes no website source.
+**Previous Labels revision hosted Chromium PASS:** both full suites passed on the live PR preview against website source `c07c261be6d9962aed3ca42c95c75b951c2b3c9e`, Netlify Qredible deploy `6adab6354d415e3baa86531b`. Results dated `2026-10-23T01:20:08.585Z` (Labels) and `2026-10-23T01:20:08.655Z` (migration) contain 19 + 41 hosted screenshots, zero page errors, failed same-origin responses or product API calls. Two Labels and four migration Netlify deploy-view telemetry requests are recorded separately. Proof is in `labels-hosted/` and `migration-hosted/`. The following proof/documentation commit changes no website source.
 
 ## Evidence and limits
 
@@ -82,9 +92,9 @@ $env:MIGRATION_VALIDATION_OUTPUT='validation/registry-walkthrough/migration-host
 node validation/registry-walkthrough/validate-migration.cjs
 ```
 
-`migration-local/result.json` and screenshots record current local proof. Current Labels proof is in `labels-local/`. Matching hosted proof is in `labels-hosted/` and `migration-hosted/`. The harness covers all nine current/proposed screen families, all five catalogs, direct COAs access, optional no-COA report receipt, product creation/search/filter/column control, empty catalogs, required-COA dashboard drilldown, all five Display sections, content preview and snippet clipboard, invite/entry navigation, a labeled actual baseline capture, all review sections/packaging options, deep-link/reload/legacy sharing compatibility, desktop/mobile widths 1600/1280/390 and the archived references. Each migration run captures 41 screenshots. The dedicated Labels run captures 19 additional screenshots. Product API calls, failed same-origin responses and browser errors must be empty. Netlify's narrowly identified deploy-view telemetry is recorded separately.
+`migration-local/result.json` and screenshots record current local proof. Current Labels proof is in `labels-local/`. Matching hosted proof is in `labels-hosted/` and `migration-hosted/`. The harness covers all nine current/proposed screen families, all five catalogs, direct COAs access, optional no-COA report receipt, product creation/search/filter/column control, empty catalogs, required-COA dashboard drilldown, all five Display sections, content preview and snippet clipboard, invite/entry navigation, a labeled actual baseline capture, all review sections/packaging options, deep-link/reload/legacy sharing compatibility, desktop/mobile widths 1600/1280/390 and the archived references. Each current migration/navigation run captures 47 screenshots. The dedicated Labels run captures 19 additional screenshots. Product API calls, failed same-origin responses and browser errors must be empty. Netlify's narrowly identified deploy-view telemetry is recorded separately.
 
-**Previous revision hosted PASS:** the full Chromium run completed at 2026-10-22 23:18:47 UTC against source `5f28817210459e219759c0d10b215ca284eba3e4`, Netlify Qredible deploy `6ada99bc59c13cd9fdf3a3a1`. That revision recorded 39 hosted screenshots; its original proof remains in Git history before the current refresh. Zero browser errors, failed same-origin responses and product API calls; four hosting telemetry requests are listed separately. That historical source predates the Labels addition. Current hosted validation is recorded in the Labels section above.
+**Previous revision hosted PASS:** the full Chromium run completed at 2026-10-22 23:18:47 UTC against source `5f28817210459e219759c0d10b215ca284eba3e4`, Netlify Qredible deploy `6ada99bc59c13cd9fdf3a3a1`. That revision recorded 39 hosted screenshots; its original proof remains in Git history before the current refresh. Zero browser errors, failed same-origin responses and product API calls; four hosting telemetry requests are listed separately. That historical source predates the Labels addition. Latest validation is recorded in the navigation section above.
 
 ## Retained historical artifacts
 

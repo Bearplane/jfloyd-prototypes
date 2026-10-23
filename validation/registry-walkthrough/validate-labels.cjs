@@ -17,7 +17,7 @@ fs.mkdirSync(out,{recursive:true});
  const sample=(name,mimeType='image/png')=>({name,mimeType,buffer:Buffer.from('Filename fixture only; no real image, OCR or upload.')});
  const close=async()=>page.getByRole('button',{name:'Close',exact:true}).click();
  try{
-  await page.goto(origin+'/registry-user-journeys/?design=labels-v4#screen=products&scenario=mixed',{waitUntil:'networkidle'});
+  await page.goto(origin+'/registry-user-journeys/?design=navigation-v5#screen=products&scenario=mixed',{waitUntil:'networkidle'});
   await expect(page.locator('thead')).toContainText('Label');await expect(product('SOAP-01').locator('.product-label-cell')).toContainText('Needs review');await expect(product('NEW-05').locator('.product-label-cell')).toContainText('No label on file');await snap('products-label-column');
   await page.locator('.folder-tabs [data-screen="labels"]').click();await expect(page.locator('.label-proposal-strip')).toContainText('New table & tab');await expect(page.locator('.change-rail')).toContainText('Reuse');await expect(page.locator('#label-rows tr')).toHaveCount(3);await snap('labels-library');
   await page.locator('#view-mode').selectOption('current');await expect(page.locator('.folder-tabs [data-screen="labels"]')).toHaveCount(0);await expect(page.locator('.app-content')).toContainText('No standalone Labels table in the current design');await snap('current-label-entry-points');await page.getByRole('button',{name:'Open Products · Label column',exact:true}).click();await expect(page.locator('thead')).toContainText('Label');await page.locator('#view-mode').selectOption('proposed');await screen('labels');
