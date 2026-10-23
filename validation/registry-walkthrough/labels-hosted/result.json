@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-23T01:20:08.585Z",
+  "origin": "https://deploy-preview-100--jfloyd-qredible.netlify.app",
+  "browser": "156.0.8078.47",
+  "scope": "Running Labels prototype website only. Synthetic browser-memory records; filenames only; no real product/label API, extraction, permissions, policy or persistence acceptance.",
+  "checks": [
+    "Existing Label column and viewer remain in Products, including source-sketch mode. New Labels tab/table explicitly marked; current mode states it does not exist. Search and review/unassigned filters work.",
+    "Upload groups front/back filenames in one record; record stays unassigned until explicit confirmation. Exact SKU suggestion needs confirmation. Matching updates Products Label cell and preserves Not evaluated product status. Escaped text renders safely.",
+    "New version preserves assignments/history; multi-product assignment requires explicit replacement consent for existing labels. Search retains selections; product-scoped viewing, unassignment, archive and restore preserve records without compliance promotion.",
+    "Unsupported filename extension refused; no-COA product can upload/assign a label without a plan change while COA column is hidden. Empty catalog upload remains unassigned, with no invented match.",
+    "Duplicate filename SKU refuses suggestions; the user explicitly chooses the intended product.",
+    "Labels deep link/reload resets browser-only state; table and Products layouts at1600/1280/390px; mobile matching dialog has no horizontal overflow."
+  ],
+  "screenshots": [
+    "products-label-column.png",
+    "labels-library.png",
+    "current-label-entry-points.png",
+    "upload-grouped-panels.png",
+    "confirm-suggested-product.png",
+    "products-after-label-match.png",
+    "existing-viewer-model-product-context.png",
+    "retained-label-versions.png",
+    "explicit-assignment-replacement.png",
+    "no-coa-products-label-workflow.png",
+    "empty-catalog-unmatched-label.png",
+    "ambiguous-sku-requires-manual-choice.png",
+    "labels-responsive-1600.png",
+    "products-responsive-1600.png",
+    "labels-responsive-1280.png",
+    "products-responsive-1280.png",
+    "labels-responsive-390.png",
+    "products-responsive-390.png",
+    "matching-mobile.png"
+  ],
+  "pageErrors": [],
+  "failedResponses": [],
+  "productApiRequests": [],
+  "hostingTelemetry": [
+    "https://app.netlify.com/access-control/bb-api/api/v1/cdp/deploys/6adab6354d415e3baa86531b/views",
+    "https://app.netlify.com/access-control/bb-api/api/v1/cdp/deploys/6adab6354d415e3baa86531b/views"
+  ],
+  "pass": true
+}
