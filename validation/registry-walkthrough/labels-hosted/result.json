@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-23T01:20:08.585Z",
+  "at": "2026-10-23T01:32:32.953Z",
   "origin": "https://deploy-preview-100--jfloyd-qredible.netlify.app",
   "browser": "156.0.8078.47",
   "scope": "Running Labels prototype website only. Synthetic browser-memory records; filenames only; no real product/label API, extraction, permissions, policy or persistence acceptance.",
@@ -36,8 +36,8 @@
   "failedResponses": [],
   "productApiRequests": [],
   "hostingTelemetry": [
-    "https://app.netlify.com/access-control/bb-api/api/v1/cdp/deploys/6adab6354d415e3baa86531b/views",
-    "https://app.netlify.com/access-control/bb-api/api/v1/cdp/deploys/6adab6354d415e3baa86531b/views"
+    "https://app.netlify.com/access-control/bb-api/api/v1/cdp/deploys/6adab918cf5db9ce863942ce/views",
+    "https://app.netlify.com/access-control/bb-api/api/v1/cdp/deploys/6adab918cf5db9ce863942ce/views"
   ],
   "pass": true
 }
