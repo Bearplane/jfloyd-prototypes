@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-22T20:54:00.610Z",
+  "origin": "http://127.0.0.1:4339",
+  "browser": "156.0.8078.47",
+  "scope": "Actual full static walkthrough website, normal routes and controls; underlying product screenshots are dated local design evidence",
+  "chapters": 26,
+  "images": 29,
+  "sourceFiles": 26,
+  "checks": [
+    "All 26 chapter narratives and all 29 original screenshots visited/decoded; served image SHA256 matches manifest; all source-only/future labels explicit",
+    "Keyboard previous/next, full-size reading, clipboard deep link + reload, 29-image overview selection, presentation/Escape, 26-file coverage jumps, evidence dialog, all role filters, 1600/1280/390px layouts"
+  ],
+  "pageErrors": [],
+  "failedResponses": [],
+  "pass": true
+}

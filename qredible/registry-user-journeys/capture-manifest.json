@@ -1,0 +1,239 @@
+{
+  "captured": "2026-10-22",
+  "images": [
+    {
+      "file": "assets/after-empty-products.png",
+      "bytes": 121691,
+      "sha256": "91fd0628bb76e79ca388aaab5e8fa980e1711cc3512395612c9a8a18a228d66a",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-empty-welcome.png",
+      "bytes": 190251,
+      "sha256": "4b75fadf17236d49816d3184c23a0f263f8ecb3d0c5634012a3e5fdfa92bca78",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-invite-composer-resolved.png",
+      "bytes": 254199,
+      "sha256": "29bbbb1309c5569bcd56041989100327fb7d16d1e811512dc0351a360249d58c",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-invite-composer.png",
+      "bytes": 240270,
+      "sha256": "f8dfa708386bc9eea388797ee74de9c11fdd04311154adc115fd463f9f3a0714",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-merchant-plan-options.png",
+      "bytes": 163410,
+      "sha256": "f3805e9751a922c803a6c1e4d7f8359c4d008bb41a4e9396e0049d54116a8dbe",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-merchant-subscription.png",
+      "bytes": 77795,
+      "sha256": "3ab962ecbfb4741789274acf13eaa95a2d0e53b3e817c04db6b021b0c04645ce",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-mixed-evidence.png",
+      "bytes": 125375,
+      "sha256": "a8ad9a00f706ebb34d72621152510276a80ef0470fd93f5c5a3fe46a74a4771f",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-mixed-products.png",
+      "bytes": 166922,
+      "sha256": "485ba00ab9d860c2e31f56e30709c5d8fe916bea8bed06ec93d2f886606c15e8",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-mixed-sharing.png",
+      "bytes": 227228,
+      "sha256": "d979ef4c5dfcefbc87c0286a9b53a23ae8b850c5e8a694c9f0723dc610c27277",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-mixed-welcome.png",
+      "bytes": 221930,
+      "sha256": "90feafaae5a202e86677dfa3eb93a3e757656f0481a0758619fc8dd378082ebc",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-no-coa-products.png",
+      "bytes": 149607,
+      "sha256": "bba42498eaefc0cadac2eb2cd54e9c8c8a750f60c4fce7d958b39f4fe551a3ed",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-no-coa-welcome.png",
+      "bytes": 204874,
+      "sha256": "51274bfa2ab0b32f4c695d503e09077595665610ca07ffbd00f4ba30cb6639d9",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-processor-list.png",
+      "bytes": 225906,
+      "sha256": "930e9746af83e5c738ee64ddc8ecaa57c468023789a9c551d0c7d072e15b8936",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-processor-status-tooltip.png",
+      "bytes": 228627,
+      "sha256": "6d31a1f3a06bc64c2f38b437bbf7beba552dd8e0895b1a4037f954d2df854817",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-product-trust-center-dialog.png",
+      "bytes": 197811,
+      "sha256": "da487376d868622345bb6a16195e7e2eb1d36bcbb7d95b972edeaa043f2c46ea",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-required-products.png",
+      "bytes": 149728,
+      "sha256": "bbe5953d6b70e4c7ecc4a3883c441c8a2b19a94a6d5edd20ff27838fa91c1168",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/after-required-welcome.png",
+      "bytes": 206094,
+      "sha256": "91b2c7b96e8442d4f3969e4d7924d58484e4ae78d61eb0b3f1ccd8a52d3ff712",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Registry design preview (flag ON)"
+    },
+    {
+      "file": "assets/before-empty-products.png",
+      "bytes": 110462,
+      "sha256": "7be8937c28c5eb976239902c94ad767c3d8df768f12d01f3d0be20de40c64642",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-empty-welcome.png",
+      "bytes": 170149,
+      "sha256": "6e659d8a3418d5b5081b5dc1a659c4b370017641a67a404c54dceaf9b1b709b8",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-merchant-plan-options.png",
+      "bytes": 145358,
+      "sha256": "cf92bd4184dc8106285de10f1a534381a34876046e457166223559308fe08f71",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-merchant-subscription.png",
+      "bytes": 76535,
+      "sha256": "7afcfec1168ed74b13ab853caf35da9542afd4e8c55b698fda67c6decb2889b0",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-mixed-evidence.png",
+      "bytes": 106432,
+      "sha256": "dce6404e830e1d6917ecb3b1b4c9920790ba6a7a122be9fbc0d40ecf19906aaa",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-mixed-products.png",
+      "bytes": 150987,
+      "sha256": "6ee7f098a7dda6c377bdd9293cd0ba5ffeb1c6a4b1ff9af926869df3eb7379bd",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-mixed-sharing.png",
+      "bytes": 247180,
+      "sha256": "04c4ff153df39e8b68601212918577ce353712f5609e7c2ef7e9367bcb5aa150",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-mixed-welcome.png",
+      "bytes": 153786,
+      "sha256": "26ab88a2ffdae2116c590277c1d5ab31ac59cf78022375c6a8262ddb422cd7cb",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-no-coa-products.png",
+      "bytes": 138853,
+      "sha256": "3abf5575f6d85e83d5c5fdd4ae6c16ed26a711ac015221c4ae083c5e045134a8",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-no-coa-welcome.png",
+      "bytes": 170646,
+      "sha256": "04f01f01e53d8692d05d97228d8406f04a9e15b61e68249090b46ac40854a056",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-required-products.png",
+      "bytes": 133884,
+      "sha256": "60e054a656f015a5084777e5410f0fdc0e010d62c67a89d4d6a3e9a075a9f409",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    },
+    {
+      "file": "assets/before-required-welcome.png",
+      "bytes": 159193,
+      "sha256": "31ea76f610bebde41216541b56b382437f2714d5dc311c44689f58166339f3eb",
+      "environment": "Full local Next/Nest application; synthetic review fixtures",
+      "captured": "2026-10-22",
+      "mode": "Baseline (flag OFF)"
+    }
+  ],
+  "unchangedOriginalBytes": true,
+  "excluded": "Raw before-processor/before-invite images and warming Settings screenshot; private runtime, logs, credentials and production exports excluded"
+}
