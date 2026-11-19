@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Merchant Intelligence Report: where it lives</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F3F6FA; --surface: #FFFFFF; --quiet: #F8FBFD; --lav: #F7F5FF;
+    --ink: #1A202E; --ink-2: #39435C; --muted: #4D5A78;
+    --line: #EBEDF2; --line-2: #DDE2EA; --dash: #9AA3B5;
+    --blue: #2563EB; --blue-d: #1D4ED8; --blue-50: #EFF6FF; --blue-100: #DBEAFE; --blue-800: #1E40AF;
+    --green: #059669; --green-50: #ECFDF5; --green-100: #D1FAE5; --green-800: #065F46; --green-line: #A7F3D0;
+    --amber-100: #FEF3C7; --amber-800: #92400E;
+    --red-100: #FEE2E2; --red-800: #991B1B;
+    --shadow: 0 4px 12px rgba(26, 32, 46, 0.08), 0 1px 3px rgba(26, 32, 46, 0.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Uber Move', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 15px; line-height: 1.55;
+  }
+  a { color: var(--blue); }
+  a:hover { color: var(--blue-d); }
+  :focus-visible { outline: 3px solid var(--blue-100); outline-offset: 2px; border-radius: 6px; }
+  h1, h2, h3, p { margin: 0; }
+  code {
+    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 0.9em;
+    background: var(--quiet); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px;
+    overflow-wrap: anywhere;
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 20; background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(6px); border-bottom: 1px solid var(--line);
+  }
+  .topbar-in {
+    max-width: 1120px; margin: 0 auto; padding: 10px 16px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .brand b { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+  .topbar .btn { flex: 0 0 auto; }
+  @media (max-width: 640px) {
+    .topbar-in { flex-wrap: nowrap; }
+    .brand .pill { display: none; }
+    .brand b { font-size: 14px; line-height: 1.25; }
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px;
+    border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink);
+    font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+  }
+  .btn:hover { color: var(--ink); border-color: var(--dash); }
+  .btn-primary { background: var(--blue); border-color: var(--blue); color: #FFFFFF; }
+  .btn-primary:hover { background: var(--blue-d); border-color: var(--blue-d); color: #FFFFFF; }
+
+  .pill {
+    display: inline-flex; align-items: center; min-height: 22px; padding: 1px 9px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; white-space: nowrap;
+  }
+  .pill-neutral { background: var(--line); color: var(--ink-2); }
+  .pill-green { background: var(--green-100); color: var(--green-800); }
+  .pill-blue { background: var(--blue-100); color: var(--blue-800); }
+  .pill-amber { background: var(--amber-100); color: var(--amber-800); }
+  .pill-red { background: var(--red-100); color: var(--red-800); }
+  .pill-dash { border: 1px dashed var(--dash); color: var(--muted); }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 72px; display: flex; flex-direction: column; gap: 20px; }
+  .hero { display: flex; flex-direction: column; gap: 12px; padding: 12px 4px 4px; }
+  .hero h1 { font-size: clamp(28px, 4.6vw, 40px); line-height: 1.12; font-weight: 700; letter-spacing: -0.02em; max-width: 20ch; }
+  .hero p { font-size: 17px; color: var(--ink-2); max-width: 64ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--muted); font-size: 13px; }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+    padding: 24px; display: flex; flex-direction: column; gap: 16px; min-width: 0;
+  }
+  .panel > h2 { font-size: 22px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; }
+  .lead { color: var(--ink-2); max-width: 72ch; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px; }
+  .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @media (max-width: 1000px) { .grid.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .grid.four { grid-template-columns: 1fr; } }
+  .card {
+    border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    min-width: 0; background: var(--surface);
+  }
+  .card h3 { font-size: 15px; font-weight: 600; }
+  .card p { font-size: 14px; color: var(--ink-2); }
+  .card .big { font-size: 20px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); overflow-wrap: anywhere; }
+  .eyebrow { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+  .shot { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .thumbs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 900px) { .thumbs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .thumbs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .thumb { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: var(--ink); min-width: 0; }
+  .thumb .shot { aspect-ratio: 24 / 13; }
+  .thumb .shot img { height: 100%; object-fit: cover; object-position: top left; }
+  .thumb b { font-size: 14px; font-weight: 600; }
+  .thumb span { font-size: 13px; color: var(--muted); }
+  .thumb:hover b { color: var(--blue-d); }
+
+  .rows { display: flex; flex-direction: column; }
+  .row {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 6px 20px; align-items: baseline;
+    padding: 12px 0; border-top: 1px solid var(--line);
+  }
+  .row:first-child { border-top: 0; padding-top: 0; }
+  .row > :first-child { font-weight: 600; }
+  .row > :last-child { color: var(--ink-2); }
+  .row .pill { margin-left: 8px; vertical-align: 1px; }
+  @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .panel { padding: 18px 16px; } }
+
+  ol.steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; counter-reset: s; }
+  ol.steps li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; color: var(--ink-2); font-size: 14px; }
+  ol.steps li::before {
+    content: counter(s); width: 28px; height: 28px; border-radius: 8px; background: var(--blue-50); color: var(--blue-d);
+    font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  ul.plain { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 14px; display: flex; flex-direction: column; gap: 6px; }
+
+  .option { gap: 10px; }
+  .option .head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+  .option dl { margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+  .option dt { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .option dd { margin: 0; color: var(--ink-2); }
+
+  .signoff { background: var(--green-50); border-color: var(--green-line); }
+  .signoff > h2 { color: var(--green-800); }
+  .decision {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px;
+    display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 6px 12px;
+  }
+  .decision .n {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--blue-50); color: var(--blue-d);
+    font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+  .decision h3 { font-size: 16px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+  .decision p { font-size: 14px; color: var(--ink-2); }
+  .decision .body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .choice { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
+  .choice legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .choice label {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 8px;
+    border: 1px solid var(--line-2); background: var(--surface); font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .choice input { accent-color: var(--blue); width: 16px; height: 16px; margin: 0; }
+  .choice label:has(input:checked) { border-color: var(--blue); background: var(--blue-50); color: var(--blue-d); }
+  .field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); min-width: 0; }
+  .field input, .field textarea {
+    width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 8px;
+    background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; font-weight: 400;
+  }
+  .field textarea { min-height: 64px; resize: vertical; }
+  .send { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+  .send .field { flex: 1 1 220px; }
+  #status { font-size: 13px; color: var(--green-800); font-weight: 600; min-height: 20px; }
+  #fallback { display: none; }
+  .foot { color: var(--muted); font-size: 13px; padding: 0 4px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <svg aria-hidden="true" width="28" height="28" viewBox="0 0 34 34" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="15" r="11" stroke="#1A202E" stroke-width="3"></circle><path d="M10.5 15.2l3.2 3.2 6.4-7.4" stroke="#059669" stroke-width="3"></path><path d="M23.4 23.4l6 6" stroke="#1A202E" stroke-width="3"></path></svg>
+      <b>Merchant Intelligence Report</b>
+      <span class="pill pill-blue">Proposal for sign-off</span>
+    </div>
+    <a class="btn btn-primary" href="#sign-off">Go to sign-off</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" aria-labelledby="t">
+    <div class="meta"><span>November 19, 2026</span><span aria-hidden="true">·</span><span>Joseph Floyd</span><span class="pill pill-neutral">Sample data throughout</span></div>
+    <h1 id="t">Where it lives, and how people get to it</h1>
+    <p>The one-page report is designed. This page proposes where it sits in Qredible, who can open it, how it is paid for, and how someone can try it from the website. Five points need a yes or a change. They are at the bottom.</p>
+  </section>
+
+  <section class="grid four" aria-label="The proposal in four lines">
+    <div class="card"><span class="eyebrow">Where</span><div class="big">Inside the platform we already have</div><p>One application and one login. Not a separate product to sign in to.</p></div>
+    <div class="card"><span class="eyebrow">Address</span><div class="big">/merchant-intelligence</div><p>On members.qredible.com, linked from the Merchant Intelligence page on qredible.com.</p></div>
+    <div class="card"><span class="eyebrow">Paying</span><div class="big">A monthly plan with reports included</div><p>It bills today. Charging per report follows.</p></div>
+    <div class="card"><span class="eyebrow">Trying it</span><div class="big">A sample now, a sign-up trial later</div><p>No single-report purchase without an account.</p></div>
+  </section>
+
+  <section class="panel" aria-labelledby="s1">
+    <h2 id="s1">What they open</h2>
+    <p class="lead">A salesperson types five details about a merchant and gets this page a few minutes later. Every card opens into detail, and the page downloads as a PDF. Click the picture to open the sample and move around in it.</p>
+    <a class="shot" href="screens/01-report-one-page.html"><img src="img/01-report-one-page.png" width="1440" height="1170" alt="The one-page report for a made-up merchant: an overall score and four other scores across the top, eight cards below them, and a key takeaway with a recommended next step at the foot."></a>
+    <div class="thumbs">
+      <a class="thumb" href="screens/03-new-report.html"><span class="shot"><img src="img/03-new-report.png" width="720" height="390" alt="" loading="lazy"></span><b>New report</b><span>Five details in</span></a>
+      <a class="thumb" href="screens/04-while-it-runs.html"><span class="shot"><img src="img/04-while-it-runs.png" width="720" height="390" alt="" loading="lazy"></span><b>While it runs</b><span>Cards fill in as sources answer</span></a>
+      <a class="thumb" href="screens/05-my-reports.html"><span class="shot"><img src="img/05-my-reports.png" width="720" height="390" alt="" loading="lazy"></span><b>My reports</b><span>Where the team lands after sign-in</span></a>
+      <a class="thumb" href="screens/02-report-detail.html"><span class="shot"><img src="img/02-report-detail.png" width="720" height="390" alt="" loading="lazy"></span><b>The detail</b><span>Behind every card</span></a>
+      <a class="thumb" href="screens/06-merchant-view.html"><span class="shot"><img src="img/06-merchant-view.png" width="720" height="390" alt="" loading="lazy"></span><b>The merchant's version</b><span>What a shared report looks like to them</span></a>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="s2">
+    <h2 id="s2">Where it lives</h2>
+    <p class="lead">It is part of the existing platform, the one the website calls Q-Trust. A sales team signs in at the same place as every other customer and sees only the report. "Powered by Q-Trust" on the website stays accurate.</p>
+    <div class="rows">
+      <div class="row"><div>My reports <span class="pill pill-neutral">lands here</span></div><div><code>members.qredible.com/merchant-intelligence</code></div></div>
+      <div class="row"><div>New report</div><div><code>/merchant-intelligence/new</code></div></div>
+      <div class="row"><div>A report, while it runs and once saved</div><div><code>/merchant-intelligence/reports/{id}</code></div></div>
+      <div class="row"><div>The merchant's version</div><div>A private link outside the signed-in area. The merchant needs no account to read it.</div></div>
+      <div class="row"><div>From qredible.com</div><div>The Merchant Intelligence page sends people with access to sign-in, and everyone else to "Request access".</div></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="s3">
+    <h2 id="s3">Who sees what</h2>
+    <div class="grid four">
+      <div class="card"><h3>A sales team at a bank, an ISO or an agent office</h3><p>The report screens, Settings, Support and Profile. Nothing else in the product.</p></div>
+      <div class="card"><h3>A processor already using We Monitor</h3><p>One more menu item, once it is on their plan. From a report they can move the prospect to Pre-Underwriting.</p></div>
+      <div class="card"><h3>A merchant the report was shared with</h3><p>Their own version by private link. An account only if they choose to confirm their details, which leads into MyCOA.</p></div>
+      <div class="card"><h3>Qredible staff</h3><p>Every team's reports, for support.</p></div>
+    </div>
+    <p class="lead">One team never sees another team's reports. A merchant typed into a report does not appear in the directory, in search or anywhere another customer can see it. It becomes a company on the platform only when the merchant claims its profile or a processor boards it.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="s4">
+    <h2 id="s4">Getting in, and paying</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>The first customers</h3>
+        <ol class="steps">
+          <li>We set up the team's workspace and invite its owner by email.</li>
+          <li>The owner sets a password, accepts the terms and invites the rest of the team.</li>
+          <li>Anyone on the team runs reports. Everyone on the team sees them in My reports.</li>
+        </ol>
+        <p>This is how the first ISO was set up. Open sign-up comes after the first customers are live.</p>
+      </div>
+      <div class="card">
+        <h3>The plan</h3>
+        <ul class="plain">
+          <li><b>At launch:</b> a monthly plan with a set number of reports included. This bills today with no new billing work.</li>
+          <li><b>After launch:</b> charging for each report beyond the included number, or prepaid packs. About a week of billing work.</li>
+          <li><b>Prices are settings.</b> The monthly fee, the included number and the price per report can change without a release.</li>
+          <li>No second subscription is needed to use it.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="s5">
+    <h2 id="s5">How it fits with the rest of Qredible</h2>
+    <div class="rows">
+      <div class="row"><div>Q-Trust <span class="pill pill-green">Runs on it</span></div><div>Same sign-in, same plans, and the same lookups and website checks that already feed monitoring.</div></div>
+      <div class="row"><div>We Monitor <span class="pill pill-blue">Hand-off</span></div><div>A processor moves a prospect from a report into Pre-Underwriting. Reports themselves do not appear in We Monitor.</div></div>
+      <div class="row"><div>MyCOA <span class="pill pill-blue">Hand-off</span></div><div>A merchant who opens a shared report is shown what to fix and offered a free profile, then MyCOA for lab reports.</div></div>
+      <div class="row"><div>Q-Commerce <span class="pill pill-dash">No connection yet</span></div><div>Nothing in the report reads from it or writes to it in the first release.</div></div>
+      <div class="row"><div>White label <span class="pill pill-dash">Later</span></div><div>Qredible-branded only at first: the screens, the PDF and the merchant's version.</div></div>
+      <div class="row"><div>Where the data sits</div><div>In the platform's existing database, in new tables of its own. A saved report never changes. No new system to run or secure.</div></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="s6">
+    <h2 id="s6">Trying it from the website</h2>
+    <p class="lead">Three ways someone who finds the product on qredible.com could try it.</p>
+    <div class="grid">
+      <div class="card option">
+        <div class="head"><h3>1. A sample report</h3><span class="pill pill-green">Recommended now</span></div>
+        <dl>
+          <div><dt>What they get</dt><dd>The one-page report for a made-up merchant, labelled as a sample, with its detail.</dd></div>
+          <div><dt>What it needs</dt><dd>Hosting only. The sample on this page is it.</dd></div>
+        </dl>
+      </div>
+      <div class="card option">
+        <div class="head"><h3>2. Sign up and try it</h3><span class="pill pill-blue">Recommended next</span></div>
+        <dl>
+          <div><dt>What they get</dt><dd>Their own workspace on a starter plan with a few reports included, and a card on file for more.</dd></div>
+          <div><dt>What it needs</dt><dd>A starter plan. Sign-up for a new company is already open. Best turned on once the first customers are live.</dd></div>
+        </dl>
+      </div>
+      <div class="card option">
+        <div class="head"><h3>3. One report by card, no account</h3><span class="pill pill-red">Not recommended</span></div>
+        <dl>
+          <div><dt>What they get</dt><dd>A single report sent by email link.</dd></div>
+          <div><dt>Why not</dt><dd>
+            <ul class="plain">
+              <li>A report names a business and an owner. With no account, nothing records who asked for it or why.</li>
+              <li>The buyer has nowhere to keep the report or find it again.</li>
+              <li>Every report reads a real store, so an open form can be pointed at any site, any number of times.</li>
+              <li>A disputed card payment can cost more than the sale.</li>
+            </ul>
+          </dd></div>
+        </dl>
+      </div>
+    </div>
+    <p class="lead">For our own sales conversations: a Qredible-run workspace holding a few saved reports on made-up merchants, so the report can be shown without running one live.</p>
+  </section>
+
+  <section class="panel signoff" id="sign-off" aria-labelledby="s7">
+    <h2 id="s7">For sign-off</h2>
+    <p class="lead">Mark each point, add a note where you want a change, then copy your answers and send them to Joseph. Nothing on this page is sent anywhere by itself.</p>
+
+    <form id="f" class="grid" style="grid-template-columns: 1fr" onsubmit="return false">
+      <div class="decision"><div class="n">1</div><div class="body">
+        <h3>One application and one login, at members.qredible.com/merchant-intelligence</h3>
+        <p>Not a separate application. No second subscription to use it.</p>
+        <fieldset class="choice"><legend>Point 1</legend>
+          <label><input type="radio" name="d1" value="Approve"> Approve</label>
+          <label><input type="radio" name="d1" value="Change"> Change</label>
+        </fieldset>
+        <label class="field">Note (optional)<textarea name="n1"></textarea></label>
+      </div></div>
+
+      <div class="decision"><div class="n">2</div><div class="body">
+        <h3>For the first customers, we set up each team's workspace and invite them</h3>
+        <p>Open sign-up comes after the first customers are live.</p>
+        <fieldset class="choice"><legend>Point 2</legend>
+          <label><input type="radio" name="d2" value="Approve"> Approve</label>
+          <label><input type="radio" name="d2" value="Change"> Change</label>
+        </fieldset>
+        <label class="field">Note (optional)<textarea name="n2"></textarea></label>
+      </div></div>
+
+      <div class="decision"><div class="n">3</div><div class="body">
+        <h3>Launch on a monthly plan with reports included</h3>
+        <p>Charging per report, or prepaid packs, follows in the next phase.</p>
+        <fieldset class="choice"><legend>Point 3</legend>
+          <label><input type="radio" name="d3" value="Approve"> Approve</label>
+          <label><input type="radio" name="d3" value="Change"> Change</label>
+        </fieldset>
+        <label class="field">Note (optional)<textarea name="n3"></textarea></label>
+      </div></div>
+
+      <div class="decision"><div class="n">4</div><div class="body">
+        <h3>No Q-Commerce connection and Qredible branding only, in the first release</h3>
+        <p>Both can be added later. Neither is needed to sell the report.</p>
+        <fieldset class="choice"><legend>Point 4</legend>
+          <label><input type="radio" name="d4" value="Approve"> Approve</label>
+          <label><input type="radio" name="d4" value="Change"> Change</label>
+        </fieldset>
+        <label class="field">Note (optional)<textarea name="n4"></textarea></label>
+      </div></div>
+
+      <div class="decision"><div class="n">5</div><div class="body">
+        <h3>On the website: a sample report now, a sign-up trial once the first customers are live</h3>
+        <p>No purchase of a single report without an account.</p>
+        <fieldset class="choice"><legend>Point 5</legend>
+          <label><input type="radio" name="d5" value="Approve"> Approve</label>
+          <label><input type="radio" name="d5" value="Change"> Change</label>
+        </fieldset>
+        <label class="field">Note (optional)<textarea name="n5"></textarea></label>
+      </div></div>
+
+      <div class="send">
+        <label class="field">Your name<input type="text" name="who" autocomplete="name"></label>
+        <button class="btn btn-primary" type="button" id="copy">Copy my answers</button>
+      </div>
+      <div id="status" role="status" aria-live="polite"></div>
+      <label class="field" id="fallback">Copy this text and send it to Joseph<textarea id="out" rows="9" readonly></textarea></label>
+    </form>
+
+    <p class="lead" style="font-size: 14px">Not part of this sign-off: the choice of scores on the page, sanctions screening, which processors share a policy, and the product's name. Those are separate decisions on the report itself.</p>
+  </section>
+
+  <p class="foot">Every merchant, person and number on the sample screens is made up. Nothing on this page is built yet.</p>
+</main>
+
+<script>
+(function () {
+  var form = document.getElementById('f');
+  var status = document.getElementById('status');
+  var fallback = document.getElementById('fallback');
+  var out = document.getElementById('out');
+  var KEY = 'mir-where-it-lives-signoff';
+  var points = [
+    'One application and one login, at members.qredible.com/merchant-intelligence',
+    'First customers: we set up each team\'s workspace and invite them',
+    'Launch on a monthly plan with reports included',
+    'No Q-Commerce connection and Qredible branding only, in the first release',
+    'Website: a sample report now, a sign-up trial once the first customers are live'
+  ];
+
+  function read() {
+    var d = { who: form.elements.who.value.trim() };
+    for (var i = 1; i <= points.length; i++) {
+      var r = form.querySelector('input[name="d' + i + '"]:checked');
+      d['d' + i] = r ? r.value : '';
+      d['n' + i] = form.elements['n' + i].value.trim();
+    }
+    return d;
+  }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(read())); } catch (e) { /* storage unavailable: nothing to do */ }
+  }
+
+  function restore() {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { d = null; }
+    if (!d) return;
+    form.elements.who.value = d.who || '';
+    for (var i = 1; i <= points.length; i++) {
+      if (d['d' + i]) {
+        var r = form.querySelector('input[name="d' + i + '"][value="' + d['d' + i] + '"]');
+        if (r) r.checked = true;
+      }
+      form.elements['n' + i].value = d['n' + i] || '';
+    }
+  }
+
+  function text() {
+    var d = read();
+    var lines = ['Merchant Intelligence Report: where it lives (sign-off)', 'From: ' + (d.who || 'not given'), ''];
+    for (var i = 1; i <= points.length; i++) {
+      lines.push(i + '. ' + points[i - 1] + ': ' + (d['d' + i] || 'No answer yet'));
+      if (d['n' + i]) lines.push('   Note: ' + d['n' + i]);
+    }
+    return lines.join('\n');
+  }
+
+  function showFallback(t) {
+    out.value = t;
+    fallback.style.display = 'flex';
+    out.focus();
+    out.select();
+    status.textContent = 'Copy the text below and send it to Joseph.';
+  }
+
+  document.getElementById('copy').addEventListener('click', function () {
+    var t = text();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(function () {
+        status.textContent = 'Copied. Paste it into a message to Joseph.';
+      }, function () { showFallback(t); });
+    } else {
+      showFallback(t);
+    }
+  });
+
+  form.addEventListener('input', save);
+  form.addEventListener('change', save);
+  restore();
+})();
+</script>
+</body>
+</html>
