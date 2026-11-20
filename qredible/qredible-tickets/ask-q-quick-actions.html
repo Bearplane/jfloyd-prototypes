@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask-Q — quick actions mockup</title>
+<style>
+  :root{
+    --qt-surface-page:#F6F8FB; --qt-surface-raised:#FFFFFF; --qt-surface-sunken:#F1F5F9; --qt-surface-overlay:#FFFFFF;
+    --qt-surface-selected:#EFF6FF; --qt-surface-hover:rgba(26,32,46,.04); --qt-scrim:rgba(26,32,46,.40);
+    --qt-text-primary:#1A202E; --qt-text-secondary:#4D5A78; --qt-text-muted:#657496; --qt-text-inverse:#FFFFFF;
+    --qt-border-subtle:#EBEDF2; --qt-border-default:#DDE2EA; --qt-accent:#2563EB; --qt-accent-soft:#EFF6FF; --qt-ink:#1A202E;
+    --qt-rail:#233044; --qt-rail-fg:#C7CFDD;
+    --qt-status-warning-bg:#FEF3C7; --qt-status-warning-fg:#92400E; --qt-status-danger-bg:#FEE2E2; --qt-status-danger-fg:#991B1B;
+    --qt-status-info-bg:#EFF6FF; --qt-status-info-fg:#1E40AF; --qt-status-ok-bg:#DCFCE7; --qt-status-ok-fg:#166534;
+    --kpi-violative:#EE4040; --kpi-missing:#ED834E; --kpi-compliant:#48D188; --kpi-info:#2563EB;
+    --qt-elevation-3:0 12px 32px rgba(26,32,46,.14),0 2px 8px rgba(26,32,46,.08);
+    --qt-control-radius:6px; --qt-overlay-radius:12px; --qt-chip-radius:4px; --qt-card-radius:10px;
+  }
+  [data-theme="dark"]{
+    --qt-surface-page:#0C0F16; --qt-surface-raised:#1A202E; --qt-surface-sunken:#0C0F16; --qt-surface-overlay:#222A3D;
+    --qt-surface-selected:rgba(30,58,138,.30); --qt-surface-hover:rgba(255,255,255,.08); --qt-scrim:rgba(26,32,46,.60);
+    --qt-text-primary:#EDF0F7; --qt-text-secondary:#A6B0C6; --qt-text-muted:#7F8AA3; --qt-text-inverse:#1A202E;
+    --qt-border-subtle:#2B3448; --qt-border-default:#3A455C; --qt-accent:#60A5FA; --qt-accent-soft:rgba(96,165,250,.14); --qt-ink:#EDF0F7;
+    --qt-rail:#11161F; --qt-rail-fg:#A6B0C6;
+    --qt-status-warning-bg:rgba(146,64,14,.28); --qt-status-warning-fg:#FCD34D; --qt-status-danger-bg:rgba(153,27,27,.30); --qt-status-danger-fg:#FCA5A5;
+    --qt-status-info-bg:rgba(30,64,175,.30); --qt-status-info-fg:#93C5FD; --qt-status-ok-bg:rgba(22,101,52,.30); --qt-status-ok-fg:#86EFAC;
+    --qt-elevation-3:0 12px 32px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--qt-surface-page);color:var(--qt-text-primary);font:13px/1.45 "Uber Move","Plus Jakarta Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:24px 20px 80px}
+  .wrap{max-width:1120px;margin:0 auto}
+  .hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:22px;font-weight:600}
+  .sub{color:var(--qt-text-secondary);font-size:13px;margin:4px 0 14px;max-width:820px}
+  .sub code,.note code,td code{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;background:var(--qt-surface-sunken);border:1px solid var(--qt-border-subtle);border-radius:4px;padding:1px 5px}
+  .principle{display:inline-flex;align-items:center;gap:8px;background:var(--qt-status-info-bg);color:var(--qt-status-info-fg);border-radius:999px;padding:4px 12px;font-weight:600;font-size:12px;margin-bottom:14px}
+  .toggle{border:1px solid var(--qt-border-default);background:var(--qt-surface-raised);color:var(--qt-text-primary);border-radius:6px;padding:6px 12px;font:inherit;font-weight:600;cursor:pointer}
+  .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .tab{padding:7px 14px;border-radius:999px;border:1px solid var(--qt-border-default);background:var(--qt-surface-raised);font-weight:600;cursor:pointer;color:var(--qt-text-secondary);font-size:12.5px}
+  .tab.on{background:var(--qt-ink);border-color:var(--qt-ink);color:var(--qt-text-inverse)}
+  .pane{display:none}.pane.on{display:block}
+  .note{font-size:12.5px;color:var(--qt-text-secondary);margin:0 2px 12px;max-width:900px;line-height:1.55}
+  .note b{color:var(--qt-text-primary)}
+
+  /* ── shell stage ── */
+  .stage{position:relative;border:1px solid var(--qt-border-subtle);border-radius:14px;overflow:hidden;background:var(--qt-surface-page);height:560px;display:flex}
+  .rail{width:64px;background:var(--qt-rail);display:flex;flex-direction:column;align-items:center;padding-top:14px;gap:14px;flex:none}
+  .rail i{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.08);display:block}
+  .rail i.on{background:var(--qt-accent)}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .topbar{height:56px;background:var(--qt-surface-raised);border-bottom:1px solid var(--qt-border-subtle);display:flex;align-items:center;padding:0 20px;gap:18px}
+  .crumb{font-size:12.5px;color:var(--qt-text-muted)}
+  .crumb b{color:var(--qt-text-primary);font-weight:600}
+  .pill{margin-left:auto;display:flex;align-items:center;gap:8px;border:1px solid var(--qt-border-default);background:var(--qt-surface-sunken);border-radius:999px;padding:6px 12px;width:280px;color:var(--qt-text-muted);font-size:12.5px;cursor:pointer}
+  .pill kbd{margin-left:auto;font-size:10px;font-weight:600;color:var(--qt-text-muted);border:1px solid var(--qt-border-default);border-radius:4px;padding:1px 5px;background:var(--qt-surface-raised)}
+  .utils{display:flex;gap:10px}.utils i{width:22px;height:22px;border-radius:50%;background:var(--qt-surface-sunken);border:1px solid var(--qt-border-subtle);display:block}
+  .page{padding:18px 22px;color:var(--qt-text-muted);font-size:12px}
+  .kpis{display:flex;gap:10px;margin-top:10px}
+  .kpi{flex:1;background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);border-radius:10px;padding:10px 12px}
+  .kpi small{display:block;color:var(--qt-text-muted);font-size:11px}.kpi b{font-size:20px;font-weight:600;color:var(--qt-text-primary)}
+  .ghostrows{margin-top:12px;display:grid;gap:6px}.ghostrows i{height:28px;border-radius:6px;background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);display:block;opacity:.7}
+  .scrim{position:absolute;inset:0;background:var(--qt-scrim)}
+
+  /* ── palette ── */
+  .palette{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:min(620px,92%);background:var(--qt-surface-overlay);border:1px solid var(--qt-border-subtle);border-radius:var(--qt-overlay-radius);box-shadow:var(--qt-elevation-3);overflow:hidden}
+  .p-in{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--qt-border-subtle)}
+  .p-in svg{flex:none;color:var(--qt-text-muted)}
+  .p-in input{flex:1;border:0;outline:0;background:transparent;font:inherit;font-size:15px;color:var(--qt-text-primary)}
+  .p-in input::placeholder{color:var(--qt-text-muted)}
+  .p-in kbd{font-size:10px;font-weight:600;color:var(--qt-text-muted);border:1px solid var(--qt-border-default);border-radius:4px;padding:2px 5px}
+  .ctx{display:flex;align-items:center;gap:8px;padding:8px 16px 0;font-size:11.5px;color:var(--qt-text-muted)}
+  .ctx span{background:var(--qt-surface-sunken);border:1px solid var(--qt-border-subtle);border-radius:999px;padding:2px 9px;color:var(--qt-text-secondary);font-weight:600}
+  .p-body{padding:6px 8px 10px;max-height:430px;overflow:auto}
+  .sect{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--qt-text-muted);padding:10px 8px 4px;display:flex;justify-content:space-between}
+  .sect a{font-weight:600;letter-spacing:0;text-transform:none;color:var(--qt-accent);font-size:11px;cursor:pointer}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:2px 8px}
+  .qa{border:1px solid var(--qt-border-subtle);background:var(--qt-surface-raised);border-radius:var(--qt-card-radius);padding:10px 12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+  .qa:hover,.qa.hl{border-color:var(--qt-accent);background:var(--qt-surface-selected)}
+  .qa .ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none;color:#fff}
+  .qa .t{font-weight:600;font-size:12.5px;line-height:1.25}
+  .qa .d{font-size:11px;color:var(--qt-text-muted);margin-top:2px}
+  .qa .n{font-size:16px;font-weight:600;line-height:1}
+  .row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--qt-control-radius);cursor:pointer;color:var(--qt-text-primary)}
+  .row:hover,.row.hl{background:var(--qt-surface-selected)}
+  .row .ic{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}
+  .ic-p{background:var(--qt-status-info-bg);color:var(--qt-status-info-fg)}.ic-c{background:var(--qt-status-ok-bg);color:var(--qt-status-ok-fg)}
+  .ic-a{background:var(--qt-status-warning-bg);color:var(--qt-status-warning-fg)}.ic-s{background:var(--qt-surface-sunken);color:var(--qt-text-secondary)}
+  .row .l{font-weight:500;font-size:13px;white-space:nowrap}
+  .row .s{font-size:12px;color:var(--qt-text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .verbs{margin-left:auto;display:flex;gap:4px;flex:none}
+  .row .verbs span{font-size:11px;font-weight:600;color:var(--qt-accent);background:var(--qt-accent-soft);border-radius:4px;padding:2px 7px}
+  .row .go{margin-left:auto;font-size:11px;color:var(--qt-text-muted);flex:none}
+  .more{display:flex;gap:6px;flex-wrap:wrap;padding:4px 8px 2px}
+  .more span{font-size:11.5px;color:var(--qt-text-secondary);border:1px solid var(--qt-border-subtle);background:var(--qt-surface-raised);border-radius:999px;padding:3px 10px;cursor:pointer}
+  .more span:hover{border-color:var(--qt-accent);color:var(--qt-accent)}
+  .foot{border-top:1px solid var(--qt-border-subtle);padding:7px 14px;font-size:11px;color:var(--qt-text-muted);display:flex;gap:14px}
+  .foot kbd{font-size:10px;border:1px solid var(--qt-border-default);border-radius:3px;padding:0 4px}
+  .answer{margin:8px;border:1px solid var(--qt-border-subtle);background:var(--qt-surface-raised);border-radius:var(--qt-card-radius);padding:14px 16px}
+  .answer .big{font-size:20px;font-weight:600;line-height:1.2}
+  .answer .big em{font-style:normal;color:var(--kpi-missing)}
+  .answer .src{font-size:11.5px;color:var(--qt-text-muted);margin-top:4px}
+  .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .btn{border:0;border-radius:5px;padding:7px 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .btn-ink{background:var(--qt-ink);color:var(--qt-text-inverse)}
+  .btn-sec{background:var(--qt-surface-sunken);color:var(--qt-text-primary);border:1px solid var(--qt-border-default)}
+
+  /* ── embedded strip ── */
+  .embed{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+  .card{background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);border-radius:12px;padding:16px;overflow:hidden}
+  .card h3{font-size:14px;font-weight:600;margin-bottom:2px}
+  .card .cap{font-size:11.5px;color:var(--qt-text-muted);margin-bottom:12px}
+  .tabsbar{display:flex;gap:18px;border-bottom:1px solid var(--qt-border-subtle);margin-bottom:12px;font-size:12.5px;color:var(--qt-text-muted)}
+  .tabsbar span{padding:6px 0}.tabsbar span.on{color:var(--qt-text-primary);font-weight:600;border-bottom:2px solid #F05252}
+  .strip{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .strip .lbl{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--qt-text-muted);margin-right:4px}
+  .strip button{border:1px solid var(--qt-border-default);background:var(--qt-surface-raised);color:var(--qt-text-primary);border-radius:999px;padding:5px 11px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+  .strip button b{font-weight:700}
+  .strip button:hover{border-color:var(--qt-accent);color:var(--qt-accent)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .tile{border:1px solid var(--qt-border-subtle);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--qt-surface-page)}
+  .tile:hover{border-color:var(--qt-accent)}
+  .tile b{display:block;font-size:20px;font-weight:600}.tile span{font-size:11.5px;color:var(--qt-text-secondary)}
+
+  table{border-collapse:collapse;width:100%;font-size:12.5px;background:var(--qt-surface-raised);border:1px solid var(--qt-border-subtle);border-radius:10px;overflow:hidden}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--qt-text-muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--qt-border-subtle);background:var(--qt-surface-sunken)}
+  td{padding:9px 12px;border-bottom:1px solid var(--qt-border-subtle);vertical-align:top;color:var(--qt-text-secondary)}
+  td:first-child{color:var(--qt-text-primary);font-weight:600;white-space:nowrap}
+  .tag{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px}
+  .tag-ok{background:var(--qt-status-ok-bg);color:var(--qt-status-ok-fg)}.tag-new{background:var(--qt-status-info-bg);color:var(--qt-status-info-fg)}.tag-no{background:var(--qt-status-danger-bg);color:var(--qt-status-danger-fg)}
+  .tblwrap{overflow-x:auto}
+  @media (max-width:820px){.grid{grid-template-columns:1fr 1fr}.embed{grid-template-columns:1fr}.pill{width:auto}.stage{height:auto;min-height:560px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div>
+      <h1>Ask-Q — one box, a few quick actions, plain answers</h1>
+      <div class="sub">Mockup for Joseph to react to · MyCOA release polish · builds on the QP-4441 spec (<code>docs/specs/qp4441-ask-q-global-search-and-advanced-search-spec-2026-08-21.md</code>) but cut hard for simplicity. Placeholder merchant data throughout.</div>
+    </div>
+    <button class="toggle" onclick="toggleTheme()">◐ Light / Dark</button>
+  </div>
+  <div class="principle">✦ Principle: the system is too detailed — Ask-Q should make it feel smaller, not add a fifth surface</div>
+
+  <div class="tabs">
+    <div class="tab on" data-p="p1">1 · Open it — quick actions</div>
+    <div class="tab" data-p="p2">2 · Type — find + act</div>
+    <div class="tab" data-p="p3">3 · Ask a question (no AI)</div>
+    <div class="tab" data-p="p4">4 · Embedded — MyCOA + Exec Dashboard</div>
+    <div class="tab" data-p="p5">5 · What's real vs. new</div>
+  </div>
+
+  <!-- ═══ P1 ═══ -->
+  <div class="pane on" id="p1">
+    <div class="note">Click the <b>Ask-Q</b> pill in the top bar (or <b>⌘K</b>, which already exists). Before you type anything, Q shows the <b>six things people actually do</b> for the company you're looking at — with live counts pulled from the same statistics the KPI tiles use. Every tile is a deep link into a screen the app already has. Nothing here is a new capability; it's a shorter path to an existing one.</div>
+    <div class="stage">
+      <div class="rail"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="main">
+        <div class="topbar">
+          <div class="crumb">Q-Monitor / <b>Product Compliance</b></div>
+          <div class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Ask-Q…<kbd>⌘K</kbd></div>
+          <div class="utils"><i></i><i></i><i></i></div>
+        </div>
+        <div class="page">Northwind Botanicals · Products
+          <div class="kpis"><div class="kpi"><small>Total</small><b>33</b></div><div class="kpi"><small>Missing COA</small><b>18</b></div><div class="kpi"><small>Violative</small><b>4</b></div><div class="kpi"><small>Compliant</small><b>11</b></div></div>
+          <div class="ghostrows"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+      <div class="palette">
+        <div class="p-in"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Find a product or COA, or tell Q what to do…" readonly><kbd>esc</kbd></div>
+        <div class="ctx">Working in <span>Northwind Botanicals</span> <span>Products</span></div>
+        <div class="p-body">
+          <div class="sect">Quick actions</div>
+          <div class="grid">
+            <div class="qa hl"><div class="ic" style="background:var(--kpi-missing)">!</div><div><div class="n">18</div><div class="t">Products missing a COA</div><div class="d">show them</div></div></div>
+            <div class="qa"><div class="ic" style="background:var(--kpi-violative)">✕</div><div><div class="n">4</div><div class="t">Violative products</div><div class="d">show them</div></div></div>
+            <div class="qa"><div class="ic" style="background:var(--kpi-info)">◌</div><div><div class="n">7</div><div class="t">Unassigned COAs</div><div class="d">match them to products</div></div></div>
+            <div class="qa"><div class="ic" style="background:var(--qt-status-warning-fg)">⏱</div><div><div class="n">2</div><div class="t">Expired COAs</div><div class="d">resolve them</div></div></div>
+            <div class="qa"><div class="ic" style="background:var(--qt-ink);color:var(--qt-text-inverse)">↑</div><div><div class="t">Upload COAs</div><div class="d">files or URLs</div></div></div>
+            <div class="qa"><div class="ic" style="background:var(--qt-ink);color:var(--qt-text-inverse)">⇄</div><div><div class="t">Match COAs to products</div><div class="d">bulk match</div></div></div>
+          </div>
+          <div class="sect">More</div>
+          <div class="more"><span>Tidy up COAs</span><span>Add a product</span><span>Scan for products</span><span>Export products</span><span>Table settings</span></div>
+          <div class="sect">Recent</div>
+          <div class="row"><div class="ic ic-s">↺</div><span class="l">snowball</span><span class="s">2 products · 1 COA</span><span class="go">re-run</span></div>
+          <div class="row"><div class="ic ic-s">↺</div><span class="l">expired coas</span><span class="s">→ COAs · Expired</span><span class="go">re-run</span></div>
+        </div>
+        <div class="foot"><span><kbd>↑↓</kbd> move</span><span><kbd>↵</kbd> go</span><span><kbd>esc</kbd> close</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ P2 ═══ -->
+  <div class="pane" id="p2">
+    <div class="note">Type a word and Q searches <b>products, COAs and screens</b> at once — scoped to what this user can already see (it reuses each listing's own query). Product rows carry the two or three verbs that matter <b>right on the row</b>: open it, open its COA family chain, assign a COA. No submenus. Matching actions ("upload", "match") show up as you type them.</div>
+    <div class="stage">
+      <div class="rail"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="main"><div class="topbar"><div class="crumb">Q-Monitor / <b>Product Compliance</b></div><div class="pill">Ask-Q…<kbd>⌘K</kbd></div><div class="utils"><i></i><i></i><i></i></div></div><div class="page"><div class="ghostrows"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+      <div class="scrim"></div>
+      <div class="palette">
+        <div class="p-in"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input value="snowball" readonly><kbd>esc</kbd></div>
+        <div class="ctx">Working in <span>Northwind Botanicals</span></div>
+        <div class="p-body">
+          <div class="sect">Products <a>see all in Products ↗</a></div>
+          <div class="row hl"><div class="ic ic-p">P</div><span class="l">Snowball THCA Flower 3.5g</span><span class="s">SKU NB-SNB-35 · Compliant</span><div class="verbs"><span>Open</span><span>COA family</span><span>Assign COA</span></div></div>
+          <div class="row"><div class="ic ic-p">P</div><span class="l">Snowball THCA Pre-roll 2pk</span><span class="s">SKU NB-SNB-PR2 · Missing COA</span><div class="verbs"><span>Open</span><span>COA family</span><span>Add COA</span></div></div>
+          <div class="sect">COAs</div>
+          <div class="row"><div class="ic ic-c">C</div><span class="l">snowball-lot-0424.pdf</span><span class="s">Batch 0424 · Green Leaf Labs · Unassigned</span><div class="verbs"><span>Open</span><span>Assign to product</span></div></div>
+          <div class="sect">Actions</div>
+          <div class="row"><div class="ic ic-a">⚡</div><span class="l">Match COAs to products</span><span class="s">opens Bulk Match on the COAs tab</span><span class="go">↵</span></div>
+          <div class="row"><div class="ic ic-a">⚡</div><span class="l">Upload COAs</span><span class="s">opens the upload dialog</span><span class="go"></span></div>
+        </div>
+        <div class="foot"><span><kbd>↵</kbd> open</span><span><kbd>tab</kbd> next verb</span><span>Screens still match too — "product compliance", "my coa"…</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ P3 ═══ -->
+  <div class="pane" id="p3">
+    <div class="note">Ask a plain question and Q answers with <b>one number and the next step</b>. No AI is needed for this: the small set of questions people actually ask ("how many are missing a COA?", "what's violative?", "anything expired?") maps directly onto the statistics the page already loads, so the answer is always the same number the KPI tile shows. AI phrasing can be added later behind <code>topBar_assist_01</code> without changing this screen.</div>
+    <div class="stage">
+      <div class="rail"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="main"><div class="topbar"><div class="crumb">Q-Monitor / <b>Product Compliance</b></div><div class="pill">Ask-Q…<kbd>⌘K</kbd></div><div class="utils"><i></i><i></i><i></i></div></div><div class="page"><div class="ghostrows"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+      <div class="scrim"></div>
+      <div class="palette">
+        <div class="p-in"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input value="how many products are missing a coa?" readonly><kbd>esc</kbd></div>
+        <div class="ctx">Working in <span>Northwind Botanicals</span></div>
+        <div class="p-body">
+          <div class="answer">
+            <div class="big"><em>18</em> of 33 products are missing a COA</div>
+            <div class="src">Northwind Botanicals · same count as the Missing COA tile · just now</div>
+            <div class="btns"><button class="btn btn-ink">Show them</button><button class="btn btn-sec">Upload COAs</button><button class="btn btn-sec">Match COAs to products</button></div>
+          </div>
+          <div class="sect">Questions Q can answer today</div>
+          <div class="more"><span>how many are violative?</span><span>what's compliant?</span><span>any expired COAs?</span><span>how many COAs are unassigned?</span><span>which products need a COA?</span><span>what changed in the last scan?</span></div>
+        </div>
+        <div class="foot"><span>Deterministic — answered from <code>/api/product/statistic</code> and <code>/api/coa/statistic</code>, the calls the page already makes.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ P4 ═══ -->
+  <div class="pane" id="p4">
+    <div class="note">The same quick actions, <b>without the palette</b>: a one-line strip under the MyCOA Products/COAs KPI cards, and a tile widget on the Product Compliance Executive Dashboard (owned by a separate session). Both render the same registry — an action is just <code>{ id, label, count?, href }</code> — so there is exactly one list to maintain and every consumer deep-links into the same screens.</div>
+    <div class="embed">
+      <div class="card">
+        <h3>MyCOA · Products tab</h3>
+        <div class="cap">merchant view · scoped to the merchant's own company</div>
+        <div class="tabsbar"><span>COAs</span><span class="on">Products</span><span>Display</span><span>Labs</span></div>
+        <div class="kpis"><div class="kpi"><small>Total</small><b>33</b></div><div class="kpi"><small>Missing COA</small><b style="color:var(--kpi-missing)">18</b></div><div class="kpi"><small>Violative</small><b style="color:var(--kpi-violative)">4</b></div><div class="kpi"><small>Compliant</small><b style="color:var(--kpi-compliant)">11</b></div></div>
+        <div class="strip"><span class="lbl">Quick actions</span>
+          <button><span class="dot" style="background:var(--kpi-missing)"></span>Missing COA <b>18</b></button>
+          <button><span class="dot" style="background:var(--kpi-info)"></span>Unassigned COAs <b>7</b></button>
+          <button>↑ Upload COAs</button>
+          <button>⇄ Match COAs</button>
+          <button>✦ Tidy up</button>
+        </div>
+        <div class="ghostrows" style="margin-top:14px"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="card">
+        <h3>Product Compliance Executive Dashboard · widget</h3>
+        <div class="cap">portfolio or per-merchant · rendered by the dashboard session via <code>&lt;QuickActionsStrip variant="tiles"/&gt;</code></div>
+        <div class="tiles">
+          <div class="tile"><b style="color:var(--kpi-missing)">142</b><span>Products missing a COA · all merchants</span></div>
+          <div class="tile"><b style="color:var(--kpi-violative)">31</b><span>Violative products · all merchants</span></div>
+          <div class="tile"><b>9</b><span>Merchants fully compliant</span></div>
+          <div class="tile"><b style="color:var(--qt-status-warning-fg)">12</b><span>COAs expiring in 30 days</span></div>
+        </div>
+        <div class="strip" style="margin-top:12px"><span class="lbl">Do</span><button>⇄ Match COAs</button><button>✦ Tidy up COAs</button><button>⇩ Export</button></div>
+        <div class="cap" style="margin-top:10px">Each tile = a quick action with a count; click → Product Compliance with that filter applied (<code>?companyId=…&amp;kpi=missingCoa</code>).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ P5 ═══ -->
+  <div class="pane" id="p5">
+    <div class="note">Every action in this mockup was checked against the real app. <span class="tag tag-ok">EXISTS</span> = the destination and its opener already exist. <span class="tag tag-new">NEW PARAM</span> = the screen exists, it just needs a URL parameter to open the dialog/filter on load (the same trick <code>?suggestedActions=1</code> and <code>?highlight=product:ID</code> use today). <span class="tag tag-no">NOT IN V1</span> = deliberately left out.</div>
+    <div class="tblwrap"><table>
+      <tr><th>Quick action</th><th>What it does in the app today</th><th>How Ask-Q reaches it</th><th></th></tr>
+      <tr><td>Products missing a COA (n)</td><td>KPI tile "Missing COA" → <code>complianceIssues=[missingCoa]</code></td><td><code>?tab=products&amp;kpi=missingCoa</code></td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Violative products (n)</td><td>KPI tile "Violative"</td><td><code>?tab=products&amp;kpi=violative</code></td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Unassigned / Expired COAs (n)</td><td>COAs-tab KPI tiles</td><td><code>?tab=coas&amp;kpi=unassigned|expired</code></td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Upload COAs</td><td>"Upload COAs" → <code>UploadMyCOAModal</code></td><td><code>?tab=coas&amp;open=uploadCoas</code></td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Match COAs to products</td><td>"Bulk Match" → <code>BulkMatchCoasModal</code></td><td><code>?tab=coas&amp;open=bulkMatch</code></td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Tidy up COAs</td><td>Suggested-actions drawer</td><td><code>?suggestedActions=1</code></td><td><span class="tag tag-ok">EXISTS</span></td></tr>
+      <tr><td>Add a product / Export / Scan for products</td><td>Actions menu items on the Products tab; scan = company-bar "Run Product Scan" flow</td><td><code>?open=addProduct|export</code> · scan reuses <code>QtCompanyActions</code> flow</td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Open product · locate row</td><td>QP-4215 row deep-link + server locate</td><td><code>?highlight=product:ID</code></td><td><span class="tag tag-ok">EXISTS</span></td></tr>
+      <tr><td>COA family chain for a product</td><td>Lives inside the COA-list modal (<code>ProductListDetailDispositionModal</code>)</td><td><code>?highlight=product:ID&amp;open=coaList</code></td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Assign / add a COA to a product</td><td>QP-4444 Missing-badge chooser → upload or match</td><td><code>?highlight=product:ID&amp;open=addCoa</code></td><td><span class="tag tag-new">NEW PARAM</span></td></tr>
+      <tr><td>Find products / COAs by name, SKU, batch</td><td>Each tab's own search box (server-side)</td><td>new <code>GET /api/search/global</code> reusing those listing queries (QP-4441 A3)</td><td><span class="tag tag-new">NEW API</span></td></tr>
+      <tr><td>Count answers</td><td>KPI numbers from <code>/api/product/statistic</code>, <code>/api/coa/statistic</code></td><td>client-side question → stat lookup; no AI</td><td><span class="tag tag-ok">EXISTS</span></td></tr>
+      <tr><td>"Mark compliant" in one tap</td><td>No such single action exists — disposition changes go through the COA modal on purpose</td><td>Ask-Q offers "Open COA management" instead; never silently changes a disposition</td><td><span class="tag tag-no">NOT IN V1</span></td></tr>
+      <tr><td>Natural-language → arbitrary filter (AI)</td><td>QP-4441 Phase B, behind <code>topBar_assist_01</code></td><td>later; answers above already cover the common questions</td><td><span class="tag tag-no">NOT IN V1</span></td></tr>
+      <tr><td>We Monitor company find</td><td>Companies dropdown / We Monitor search</td><td>second slice after products + COAs</td><td><span class="tag tag-no">NOT IN V1</span></td></tr>
+    </table></div>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.pane').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');document.getElementById(t.dataset.p).classList.add('on');
+  }));
+  function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';}
+</script>
+</body>
+</html>
