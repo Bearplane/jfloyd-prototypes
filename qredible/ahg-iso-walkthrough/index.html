@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AHG on Qredible: ISO day-one walkthrough (staging, Nov 20)</title>
+<style>
+  :root {
+    --blue: #2563eb;
+    --text: #1A202E;
+    --muted: #5b6474;
+    --line: #e3e7ee;
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --tint: #eef3fe;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Uber Move", "Uber Move Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px; line-height: 1.6;
+  }
+  a { color: var(--blue); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 80px; }
+  header.hero { padding: 48px 0 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--blue); margin: 0 0 8px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 0 0 16px; }
+  .intro { font-size: 18px; color: #2c3445; max-width: 760px; margin: 0; }
+  .note { margin-top: 16px; font-size: 14px; color: var(--muted); }
+  nav.toc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; margin: 8px 0 32px; }
+  nav.toc strong { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 6px; }
+  nav.toc ol { margin: 0; padding-left: 20px; }
+  nav.toc li { margin: 2px 0; }
+  section.part { margin-top: 48px; }
+  section.part > h2 { font-size: 24px; margin: 0 0 6px; padding-top: 8px; }
+  section.part > .lede { color: var(--muted); margin: 0 0 20px; max-width: 760px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 24px; align-items: start; }
+  .step-head { display: flex; gap: 12px; align-items: baseline; margin-bottom: 8px; }
+  .num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+  .step h3 { margin: 0; font-size: 18px; line-height: 1.3; }
+  .who { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--tint); color: var(--blue); margin-bottom: 10px; }
+  dl { margin: 0; }
+  dt { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-top: 10px; }
+  dd { margin: 2px 0 0; }
+  figure { margin: 0; }
+  figure a { display: block; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  figure img { display: block; width: 100%; height: auto; }
+  figure a:hover { border-color: var(--blue); }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 8px 20px; }
+  .next li { margin: 12px 0; }
+  .next .tag { font-size: 12px; font-weight: 600; color: var(--muted); }
+  footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
+  @media (max-width: 760px) {
+    h1 { font-size: 27px; }
+    .step { grid-template-columns: 1fr; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Qredible &middot; Partner program &middot; Staging</p>
+  <h1>AHG on Qredible: ISO day-one walkthrough (staging, Nov 20)</h1>
+  <p class="intro">This walkthrough follows Alternative Horizons Group (AHG), an independent sales organization (ISO) that works with WestTown Payments, through its first day on Qredible. Qredible switches on monitoring for AHG's plan, WestTown sets what AHG is allowed to do, and AHG then watches the 81 WestTown merchants assigned to it in view-only monitoring. AHG also adds a new merchant of its own and sends it to WestTown with a note, and WestTown accepts it with the status it chooses. Every screen below was captured on staging on November 20, 2026.</p>
+  <p class="note">Real merchant names, websites, emails and contacts are blurred. The merchant "ZZ-TEST AHG Prospect 20261120" is a test record created for this walkthrough. Click any screen to open it full size.</p>
+</header>
+
+<nav class="toc" aria-label="Sections">
+  <strong>Sections</strong>
+  <ol>
+    <li><a href="#setup">Setup (Qredible / WestTown)</a></li>
+    <li><a href="#monitor">AHG monitors WestTown's merchants (view only)</a></li>
+    <li><a href="#add">AHG adds its own merchants</a></li>
+    <li><a href="#send">AHG sends a merchant to WestTown</a></li>
+    <li><a href="#accept">WestTown reviews and accepts</a></li>
+    <li><a href="#next">What's next</a></li>
+  </ol>
+</nav>
+
+<!-- ============ SETUP ============ -->
+<section class="part" id="setup">
+  <h2>Setup (Qredible / WestTown)</h2>
+  <p class="lede">Two switches decide what an ISO can see: the screen has to be available on the ISO's plan, and the processor has to grant the permission on the relationship. Both are needed.</p>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">1</span><h3>Turn on assigned merchant monitoring for AHG's plan</h3></div>
+      <span class="who">Qredible staff &middot; Q-Config</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>In Q-Config, under Application Sources and plan access, a Qredible admin picks the ISO Onboarding plan (#44) and sets "Assigned merchant monitoring" to Available, then saves plan Source access.</dd>
+        <dt>What they see</dt>
+        <dd>The four ISO screens registered as Sources, each with its availability for this plan. Partner ISO relationship management stays Hidden; onboarding portfolio, the practice walkthrough and assigned merchant monitoring are Available.</dd>
+        <dt>Why it matters</dt>
+        <dd>The screen comes with the plan. No code change or deploy is needed to give an ISO the monitoring view, and it can be taken away the same way.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/00-qconfig-plan44-monitoring-available.jpg" target="_blank" rel="noopener"><img src="img/00-qconfig-plan44-monitoring-available.jpg" alt="Q-Config plan Source access with Assigned merchant monitoring set to Available on the ISO Onboarding plan" loading="lazy"></a>
+      <figcaption>Q-Config: plan Source access for ISO Onboarding (#44).</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">2</span><h3>WestTown opens its relationship with AHG</h3></div>
+      <span class="who">WestTown &middot; Partner Program, ISOs tab</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>WestTown opens Edit relationship for Alternative Horizons Group.</dd>
+        <dt>What they see</dt>
+        <dd>The ISO owner, the kind (Retail), the relationship state (Active), and a list of permitted capabilities. Before setup, only "View onboarding portfolio" is checked.</dd>
+        <dt>Why it matters</dt>
+        <dd>The processor stays in control. An ISO gets nothing beyond what the processor checks here.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/01-westtown-ahg-relationship-before.jpg" target="_blank" rel="noopener"><img src="img/01-westtown-ahg-relationship-before.jpg" alt="WestTown Edit relationship dialog for AHG before setup" loading="lazy"></a>
+      <figcaption>Edit relationship, before. The ISO owner email is blurred.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">3</span><h3>81 merchants are assigned to AHG</h3></div>
+      <span class="who">WestTown &middot; ISOs tab</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>WestTown saves the relationship and reviews the merchants assigned to AHG.</dd>
+        <dt>What they see</dt>
+        <dd>AHG shows as Retail, Active, with 81 assigned merchants. Below, each assigned merchant with its invitation, portal, MyCOA and completion status.</dd>
+        <dt>Why it matters</dt>
+        <dd>Assignment is explicit, merchant by merchant. AHG sees these 81 and no others from WestTown's book.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/02-westtown-isos-tab-assigned-81.jpg" target="_blank" rel="noopener"><img src="img/02-westtown-isos-tab-assigned-81.jpg" alt="WestTown ISOs tab showing AHG with 81 assigned merchants; merchant names and contacts blurred" loading="lazy"></a>
+      <figcaption>Merchant names, contacts and the ISO owner email are blurred.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">4</span><h3>WestTown's "Merchants sent by ISOs" inbox starts empty</h3></div>
+      <span class="who">WestTown &middot; ISOs tab</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Nothing yet. WestTown sees a new section under ISO relationships.</dd>
+        <dt>What they see</dt>
+        <dd>"Merchants sent by ISOs", filtered to Waiting for review, with the message "No merchants are waiting for review." The instructions explain that WestTown reviews each merchant and picks its status on accept: Active, Pending or Pre-underwriting.</dd>
+        <dt>Why it matters</dt>
+        <dd>Merchants that come from an ISO land in one review queue. Nothing joins WestTown's monitored book until WestTown accepts it.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/03-westtown-inbox-merchants-sent-by-isos.jpg" target="_blank" rel="noopener"><img src="img/03-westtown-inbox-merchants-sent-by-isos.jpg" alt="WestTown empty inbox for merchants sent by ISOs" loading="lazy"></a>
+      <figcaption>Empty review inbox.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">5</span><h3>WestTown grants two new permissions</h3></div>
+      <span class="who">WestTown &middot; Edit relationship</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>WestTown checks "View compliance monitoring" and can also check "Send merchants to processor", then confirms the review box and saves.</dd>
+        <dt>What they see</dt>
+        <dd>The same dialog, now with "Send merchants to processor" listed beside the other capabilities.</dd>
+        <dt>Why it matters</dt>
+        <dd>Monitoring and sending merchants are separate permissions. A processor can let an ISO watch without letting it submit merchants, or allow both.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/04-westtown-relationship-send-merchants-option.jpg" target="_blank" rel="noopener"><img src="img/04-westtown-relationship-send-merchants-option.jpg" alt="Edit relationship with View compliance monitoring and Send merchants to processor" loading="lazy"></a>
+      <figcaption>Edit relationship with the new capabilities. The ISO owner email is blurred.</figcaption>
+    </figure>
+  </article>
+</section>
+
+<!-- ============ MONITOR ============ -->
+<section class="part" id="monitor">
+  <h2>AHG monitors WestTown's merchants (view only)</h2>
+  <p class="lede">AHG opens We Monitor and sees WestTown's results for the 81 merchants assigned to it. It can read, search, filter and export. It cannot add notes, open cases or change anything.</p>
+
+  
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">6</span><h3>The assigned merchants appear first</h3></div>
+      <span class="who">AHG &middot; We Monitor, view only</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>With AHG selected, opens We Monitor. "Assigned by" shows WestTown Payments, LLC.</dd>
+        <dt>What they see</dt>
+        <dd>The merchant rows load right away with stage, license status, product compliance, COA counts, cases and MyCOA status, paged 1 to 25 of 81. The website compliance, scans and MRI columns are still filling in.</dd>
+        <dt>Why it matters</dt>
+        <dd>AHG sees its list straight away instead of waiting for every column. The page states that these are WestTown's current results and the time they were read.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/07-ahg-we-monitor-rows-first.jpg" target="_blank" rel="noopener"><img src="img/07-ahg-we-monitor-rows-first.jpg" alt="AHG view-only We Monitor with rows loaded first; merchant names blurred" loading="lazy"></a>
+      <figcaption>Merchant names, DBAs and websites are blurred.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">7</span><h3>Website compliance, scans and MRI fill in</h3></div>
+      <span class="who">AHG &middot; We Monitor, view only</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Waits a moment on the same page.</dd>
+        <dt>What they see</dt>
+        <dd>Website violations with severity, the latest website and product scan dates, and MRI risk signals with how many need review. Refresh and Export become available. There are no note, case or action controls.</dd>
+        <dt>Why it matters</dt>
+        <dd>AHG gets the same compliance picture WestTown sees for these merchants, so it can follow up with its merchants, while WestTown keeps sole control of decisions.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/08-ahg-we-monitor-columns-filled.jpg" target="_blank" rel="noopener"><img src="img/08-ahg-we-monitor-columns-filled.jpg" alt="AHG view-only We Monitor with website compliance, scans and MRI filled; merchant names blurred" loading="lazy"></a>
+      <figcaption>All columns filled. Merchant names, DBAs and websites are blurred.</figcaption>
+    </figure>
+  </article>
+</section>
+
+<!-- ============ ADD ============ -->
+<section class="part" id="add">
+  <h2>AHG adds its own merchants (create-only, no registry search)</h2>
+  <p class="lede">AHG also has its own monitoring list for merchants it brings in. It can create new merchants, but it cannot search or pull in companies that are already on Qredible.</p>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">8</span><h3>AHG's own We Monitor starts empty</h3></div>
+      <span class="who">AHG &middot; Q-Monitor, We Monitor</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Opens AHG's own We Monitor.</dd>
+        <dt>What they see</dt>
+        <dd>The standard tabs (Pre-Underwriting, Pending, Active, Off-Boarding, Archived), all at 0, with Add Company and Upload Companies at the top.</dd>
+        <dt>Why it matters</dt>
+        <dd>This list is separate from the 81 WestTown merchants. What AHG adds here belongs to AHG until it is sent to a processor.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/09-ahg-own-we-monitor-empty.jpg" target="_blank" rel="noopener"><img src="img/09-ahg-own-we-monitor-empty.jpg" alt="AHG's own empty We Monitor with Add Company and Upload Companies" loading="lazy"></a>
+      <figcaption>AHG's own list, empty.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">9</span><h3>Add Companies is create-only</h3></div>
+      <span class="who">AHG &middot; Add Companies</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Clicks Add Company.</dd>
+        <dt>What they see</dt>
+        <dd>One option, "Add new merchant", with the note that the account "adds new merchants only; it does not search companies already on the platform." New companies are added as Pending.</dd>
+        <dt>Why it matters</dt>
+        <dd>An ISO cannot browse or claim merchants that other customers already monitor on Qredible. That protects every other customer's book.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/10-ahg-add-company-create-only.jpg" target="_blank" rel="noopener"><img src="img/10-ahg-add-company-create-only.jpg" alt="Add Companies dialog with create-only message" loading="lazy"></a>
+      <figcaption>Create-only Add Companies dialog.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">10</span><h3>The new merchant is created</h3></div>
+      <span class="who">AHG &middot; Add Companies</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Enters the merchant's details (test merchant ZZ-TEST AHG Prospect 20261120, Washington DC, Hemp / CBD, Distributor) and confirms.</dd>
+        <dt>What they see</dt>
+        <dd>A success message and the merchant listed under Selected Companies, saved as Pending.</dd>
+        <dt>Why it matters</dt>
+        <dd>Adding a prospect takes one short form. No Qredible staff are involved.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/11-ahg-new-merchant-created.jpg" target="_blank" rel="noopener"><img src="img/11-ahg-new-merchant-created.jpg" alt="New test merchant created in Add Companies" loading="lazy"></a>
+      <figcaption>Test merchant created.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">11</span><h3>The merchant appears in AHG's Pending list</h3></div>
+      <span class="who">AHG &middot; We Monitor, Pending</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Opens the Pending tab.</dd>
+        <dt>What they see</dt>
+        <dd>Pending (1) with the test merchant, its location and industry tags, Not Scanned for website and product, and an MRI result that already shows 1 of 4 factors screened.</dd>
+        <dt>Why it matters</dt>
+        <dd>AHG can start vetting a prospect on Qredible before it ever reaches the processor.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/12-ahg-own-pending-merchant.jpg" target="_blank" rel="noopener"><img src="img/12-ahg-own-pending-merchant.jpg" alt="AHG Pending list with the test merchant" loading="lazy"></a>
+      <figcaption>AHG's Pending list.</figcaption>
+    </figure>
+  </article>
+</section>
+
+<!-- ============ SEND ============ -->
+<section class="part" id="send">
+  <h2>AHG sends a merchant to WestTown with a note</h2>
+  <p class="lede">On AHG's ISO onboarding page, below its assigned merchants, a new section lists the merchants AHG added itself and lets it send them to WestTown for review.</p>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">12</span><h3>"Send merchants to WestTown Payments, LLC"</h3></div>
+      <span class="who">AHG &middot; ISO onboarding</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Scrolls past the assigned merchants, writes an optional note for the processor, and clicks Send on the test merchant.</dd>
+        <dt>What they see</dt>
+        <dd>The merchants AHG added, each with its status with WestTown (here, Not sent), a search box, a note field and a Send to processor button.</dd>
+        <dt>Why it matters</dt>
+        <dd>The ISO hands a pre-vetted merchant to the processor inside Qredible, with context, instead of by email or spreadsheet.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/13-ahg-send-section.jpg" target="_blank" rel="noopener"><img src="img/13-ahg-send-section.jpg" alt="AHG send merchants to WestTown section; assigned merchant names and emails blurred" loading="lazy"></a>
+      <figcaption>Assigned merchant names and contact emails above are blurred.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">13</span><h3>Sent: waiting for the processor</h3></div>
+      <span class="who">AHG &middot; ISO onboarding</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Nothing more. AHG can Withdraw the request while it waits.</dd>
+        <dt>What they see</dt>
+        <dd>"1 merchant sent to WestTown Payments, LLC for review", and the status pill changes to Waiting for processor.</dd>
+        <dt>Why it matters</dt>
+        <dd>AHG always knows where each merchant stands with the processor.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/14-ahg-sent-waiting.jpg" target="_blank" rel="noopener"><img src="img/14-ahg-sent-waiting.jpg" alt="Merchant sent, status Waiting for processor; assigned merchant names and emails blurred" loading="lazy"></a>
+      <figcaption>Waiting for processor. Assigned merchant names and emails are blurred.</figcaption>
+    </figure>
+  </article>
+</section>
+
+<!-- ============ ACCEPT ============ -->
+<section class="part" id="accept">
+  <h2>WestTown reviews and accepts</h2>
+  <p class="lede">The request lands in WestTown's inbox. WestTown chooses the status the merchant gets in its own book, and AHG keeps view-only monitoring of it.</p>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">14</span><h3>The request from AHG arrives</h3></div>
+      <span class="who">WestTown &middot; Merchants sent by ISOs</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Opens the ISOs tab.</dd>
+        <dt>What they see</dt>
+        <dd>The test merchant, sent by Alternative Horizons Group on 11/20/2026 with AHG's note, the work AHG has done so far (0 website scans, 0 product scans), MyCOA status, and Accept or Decline.</dd>
+        <dt>Why it matters</dt>
+        <dd>WestTown sees who sent the merchant, why, and how much vetting has been done before it decides.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/15-westtown-inbox-request.jpg" target="_blank" rel="noopener"><img src="img/15-westtown-inbox-request.jpg" alt="WestTown inbox showing the request from AHG" loading="lazy"></a>
+      <figcaption>Request waiting for review. The ISO owner email is blurred.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">15</span><h3>WestTown picks the status: Active, Pending or Pre-underwriting</h3></div>
+      <span class="who">WestTown &middot; Accept dialog</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Clicks Accept and chooses a status.</dd>
+        <dt>What they see</dt>
+        <dd>"Choose the status this merchant will have in your monitored merchants. The ISO keeps its view-only monitoring." with Active, Pending and Pre-underwriting.</dd>
+        <dt>Why it matters</dt>
+        <dd>The processor decides where the merchant sits in its own underwriting flow. The ISO cannot place a merchant straight into Active.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/16-westtown-accept-status-choice.jpg" target="_blank" rel="noopener"><img src="img/16-westtown-accept-status-choice.jpg" alt="Accept dialog with Active, Pending and Pre-underwriting" loading="lazy"></a>
+      <figcaption>Status choice on accept.</figcaption>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div>
+      <div class="step-head"><span class="num">16</span><h3>Accepted as Pending</h3></div>
+      <span class="who">WestTown &middot; ISOs tab</span>
+      <dl>
+        <dt>What the user does</dt>
+        <dd>Confirms with Pending.</dd>
+        <dt>What they see</dt>
+        <dd>"ZZ-TEST AHG Prospect 20261120 accepted as Pending. It is now in your monitored merchants and stays visible to Alternative Horizons Group." The inbox is empty again.</dd>
+        <dt>Why it matters</dt>
+        <dd>One accept moves the merchant into WestTown's book, and AHG keeps watching it in view-only monitoring with no extra setup.</dd>
+      </dl>
+    </div>
+    <figure>
+      <a href="img/17-westtown-accepted-pending.jpg" target="_blank" rel="noopener"><img src="img/17-westtown-accepted-pending.jpg" alt="Merchant accepted as Pending; stays visible to AHG" loading="lazy"></a>
+      <figcaption>Accepted as Pending. The ISO owner email is blurred.</figcaption>
+    </figure>
+  </article>
+</section>
+
+<!-- ============ NEXT ============ -->
+<section class="part" id="next">
+  <h2>What's next</h2>
+  <p class="lede">Not part of today's flow. These are the next pieces planned for ISOs.</p>
+  <ul class="next">
+    <li><strong>Link to a merchant already on Qredible.</strong> When AHG's merchant is already a Qredible customer, AHG links to it instead of creating a duplicate, and sees only that merchant's published products and COAs.</li>
+    <li><strong>Scan linked merchants.</strong> Running website and product scans on linked merchants, as a permission WestTown grants on the relationship.</li>
+    <li><strong>AHG MyCOA invites.</strong> AHG invites its merchants to MyCOA. This comes with AHG's plan.</li>
+    <li><strong>Bulk upload.</strong> Adding many new merchants at once from a file, still create-only.</li>
+    <li><span class="tag">Future</span><br><strong>Multiple processors and processor policy sharing.</strong> One ISO working with more than one processor, and a processor sharing its compliance policy so the ISO vets merchants against the processor's own rules.</li>
+  </ul>
+</section>
+
+<footer>
+  Captured on Qredible staging, November 20, 2026. Real merchant data is blurred; the test merchant is synthetic.
+</footer>
+
+</div>
+</body>
+</html>
